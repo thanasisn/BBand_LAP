@@ -31,7 +31,7 @@ library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
 
 TEST <- FALSE
-TEST <- TRUE
+# TEST <- TRUE
 
 cat("\n Initialize DB or import  PySolar  Sun data\n\n")
 
@@ -132,12 +132,16 @@ for (YYYY in unique(year(inp_filelist$day))) {
                                    pysolar_mtime    = file.mtime(ss$fullname),
                                    pysolar_parsed   = Sys.time())
             ## aggregate data
-            gather     <- rbind(gather,     sun_temp, fill = TRUE )
+            if (nrow(gather) == 0) {
+                gather     <- rbind(gather, sun_temp, fill = TRUE )
+            } else {
+                gather     <- rows_upsert(gather, sun_temp, by = "Date" )
+            }
             gathermeta <- rbind(gathermeta, sun_meta)
             rm(sun_temp, sun_meta, ss)
         }
 
-        BB_meta <- rows_upsert(BB_meta, gathermeta, by = "day")
+        BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
         # BBdaily <- rows_patch(BBdaily, gathermeta, by = "day", unmatched = "ignore")
 
         setorder(gather, Date)

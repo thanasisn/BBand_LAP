@@ -31,7 +31,7 @@ library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
 
 TEST <- FALSE
-TEST <- TRUE
+# TEST <- TRUE
 
 cat("\n Import  CM-21  data\n\n")
 
@@ -190,12 +190,13 @@ for (YYYY in unique(year(inp_filelist$day))) {
                                     cm21_md5sum     = as.vector(md5sum(ss$fullname)))
 
             # gather <- rows_patch(gather, day_data, by = "Date")
+            # gather     <- rows_update(gather, day_data, by = "Date")
             gather     <- rows_upsert(gather, day_data, by = "Date")
             gathermeta <- rbind(gathermeta, file_meta)
             rm(day_data, file_meta, ss, lap)
         }
 
-        BB_meta <- rows_upsert(BB_meta, gathermeta, by = "day")
+        BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
         # BBdaily <- rows_patch(BBdaily, gathermeta, by = "day", unmatched = "ignore")
 
         setorder(gather, Date)

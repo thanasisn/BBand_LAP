@@ -29,19 +29,29 @@ source("~/BBand_LAP/build_db/Build_DB02_cm21.R")
 source("~/BBand_LAP/build_db/Build_DB03_chp1.R")
 
 
-#
-# BB <- arrow::open_dataset(DB_DIR, unify_schemas = T)
-# arrow::write_dataset(dataset = BB, path = DB_DIR,
-#                      format       = "parquet",
-#                      partitioning = c("year", "month"),
-#                      hive_style   = FALSE)
-#
-#
-#
-# BB %>% filter(!is.na(SZA))       %>% nrow()
-# BB %>% filter(!is.na(CM21_sig))  %>% nrow()
-# BB %>% filter(!is.na(CHP1_sig))  %>% nrow()
 
+BB <- arrow::open_dataset(DB_DIR,
+                          unify_schemas = T,
+                          hive_style = FALSE,
+                          partitioning = c("year", "month"))
+
+arrow::write_dataset(dataset = BB, path = DB_DIR,
+                     format       = "parquet",
+                     partitioning = c("year", "month"),
+                     hive_style   = FALSE)
+
+
+BB %>% filter(!is.na(SZA))      %>% nrow()
+BB %>% filter(!is.na(CM21_sig)) %>% nrow()
+BB %>% filter(!is.na(CHP1_sig)) %>% nrow()
+
+
+BB <- BB %>% mutate(newcol = CM21_sig + CHP1_sig ) %>% collect()
+
+# library(data.table)
+
+BB <- BB %>% mutate(newcol = CM21_sig + CHP1_sig) %>% compute()
+# BB %>% select(Date) %>% as_datetime()
 
 
 tac <- Sys.time()
