@@ -21,7 +21,7 @@ DB_DIR        <- "~/ZHOST/Broad_Band_BD"
 DB_lock       <- "~/ZHOST/Broad_Band_BD.stopfile"
 DB_META_fl    <- "~/ZHOST/Broad_Band_metadata.parquet"
 # DB_start_date <- as.Date("1993-04-01")
-DB_start_date <- as.Date("2022-04-01")
+DB_start_date <- as.Date("2022-01-01")
 
 
 

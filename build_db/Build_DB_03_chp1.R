@@ -31,7 +31,7 @@ library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
 
 TEST <- FALSE
-# TEST <- TRUE
+TEST <- TRUE
 
 cat("\n Import  CHP-1  data\n\n")
 
@@ -114,7 +114,7 @@ if (TEST) {
     cat("\nTEST MODE IS ON!!  ", Script.Name, "\n\n")
     inp_filelist <- unique(rbind(
         inp_filelist[ 1:30 ],
-        inp_filelist[sample(1:nrow(inp_filelist), 30)],
+        # inp_filelist[sample(1:nrow(inp_filelist), 30)],
         NULL
     ))
     setorder(inp_filelist, day)
