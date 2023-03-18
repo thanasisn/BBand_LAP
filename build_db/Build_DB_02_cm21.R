@@ -114,7 +114,7 @@ if (TEST) {
     cat("\nTEST MODE IS ON!!  ", Script.Name, "\n\n")
     inp_filelist <- unique(rbind(
         inp_filelist[ 1:60 ],
-        # inp_filelist[sample(1:nrow(inp_filelist), 60)],
+        inp_filelist[sample(1:nrow(inp_filelist), 60)],
         NULL
     ))
     setorder(inp_filelist, day)

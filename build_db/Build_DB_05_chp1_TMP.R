@@ -15,7 +15,7 @@ Script.Name <- tryCatch({funr::sys.script()},
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -45,35 +45,25 @@ if (file.exists(DB_META_fl)) {
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
     ## new columns
-    var <- "chp1_basename"
+    var <- "chp1_temp_basename"
     if (!any(names(BB_meta) == var)) {
         BB_meta[[var]] <- NA
         BB_meta[[var]] <- as.character(BB_meta[[var]])
     }
-    var <- "chp1_md5sum"
+    var <- "chp1_temp_md5sum"
     if (!any(names(BB_meta) == var)) {
         BB_meta[[var]] <- NA
         BB_meta[[var]] <- as.character(BB_meta[[var]])
     }
-    var <- "chp1_mtime"
+    var <- "chp1_temp_mtime"
     if (!any(names(BB_meta) == var)) {
         BB_meta[[var]] <- NA
         BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
     }
-    var <- "chp1_parsed"
+    var <- "chp1_temp_parsed"
     if (!any(names(BB_meta) == var)) {
         BB_meta[[var]] <- NA
         BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    }
-    var <- "chp1_sig_NAs"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.integer(BB_meta[[var]])
-    }
-    var <- "chp1_sig_sd_NAs"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.integer(BB_meta[[var]])
     }
 } else {
     stop("STAR A NEW DB!!")
@@ -81,33 +71,32 @@ if (file.exists(DB_META_fl)) {
 
 
 
-##  Get CHP-1 files  --------------------------------------------------------
-inp_filelist <- list.files(path        = SIRENA_DIR,
+##  Get tracker sync files  --------------------------------------------------------
+inp_filelist <- list.files(path        = CHPTMP_DIR,
                            recursive   = TRUE,
-                           pattern     = "[0-9]*03.LAP$",
+                           pattern     = "sun_tracker_.*.therm$",,
                            ignore.case = TRUE,
                            full.names  = TRUE )
-cat("\n**Found:",paste(length(inp_filelist), "CHP-1 files from Sirena**\n"))
-## just in case, there are nested folders with more lap files in Sirens
-inp_filelist <- grep("OLD", inp_filelist, ignore.case = T, invert = T, value = T )
+cat("\n**Found:",paste(length(inp_filelist), "CHP-1 temperature files**\n"))
 
 
 
 inp_filelist <- data.table(fullname = inp_filelist)
-inp_filelist[, chp1_basename := basename(fullname)]
-stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$chp1_basename))) == FALSE )
+inp_filelist[, chp1_temp_basename := basename(fullname)]
+stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$chp1_temp_basename))) == FALSE )
+
 
 inp_filelist$day <- as.Date(parse_date_time(
-    sub("03\\..*", "", inp_filelist$chp1_basename),
-    "dmy"))
+    sub("\\.therm", "", sub("sun_tracker_", "", inp_filelist$chp1_temp_basename)),
+    "Ymd"))
 setorder(inp_filelist, day)
-cat("\n**Found:",paste(nrow(inp_filelist), "CHP-1 files**\n"))
+cat("\n**Found:",paste(nrow(inp_filelist), "CHP-1 temperature files**\n"))
 
 ## only new files in the date range
-inp_filelist <- inp_filelist[!inp_filelist$chp1_basename %in% BB_meta$chp1_basename]
+inp_filelist <- inp_filelist[!inp_filelist$chp1_temp_basename %in% BB_meta$chp1_temp_basename]
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 
-cat("\n**Parse:",paste(nrow(inp_filelist), "CHP-1 files**\n\n"))
+cat("\n**Parse:",paste(nrow(inp_filelist), "CHP-1 temperature files**\n\n"))
 
 ## test random
 if (TEST) {
@@ -136,15 +125,10 @@ for (YYYY in unique(year(inp_filelist$day))) {
             cat(" Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## add columns for this set
-            var <- "CHP1_sig"
+            var <- "Async_tracker"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
-                gather[[var]] <- as.numeric(gather[[var]])
-            }
-            var <- "CHP1_sig_sd"
-            if (!any(names(gather) == var)) {
-                gather[[var]] <- NA
-                gather[[var]] <- as.numeric(gather[[var]])
+                gather[[var]] <- as.logical(gather[[var]])
             }
             var <- "year"
             if (!any(names(gather) == var)) {
@@ -168,42 +152,56 @@ for (YYYY in unique(year(inp_filelist$day))) {
         for (ad in submonth$day) {
             ss <- submonth[day == ad]
 
+            asyncstp <- rep( NA,    1440 )
+            async    <- rep( FALSE, 1440 )
+
             suppressWarnings(rm(D_minutes))
             D_minutes <- seq(from       = as.POSIXct(paste(as_date(ad), "00:00:30 UTC")),
                              length.out = 1440,
                              by         = "min" )
+stop()
 
-            ## __  Read LAP file  --------------------------------------------------
-            lap   <- fread(ss$fullname, na.strings = "-9")
-            lap$V1 <- as.numeric(lap$V1)
-            lap$V2 <- as.numeric(lap$V2)
-            stopifnot(is.numeric(lap$V1))
-            stopifnot(is.numeric(lap$V2))
-            stopifnot(dim(lap)[1] == 1440)
-            lap[V1 < -8, V1 := NA]
-            lap[V2 < -8, V2 := NA]
+            ## __  Read CHP-1 temperature file  --------------------------------
 
-            ## get data
-            day_data <- data.table(Date        = D_minutes,      # Date of the data point
-                                   year        = year(D_minutes),
-                                   month       = month(D_minutes),
-                                   CHP1_sig    = lap$V1,         # Raw value for CHP1
-                                   CHP1_sig_sd = lap$V2)         # Raw SD value for CHP1
 
-            ## get metadata
-            file_meta <- data.table(day             = as_date(ad),
-                                    chp1_basename   = basename(ss$fullname),
-                                    chp1_mtime      = file.mtime(ss$fullname),
-                                    chp1_parsed     = Sys.time(),
-                                    chp1_sig_NAs    = sum(is.na(day_data$CHP1_sig)),
-                                    chp1_sig_sd_NAs = sum(is.na(day_data$CHP1_sig)),
-                                    chp1_md5sum     = as.vector(md5sum(ss$fullname)))
+
+            Temp        <- rep(NA, 1440)  # CHP1 temperature
+            TempSD      <- rep(NA, 1440)  # Standard Deviation
+            TempUNC     <- rep(NA, 1440)  # Measurement uncertainty
+            RmeasuError <- rep(NA, 1440)  # Measurement uncertainty
+
+            temp_temp    <- unique(read.table( found, sep = "\t", as.is = TRUE))
+            temp_temp$V1 <- as.POSIXct( temp_temp$V1 )
+            temp_temp$V1 <- as.POSIXct( format( temp_temp$V1, format = "%F %R" ) )
+            temp_temp$V1 <- temp_temp$V1 + 30
+            temp_temp$V3[ temp_temp$V3 == 0 ] <- NA
+
+            temp_temp    <- data.table(temp_temp)
+            temp_temp    <- temp_temp[, .( V2 = mean(V2, na.rm = T),
+                                           V3 = mean(V3, na.rm = T) ), by = V1 ]
+
+
+
+
+
+
+            day_data <- data.frame(Date          = D_minutes,
+                                   year          = year(D_minutes),
+                                   month         = month(D_minutes),
+                                   Async_tracker = async)
+
+            ## get file metadata
+            file_meta <- data.table(day                = as_date(ad),
+                                    chp1_temp_basename = basename(ss$fullname),
+                                    chp1_temp_mtime    = file.mtime(ss$fullname),
+                                    chp1_temp_parsed   = Sys.time(),
+                                    chp1_temp_md5sum   = as.vector(md5sum(ss$fullname)))
 
             # gather <- rows_patch(gather, day_data, by = "Date")
-            # gather     <- rows_update(gather, day_data, by = "Date")
             gather     <- rows_upsert(gather, day_data, by = "Date")
             gathermeta <- rbind(gathermeta, file_meta)
-            rm(day_data, file_meta, ss, lap)
+            rm(day_data, file_meta, ss)
+            rm(async, async_minu, syc_temp, uniq_async, stepgo, stepis, min_ind)
         }
 
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
@@ -224,6 +222,6 @@ rm(inp_filelist)
 
 
 
-myunlock(DB_lock)
+# myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
