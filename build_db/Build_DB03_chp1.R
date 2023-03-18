@@ -1,30 +1,33 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
+
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({ funr::sys.script() },
-                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CHP1_R10_db_build_") })
+Script.Name <- tryCatch({funr::sys.script()},
+                        error = function(e) {
+                            cat(paste("\nUnresolved script name: ", e),"\n\n")
+                            return("CHP1_R10_db_build_")
+                        })
 
 
-source("~/CHP_1_DIR/DEFINITIONS_db.R")
-dblock <- flock::lock(paste0(DB_DIR, ".lock"), exclusive = TRUE)
-
+source("~/BBand_LAP/DEFINITIONS.R")
+source("~/CODE/FUNCTIONS/R/execlock.R")
+mylock(DB_lock)
 
 
 if (!interactive()) {
-    pdf( file = paste0("~/CHP_1_DIR/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/CHP_1_DIR/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+    pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+    sink(file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-library(arrow)
-library(dplyr)
-library(lubridate)
-library(data.table)
-library(tools)
+library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
+library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
+library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
+library(data.table, warn.conflicts = TRUE, quietly = TRUE)
+library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
 
 TEST <- FALSE
@@ -172,6 +175,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
 
             ## get data
             day_data <- data.table(Date        = D_minutes,      # Date of the data point
+                                   year        = year(D_minutes),
+                                   month       = month(D_minutes),
                                    CHP1_sig    = lap$V1,         # Raw value for CHP1
                                    CHP1_sig_sd = lap$V2)         # Raw SD value for CHP1
 
@@ -190,7 +195,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
             rm(day_data, file_meta, ss, lap)
         }
 
-        # rows_upsert(BB_meta, gathermeta, by = "day")
         BB_meta <- rows_upsert(BB_meta, gathermeta, by = "day")
         # BBdaily <- rows_patch(BBdaily, gathermeta, by = "day", unmatched = "ignore")
 
@@ -209,6 +213,6 @@ rm(inp_filelist)
 
 
 
-flock::unlock(dblock)
+myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
