@@ -31,7 +31,7 @@ library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
 
 TEST <- FALSE
-TEST <- TRUE
+# TEST <- TRUE
 
 cat("\n Import  CHP-1  data\n\n")
 

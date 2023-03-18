@@ -31,7 +31,7 @@ library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
 
 TEST <- FALSE
-TEST <- TRUE
+# TEST <- TRUE
 
 cat("\n Import  CHP-1  data\n\n")
 
@@ -86,7 +86,6 @@ inp_filelist <- data.table(fullname = inp_filelist)
 inp_filelist[, chp1_sync_basename := basename(fullname)]
 stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$chp1_sync_basename))) == FALSE )
 
-sub("\\.snc", "", sub("sun_tracker_", "", inp_filelist$chp1_sync_basename))
 
 inp_filelist$day <- as.Date(parse_date_time(
     sub("\\.snc", "", sub("sun_tracker_", "", inp_filelist$chp1_sync_basename)),

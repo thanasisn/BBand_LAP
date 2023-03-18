@@ -15,7 +15,7 @@ Script.Name <- tryCatch({funr::sys.script()},
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -31,7 +31,7 @@ library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
 
 TEST <- FALSE
-TEST <- TRUE
+# TEST <- TRUE
 
 cat("\n Import  CHP-1  data\n\n")
 
@@ -81,6 +81,7 @@ cat("\n**Found:",paste(length(inp_filelist), "CHP-1 temperature files**\n"))
 
 
 
+
 inp_filelist <- data.table(fullname = inp_filelist)
 inp_filelist[, chp1_temp_basename := basename(fullname)]
 stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$chp1_temp_basename))) == FALSE )
@@ -125,10 +126,15 @@ for (YYYY in unique(year(inp_filelist$day))) {
             cat(" Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## add columns for this set
-            var <- "Async_tracker"
+            var <- "chp1_R_therm"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
-                gather[[var]] <- as.logical(gather[[var]])
+                gather[[var]] <- as.numeric(gather[[var]])
+            }
+            var <- "chp1_R_SD_therm"
+            if (!any(names(gather) == var)) {
+                gather[[var]] <- NA
+                gather[[var]] <- as.numeric(gather[[var]])
             }
             var <- "year"
             if (!any(names(gather) == var)) {
@@ -152,25 +158,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
         for (ad in submonth$day) {
             ss <- submonth[day == ad]
 
-            asyncstp <- rep( NA,    1440 )
-            async    <- rep( FALSE, 1440 )
-
-            suppressWarnings(rm(D_minutes))
-            D_minutes <- seq(from       = as.POSIXct(paste(as_date(ad), "00:00:30 UTC")),
-                             length.out = 1440,
-                             by         = "min" )
-stop()
-
             ## __  Read CHP-1 temperature file  --------------------------------
-
-
-
-            Temp        <- rep(NA, 1440)  # CHP1 temperature
-            TempSD      <- rep(NA, 1440)  # Standard Deviation
-            TempUNC     <- rep(NA, 1440)  # Measurement uncertainty
-            RmeasuError <- rep(NA, 1440)  # Measurement uncertainty
-
-            temp_temp    <- unique(read.table( found, sep = "\t", as.is = TRUE))
+            temp_temp    <- read.table(ss$fullname, sep = "\t", as.is = TRUE)
             temp_temp$V1 <- as.POSIXct( temp_temp$V1 )
             temp_temp$V1 <- as.POSIXct( format( temp_temp$V1, format = "%F %R" ) )
             temp_temp$V1 <- temp_temp$V1 + 30
@@ -180,15 +169,11 @@ stop()
             temp_temp    <- temp_temp[, .( V2 = mean(V2, na.rm = T),
                                            V3 = mean(V3, na.rm = T) ), by = V1 ]
 
-
-
-
-
-
-            day_data <- data.frame(Date          = D_minutes,
-                                   year          = year(D_minutes),
-                                   month         = month(D_minutes),
-                                   Async_tracker = async)
+            day_data <- data.frame(Date            = temp_temp$V1,
+                                   year            = year(temp_temp$V1),
+                                   month           = month(temp_temp$V1),
+                                   chp1_R_therm    = temp_temp$V2,
+                                   chp1_R_SD_therm = temp_temp$V3 )
 
             ## get file metadata
             file_meta <- data.table(day                = as_date(ad),
@@ -201,7 +186,7 @@ stop()
             gather     <- rows_upsert(gather, day_data, by = "Date")
             gathermeta <- rbind(gathermeta, file_meta)
             rm(day_data, file_meta, ss)
-            rm(async, async_minu, syc_temp, uniq_async, stepgo, stepis, min_ind)
+            rm(temp_temp)
         }
 
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
@@ -222,6 +207,6 @@ rm(inp_filelist)
 
 
 
-# myunlock(DB_lock)
+myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
