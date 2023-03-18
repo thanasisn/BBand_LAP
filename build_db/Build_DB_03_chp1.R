@@ -146,6 +146,16 @@ for (YYYY in unique(year(inp_filelist$day))) {
                 gather[[var]] <- NA
                 gather[[var]] <- as.numeric(gather[[var]])
             }
+            var <- "year"
+            if (!any(names(gather) == var)) {
+                gather[[var]] <- NA
+                gather[[var]] <- as.integer(gather[[var]])
+            }
+            var <- "month"
+            if (!any(names(gather) == var)) {
+                gather[[var]] <- NA
+                gather[[var]] <- as.integer(gather[[var]])
+            }
         } else {
             cat("Skipping new rows data inport", partfile, "\n")
             next()

@@ -15,7 +15,7 @@ Script.Name <- tryCatch({funr::sys.script()},
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -44,44 +44,34 @@ if (file.exists(DB_META_fl)) {
                      by = "day",
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
-    # ## new columns
-    # var <- "chp1_basename"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.character(BB_meta[[var]])
-    # }
-    # var <- "chp1_md5sum"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.character(BB_meta[[var]])
-    # }
-    # var <- "chp1_mtime"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    # }
-    # var <- "chp1_parsed"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    # }
-    # var <- "chp1_sig_NAs"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.integer(BB_meta[[var]])
-    # }
-    # var <- "chp1_sig_sd_NAs"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.integer(BB_meta[[var]])
-    # }
+    ## new columns
+    var <- "chp1_sync_basename"
+    if (!any(names(BB_meta) == var)) {
+        BB_meta[[var]] <- NA
+        BB_meta[[var]] <- as.character(BB_meta[[var]])
+    }
+    var <- "chp1_sync_md5sum"
+    if (!any(names(BB_meta) == var)) {
+        BB_meta[[var]] <- NA
+        BB_meta[[var]] <- as.character(BB_meta[[var]])
+    }
+    var <- "chp1_sync_mtime"
+    if (!any(names(BB_meta) == var)) {
+        BB_meta[[var]] <- NA
+        BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
+    }
+    var <- "chp1_sync_parsed"
+    if (!any(names(BB_meta) == var)) {
+        BB_meta[[var]] <- NA
+        BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
+    }
 } else {
     stop("STAR A NEW DB!!")
 }
 
 
 
-##  Get CHP-1 files  --------------------------------------------------------
+##  Get tracker sync files  --------------------------------------------------------
 inp_filelist <- list.files(path        = trSYNC_DIR,
                            recursive   = TRUE,
                            pattern     = "sun_tracker_.*.snc$",
@@ -137,15 +127,20 @@ for (YYYY in unique(year(inp_filelist$day))) {
             cat(" Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## add columns for this set
-            var <- "chp1_sync_sig"
+            var <- "Async_tracker"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
-                gather[[var]] <- as.numeric(gather[[var]])
+                gather[[var]] <- as.logical(gather[[var]])
             }
-            var <- "chp1_sync_sig_sd"
+            var <- "year"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
-                gather[[var]] <- as.numeric(gather[[var]])
+                gather[[var]] <- as.integer(gather[[var]])
+            }
+            var <- "month"
+            if (!any(names(gather) == var)) {
+                gather[[var]] <- NA
+                gather[[var]] <- as.integer(gather[[var]])
             }
         } else {
             cat("Skipping new rows data inport", partfile, "\n")
@@ -167,11 +162,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
                              length.out = 1440,
                              by         = "min" )
 
-stop()
-
-            ####TODO we should use step files as more reliable to detect async events!!!
-            # stp_temp = read.table(stpfilename, sep = "\t", as.is = TRUE, na.strings = "None")
-
+            ## __  Read tracker sync file  -------------------------------------
+            ## TODO we should use step files as more reliable to detect async events!!!
             syc_temp    <- read.table(ss$fullname, sep = "\t", as.is = TRUE, na.strings = "None")
             syc_temp$V1 <- as.POSIXct(syc_temp$V1)
             async_minu  <- as.POSIXct(format(syc_temp$V1,format = "%F %R"))  ## async end
@@ -200,34 +192,23 @@ stop()
                                   D_minutes >= syc_temp$async_start[ ik ]  ) ] <- TRUE
             }
 
-            day_data <- data.frame(Date = D_minutes,
-                                   Async = async)
+            day_data <- data.frame(Date          = D_minutes,
+                                   year          = year(D_minutes),
+                                   month         = month(D_minutes),
+                                   Async_tracker = async)
 
-
-
-
-            ## __  Read LAP file  --------------------------------------------------
-
-            ## get data
-            day_data <- data.table(Date        = D_minutes,      # Date of the data point
-                                   year        = year(D_minutes),
-                                   month       = month(D_minutes),
-                                   chp1_sync_sig    = lap$V1,         # Raw value for CHP1
-                                   chp1_sync_sig_sd = lap$V2)         # Raw SD value for CHP1
-
-            ## get metadata
-            file_meta <- data.table(day             = as_date(ad),
-                                    chp1_sync_basename   = basename(ss$fullname),
-                                    chp1_sync_mtime      = file.mtime(ss$fullname),
-                                    chp1_sync_parsed     = Sys.time(),
-                                    chp1_sync_sig_NAs    = sum(is.na(day_data$CHP1_sig)),
-                                    chp1_sync_sig_sd_NAs = sum(is.na(day_data$CHP1_sig)),
-                                    chp1_sync_md5sum     = as.vector(md5sum(ss$fullname)))
+            ## get file metadata
+            file_meta <- data.table(day                = as_date(ad),
+                                    chp1_sync_basename = basename(ss$fullname),
+                                    chp1_sync_mtime    = file.mtime(ss$fullname),
+                                    chp1_sync_parsed   = Sys.time(),
+                                    chp1_sync_md5sum   = as.vector(md5sum(ss$fullname)))
 
             # gather <- rows_patch(gather, day_data, by = "Date")
             gather     <- rows_upsert(gather, day_data, by = "Date")
             gathermeta <- rbind(gathermeta, file_meta)
-            rm(day_data, file_meta, ss, lap)
+            rm(day_data, file_meta, ss)
+            rm(async, async_minu, syc_temp, uniq_async, stepgo, stepis, min_ind)
         }
 
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
