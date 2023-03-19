@@ -16,7 +16,7 @@ Script.Name <- tryCatch({funr::sys.script()},
 source("~/CHP_1_DIR/Functions_CHP1.R")
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -189,6 +189,9 @@ for (YYYY in unique(year(inp_filelist$day))) {
             temp_temp    <- data.table(temp_temp)
             temp_temp    <- temp_temp[, .( V2 = mean(V2, na.rm = T),
                                            V3 = mean(V3, na.rm = T) ), by = V1 ]
+
+            temp_temp[V2 < 0, V2 := NA]
+            temp_temp[V2 < 0, V3 := NA]
 
             day_data <- data.frame(Date                = temp_temp$V1,
                                    year                = year(temp_temp$V1),
