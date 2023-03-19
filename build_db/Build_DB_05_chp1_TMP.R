@@ -13,9 +13,10 @@ Script.Name <- tryCatch({funr::sys.script()},
                         })
 
 
+source("~/CHP_1_DIR/Functions_CHP1.R")
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -33,7 +34,7 @@ library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 TEST <- FALSE
 # TEST <- TRUE
 
-cat("\n Import  CHP-1  data\n\n")
+cat("\n Import  CHP-1 temperature data\n\n")
 
 ##  Initialize meta data file  -------------------------------------------------
 if (file.exists(DB_META_fl)) {
@@ -136,6 +137,26 @@ for (YYYY in unique(year(inp_filelist$day))) {
                 gather[[var]] <- NA
                 gather[[var]] <- as.numeric(gather[[var]])
             }
+            var <- "chp1_R_meas_ERR"
+            if (!any(names(gather) == var)) {
+                gather[[var]] <- NA
+                gather[[var]] <- as.numeric(gather[[var]])
+            }
+            var <- "chp1_temperature"
+            if (!any(names(gather) == var)) {
+                gather[[var]] <- NA
+                gather[[var]] <- as.numeric(gather[[var]])
+            }
+            var <- "chp1_temperature_SD"
+            if (!any(names(gather) == var)) {
+                gather[[var]] <- NA
+                gather[[var]] <- as.numeric(gather[[var]])
+            }
+            var <- "chp1_temp_UNC"
+            if (!any(names(gather) == var)) {
+                gather[[var]] <- NA
+                gather[[var]] <- as.numeric(gather[[var]])
+            }
             var <- "year"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
@@ -169,11 +190,15 @@ for (YYYY in unique(year(inp_filelist$day))) {
             temp_temp    <- temp_temp[, .( V2 = mean(V2, na.rm = T),
                                            V3 = mean(V3, na.rm = T) ), by = V1 ]
 
-            day_data <- data.frame(Date            = temp_temp$V1,
-                                   year            = year(temp_temp$V1),
-                                   month           = month(temp_temp$V1),
-                                   chp1_R_therm    = temp_temp$V2,
-                                   chp1_R_SD_therm = temp_temp$V3 )
+            day_data <- data.frame(Date                = temp_temp$V1,
+                                   year                = year(temp_temp$V1),
+                                   month               = month(temp_temp$V1),
+                                   chp1_R_therm        = temp_temp$V2,
+                                   chp1_R_SD_therm     = temp_temp$V3,
+                                   chp1_R_meas_ERR     = Protek_506_R_error(    temp_temp$V2),
+                                   chp1_temperature    = CHP_thermistor_R_to_T( temp_temp$V2),
+                                   chp1_temperature_SD = CHP_thermistor_ResUnc_to_TempUnc(temp_temp$V2, temp_temp$V3))
+            day_data$chp1_temp_UNC <- CHP_thermistor_ResUnc_to_TempUnc(temp_temp$V2, day_data$chp1_R_meas_ERR)
 
             ## get file metadata
             file_meta <- data.table(day                = as_date(ad),

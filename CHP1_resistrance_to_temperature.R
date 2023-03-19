@@ -37,12 +37,54 @@ BB <- arrow::open_dataset(DB_DIR,
                           hive_style = FALSE,
                           partitioning = c("year", "month"))
 
+BB <- BB %>% collect() %>%
+    mutate(chp1_R_therm = replace(chp1_R_therm, which(chp1_R_therm < 0L), NA))
 
 
 
+
+BB %>% select(chp1_R_therm) %>% collect() %>% summary()
+
+
+
+BB %>% glimpse()
+
+BB %>% select(chp1_R_therm) %>% collect() %>%  filter(is.na())
+
+BB %>% select(chp1_R_therm) %>% Protek_506_R_error()
+
+Protek_506_R_error(collect(select(BB, chp1_R_therm)))
+
+Protek_506_R_error()
+
+
+
+summarise(BB, max(chp1_R_therm, na.rm = T)) %>% collect()
+summarise(BB, max(chp1_R_therm, na.rm = T), n = n()) %>% collect()
+
+BB <- BB %>% collect() %>%
+    mutate(CHP1_temperature = CHP_thermistor_R_to_T(chp1_R_therm))
+
+any(names(BB) == "CHP1_temperature")
+ BB %>% filter(is.na(CHP1_temperature) & !is.na(chp1_R_therm) )
+
+
+BB %>% filter(!is.na(CHP1_temperature))
 
 
 stop()
+
+
+
+# day_data <- data.frame(Date         = temp_temp$V1,
+#                        CHP1RmeasERR = Protek_506_R_error(    temp_temp$V2),
+#                        CHP1temp     = CHP_thermistor_R_to_T( temp_temp$V2),
+#                        CHP1tempSD   = CHP_thermistor_ResUnc_to_TempUnc(temp_temp$V2, temp_temp$V3))
+# day_data$CHP1tempUNC      <- CHP_thermistor_ResUnc_to_TempUnc(temp_temp$V2, day_data$CHP1RmeasERR )
+# day_data$CHP1Resistance   <- temp_temp$V2
+# day_data$CHP1ResistanceSD <- temp_temp$V3
+
+
 BB %>% glimpse()
 
 write_dataset(dataset = BB, path = DB_DIR,
