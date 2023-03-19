@@ -1,6 +1,15 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
+#'
+#' Read PySolar files `sun_path_.*.dat.gz`
+#'
+#' Populates:
+#'  - Date
+#'  - Azimuth
+#'  - Elevat
+#'  - SZA
+#'
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
@@ -9,14 +18,12 @@ tic <- Sys.time()
 Script.Name <- tryCatch({funr::sys.script()},
                         error = function(e) {
                             cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CHP1_R10_db_build_")
+                            return("Buid_DB_01_")
                         })
-
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
-
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -28,7 +35,6 @@ library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
-
 
 TEST <- FALSE
 # TEST <- TRUE
@@ -154,8 +160,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
     rm(subyear)
 }
 rm(inp_filelist)
-
-
 
 
 

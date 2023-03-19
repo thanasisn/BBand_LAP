@@ -1,6 +1,14 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
+#'
+#' Reads tracker synchronization data form `sun_tracker_.*.snc$`
+#'
+#' Populates:
+#'  - Async_tracker
+#'
+#' There are more data but are parsed here
+#'
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
@@ -9,14 +17,12 @@ tic <- Sys.time()
 Script.Name <- tryCatch({funr::sys.script()},
                         error = function(e) {
                             cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CHP1_R10_db_build_")
+                            return("Buid_DB_04_")
                         })
-
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
-
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -28,7 +34,6 @@ library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
-
 
 TEST <- FALSE
 # TEST <- TRUE
@@ -71,7 +76,7 @@ if (file.exists(DB_META_fl)) {
 
 
 
-##  Get tracker sync files  --------------------------------------------------------
+##  Get tracker sync files  ----------------------------------------------------
 inp_filelist <- list.files(path        = trSYNC_DIR,
                            recursive   = TRUE,
                            pattern     = "sun_tracker_.*.snc$",
@@ -79,13 +84,9 @@ inp_filelist <- list.files(path        = trSYNC_DIR,
                            full.names  = TRUE )
 cat("\n**Found:",paste(length(inp_filelist), "tracker sync files**\n"))
 
-
-
-
 inp_filelist <- data.table(fullname = inp_filelist)
 inp_filelist[, chp1_sync_basename := basename(fullname)]
 stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$chp1_sync_basename))) == FALSE )
-
 
 inp_filelist$day <- as.Date(parse_date_time(
     sub("\\.snc", "", sub("sun_tracker_", "", inp_filelist$chp1_sync_basename)),
@@ -111,7 +112,8 @@ if (TEST) {
 }
 
 
-##  Import CHP-1 files  00------------------------------------------------------
+
+##  Import CHP-1 files  --------------------------------------------------------
 for (YYYY in unique(year(inp_filelist$day))) {
     subyear <- inp_filelist[year(day) == YYYY]
     ## months to do
@@ -223,8 +225,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
     rm(subyear)
 }
 rm(inp_filelist)
-
-
 
 
 

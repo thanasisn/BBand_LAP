@@ -9,7 +9,7 @@ tic <- Sys.time()
 Script.Name <- tryCatch({funr::sys.script()},
                         error = function(e) {
                             cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CHP1_R10_db_build_")
+                            return("Buid_DB_05_")
                         })
 
 
@@ -111,14 +111,14 @@ if (TEST) {
 }
 
 
-##  Import CHP-1 files  00------------------------------------------------------
+##  Import CHP-1 files  ------------------------------------------------------
 for (YYYY in unique(year(inp_filelist$day))) {
     subyear <- inp_filelist[year(day) == YYYY]
     ## months to do
     for (mm in subyear[, unique(month(day))]) {
         submonth <- subyear[month(day) == mm]
         ## export file name and hive dir
-        filedir <- paste0(DB_DIR, "/", YYYY, "/", mm, "/" )
+        filedir <- paste0(DB_DIR, "/", YYYY, "/", mm, "/")
         dir.create(filedir, recursive = TRUE, showWarnings = FALSE)
         partfile <- paste0(filedir, "/part-0.parquet")
         ## init data collector

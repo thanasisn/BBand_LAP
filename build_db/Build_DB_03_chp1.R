@@ -1,6 +1,13 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
+#'
+#' Read CHP-1 signal from `[0-9]*03.LAP$`
+#'
+#' Populates:
+#'  - CHP1_sig
+#'  - CHP1_sig_sd
+#'
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
@@ -9,14 +16,12 @@ tic <- Sys.time()
 Script.Name <- tryCatch({funr::sys.script()},
                         error = function(e) {
                             cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CHP1_R10_db_build_")
+                            return("Buid_DB_03_")
                         })
-
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
-
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -28,7 +33,6 @@ library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
-
 
 TEST <- FALSE
 # TEST <- TRUE
@@ -89,13 +93,12 @@ inp_filelist <- list.files(path        = SIRENA_DIR,
                            full.names  = TRUE )
 cat("\n**Found:",paste(length(inp_filelist), "CHP-1 files from Sirena**\n"))
 ## just in case, there are nested folders with more lap files in Sirens
-inp_filelist <- grep("OLD", inp_filelist, ignore.case = T, invert = T, value = T )
-
+inp_filelist <- grep("OLD", inp_filelist, ignore.case = T, invert = T, value = T)
 
 
 inp_filelist <- data.table(fullname = inp_filelist)
 inp_filelist[, chp1_basename := basename(fullname)]
-stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$chp1_basename))) == FALSE )
+stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$chp1_basename))) == FALSE)
 
 inp_filelist$day <- as.Date(parse_date_time(
     sub("03\\..*", "", inp_filelist$chp1_basename),
@@ -119,6 +122,7 @@ if (TEST) {
     ))
     setorder(inp_filelist, day)
 }
+
 
 
 ##  Import CHP-1 files  00------------------------------------------------------
@@ -219,8 +223,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
     rm(subyear)
 }
 rm(inp_filelist)
-
-
 
 
 

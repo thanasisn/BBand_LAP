@@ -1,6 +1,13 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
+#'
+#' Reads CM-21 signal from `[0-9]*06.LAP$``
+#'
+#' Populates:
+#'  - CM21_sig
+#'  - CM21_sig_sd
+#'
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
@@ -9,14 +16,12 @@ tic <- Sys.time()
 Script.Name <- tryCatch({funr::sys.script()},
                         error = function(e) {
                             cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CHP1_R10_db_build_")
+                            return("Buid_DB_02_")
                         })
-
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
-
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -28,7 +33,6 @@ library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
-
 
 TEST <- FALSE
 # TEST <- TRUE
@@ -81,7 +85,7 @@ if (file.exists(DB_META_fl)) {
 
 
 
-##  Get CM-21 files  --------------------------------------------------------
+##  Get CM-21 files  -----------------------------------------------------------
 inp_filelist <- list.files(path        = SIRENA_GLB,
                            recursive   = TRUE,
                            pattern     = "[0-9]*06.LAP$",
@@ -90,8 +94,6 @@ inp_filelist <- list.files(path        = SIRENA_GLB,
 cat("\n**Found:",paste(length(inp_filelist), "CM-21 files from Sirena**\n"))
 ## just in case, there are nested folders with more lap files in Sirens
 inp_filelist <- grep("OLD", inp_filelist, ignore.case = T, invert = T, value = T )
-
-
 
 inp_filelist <- data.table(fullname = inp_filelist)
 inp_filelist[, cm21_basename := basename(fullname)]
@@ -121,7 +123,8 @@ if (TEST) {
 }
 
 
-##  Import CM-21 files  00------------------------------------------------------
+
+##  Import CM-21 files  --------------------------------------------------------
 for (YYYY in unique(year(inp_filelist$day))) {
     subyear <- inp_filelist[year(day) == YYYY]
     ## months to do
@@ -219,8 +222,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
     rm(subyear)
 }
 rm(inp_filelist)
-
-
 
 
 
