@@ -21,8 +21,8 @@ RADMON_DIR <- "~/DATA_RAW/Raddata/3"
 DB_DIR        <- "~/ZHOST/Broad_Band_BD"
 DB_lock       <- "~/ZHOST/Broad_Band_BD.stopfile"
 DB_META_fl    <- "~/ZHOST/Broad_Band_metadata.parquet"
-# DB_start_date <- as.Date("1991-01-01")   ## <- start in 1993-01-19!!!!!
-DB_start_date <- as.Date("2016-01-01")
+DB_start_date <- as.Date("1991-01-01")   ## <- start in 1993-01-19!!!!!
+# DB_start_date <- as.Date("2016-01-01")
 
 
 

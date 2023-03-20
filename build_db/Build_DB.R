@@ -32,6 +32,8 @@ source("~/BBand_LAP/build_db/Build_DB_06_cm21_TOT.R")
 
 stop()
 
+
+
 # library(arrow)
 # BB_meta <- read_parquet(DB_META_fl)
 # BB_meta$chp1_temp_basename <- NULL
