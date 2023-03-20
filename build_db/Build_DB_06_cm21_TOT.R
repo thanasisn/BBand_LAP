@@ -102,6 +102,7 @@ inp_filelist$day <- as.Date(parse_date_time(
 setorder(inp_filelist, day)
 cat("\n**Found:",paste(nrow(inp_filelist), "TOT CM-21 files**\n"))
 
+
 ## only new files in the date range
 inp_filelist <- inp_filelist[!inp_filelist$tot_cm21_basename %in% BB_meta$tot_cm21_basename]
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
