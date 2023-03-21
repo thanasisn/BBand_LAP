@@ -114,7 +114,17 @@ for (i in 1:nrow(ranges_CHP1)) {
     upper <- ranges_CHP1$Until[  i]
     comme <- ranges_CHP1$Comment[i]
 
+    BB %>% filter( Date >= lower & Date < upper ) %>% collect()
 
+    BB %>% mutate(chp1_bad_data = replace(chp1_bad_data,
+                                          Date >= lower & Date < upper & is.na(chp1_bad_data),
+                                          comme))
+
+    BB %>% mutate(chp1_bad_data = if_else(Date >= lower & Date < upper & is.na(chp1_bad_data),
+                                   NA,
+                                   comme) ) %>% collect()
+
+    stop()
     ## mark bad regions of data
     # rawdata[Date >= lower & Date < upper, Bad_ranges := comme]
 }
