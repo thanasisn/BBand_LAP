@@ -81,20 +81,46 @@ cat('\n\n')
 ## - if works move column creation elsewhere
 
 
-BB <- arrow::open_dataset(DB_DIR,
-                          unify_schemas = TRUE,
-                          hive_style    = FALSE,
-                          partitioning  = c("year", "month"))
-
-
-
-
-## create new column
-var <- "chp1_bad_data"
-if (any(names(BB) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.character(BB_meta[[var]])
+opendata <- function() {
+    open_dataset(sources       = DB_DIR,
+                 unify_schemas = TRUE,
+                 hive_style    = FALSE,
+                 partitioning  = c("year", "month"))
 }
+
+writedata <- function(.) {
+    write_dataset(., path         = DB_DIR,
+                  format       = "parquet",
+                  partitioning = c("year", "month"),
+                  hive_style   = FALSE)
+}
+
+
+BB <- opendata()
+# BB %>% writedata()
+
+
+## create new column if not exist
+var <- "chp1_bad_data"
+if (!any(names(BB) == var)) {
+    BB %>%
+        mutate(chp1_bad_data = as.factor(NA)) %>%
+        writedata()
+}
+
+
+for (i in 1:nrow(ranges_CHP1)) {
+    lower <- ranges_CHP1$From[   i]
+    upper <- ranges_CHP1$Until[  i]
+    comme <- ranges_CHP1$Comment[i]
+
+
+    ## mark bad regions of data
+    # rawdata[Date >= lower & Date < upper, Bad_ranges := comme]
+}
+
+
+
 
 BB[["Ff"]] <- "dd"
 
