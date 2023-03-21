@@ -115,35 +115,46 @@ for (ay in yearstodo) {
         ami = 4
         ## pull data to work
         datapart <- BB %>% filter(year == ay & month == ami) %>% compute()
-        datapart <- as_tibble(datapart)
-
+        datapart <- as.data.table(datapart)
 
         for (i in 1:nrow(ranges_CHP1)) {
             lower <- ranges_CHP1$From[   i]
             upper <- ranges_CHP1$Until[  i]
             comme <- ranges_CHP1$Comment[i]
             ## mark bad regions of data
-            # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
-            tempex <- data.table(Date = seq(lower, upper - 60, by = "min"),
-                                 chp1_bad_data = as.factor(comme))
+            datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
 
+
+            # tempex <- data.table(Date = seq(lower, upper - 60, by = "min"),
+            #                      chp1_bad_data = as.factor(comme))
+            # dd<-datapart %>%
+            #     filter(Date >= lower & Date < upper & is.na(chp1_bad_data)) %>%
+            #     mutate(chp1_bad_data = as.factor(comme), .keep = "all") %>% compute()
+            # datapart <- datapart %>%
+            #     mutate(chp1_bad_data = ifelse((datapart$Date >= lower & datapart$Date < upper),
+            #                                    NA,
+            #                                    comme) , .keep = "all") %>% collect()
             # datapart <- rows_patch(datapart, tempex, by = "Date", unmatched = "ignore")
             # datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
             # datapart <- rows_upsert(datapart, tempex, by = "Date")
-
-            datapart$chp1_bad_data <- NULL
-            datapart <- left_join(datapart, tempex)
-
-
+            # datapart <- left_join(datapart, tempex, by = Date)
             # datapart %>%
             #     filter(Date >= lower & Date < upper) %>%
             #     mutate(chp1_bad_data = as.factor(comme)) %>%
             #     compute()
             #
-            datapart %>% filter(!is.na(chp1_bad_data)) %>% collect()
-
+            # datapart %>% filter(!is.na(chp1_bad_data)) %>% collect()
+            # datapart %>% filter(Date >= lower & Date < upper) %>% collect()
         }
 
+
+        as_arrow_table(datapart) %>% filter(!is.na(chp1_bad_data)) %>% collect()
+
+        aaa<-BB %>% filter(!is.na(chp1_bad_data)) %>% collect()
+
+        ## works but updates file unnecessary
+        datapart <- as_arrow_table(datapart)
+        datapart %>% writedata()
 
 
         # datapart %>% collect()
