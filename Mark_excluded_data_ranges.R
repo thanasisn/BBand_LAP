@@ -109,33 +109,57 @@ if (!any(names(BB) == var)) {
 }
 
 
+yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
+for (ay in yearstodo) {
+    for (am in 1:12) {
+
+    }
+}
+
+
+
+
+stop()
 for (i in 1:nrow(ranges_CHP1)) {
     lower <- ranges_CHP1$From[   i]
     upper <- ranges_CHP1$Until[  i]
     comme <- ranges_CHP1$Comment[i]
 
-    BB %>% filter( Date >= lower & Date < upper ) %>% collect()
 
-    BB %>% mutate(chp1_bad_data = replace(chp1_bad_data,
-                                          Date >= lower & Date < upper & is.na(chp1_bad_data),
-                                          comme))
+    tempex <- data.table(Date = seq(lower, upper - 60, by = "min"),
+                         chp1_bad_data = comme)
 
-    BB %>% mutate(chp1_bad_data = if_else(Date >= lower & Date < upper & is.na(chp1_bad_data),
-                                   NA,
-                                   comme) ) %>% collect()
+    DD <- to_duckdb(BB)
+    rows_patch(DD, tempex, by = "Date", copy = TRUE)
 
-    stop()
+    BB %>%
+        filter(Date >= lower & Date < upper) %>%
+        mutate(chp1_bad_data = as.factor(comme)) %>%
+        collect()
+
+    # BB %>%
+    #     filter( Date >= lower & Date < upper ) %>% collect()
+    #
+    # BB %>% mutate(chp1_bad_data = replace(chp1_bad_data,
+    #                                       Date >= lower & Date < upper & is.na(chp1_bad_data),
+    #                                       comme))
+    #
+    BB %>% mutate(chp1_bad_data = if_else(Date >= lower && Date < upper && is.na(chp1_bad_data),
+                                          "pass",
+                                          comme) , .keep = "all") %>% compute()
+    # stop()
     ## mark bad regions of data
     # rawdata[Date >= lower & Date < upper, Bad_ranges := comme]
 }
 
 
 
+BB %>% filter(!is.na(chp1_bad_data)) %>% collect()
+BB %>% select(chp1_bad_data) %>% collect()
+BB %>% select(Date) %>% collect()
 
-BB[["Ff"]] <- "dd"
 
-BB$create("dd")
-
+BB %>% filter(Date >= lower) %>% collect()
 
 yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
 
