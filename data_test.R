@@ -39,6 +39,11 @@ BB <- arrow::open_dataset(DB_DIR,
                           hive_style = FALSE,
                           partitioning = c("year", "month"))
 
+
+BB %>% summarise(min(Date)) %>% collect()
+
+dd <- BB %>% filter(year == 1992) %>% select(Date, tot_glb) %>% collect()
+
 stop()
 BB %>% glimpse()
 

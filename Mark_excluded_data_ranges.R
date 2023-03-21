@@ -81,6 +81,30 @@ cat('\n\n')
 ## - if works move column creation elsewhere
 
 
+BB <- arrow::open_dataset(DB_DIR,
+                          unify_schemas = TRUE,
+                          hive_style    = FALSE,
+                          partitioning  = c("year", "month"))
+
+
+
+
+## create new column
+var <- "chp1_bad_data"
+if (any(names(BB) == var)) {
+        BB_meta[[var]] <- NA
+        BB_meta[[var]] <- as.character(BB_meta[[var]])
+}
+
+BB[["Ff"]] <- "dd"
+
+BB$create("dd")
+
+
+yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
+
+
+
 
 
 
