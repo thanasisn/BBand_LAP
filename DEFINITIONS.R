@@ -14,6 +14,11 @@ trSYNC_DIR <- "~/DATA_RAW/tracker_chp1/tracker_SYNC"
 CHPTMP_DIR <- "~/DATA_RAW/tracker_chp1/Tracker_THERM"
 SIRENA_TOT <- "~/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
 
+
+CM21_EXCLUDE <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CM21.dat"
+CHP1_EXCLUDE <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CHP1.dat"
+CHP1_TEMP_EX <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CHP1_Temp.dat"
+
 RADMON_DIR <- "~/DATA_RAW/Raddata/3"
 
 
