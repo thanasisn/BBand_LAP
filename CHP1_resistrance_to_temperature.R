@@ -15,7 +15,9 @@ Script.Name <- tryCatch({funr::sys.script()},
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
+on.exit(myunlock(DB_lock))
+
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -90,6 +92,6 @@ BB %>% write_dataset(path = DB_DIR,
                      hive_style   = FALSE)
 
 
-myunlock(DB_lock)
+
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

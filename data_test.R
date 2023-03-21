@@ -14,6 +14,11 @@ Script.Name <- tryCatch({funr::sys.script()},
 
 
 source("~/BBand_LAP//DEFINITIONS.R")
+source("~/CODE/FUNCTIONS/R/execlock.R")
+mylock(DB_lock)
+on.exit(myunlock(DB_lock))
+
+
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
