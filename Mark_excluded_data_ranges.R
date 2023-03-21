@@ -108,11 +108,48 @@ if (!any(names(BB) == var)) {
         writedata()
 }
 
-
+## touch only needed
 yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
 for (ay in yearstodo) {
-    for (am in 1:12) {
+    for (ami in 1:12) {
+        ami = 4
+        ## pull data to work
+        datapart <- BB %>% filter(year == ay & month == ami) %>% compute()
+        datapart <- as_tibble(datapart)
 
+
+        for (i in 1:nrow(ranges_CHP1)) {
+            lower <- ranges_CHP1$From[   i]
+            upper <- ranges_CHP1$Until[  i]
+            comme <- ranges_CHP1$Comment[i]
+            ## mark bad regions of data
+            # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
+            tempex <- data.table(Date = seq(lower, upper - 60, by = "min"),
+                                 chp1_bad_data = as.factor(comme))
+
+            # datapart <- rows_patch(datapart, tempex, by = "Date", unmatched = "ignore")
+            # datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
+            # datapart <- rows_upsert(datapart, tempex, by = "Date")
+
+            datapart$chp1_bad_data <- NULL
+            datapart <- left_join(datapart, tempex)
+
+
+            # datapart %>%
+            #     filter(Date >= lower & Date < upper) %>%
+            #     mutate(chp1_bad_data = as.factor(comme)) %>%
+            #     compute()
+            #
+            datapart %>% filter(!is.na(chp1_bad_data)) %>% collect()
+
+        }
+
+
+
+        # datapart %>% collect()
+        # datapart %>% writedata()
+
+        stop()
     }
 }
 
@@ -129,8 +166,6 @@ for (i in 1:nrow(ranges_CHP1)) {
     tempex <- data.table(Date = seq(lower, upper - 60, by = "min"),
                          chp1_bad_data = comme)
 
-    DD <- to_duckdb(BB)
-    rows_patch(DD, tempex, by = "Date", copy = TRUE)
 
     BB %>%
         filter(Date >= lower & Date < upper) %>%
