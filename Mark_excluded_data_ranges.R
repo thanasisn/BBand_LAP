@@ -33,8 +33,6 @@ library(pander)
 
 ## CHP-1 exclusions ------------------------------------------------------------
 
-
-
 ranges_CHP1       <- read.table(CHP1_EXCLUDE,
                                 sep          = ";",
                                 colClasses   = "character",
@@ -47,40 +45,40 @@ ranges_CHP1$Until <- as.POSIXct(strptime(ranges_CHP1$Until, format = "%F %H:%M",
 ## check negative ranges
 if (!all((ranges_CHP1$Until - ranges_CHP1$From) >= 1)) {
     pander(ranges_CHP1[ !ranges_CHP1$From < ranges_CHP1$Until, ])
-    stop("Inverted ranges in ", CHP1_EXCLUDE ,"!!!")
+    stop("Inverted ranges in ", CHP1_EXCLUDE, "!!!")
 }
 ## capitalize
 ranges_CHP1$Comment <- sub("(.)", "\\U\\1", ranges_CHP1$Comment, perl = TRUE)
-
-ranges_CHP1$HourSpan <- as.numeric(ranges_CHP1$Until - ranges_CHP1$From) / 3600
 ranges_CHP1$Comment[ranges_CHP1$Comment == ""] <- "NO DESCRIPTION"
-
-#'
-#' Check inverted time ranges
-#'
-#+ include=T, echo=F
-
-
+## compute time span
+ranges_CHP1$HourSpan <- as.numeric(ranges_CHP1$Until - ranges_CHP1$From) / 3600
 
 
 #'
 #' Check time ranges span in hours
 #'
 #+ include=T, echo=F
-hist(ranges$HourSpan)
+
+hist(ranges_CHP1$HourSpan)
 cat('\n\n')
-temp <- ranges[ ranges$HourSpan > 12 , ]
+
+temp <- ranges_CHP1[ ranges_CHP1$HourSpan > 12 , ]
 row.names(temp) <- NULL
 pander( temp )
+
 cat('\n\n')
-pander(data.table(table(ranges$Comment)))
+pander(data.table(table(ranges_CHP1$Comment)))
 cat('\n\n')
 
 
 
 
 
-
+## todo
+## - create a factor column
+## - fill column with data
+## - try to fill by year / month?
+## - if works move column creation elsewhere
 
 
 
