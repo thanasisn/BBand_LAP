@@ -44,8 +44,9 @@ cat("\n Initialize DB or import  PySolar  Sun data\n\n")
 if (file.exists(DB_META_fl)) {
     BB_meta <- read_parquet(DB_META_fl)
     BB_meta <- merge(BB_meta,
-                     data.table(day = seq(max(BB_meta$day), Sys.Date(),
-                                          by = "day")),
+                     data.table(day = seq(from = max(BB_meta$day),
+                                          to   = Sys.Date(),
+                                          by   = "day")),
                      by = "day",
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
@@ -126,8 +127,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
             names(sun_temp)[names(sun_temp) == "DATE"] <- "Date"
             names(sun_temp)[names(sun_temp) == "AZIM"] <- "Azimuth"
             names(sun_temp)[names(sun_temp) == "ELEV"] <- "Elevat"
-            sun_temp[, DIST := NULL]
-            sun_temp[, SZA  := 90 - Elevat]
+            sun_temp[, DIST  := NULL]
+            sun_temp[, SZA   := 90 - Elevat]
             sun_temp[, year  := year( Date)]
             sun_temp[, month := month(Date)]
             sun_temp[, doy   := yday( Date)]
@@ -138,9 +139,12 @@ for (YYYY in unique(year(inp_filelist$day))) {
                                    pysolar_parsed   = Sys.time())
             ## aggregate data
             if (nrow(gather) == 0) {
-                gather     <- rbind(gather, sun_temp, fill = TRUE )
+                ## this inits the database table!!
+                gather     <- as_tibble(sun_temp)
+                # stop()
+                # gather     <- rbind(gather, sun_temp, fill = TRUE)
             } else {
-                gather     <- rows_upsert(gather, sun_temp, by = "Date" )
+                gather     <- rows_upsert(gather, sun_temp, by = "Date")
             }
             gathermeta <- rbind(gathermeta, sun_meta)
             rm(sun_temp, sun_meta, ss)

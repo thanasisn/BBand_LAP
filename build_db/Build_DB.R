@@ -6,11 +6,7 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({funr::sys.script()},
-                        error = function(e) {
-                            cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CHP1_001_")
-                        })
+Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
 
 
 source("~/BBand_LAP//DEFINITIONS.R")

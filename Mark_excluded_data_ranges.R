@@ -1,6 +1,7 @@
-#!/usr/bin/env Rscript
+#!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
+dd <- ""
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
@@ -155,21 +156,34 @@ BB <- opendata()
 # BB %>% writedata()
 
 
+BB |> glimpse()
+
+BB <- BB |> mutate(chp1_bad_data = as.factor(NA)) |> compute()
+BB |> writedata()
+
+stop()
 
 ##  Create new column if not exist in the dataset  -----------------------------
 var <- "chp1_bad_data"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
-    BB %>%
-        mutate(chp1_bad_data = as.character(NA)) %>%
-        writedata()
+    # BB %>%
+    #     mutate(chp1_bad_data = as.character(NA)) %>%
+    #     compute() %>%
+    #     writedata()
+    BB <- BB |> mutate(chp1_bad_data = as.character(NA)) |> compute()
+    BB |> writedata()
+
 }
 var <- "cm21_bad_data"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
-    BB %>%
-        mutate(cm21_bad_data = as.character(NA)) %>%
-        writedata()
+    # BB %>%
+    #     mutate(cm21_bad_data = as.character(NA)) %>%
+    #     compute() %>%
+    #     writedata()
+    BB <- BB |> mutate(cm21_bad_data = as.character(NA)) |> compute()
+    BB |> writedata()
 }
 
 
@@ -203,65 +217,60 @@ if (file.exists(DB_META_fl)) {
 
 
 
-## Flag exclusions -------------------------------------------------------------
-
-filelist <- list.files(DB_DIR,
-                       pattern = "*.parquet",
-                       recursive  = TRUE,
-                       full.names = TRUE)
-
-
-for (af in filelist) {
-    datapart <- read_parquet(af)
-
-    ## flag data
-    for (i in 1:nrow(ranges_CHP1)) {
-        lower  <- ranges_CHP1$From[   i]
-        upper  <- ranges_CHP1$Until[  i]
-        comme  <- ranges_CHP1$Comment[i]
-        tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                             chp1_bad_data = comme)
-
-        ## mark bad regions of data
-        datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
-
-        # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
-        rm(tempex)
-    }
-
-    for (i in 1:nrow(ranges_CM21)) {
-        lower  <- ranges_CM21$From[   i]
-        upper  <- ranges_CM21$Until[  i]
-        comme  <- ranges_CM21$Comment[i]
-        tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                             cm21_bad_data = comme)
-
-        ## mark bad regions of data
-        datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
-        # datapart[Date >= lower & Date < upper, cm21_bad_data := comme]
-        rm(tempex)
-    }
-
-
-    chg_days <- unique(as.Date(datapart$Date))
-
-    ## flag metadata
-    BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime]
-    BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime]
-
-
-    stop()
-    to_arrow(datapart)
-    as_tibble(datapart)
-    arrow_table(as_tibble(datapart))
-arrow_table(datapart)
-
-stop()
-    write_parquet(x = datapart, sink = af)
-
-
-    stop()
-}
+# ## Flag exclusions -------------------------------------------------------------
+#
+# filelist <- list.files(DB_DIR,
+#                        pattern = "*.parquet",
+#                        recursive  = TRUE,
+#                        full.names = TRUE)
+#
+#
+# for (af in filelist) {
+#     datapart <- read_parquet(af)
+#
+#     ## flag data
+#     for (i in 1:nrow(ranges_CHP1)) {
+#         lower  <- ranges_CHP1$From[   i]
+#         upper  <- ranges_CHP1$Until[  i]
+#         comme  <- ranges_CHP1$Comment[i]
+#         tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+#                              chp1_bad_data = comme)
+#
+#         ## mark bad regions of data
+#         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
+#
+#         # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
+#         rm(tempex)
+#     }
+#
+#     for (i in 1:nrow(ranges_CM21)) {
+#         lower  <- ranges_CM21$From[   i]
+#         upper  <- ranges_CM21$Until[  i]
+#         comme  <- ranges_CM21$Comment[i]
+#         tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+#                              cm21_bad_data = comme)
+#
+#         ## mark bad regions of data
+#         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
+#         # datapart[Date >= lower & Date < upper, cm21_bad_data := comme]
+#         rm(tempex)
+#     }
+# stop()
+#
+#     chg_days <- unique(as.Date(datapart$Date))
+#
+#     ## flag metadata
+#     BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime]
+#     BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime]
+#
+#
+#
+# stop()
+#     write_parquet(x = datapart, sink = af)
+#
+#
+#     stop()
+# }
 
 
 
@@ -315,17 +324,17 @@ yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
            #   collect()
 
             ## update values only part
-            temp <- BB %>%
-                filter(year %in% yearsvec & Date >= lower & Date < upper & is.na(chp1_bad_data)) %>%
-                mutate(chp1_bad_data = comme, .keep = "all") %>%
-                collect()
-
-            temp <- to_duckdb(as_tibble(temp))
-
-
-            DB <- to_duckdb(BB)
-            CC <- rows_update(DB , temp, by = "Date", unmatched = "ignore" ) %>% compute() %>%
-                  to_arrow()
+            # temp <- BB %>%
+            #     filter(year %in% yearsvec & Date >= lower & Date < upper & is.na(chp1_bad_data)) %>%
+            #     mutate(chp1_bad_data = comme, .keep = "all") %>%
+            #     collect()
+            #
+            # temp <- to_duckdb(as_tibble(temp))
+            #
+            #
+            # DB <- to_duckdb(BB)
+            # CC <- rows_update(DB , temp, by = "Date", unmatched = "ignore" ) %>% compute() %>%
+            #       to_arrow()
 
             stop()
             # right_join(BB, as_tibble(temp), by = join_by(Date), keep = T) %>% compute()
@@ -369,14 +378,18 @@ for (i in 1:nrow(ranges_CHP1)) {
     comme <- ranges_CHP1$Comment[i]
 
 
-    tempex <- data.table(Date = seq(lower, upper - 60, by = "min"),
+    tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
                          chp1_bad_data = comme)
 
 
-    BB %>%
-        filter(Date >= lower & Date < upper) %>%
-        mutate(chp1_bad_data = as.factor(comme)) %>%
-        collect()
+    rows_update(to_duckdb(BB), tempex, by = "Date")
+
+    BB <- left_join(BB, tempex, by = "Date") %>% compute()
+
+    # BB %>%
+    #     filter(Date >= lower & Date < upper) %>%
+    #     mutate(chp1_bad_data = as.factor(comme)) %>%
+    #     collect()
 
     # BB %>%
     #     filter( Date >= lower & Date < upper ) %>% collect()
@@ -384,27 +397,30 @@ for (i in 1:nrow(ranges_CHP1)) {
     # BB %>% mutate(chp1_bad_data = replace(chp1_bad_data,
     #                                       Date >= lower & Date < upper & is.na(chp1_bad_data),
     #                                       comme))
-    #
-    BB %>% mutate(chp1_bad_data = if_else(Date >= lower && Date < upper && is.na(chp1_bad_data),
-                                          "pass",
-                                          comme) , .keep = "all") %>% compute()
+
+    ## ~ work??
+    # BB <- BB %>% mutate(chp1_bad_data = if_else(Date >= lower & Date < upper,
+    #                                             "OK",
+    #                                             comme), .keep = "all") %>% compute()
     # stop()
     ## mark bad regions of data
-    # rawdata[Date >= lower & Date < upper, Bad_ranges := comme]
+
 }
 
 
 
 BB %>% filter(!is.na(chp1_bad_data)) %>% collect()
-BB %>% select(chp1_bad_data) %>% collect()
+BB %>% select(chp1_bad_data) %>% unique() %>% collect()
+BB %>% select(cm21_bad_data) %>% unique() %>% collect()
+
 BB %>% select(Date) %>% collect()
 
 
 BB %>% filter(Date >= lower) %>% collect()
 
+BB |> glimpse()
 
-
-
+aa <- as_tibble(BB)
 
 
 
