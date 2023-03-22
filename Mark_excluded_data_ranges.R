@@ -31,8 +31,8 @@ library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 library(pander)
 
 
-## CHP-1 exclusions ------------------------------------------------------------
-
+## Load CHP-1 exclusions -------------------------------------------------------
+chp1_exclude_mtime <- file.mtime(CHP1_EXCLUDE)
 ranges_CHP1       <- read.table(CHP1_EXCLUDE,
                                 sep          = ";",
                                 colClasses   = "character",
@@ -51,7 +51,7 @@ if (!all((ranges_CHP1$Until - ranges_CHP1$From) >= 1)) {
 ranges_CHP1$Comment <- sub("(.)", "\\U\\1", ranges_CHP1$Comment, perl = TRUE)
 ranges_CHP1$Comment[ranges_CHP1$Comment == ""] <- "NO DESCRIPTION"
 ## compute time span
-ranges_CHP1$HourSpan <- as.numeric(ranges_CHP1$Until - ranges_CHP1$From) / 3600
+ranges_CHP1$HourSpan <- (as.numeric(ranges_CHP1$Until) - as.numeric(ranges_CHP1$From)) / 3600
 
 
 #'
@@ -69,6 +69,64 @@ pander( temp )
 cat('\n\n')
 pander(data.table(table(ranges_CHP1$Comment)))
 cat('\n\n')
+
+
+
+
+
+
+## Load CM-21 exclusions -------------------------------------------------------
+cm21_exclude_mtime <- file.mtime(CM21_EXCLUDE)
+ranges_CM21       <- read.table(CM21_EXCLUDE,
+                                sep          = ";",
+                                colClasses   = "character",
+                                strip.white  = TRUE,
+                                header       = TRUE,
+                                comment.char = "#" )
+ranges_CM21$From  <- as.POSIXct(strptime(ranges_CM21$From,  format = "%F %H:%M", tz = "UTC"))
+ranges_CM21$Until <- as.POSIXct(strptime(ranges_CM21$Until, format = "%F %H:%M", tz = "UTC"))
+
+## check negative ranges
+if (!all((ranges_CM21$Until - ranges_CM21$From) >= 1)) {
+    pander(ranges_CM21[ !ranges_CM21$From < ranges_CM21$Until, ])
+    stop("Inverted ranges in ", CM21_EXCLUDE, "!!!")
+}
+## capitalize
+ranges_CM21$Comment <- sub("(.)", "\\U\\1", ranges_CM21$Comment, perl = TRUE)
+ranges_CM21$Comment[ranges_CM21$Comment == ""] <- "NO DESCRIPTION"
+## compute time span
+ranges_CM21$HourSpan <- (as.numeric(ranges_CM21$Until) - as.numeric(ranges_CM21$From)) / 3600
+
+
+#'
+#' Check time ranges span in hours
+#'
+#+ include=T, echo=F
+
+hist(ranges_CM21$HourSpan)
+cat('\n\n')
+
+temp <- ranges_CM21[ ranges_CM21$HourSpan > 12 , ]
+row.names(temp) <- NULL
+pander( temp )
+
+cat('\n\n')
+pander(data.table(table(ranges_CM21$Comment)))
+cat('\n\n')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -100,14 +158,99 @@ BB <- opendata()
 # BB %>% writedata()
 
 
-## create new column if not exist
+
+##  Create new column if not exist in the dataset  -----------------------------
 var <- "chp1_bad_data"
 if (!any(names(BB) == var)) {
+    cat("Create column  ", var ,"  in dataset\n")
     BB %>%
         mutate(chp1_bad_data = as.character(NA)) %>%
         writedata()
 }
+var <- "cm21_bad_data"
+if (!any(names(BB) == var)) {
+    cat("Create column  ", var ,"  in dataset\n")
+    BB %>%
+        mutate(cm21_bad_data = as.character(NA)) %>%
+        writedata()
+}
 
+
+
+##  Initialize meta data file  -------------------------------------------------
+if (file.exists(DB_META_fl)) {
+    BB_meta <- read_parquet(DB_META_fl)
+    ## add more days
+    BB_meta <- merge(BB_meta,
+                     data.table(day = seq(max(BB_meta$day), Sys.Date(),
+                                          by = "day")),
+                     by = "day",
+                     all = TRUE)
+    stopifnot(sum(duplicated(BB_meta$day)) == 0)
+    ## new columns
+    var <- "chp1_bad_data_flagged"
+    if (!any(names(BB_meta) == var)) {
+        BB_meta[[var]] <- NA
+        BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
+    }
+    var <- "cm21_bad_data_flagged"
+    if (!any(names(BB_meta) == var)) {
+        BB_meta[[var]] <- NA
+        BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
+    }
+} else {
+    stop("STAR A NEW DB!!")
+}
+
+
+
+
+
+## Flag exclusions -------------------------------------------------------------
+
+filelist <- list.files(DB_DIR,
+                       pattern = "*.parquet",
+                       recursive  = TRUE,
+                       full.names = TRUE)
+
+
+for (af in filelist) {
+    datapart <- read_parquet(af)
+
+    for (i in 1:nrow(ranges_CHP1)) {
+        lower <- ranges_CHP1$From[   i]
+        upper <- ranges_CHP1$Until[  i]
+        comme <- ranges_CHP1$Comment[i]
+        ## mark bad regions of data
+        datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
+    }
+
+    for (i in 1:nrow(ranges_CM21)) {
+        lower <- ranges_CM21$From[   i]
+        upper <- ranges_CM21$Until[  i]
+        comme <- ranges_CM21$Comment[i]
+        ## mark bad regions of data
+        datapart[Date >= lower & Date < upper, cm21_bad_data := comme]
+    }
+
+
+    chg_days <- unique(as.Date(datapart$Date))
+
+    BB_meta[ day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime ]
+
+
+
+
+    stop()
+}
+
+
+
+
+
+
+stop()  ###
+###
 ## touch only needed
 yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
 # for (ay in yearstodo) {
