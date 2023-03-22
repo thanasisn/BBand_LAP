@@ -381,6 +381,7 @@ for (i in 1:nrow(ranges_CHP1)) {
     tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
                          chp1_bad_data = comme)
 
+    stop()
 
     rows_update(to_duckdb(BB), tempex, by = "Date")
 
