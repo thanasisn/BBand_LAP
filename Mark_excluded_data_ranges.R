@@ -223,7 +223,20 @@ filelist <- list.files(DB_DIR,
                        recursive  = TRUE,
                        full.names = TRUE)
 
-BB_meta
+dd      <- dirname(filelist)
+dd      <- tstrsplit(dd, "/")
+
+flmonth <- as.numeric(unlist(dd[length(dd)]))
+flyear  <- as.numeric(unlist(dd[length(dd)-1]))
+
+
+BB_meta$chp1_bad_data_flagged
+
+BB_meta$cm21_bad_data_flagged
+
+cm21_exclude_mtime
+
+## compare times remove files form file list
 
 stop()
 
