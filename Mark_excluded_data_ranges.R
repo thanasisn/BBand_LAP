@@ -217,6 +217,7 @@ filelist <- list.files(DB_DIR,
 for (af in filelist) {
     datapart <- read_parquet(af)
 
+    ## flag data
     for (i in 1:nrow(ranges_CHP1)) {
         lower <- ranges_CHP1$From[   i]
         upper <- ranges_CHP1$Until[  i]
@@ -236,9 +237,14 @@ for (af in filelist) {
 
     chg_days <- unique(as.Date(datapart$Date))
 
-    BB_meta[ day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime ]
+    ## flag metadata
+    BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime]
+    BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime]
 
 
+
+stop()
+    write_parquet(x = datapart, sink = af)
 
 
     stop()

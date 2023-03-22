@@ -14,11 +14,7 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({funr::sys.script()},
-                        error = function(e) {
-                            cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("Buid_DB_04_")
-                        })
+Script.Name <- "~/BBand_LAP/build_db/Build_DB_04_chp1_SNC.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
