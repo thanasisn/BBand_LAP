@@ -158,9 +158,16 @@ yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
                 mutate(chp1_bad_data = comme, .keep = "all") %>%
                 collect()
 
-            as_tibble(temp)
+            temp <- to_duckdb(as_tibble(temp))
+
+
+            DB <- to_duckdb(BB)
+            CC <- rows_update(DB , temp, by = "Date", unmatched = "ignore" ) %>% compute() %>%
+                  to_arrow()
+
             stop()
-            right_join(BB, as_tibble(temp), by = join_by(Date))
+            # right_join(BB, as_tibble(temp), by = join_by(Date), keep = T) %>% compute()
+            # BB <- left_join(BB, as_tibble(temp), by = join_by(Date)) %>% compute()
 
             # DF <- mutate(DF, V2 = base::replace(V2, V2 < 4, 0L))
             # tempex <- data.table(Date = seq(lower, upper - 60, by = "min"),
@@ -190,6 +197,7 @@ yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
 # }
 
 aaa <- BB %>% filter(!is.na(chp1_bad_data)) %>% collect()
+bbb <- CC %>% filter(!is.na(chp1_bad_data)) %>% collect()
 
 
 stop()
