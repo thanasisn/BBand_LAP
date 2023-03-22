@@ -404,8 +404,8 @@ for (i in 1:nrow(ranges_CHP1)) {
 
     ## ~ work??
     BB <- BB %>% mutate(chp1_bad_data = ifelse(Date >= lower & Date < upper,
-                                                "OK",
-                                                comme), .keep = "all") %>% compute()
+                                               chp1_bad_data,
+                                               comme), .keep = "all") %>% compute()
     # stop()
     ## mark bad regions of data
 
@@ -413,7 +413,7 @@ for (i in 1:nrow(ranges_CHP1)) {
 
 
 
-BB %>% filter(!is.na(chp1_bad_data)) %>% collect()
+BB %>% filter(is.na(chp1_bad_data)) %>% collect()
 BB %>% select(chp1_bad_data) %>% unique() %>% collect()
 BB %>% select(cm21_bad_data) %>% unique() %>% collect()
 
@@ -424,9 +424,12 @@ BB %>% filter(Date >= lower) %>% collect()
 
 BB |> glimpse()
 
-aa <- as_tibble(BB)
+aa <- data.table(as_tibble(BB))
+aa[!is.na(chp1_bad_data)]
 
+data.table(BB)
 
+ss <- BB |> head(n = 10000)
 
 
 
