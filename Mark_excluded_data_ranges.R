@@ -214,60 +214,66 @@ if (file.exists(DB_META_fl)) {
 
 
 
-# ## Flag exclusions -------------------------------------------------------------
-#
-# filelist <- list.files(DB_DIR,
-#                        pattern = "*.parquet",
-#                        recursive  = TRUE,
-#                        full.names = TRUE)
-#
-#
-# for (af in filelist) {
-#     datapart <- read_parquet(af)
-#
-#     ## flag data
-#     for (i in 1:nrow(ranges_CHP1)) {
-#         lower  <- ranges_CHP1$From[   i]
-#         upper  <- ranges_CHP1$Until[  i]
-#         comme  <- ranges_CHP1$Comment[i]
-#         tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-#                              chp1_bad_data = comme)
-#
-#         ## mark bad regions of data
-#         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
-#
-#         # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
-#         rm(tempex)
-#     }
-#
-#     for (i in 1:nrow(ranges_CM21)) {
-#         lower  <- ranges_CM21$From[   i]
-#         upper  <- ranges_CM21$Until[  i]
-#         comme  <- ranges_CM21$Comment[i]
-#         tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-#                              cm21_bad_data = comme)
-#
-#         ## mark bad regions of data
-#         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
-#         # datapart[Date >= lower & Date < upper, cm21_bad_data := comme]
-#         rm(tempex)
-#     }
-# stop()
-#
-#     chg_days <- unique(as.Date(datapart$Date))
-#
-#     ## flag metadata
-#     BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime]
-#     BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime]
-#
-#
-#
-# stop()
-#     write_parquet(x = datapart, sink = af)
-#
-#
-#     stop()
-# }
+
+
+## Flag exclusions by file  ----------------------------------------------------
+
+filelist <- list.files(DB_DIR,
+                       pattern = "*.parquet",
+                       recursive  = TRUE,
+                       full.names = TRUE)
+
+BB_meta
+
+stop()
+
+for (af in filelist) {
+    datapart <- read_parquet(af)
+
+    ## flag data
+    for (i in 1:nrow(ranges_CHP1)) {
+        lower  <- ranges_CHP1$From[   i]
+        upper  <- ranges_CHP1$Until[  i]
+        comme  <- ranges_CHP1$Comment[i]
+        tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+                             chp1_bad_data = comme)
+
+        ## mark bad regions of data
+        datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
+
+        # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
+        rm(tempex)
+    }
+
+    for (i in 1:nrow(ranges_CM21)) {
+        lower  <- ranges_CM21$From[   i]
+        upper  <- ranges_CM21$Until[  i]
+        comme  <- ranges_CM21$Comment[i]
+        tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+                             cm21_bad_data = comme)
+
+        ## mark bad regions of data
+        datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
+        # datapart[Date >= lower & Date < upper, cm21_bad_data := comme]
+        rm(tempex)
+    }
+
+    unique(datapart$chp1_bad_data)
+    unique(datapart$cm21_bad_data)
+
+    chg_days <- unique(as.Date(datapart$Date))
+
+    ## flag metadata
+    BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime]
+    BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime]
+
+    write_parquet(x = datapart, sink = af)
+    write_parquet(BB_meta, DB_META_fl)
+
+    rm(datapart)
+
+    stop()
+}
 
 
 
