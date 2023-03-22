@@ -122,8 +122,10 @@ for (ay in yearstodo) {
             upper <- ranges_CHP1$Until[  i]
             comme <- ranges_CHP1$Comment[i]
             ## mark bad regions of data
-            datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
+            # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
 
+
+            # DF <- mutate(DF, V2 = base::replace(V2, V2 < 4, 0L))
 
             # tempex <- data.table(Date = seq(lower, upper - 60, by = "min"),
             #                      chp1_bad_data = as.factor(comme))
@@ -145,6 +147,8 @@ for (ay in yearstodo) {
             #
             # datapart %>% filter(!is.na(chp1_bad_data)) %>% collect()
             # datapart %>% filter(Date >= lower & Date < upper) %>% collect()
+            #
+            stop()
         }
 
 
