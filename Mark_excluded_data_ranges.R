@@ -6,11 +6,8 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({funr::sys.script()},
-                        error = function(e) {
-                            cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("CHP1_resistance_to_tem")
-                        })
+Script.Name <- "~/BBand_LAP/Mark_excluded_data_ranges.R"
+
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")
@@ -219,19 +216,30 @@ for (af in filelist) {
 
     ## flag data
     for (i in 1:nrow(ranges_CHP1)) {
-        lower <- ranges_CHP1$From[   i]
-        upper <- ranges_CHP1$Until[  i]
-        comme <- ranges_CHP1$Comment[i]
+        lower  <- ranges_CHP1$From[   i]
+        upper  <- ranges_CHP1$Until[  i]
+        comme  <- ranges_CHP1$Comment[i]
+        tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+                             chp1_bad_data = comme)
+
         ## mark bad regions of data
-        datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
+        datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
+
+        # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
+        rm(tempex)
     }
 
     for (i in 1:nrow(ranges_CM21)) {
-        lower <- ranges_CM21$From[   i]
-        upper <- ranges_CM21$Until[  i]
-        comme <- ranges_CM21$Comment[i]
+        lower  <- ranges_CM21$From[   i]
+        upper  <- ranges_CM21$Until[  i]
+        comme  <- ranges_CM21$Comment[i]
+        tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+                             cm21_bad_data = comme)
+
         ## mark bad regions of data
-        datapart[Date >= lower & Date < upper, cm21_bad_data := comme]
+        datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
+        # datapart[Date >= lower & Date < upper, cm21_bad_data := comme]
+        rm(tempex)
     }
 
 
@@ -242,6 +250,11 @@ for (af in filelist) {
     BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime]
 
 
+    stop()
+    to_arrow(datapart)
+    as_tibble(datapart)
+    arrow_table(as_tibble(datapart))
+arrow_table(datapart)
 
 stop()
     write_parquet(x = datapart, sink = af)
