@@ -158,10 +158,8 @@ BB <- opendata()
 
 BB |> glimpse()
 
-BB <- BB |> mutate(chp1_bad_data = as.factor(NA)) |> compute()
-BB |> writedata()
 
-stop()
+
 
 ##  Create new column if not exist in the dataset  -----------------------------
 var <- "chp1_bad_data"
@@ -173,7 +171,6 @@ if (!any(names(BB) == var)) {
     #     writedata()
     BB <- BB |> mutate(chp1_bad_data = as.character(NA)) |> compute()
     BB |> writedata()
-
 }
 var <- "cm21_bad_data"
 if (!any(names(BB) == var)) {
@@ -377,32 +374,38 @@ for (i in 1:nrow(ranges_CHP1)) {
     upper <- ranges_CHP1$Until[  i]
     comme <- ranges_CHP1$Comment[i]
 
-
+    ## TODO check those shifts!!!!
     tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
                          chp1_bad_data = comme)
 
-    stop()
+    # stop()
 
-    rows_update(to_duckdb(BB), tempex, by = "Date")
+    # rows_update(to_duckdb(BB), tempex, by = "Date")
 
-    BB <- left_join(BB, tempex, by = "Date") %>% compute()
+    # BB <- left_join(BB, tempex, by = "Date") %>% compute()
 
     # BB %>%
     #     filter(Date >= lower & Date < upper) %>%
-    #     mutate(chp1_bad_data = as.factor(comme)) %>%
+    #     mutate(chp1_bad_data = (comme)) %>%
     #     collect()
+    #
+    # BB %>%
+    #     filter(Date >= lower & Date < upper) %>%
+    #     mutate(chp1_bad_data = (comme)) %>%
+    #     compute()
+
 
     # BB %>%
     #     filter( Date >= lower & Date < upper ) %>% collect()
-    #
+
     # BB %>% mutate(chp1_bad_data = replace(chp1_bad_data,
-    #                                       Date >= lower & Date < upper & is.na(chp1_bad_data),
+    #                                       Date >= lower & Date < upper ,
     #                                       comme))
 
     ## ~ work??
-    # BB <- BB %>% mutate(chp1_bad_data = if_else(Date >= lower & Date < upper,
-    #                                             "OK",
-    #                                             comme), .keep = "all") %>% compute()
+    BB <- BB %>% mutate(chp1_bad_data = ifelse(Date >= lower & Date < upper,
+                                                "OK",
+                                                comme), .keep = "all") %>% compute()
     # stop()
     ## mark bad regions of data
 
