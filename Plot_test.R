@@ -27,7 +27,7 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 #library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 library(shiny)
-
+library(plotly)
 
 opendata <- function() {
     open_dataset(sources       = DB_DIR,
@@ -48,22 +48,40 @@ BB <- opendata()
 
 
 
-grep("Date|Azimuth|doy|year|month", names(BB), invert = TRUE, value = TRUE)
+vars <- grep("Date|Azimuth|doy|year|month", names(BB), invert = TRUE, value = TRUE)
 
 
 
 stop()
 
 
-## Only run examples in interactive R sessions
+
+
+
+
+
 if (interactive()) {
 
     ui <- fluidPage(
-        checkboxInput("somevalue", "Some value", FALSE),
-        verbatimTextOutput("value")
+        sidebarPanel(
+
+            dateInput("date1", "Date:"),
+
+
+            checkboxGroupInput("variables", "Variables:",
+                               choiceNames  = vars,
+                               choiceValues = vars),
+            textOutput("txt"),
+            width = 2
+        )
     )
-    server <- function(input, output) {
-        output$value <- renderText({ input$somevalue })
+
+    server <- function(input, output, session) {
+        output$txt <- renderText({
+            variables <- paste(input$variables, collapse = ", ")
+            sdate <- paste(input$date1, collapse = ", ")
+            paste("You chose", variables, sdate)
+        })
     }
     shinyApp(ui, server)
 }
@@ -71,6 +89,42 @@ if (interactive()) {
 
 
 
+
+
+
+ui <- fluidPage(
+    headerPanel('Example'),
+    sidebarPanel(
+        selectInput('xcol','X Variable', names(mtcars)),
+        selectInput('ycol','Y Variable', names(mtcars)),
+        selected = names(mtcars)[[2]]),
+    mainPanel(
+        plotlyOutput('plot')
+    )
+)
+
+server <- function(input, output) {
+
+    x <- reactive({
+        mtcars[,input$xcol]
+    })
+
+    y <- reactive({
+        mtcars[,input$ycol]
+    })
+
+
+    output$plot <- renderPlotly(
+        plot1 <- plot_ly(
+            x = x(),
+            y = y(),
+            type = 'scatter',
+            mode = 'markers')
+    )
+
+}
+
+shinyApp(ui,server)
 
 
 
