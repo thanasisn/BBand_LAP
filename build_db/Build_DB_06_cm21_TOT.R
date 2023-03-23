@@ -130,6 +130,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         if (file.exists(partfile)) {
             cat(" Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
+
             ## add columns for this set
             var <- "tot_glb"
             if (!any(names(gather) == var)) {
@@ -169,7 +170,16 @@ for (YYYY in unique(year(inp_filelist$day))) {
             ss <- submonth[day == ad]
 
             ## __  Read TOT file  ----------------------------------------------
-            temp      <- fread(ss$fullname, na.strings = "-9")
+            tryCatch(
+                expr  = {temp <- fread(ss$fullname, na.strings = "-9")
+                         stopifnot(dim(temp)[1] == 1440)},
+                error = function(e) {
+                    cat("\n", paste(e),"")
+                    cat("** Can not parse file", basename(ss$fullname), " **\n")
+                    next()
+                }
+            )
+
             dateess   <- paste(ss$day, temp$TIME_UT %/% 1, round((temp$TIME_UT %% 1) * 60))
             ## use the 30 second times stamp
             temp$Date <- as.POSIXct(strptime(dateess, "%F %H %M")) - 30
