@@ -170,15 +170,13 @@ for (YYYY in unique(year(inp_filelist$day))) {
             ss <- submonth[day == ad]
 
             ## __  Read TOT file  ----------------------------------------------
-            tryCatch(
-                expr  = {temp <- fread(ss$fullname, na.strings = "-9")
-                         stopifnot(dim(temp)[1] == 1440)},
-                error = function(e) {
-                    cat("\n", paste(e),"")
-                    cat("** Can not parse file", basename(ss$fullname), " **\n")
-                    next()
-                }
-            )
+            temp <- fread(ss$fullname, na.strings = "-9")
+
+            if (dim(temp)[1] != 1440) {
+                cat("** Can not parse file", basename(ss$fullname), " **\n")
+                warning("Can not parse file", basename(ss$fullname))
+                next()
+            }
 
             dateess   <- paste(ss$day, temp$TIME_UT %/% 1, round((temp$TIME_UT %% 1) * 60))
             ## use the 30 second times stamp
@@ -213,6 +211,11 @@ for (YYYY in unique(year(inp_filelist$day))) {
             gather     <- rows_upsert(gather, temp, by = "Date")
             gathermeta <- rbind(gathermeta, file_meta)
             rm(temp, file_meta, ss )
+        }
+
+        if (nrow(gathermeta) == 0) {
+            cat("\nNo new files to import\n\n")
+            next()
         }
 
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")

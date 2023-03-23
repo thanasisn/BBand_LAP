@@ -217,6 +217,7 @@ if (file.exists(DB_META_fl)) {
 
 
 ## Flag exclusions by file  ----------------------------------------------------
+## FIXME should find a better method through arrow
 
 filelist <- list.files(DB_DIR,
                        pattern = "*.parquet",
@@ -421,10 +422,10 @@ for (i in 1:nrow(ranges_CHP1)) {
     #                                       Date >= lower & Date < upper ,
     #                                       comme))
 
-    ## ~ work??
-    BB <- BB %>% mutate(chp1_bad_data = ifelse(Date >= lower & Date < upper,
-                                               chp1_bad_data,
-                                               comme), .keep = "all") %>% compute()
+    ## ~ no work??
+    # BB <- BB %>% mutate(chp1_bad_data = ifelse(Date >= lower & Date < upper,
+    #                                            chp1_bad_data,
+    #                                            comme), .keep = "all") %>% compute()
     # stop()
     ## mark bad regions of data
 
