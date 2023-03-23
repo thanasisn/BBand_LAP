@@ -450,8 +450,8 @@ data.table(BB)
 
 ss <- BB |> head(n = 10000)
 
-
-
+BB %>% filter(is.na(month)) %>% collect()
+BB %>% filter(is.na(year)) %>% collect()
 
 
 tac <- Sys.time()
