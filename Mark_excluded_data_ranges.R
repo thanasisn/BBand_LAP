@@ -153,8 +153,6 @@ writedata <- function(.) {
 
 
 BB <- opendata()
-# BB %>% writedata()
-
 
 BB |> glimpse()
 
@@ -219,29 +217,36 @@ if (file.exists(DB_META_fl)) {
 ## Flag exclusions by file  ----------------------------------------------------
 ## FIXME should find a better method through arrow
 
-filelist <- list.files(DB_DIR,
+## list data base files
+filelist <- data.table(
+    names = list.files(DB_DIR,
                        pattern = "*.parquet",
                        recursive  = TRUE,
-                       full.names = TRUE)
-
-dd      <- dirname(filelist)
+                       full.names = TRUE))
+dd      <- dirname(filelist$names)
 dd      <- tstrsplit(dd, "/")
 
-flmonth <- as.numeric(unlist(dd[length(dd)]))
-flyear  <- as.numeric(unlist(dd[length(dd)-1]))
+filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
+filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
+
+## list data set to touch
+todosets <- unique(rbind(
+    BB_meta[is.na(chp1_bad_data_flagged),
+            .(month = month(day), year = year(day))],
+    BB_meta[is.na(cm21_bad_data_flagged),
+            .(month = month(day), year = year(day))]
+))
+
+## select what to touch
+filelist <- filelist[ flmonth %in% todosets$month & flyear %in% todosets$year]
 
 
-BB_meta$chp1_bad_data_flagged
-
-BB_meta$cm21_bad_data_flagged
-
-cm21_exclude_mtime
 
 ## compare times remove files form file list
 
 stop()
 
-for (af in filelist) {
+for (af in filelist$names) {
     datapart <- read_parquet(af)
 
     ## flag data
@@ -272,8 +277,8 @@ for (af in filelist) {
         rm(tempex)
     }
 
-    unique(datapart$chp1_bad_data)
-    unique(datapart$cm21_bad_data)
+    # unique(datapart$chp1_bad_data)
+    # unique(datapart$cm21_bad_data)
 
     chg_days <- unique(as.Date(datapart$Date))
 
@@ -314,9 +319,14 @@ yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
 
             tempex <- data.table(Date = seq(lower, upper - 60, by = "min"))
 
+            tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+                                 chp1_bad_data = comme)
+
             yearsvec  <- unique(year(tempex$Date))
             monthsvec <- unique(month(tempex$Date))
 
+
+            stop()
 
             # mutate(BB, chp1_bad_data = base::replace(chp1_bad_data,
             #                                          Date >= lower & Date < upper,
@@ -335,11 +345,6 @@ yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
             # filter(Date >= lower & Date < upper) %>%
             # filter(!is.na(chp1_bad_data)) %>%  collect()
 
-           # &
-           #             Date >= lower & Date < upper &
-           #             is.na(chp1_bad_data)) %>%
-           #   collect()
-
             ## update values only part
             # temp <- BB %>%
             #     filter(year %in% yearsvec & Date >= lower & Date < upper & is.na(chp1_bad_data)) %>%
@@ -349,9 +354,9 @@ yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
             # temp <- to_duckdb(as_tibble(temp))
             #
             #
-            # DB <- to_duckdb(BB)
-            # CC <- rows_update(DB , temp, by = "Date", unmatched = "ignore" ) %>% compute() %>%
-            #       to_arrow()
+            DB <- to_duckdb(BB)
+            BB <- rows_update(DB , tempex, by = "Date", unmatched = "ignore", copy = TRUE ) %>%
+                compute() %>% to_arrow()
 
             stop()
             # right_join(BB, as_tibble(temp), by = join_by(Date), keep = T) %>% compute()
@@ -389,51 +394,49 @@ bbb <- CC %>% filter(!is.na(chp1_bad_data)) %>% collect()
 
 
 stop()
-for (i in 1:nrow(ranges_CHP1)) {
-    lower <- ranges_CHP1$From[   i]
-    upper <- ranges_CHP1$Until[  i]
-    comme <- ranges_CHP1$Comment[i]
-
-    ## TODO check those shifts!!!!
-    tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                         chp1_bad_data = comme)
-
-    # stop()
-
-    # rows_update(to_duckdb(BB), tempex, by = "Date")
-
-    # BB <- left_join(BB, tempex, by = "Date") %>% compute()
-
-    # BB %>%
-    #     filter(Date >= lower & Date < upper) %>%
-    #     mutate(chp1_bad_data = (comme)) %>%
-    #     collect()
-    #
-    # BB %>%
-    #     filter(Date >= lower & Date < upper) %>%
-    #     mutate(chp1_bad_data = (comme)) %>%
-    #     compute()
-
-
-    # BB %>%
-    #     filter( Date >= lower & Date < upper ) %>% collect()
-
-    # BB %>% mutate(chp1_bad_data = replace(chp1_bad_data,
-    #                                       Date >= lower & Date < upper ,
-    #                                       comme))
-
-    ## ~ no work??
-    # BB <- BB %>% mutate(chp1_bad_data = ifelse(Date >= lower & Date < upper,
-    #                                            chp1_bad_data,
-    #                                            comme), .keep = "all") %>% compute()
-    # stop()
-    ## mark bad regions of data
-
-}
+# for (i in 1:nrow(ranges_CHP1)) {
+#     lower <- ranges_CHP1$From[   i]
+#     upper <- ranges_CHP1$Until[  i]
+#     comme <- ranges_CHP1$Comment[i]
+#
+#     ## TODO check those shifts!!!!
+#     tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+#                          chp1_bad_data = comme)
+#
+#     # stop()
+#
+#     # rows_update(to_duckdb(BB), tempex, by = "Date")
+#
+#     # BB <- left_join(BB, tempex, by = "Date") %>% compute()
+#
+#     # BB %>%
+#     #     filter(Date >= lower & Date < upper) %>%
+#     #     mutate(chp1_bad_data = (comme)) %>%
+#     #     collect()
+#     #
+#     # BB %>%
+#     #     filter(Date >= lower & Date < upper) %>%
+#     #     mutate(chp1_bad_data = (comme)) %>%
+#     #     compute()
+#
+#     # BB %>%
+#     #     filter( Date >= lower & Date < upper ) %>% collect()
+#
+#     # BB %>% mutate(chp1_bad_data = replace(chp1_bad_data,
+#     #                                       Date >= lower & Date < upper ,
+#     #                                       comme))
+#
+#     ## ~ no work??
+#     # BB <- BB %>% mutate(chp1_bad_data = ifelse(Date >= lower & Date < upper,
+#     #                                            chp1_bad_data,
+#     #                                            comme), .keep = "all") %>% compute()
+#     # stop()
+#     ## mark bad regions of data
+# }
 
 
 
-BB %>% filter(is.na(chp1_bad_data)) %>% collect()
+BB %>% filter(!is.na(chp1_bad_data)) %>% collect()
 BB %>% select(chp1_bad_data) %>% unique() %>% collect()
 BB %>% select(cm21_bad_data) %>% unique() %>% collect()
 
