@@ -83,7 +83,7 @@ cat('\n\n')
 
 ## Load CM-21 exclusions -------------------------------------------------------
 cm21_exclude_mtime <- file.mtime(CM21_EXCLUDE)
-ranges_CM21       <- read.table(CM21_EXCLUDE,
+ranges_CM21        <- read.table(CM21_EXCLUDE,
                                 sep          = ";",
                                 colClasses   = "character",
                                 strip.white  = TRUE,
@@ -133,12 +133,22 @@ if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
     BB <- BB |> mutate(chp1_bad_data = as.character(NA)) |> compute()
     BB |> writedata()
+    if (file.exists(DB_META_fl)) {
+        BB_meta <- read_parquet(DB_META_fl)
+        BB_meta$chp1_bad_data_flagged <- as.POSIXct(NA)
+        write_parquet(BB_meta, DB_META_fl)
+    }
 }
 var <- "cm21_bad_data"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
     BB <- BB |> mutate(cm21_bad_data = as.character(NA)) |> compute()
     BB |> writedata()
+    if (file.exists(DB_META_fl)) {
+        BB_meta <- read_parquet(DB_META_fl)
+        BB_meta$cm21_bad_data_flagged <- as.POSIXct(NA)
+        write_parquet(BB_meta, DB_META_fl)
+    }
 }
 rm(BB)
 
