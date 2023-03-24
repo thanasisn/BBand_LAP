@@ -274,7 +274,7 @@ for (af in filelist$names) {
 rm(BB_meta)
 rm(filelist)
 rm(ranges_CHP1)
-rm(ranges_CHP1)
+rm(ranges_CM21)
 
 
 
