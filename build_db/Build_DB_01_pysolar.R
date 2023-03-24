@@ -27,7 +27,6 @@ if (!interactive()) {
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
-on.exit(myunlock(DB_lock))
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
@@ -114,6 +113,9 @@ for (YYYY in unique(year(inp_filelist$day))) {
         if (file.exists(partfile)) {
             cat(" Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
+            ## columns may be missing while repacking dataset
+            gather$year  <- year(gather$Date)
+            gather$month <- month(gather$Date)
         } else {
             cat("* NEW: ", partfile, "\n")
             gather <- data.table()
@@ -167,6 +169,6 @@ rm(inp_filelist)
 
 
 
-# myunlock(DB_lock)
+on.exit(myunlock(DB_lock))
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

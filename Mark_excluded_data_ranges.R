@@ -14,7 +14,7 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
-on.exit(myunlock(DB_lock))
+
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -60,7 +60,7 @@ ranges_CHP1$HourSpan <- (as.numeric(ranges_CHP1$Until) - as.numeric(ranges_CHP1$
 hist(ranges_CHP1$HourSpan)
 cat('\n\n')
 
-temp <- ranges_CHP1[ ranges_CHP1$HourSpan > 12 , ]
+temp <- ranges_CHP1[ ranges_CHP1$HourSpan > 20 , ]
 row.names(temp) <- NULL
 pander( temp )
 
@@ -437,6 +437,6 @@ rm(ranges_CHP1)
 # BB %>% filter(is.na(month)) %>% collect()
 # BB %>% filter(is.na(year)) %>% collect()
 
-
+on.exit(myunlock(DB_lock))
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

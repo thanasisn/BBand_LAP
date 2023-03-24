@@ -12,7 +12,6 @@ source("~/CHP_1_DIR/Functions_CHP1.R")
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
-on.exit(myunlock(DB_lock))
 
 
 if (!interactive()) {
@@ -232,5 +231,6 @@ rm(inp_filelist)
 
 
 
+on.exit(myunlock(DB_lock))
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
