@@ -88,14 +88,13 @@ panderOptions("table.split.table",        120   )
 ## __  Variables  --------------------------------------------------------------
 OutliersPlot <- 4
 CLEAN        <- TRUE
-CLEAN        <- FALSE
+# CLEAN        <- FALSE
 
 
 ## __ Execution control  -------------------------------------------------------
 ## When knitting
-if (!exists("params")) {
-    params <- list(CLEAN = CLEAN)
-} else {
+if (exists("params")) {
+    # params <- list(CLEAN = CLEAN)
     CLEAN <- params$CLEAN
 }
 ## When running
@@ -103,7 +102,7 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 0) {
     if (any(args == "CLEAN")) { CLEAN <- TRUE  }
     if (any(args == "DIRTY")) { CLEAN <- FALSE }
-    cat("Argumenst",paste(args),"\n")
+    cat("Arguments", paste(args),"\n")
 }
 
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
@@ -120,6 +119,7 @@ BB_meta   <- read_parquet(DB_META_fl)
 ## TODO compare output files with parsed dates from meta
 years_to_do <- datayears
 
+years_to_do <- 2022
 
 #'
 #' Mark outlies with:
@@ -140,32 +140,33 @@ for (YYYY in years_to_do) {
     cat("\n## Year:", YYYY, "\n\n")
 
     ## load data for year
-    year_data <- as.data.table(opendata() |> filter(year == YYYY) |> collect())
+    year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
 
     ## Recording limits
     year_data[, sig_lowlim := chp1_signal_lower_limit(Date)]
     year_data[, sig_upplim := chp1_signal_upper_limit(Date)]
 
-    ## Choose what to plot
+    ## Choose what to plot (data.table slicing dong work)
     if (CLEAN) {
         year_data[!is.na(CHP1_sig), .N]
         cat("\nRemove bad data regions\n")
         cat(year_data[!is.na(chp1_bad_data), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data[is.na(chp1_bad_data), CHP1_sig    := NA]
-        year_data[is.na(chp1_bad_data), CHP1_sig_sd := NA]
+        year_data$CM21_sig   [is.na(year_data$chp1_bad_data)] <- NA
+        year_data$CM21_sig_sd[is.na(year_data$chp1_bad_data)] <- NA
 
         cat("\nRemove tracker async cases\n")
         cat(year_data[Async_tracker == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data[Async_tracker == TRUE, CHP1_sig    := NA]
-        year_data[Async_tracker == TRUE, CHP1_sig_sd := NA]
+        year_data$CHP1_sig   [year_data$Async_tracker == TRUE] <- NA
+        year_data$CHP1_sig_sd[year_data$Async_tracker == TRUE] <- NA
 
         cat("\nRemove data outside physical limits\n")
         cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data[CHP1_sig > sig_upplim, CHP1_sig    := NA]
-        year_data[CHP1_sig > sig_upplim, CHP1_sig_sd := NA]
+        year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+        year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+
         cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data[CHP1_sig < sig_lowlim, CHP1_sig    := NA]
-        year_data[CHP1_sig < sig_lowlim, CHP1_sig_sd := NA]
+        year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+        year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
     }
 
     ## Missing days
@@ -306,14 +307,15 @@ for (YYYY in years_to_do) {
     title(main = paste("CHP1sd by month", YYYY))
     cat('\n\n')
 
-# stop()
-#     count <- year_data[ , .(Asyncs = sum(Async)), by = .(Day = as.Date(Date))]
-#
-#     plot(count$Day, count$Asyncs)
-#     cat("\n\n")
-#
-#     hist(count$Asyncs)
-#     cat("\n\n")
+    count <- year_data[ , .(Asyncs = sum(Async_tracker)), by = .(Day = as.Date(Date))]
+
+    plot(count$Day, count$Asyncs,
+         main = paste("Daily Async cases", YYYY))
+    cat("\n\n")
+
+    hist(count$Asyncs,
+         main = paste("Daily Async cases", YYYY))
+    cat("\n\n")
 
     # boxplot(year_data$Elevat ~ month_vec )
     # title(main = paste("Elevation by month", YYYY) )
