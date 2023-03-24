@@ -1,54 +1,53 @@
-# /* !/usr/bin/env Rscript */
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
-#' ---
-#' title:         "Inspect raw CHP1 data **SIG** "
-#' author:        "Natsis Athanasios"
-#' institute:     "AUTH"
-#' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Inspect raw data from CHP1."
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      10pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
-#' link-citations:  yes
-#' colorlinks:      yes
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections:  no
-#'     fig_caption:      no
-#'     keep_tex:         no
-#'     latex_engine:     xelatex
-#'     toc:              yes
-#'     fig_width:        8
-#'     fig_height:       5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  7.5
-#'     fig_height: 5
-#'
-#' date: "`r format(Sys.time(), '%F')`"
-#'
-#' ---
+---
+title:         "Inspect raw CHP1 data **SIG** "
+author:        "Natsis Athanasios"
+institute:     "AUTH"
+affiliation:   "Laboratory of Atmospheric Physics"
+abstract:      "Inspect raw data from CHP1."
+documentclass: article
+classoption:   a4paper,oneside
+fontsize:      10pt
+geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 
-#'
-#'  **LAP -> SIG**
-#'
-#' **Source code: [github.com/thanasisn/BBand_LAP](https://github.com/thanasisn/BBand_LAP)**
-#'
-#' **Data display: [thanasisn.netlify.app/3-data_display/](https://thanasisn.netlify.app/3-data_display/)**
-#'
-#'
-#+ echo=F, include=T
+link-citations:  yes
+colorlinks:      yes
+
+header-includes:
+- \usepackage{caption}
+- \usepackage{placeins}
+- \captionsetup{font=small}
+
+output:
+  bookdown::pdf_document2:
+    number_sections:  no
+    fig_caption:      no
+    keep_tex:         no
+    latex_engine:     xelatex
+    toc:              yes
+    fig_width:        8
+    fig_height:       5
+  html_document:
+    toc:        true
+    fig_width:  7.5
+    fig_height: 5
+
+date: "`r format(Sys.time(), '%F')`"
+
+---
+
+ **LAP -> SIG**
+
+**Source code: [github.com/thanasisn/BBand_LAP](https://github.com/thanasisn/BBand_LAP)**
+
+**Data display: [thanasisn.netlify.app/3-data_display/](https://thanasisn.netlify.app/3-data_display/)**
 
 
-#+ echo=F, include=F
+
+```{r echo=F, include=T}
+
+
+```
+```{r echo=F, include=F}
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment    = ""       )
 knitr::opts_chunk$set(dev        = "png"    )
@@ -119,16 +118,15 @@ BB_meta   <- read_parquet(DB_META_fl)
 
 ## TODO compare output files with parsed dates from meta
 years_to_do <- datayears
+```
 
 
-#'
-#' Mark outlies with:
-#'
-#' **mean(variable) -/+ `r OutliersPlot` * sd(variable)**
-#'
+Mark outlies with:
+
+**mean(variable) -/+ `r OutliersPlot` * sd(variable)**
 
 
-#+ include=TRUE, echo=FALSE, results="asis"
+```{r include=TRUE, echo=FALSE, results="asis"}
 for (YYYY in years_to_do) {
     days_of_year <- seq.Date(as.Date(paste0(YYYY, "-01-01")),
                              as.Date(paste0(YYYY, "-12-31")), by = "day")
@@ -324,13 +322,13 @@ for (YYYY in years_to_do) {
     # cat('\n\n')
 
 }
+```
 
+**END**
 
-
-
-
-#' **END**
-#+ include=T, echo=F
+```{r include=T, echo=F}
 myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+```
+
