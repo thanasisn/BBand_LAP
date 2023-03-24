@@ -88,19 +88,24 @@ panderOptions("table.split.table",        120   )
 ## __  Variables  --------------------------------------------------------------
 OutliersPlot <- 4
 CLEAN        <- TRUE
+CLEAN        <- FALSE
 
 
 ## __ Execution control  -------------------------------------------------------
+## When knitting
+if (!exists("params")) {
+    params <- list(CLEAN = CLEAN)
+} else {
+    CLEAN <- params$CLEAN
+}
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 0) {
     if (any(args == "CLEAN")) { CLEAN <- TRUE  }
     if (any(args == "DIRTY")) { CLEAN <- FALSE }
+    cat("Argumenst",paste(args),"\n")
 }
-## When knitting
-if (!exists("params")) {
-    params <- list(CLEAN = CLEAN)
-}
+
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 
 
@@ -143,23 +148,25 @@ for (YYYY in years_to_do) {
 
     ## Choose what to plot
     if (CLEAN) {
-        stop()
+        year_data[!is.na(CHP1_sig), .N]
+        cat("\nRemove bad data regions\n")
+        cat(year_data[!is.na(chp1_bad_data), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+        year_data[is.na(chp1_bad_data), CHP1_sig    := NA]
+        year_data[is.na(chp1_bad_data), CHP1_sig_sd := NA]
 
-        cat("\nRemove bad data regions\n\n")
-        year_data[is.na(cm21_bad_data), CM21_sig    := NA]
-        year_data[is.na(cm21_bad_data), CM21_sig_sd := NA]
+        cat("\nRemove tracker async cases\n")
+        cat(year_data[Async_tracker == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+        year_data[Async_tracker == TRUE, CHP1_sig    := NA]
+        year_data[Async_tracker == TRUE, CHP1_sig_sd := NA]
 
-        cat("\nRemove tracker async cases\n\n")
-        year_data[Async_tracker == TRUE, CM21_sig    := NA]
-        year_data[Async_tracker == TRUE, CM21_sig_sd := NA]
-
-        cat("\nRemove data outside physical limits\n\n")
-        year_data[CM21_sig > sig_upplim, CM21_sig    := NA]
-        year_data[CM21_sig > sig_upplim, CM21_sig_sd := NA]
-        year_data[CM21_sig < sig_lowlim, CM21_sig    := NA]
-        year_data[CM21_sig < sig_lowlim, CM21_sig_sd := NA]
+        cat("\nRemove data outside physical limits\n")
+        cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+        year_data[CHP1_sig > sig_upplim, CHP1_sig    := NA]
+        year_data[CHP1_sig > sig_upplim, CHP1_sig_sd := NA]
+        cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+        year_data[CHP1_sig < sig_lowlim, CHP1_sig    := NA]
+        year_data[CHP1_sig < sig_lowlim, CHP1_sig_sd := NA]
     }
-
 
     ## Missing days
     cat("\n**Days without any CHP-1 data:**\n\n")
@@ -291,21 +298,30 @@ for (YYYY in years_to_do) {
     # cat("\n\n### Sun Azimuth\n")
     # cat(pander(dd$Azimuth))
 
-    boxplot(year_data$CHP1_sig~ month_vec )
-    title(main = paste("CHP1value by month", YYYY) )
+    boxplot(year_data$CHP1_sig ~ month_vec )
+    title(main = paste("CHP1value by month", YYYY))
     cat('\n\n')
 
     boxplot(year_data$CHP1_sig_sd ~ month_vec )
-    title(main = paste("CHP1sd by month", YYYY) )
+    title(main = paste("CHP1sd by month", YYYY))
     cat('\n\n')
 
-    boxplot(year_data$Elevat ~ month_vec )
-    title(main = paste("Elevation by month", YYYY) )
-    cat('\n\n')
+# stop()
+#     count <- year_data[ , .(Asyncs = sum(Async)), by = .(Day = as.Date(Date))]
+#
+#     plot(count$Day, count$Asyncs)
+#     cat("\n\n")
+#
+#     hist(count$Asyncs)
+#     cat("\n\n")
 
-    boxplot(year_data$Azimuth ~ month_vec )
-    title(main = paste("Azimuth by month", YYYY) )
-    cat('\n\n')
+    # boxplot(year_data$Elevat ~ month_vec )
+    # title(main = paste("Elevation by month", YYYY) )
+    # cat('\n\n')
+
+    # boxplot(year_data$Azimuth ~ month_vec )
+    # title(main = paste("Azimuth by month", YYYY) )
+    # cat('\n\n')
 
 }
 

@@ -42,7 +42,7 @@ render(input       = "~/BBand_LAP/Inspect_CHP1_sig_snc_temp.R",
 render(input       = "~/BBand_LAP/Inspect_CHP1_sig_snc_temp.R",
        params      = list(CLEAN = FALSE),
        clean       = T  ,
-       output_file = "~/BBand_LAP/REPORTS/Inspect_CHP1_sig_snc_temp_FALSE.pdf")
+       output_file = "~/BBand_LAP/REPORTS/Inspect_CHP1_sig_snc_temp_DIRTY.pdf")
 
 
 
