@@ -1,7 +1,14 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
-dd <- ""
+
+#'
+#' TODO
+#'
+#' - CHP-1 temperature flags
+#' - Implemented in a pure arrow table method?
+#'
+
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
@@ -12,6 +19,7 @@ Script.Name <- "~/BBand_LAP/Mark_excluded_data_ranges.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")
+source("~/BBand_LAP/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
 
@@ -26,7 +34,7 @@ library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
-library(pander)
+library(pander,     warn.conflicts = TRUE, quietly = TRUE)
 
 
 ## Load CHP-1 exclusions -------------------------------------------------------
@@ -116,58 +124,23 @@ cat('\n\n')
 
 
 
-
-
-
-
-
-## todo
-## - create a factor column
-## - fill column with data
-## - try to fill by year / month?
-## - if works move column creation elsewhere
-
-
-opendata <- function() {
-    open_dataset(sources       = DB_DIR,
-                 unify_schemas = TRUE,
-                 hive_style    = FALSE,
-                 partitioning  = c("year", "month"))
-}
-
-writedata <- function(.) {
-    write_dataset(., path      = DB_DIR,
-                  format       = "parquet",
-                  partitioning = c("year", "month"),
-                  hive_style   = FALSE)
-}
-
-
+##  Load data just to check the columns
 BB <- opendata()
-
-
 
 ##  Create new column if not exist in the dataset  -----------------------------
 var <- "chp1_bad_data"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
-    # BB %>%
-    #     mutate(chp1_bad_data = as.character(NA)) %>%
-    #     compute() %>%
-    #     writedata()
     BB <- BB |> mutate(chp1_bad_data = as.character(NA)) |> compute()
     BB |> writedata()
 }
 var <- "cm21_bad_data"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
-    # BB %>%
-    #     mutate(cm21_bad_data = as.character(NA)) %>%
-    #     compute() %>%
-    #     writedata()
     BB <- BB |> mutate(cm21_bad_data = as.character(NA)) |> compute()
     BB |> writedata()
 }
+rm(BB)
 
 
 
@@ -230,7 +203,7 @@ for (af in filelist$names) {
     datapart <- read_parquet(af)
     cat("Load: ", af, "\n")
 
-    ## flag data
+    ## CHP-1 flag data
     for (i in 1:nrow(ranges_CHP1)) {
         lower  <- ranges_CHP1$From[   i]
         upper  <- ranges_CHP1$Until[  i]
@@ -244,6 +217,7 @@ for (af in filelist$names) {
         rm(tempex)
     }
 
+    ## CM-21 flag data
     for (i in 1:nrow(ranges_CM21)) {
         lower  <- ranges_CM21$From[   i]
         upper  <- ranges_CM21$Until[  i]
@@ -437,6 +411,6 @@ rm(ranges_CM21)
 # BB %>% filter(is.na(month)) %>% collect()
 # BB %>% filter(is.na(year)) %>% collect()
 
-on.exit(myunlock(DB_lock))
+myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

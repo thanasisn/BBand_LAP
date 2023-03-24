@@ -18,13 +18,14 @@ if (!interactive()) {
 }
 
 
-source("~/BBand_LAP/build_db/Build_DB_01_pysolar.R")
-source("~/BBand_LAP/build_db/Build_DB_02_cm21.R")
-source("~/BBand_LAP/build_db/Build_DB_03_chp1.R")
-source("~/BBand_LAP/build_db/Build_DB_04_chp1_SNC.R")
-source("~/BBand_LAP/build_db/Build_DB_05_chp1_TMP.R")
-source("~/BBand_LAP/build_db/Build_DB_06_cm21_TOT.R")
+source("~/BBand_LAP/build_db/Build_DB_01_pysolar.R"       )
+source("~/BBand_LAP/build_db/Build_DB_02_cm21.R"          )
+source("~/BBand_LAP/build_db/Build_DB_03_chp1.R"          )
+source("~/BBand_LAP/build_db/Build_DB_04_chp1_SNC.R"      )
+source("~/BBand_LAP/build_db/Build_DB_05_chp1_TMP.R"      )
+source("~/BBand_LAP/build_db/Build_DB_06_cm21_TOT.R"      )
 
+source("~/BBand_LAP/build_db/Build_DB_30_exclude_ranges.R")
 
 cat("\n\nEND of Building\n\n")
 
