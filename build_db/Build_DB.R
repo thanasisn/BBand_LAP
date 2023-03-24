@@ -9,6 +9,8 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
 
 
+library(rmarkdown)
+
 source("~/BBand_LAP//DEFINITIONS.R")
 
 
@@ -27,16 +29,22 @@ source("~/BBand_LAP/build_db/Build_DB_06_cm21_TOT.R"      )
 
 source("~/BBand_LAP/build_db/Build_DB_30_exclude_ranges.R")
 
-cat("\n\nEND of Building\n\n")
-
-stop()
+cat("\n\nEND of Building the DB\n\n")
 
 
+cat("\n\nInspect CHP-1 signal\n\n")
 
-# library(arrow)
-# BB_meta <- read_parquet(DB_META_fl)
-# BB_meta$chp1_temp_basename <- NULL
-# write_parquet(BB_meta, DB_META_fl)
+render(input       = "~/BBand_LAP/Inspect_CHP1_sig_snc_temp.R",
+       params      = list(CLEAN = TRUE),
+       clean       = T  ,
+       output_file = "~/BBand_LAP/REPORTS/Inspect_CHP1_sig_snc_temp_CLEAN.pdf")
+
+render(input       = "~/BBand_LAP/Inspect_CHP1_sig_snc_temp.R",
+       params      = list(CLEAN = FALSE),
+       clean       = T  ,
+       output_file = "~/BBand_LAP/REPORTS/Inspect_CHP1_sig_snc_temp_FALSE.pdf")
+
+
 
 
 tac <- Sys.time()

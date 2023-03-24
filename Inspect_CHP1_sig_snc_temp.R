@@ -34,8 +34,7 @@
 #'     fig_height: 5
 #'
 #' date: "`r format(Sys.time(), '%F')`"
-#' params:
-#'    ALL_YEARS: TRUE
+#'
 #' ---
 
 #'
@@ -88,6 +87,23 @@ panderOptions("table.split.table",        120   )
 
 ## __  Variables  --------------------------------------------------------------
 OutliersPlot <- 4
+CLEAN        <- TRUE
+
+
+## __ Execution control  -------------------------------------------------------
+## When running
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) > 0) {
+    if (any(args == "CLEAN")) { CLEAN <- TRUE  }
+    if (any(args == "DIRTY")) { CLEAN <- FALSE }
+}
+## When knitting
+if (!exists("params")) {
+    params <- list(CLEAN = CLEAN)
+}
+cat(paste("\n**CLEAN:", CLEAN, "**\n"))
+
+
 
 
 ## years in the data base
@@ -111,7 +127,7 @@ years_to_do <- datayears
 for (YYYY in years_to_do) {
     days_of_year <- seq.Date(as.Date(paste0(YYYY, "-01-01")),
                              as.Date(paste0(YYYY, "-12-31")), by = "day")
-    ## dont go to the future
+    ## don't go to the future
     days_of_year <- days_of_year[days_of_year <= Sys.Date()]
 
     cat("\n\n\\FloatBarrier\n\n")
@@ -119,9 +135,31 @@ for (YYYY in years_to_do) {
     cat("\n## Year:", YYYY, "\n\n")
 
     ## load data for year
-    year_data <- as.data.table(
-        opendata() |> filter(year == YYYY) |> collect()
-        )
+    year_data <- as.data.table(opendata() |> filter(year == YYYY) |> collect())
+
+    ## Recording limits
+    year_data[, sig_lowlim := chp1_signal_lower_limit(Date)]
+    year_data[, sig_upplim := chp1_signal_upper_limit(Date)]
+
+    ## Choose what to plot
+    if (CLEAN) {
+        stop()
+
+        cat("\nRemove bad data regions\n\n")
+        year_data[is.na(cm21_bad_data), CM21_sig    := NA]
+        year_data[is.na(cm21_bad_data), CM21_sig_sd := NA]
+
+        cat("\nRemove tracker async cases\n\n")
+        year_data[Async_tracker == TRUE, CM21_sig    := NA]
+        year_data[Async_tracker == TRUE, CM21_sig_sd := NA]
+
+        cat("\nRemove data outside physical limits\n\n")
+        year_data[CM21_sig > sig_upplim, CM21_sig    := NA]
+        year_data[CM21_sig > sig_upplim, CM21_sig_sd := NA]
+        year_data[CM21_sig < sig_lowlim, CM21_sig    := NA]
+        year_data[CM21_sig < sig_lowlim, CM21_sig_sd := NA]
+    }
+
 
     ## Missing days
     cat("\n**Days without any CHP-1 data:**\n\n")
@@ -130,9 +168,6 @@ for (YYYY in years_to_do) {
     cat(format(empty_days), " ")
     cat("\n\n")
 
-    ## Recording limits
-    year_data[ , sig_lowlim := chp1_signal_lower_limit(Date)]
-    year_data[ , sig_upplim := chp1_signal_upper_limit(Date)]
 
     ## Get outliers limits
     suppressWarnings({

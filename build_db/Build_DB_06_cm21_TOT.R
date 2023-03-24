@@ -172,8 +172,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
             temp <- fread(ss$fullname, na.strings = "-9")
 
             if (dim(temp)[1] != 1440) {
-                cat("** Can not parse file", basename(ss$fullname), " **\n")
-                warning("Can not parse file", basename(ss$fullname))
+                cat("** Can not parse file: ", basename(ss$fullname), "**\n")
+                warning("Can not parse file: ", basename(ss$fullname))
                 next()
             }
 
