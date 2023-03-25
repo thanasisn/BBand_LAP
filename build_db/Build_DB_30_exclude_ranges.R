@@ -1,11 +1,16 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
-
+#' 
+#' Apply flags on data
+#' 
+#' - CHP-1 bad data ranges
+#' - CHP-1 temperature bad data ranges
+#' - CM-21 bad data ranges
+#'
 #'
 #' TODO
 #'
-#' - CHP-1 temperature flags
 #' - Implemented in a pure arrow table method?
 #'
 #+ include=T, echo=F

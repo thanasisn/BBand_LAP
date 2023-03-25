@@ -1,6 +1,12 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
+#' 
+#' Reads temperature data for CHP-1 into the database
+#' 
+#'  - Reads raw resistance data
+#'  - Converts resistance to temperature
+#'
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
