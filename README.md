@@ -1,13 +1,35 @@
 
 # Broad Band LAP
 
-Process the data from broadband instruments of LAP.
+Developed in the Laboratory of Atmospheric Physics of Thessaloniki, Greece.
 
-Continue CHP1 project here.
+To process the data from broadband instruments of LAP.
+
+## DOES
+
+### CHP-1
+
+- Digest raw data
+  - Signal
+  - Tracker async data
+  - Instrument temperature
+- Bad data ranges flagging
+
+
+### CM-21
+
+- Digest raw data
+- Bad data ranges flagging
 
 
 ## TODO
 
-
+- Dark signal correction
+- Convertions
+- process more instruments
 - interactive plot of db variables
 - may import QCrad and CSid
+
+
+
+
