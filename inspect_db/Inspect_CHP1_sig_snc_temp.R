@@ -122,7 +122,8 @@ BB_meta   <- read_parquet(DB_META_fl)
 ## TODO compare output files with parsed dates from meta
 years_to_do <- datayears
 
-# years_to_do <- 2022
+# TEST
+# years_to_do <- 2016
 
 #'
 #' ## Intro
@@ -170,8 +171,8 @@ for (YYYY in years_to_do) {
         year_data[!is.na(CHP1_sig), .N]
         cat("\nRemove bad data regions\n")
         cat(year_data[!is.na(chp1_bad_data), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CM21_sig   [is.na(year_data$chp1_bad_data)] <- NA
-        year_data$CM21_sig_sd[is.na(year_data$chp1_bad_data)] <- NA
+        year_data$CM21_sig   [!is.na(year_data$chp1_bad_data)] <- NA
+        year_data$CM21_sig_sd[!is.na(year_data$chp1_bad_data)] <- NA
 
         cat("\nRemove tracker async cases\n")
         cat(year_data[Async_tracker == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
@@ -232,7 +233,6 @@ for (YYYY in years_to_do) {
     ))
     cat("\n\n")
 
-
     cat("\n**Days hitting physical limit:**\n\n")
     cat(format(
         year_data[CHP1_sig > sig_upplim, unique(as.Date(Date))]
@@ -242,11 +242,9 @@ for (YYYY in years_to_do) {
         year_data[CHP1_sig < sig_lowlim, unique(as.Date(Date))]
     ))
 
-
     cat('\n\n\\footnotesize\n\n')
     cat(pander(summary(year_data[, .(Date, SZA, CHP1_sig, CHP1_sig_sd, Async_tracker)])))
     cat('\n\n\\normalsize\n\n')
-
 
     hist(year_data$CHP1_sig,
          breaks = 50,
@@ -272,7 +270,6 @@ for (YYYY in years_to_do) {
     points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
     cat('\n\n')
 
-
     plot(year_data$Date, year_data$CHP1_sig,
          pch  = 19,
          cex  = .5,
@@ -285,24 +282,20 @@ for (YYYY in years_to_do) {
     abline(h = yearlims[ an == "CHP1_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
-
     plot(year_data$Elevat, year_data$CHP1_sig_sd,
          pch  = 19,
          cex  = .5,
          main = paste("CHP1 signal SD", YYYY ),
          xlab = "Elevation",
-         ylab = "CHP1 signal Standard Deviations")
+         ylab = "CHP1 signal SD")
     abline(h = yearlims[ an == "CHP1_sig_sd", low], lty = 3, col = "red")
     abline(h = yearlims[ an == "CHP1_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
-
-
 
     # par(mar = c(2,4,2,1))
     month_vec <- strftime(  year_data$Date, format = "%m")
     dd        <- aggregate( year_data[, .(CHP1_sig, CHP1_sig_sd, Elevat, Azimuth)],
                             list(month_vec), FUN = summary, digits = 6 )
-
 
     # cat("\n\n### CHP 1 measurements, monthly aggregation\n")
     # cat("\n\n")
@@ -343,6 +336,82 @@ for (YYYY in years_to_do) {
     # boxplot(year_data$Azimuth ~ month_vec )
     # title(main = paste("Azimuth by month", YYYY) )
     # cat('\n\n')
+
+
+    if (year_data[!is.na(chp1_temperature), .N] > 0) {
+        cat("\n\n\\FloatBarrier\n\n")
+        cat("\n## Temperature data:", YYYY, "\n\n")
+
+        if (CLEAN) {
+            year_data$chp1_temperature[year_data$chp1_temperature > CHP_TEMP_MAX]        <- NA
+            year_data$chp1_temperature[year_data$chp1_temperature < CHP_TEMP_MIN]        <- NA
+            year_data$chp1_temperature[!is.na(year_data$chp1_temp_bad_data)]             <- NA
+            year_data$chp1_temperature[year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
+
+            year_data$chp1_temperature_SD[year_data$chp1_temperature > CHP_TEMP_MAX]        <- NA
+            year_data$chp1_temperature_SD[year_data$chp1_temperature < CHP_TEMP_MIN]        <- NA
+            year_data$chp1_temperature_SD[!is.na(year_data$chp1_temp_bad_data)]             <- NA
+            year_data$chp1_temperature_SD[year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
+        }
+
+
+        suppressWarnings({
+            ## Try to find outliers
+            yearlims <- data.table()
+            for (an in grep("chp1_temperature", names(year_data), value = TRUE)) {
+                daily <- year_data[ , .(dmin = min(get(an),na.rm = T),
+                                        dmax = max(get(an),na.rm = T)), by = as.Date(Date) ]
+                low <- daily[!is.infinite(dmin), mean(dmin) - OutliersPlot * sd(dmin)]
+                upe <- daily[!is.infinite(dmax), mean(dmax) + OutliersPlot * sd(dmax)]
+                yearlims <- rbind(yearlims, data.table(an = an,low = low, upe = upe))
+            }
+        })
+
+        cat("\n**Days with outliers:**\n\n")
+        cat(format(
+            year_data[chp1_temperature > yearlims[ an == "chp1_temperature", upe], unique(as.Date(Date))]
+        ))
+        cat("\n\n")
+        cat(format(
+            year_data[chp1_temperature < yearlims[ an == "chp1_temperature", low], unique(as.Date(Date))]
+        ))
+        cat("\n\n")
+
+        hist(year_data$chp1_temperature,
+             breaks = 50,
+             main   = paste("CHP1 temperature ",  YYYY))
+        abline(v = yearlims[ an == "chp1_temperature", low], lty = 3, col = "red")
+        abline(v = yearlims[ an == "chp1_temperature", upe], lty = 3, col = "red")
+        cat('\n\n')
+
+        hist(year_data$chp1_temperature_SD,
+             breaks = 50,
+             main   = paste("CHP1 temperature SD", YYYY))
+        abline(v = yearlims[ an == "chp1_temperature_SD", low], lty = 3, col = "red")
+        abline(v = yearlims[ an == "chp1_temperature_SD", upe], lty = 3, col = "red")
+        cat('\n\n')
+
+        plot(year_data$Date, year_data$chp1_temperature,
+             pch  = 19,
+             cex  = .5,
+             main = paste("CHP1 temperature ", YYYY ),
+             xlab = "",
+             ylab = "CHP1 temperature" )
+        abline(h = yearlims[ an == "chp1_temperature", low], lty = 3, col = "red")
+        abline(h = yearlims[ an == "chp1_temperature", upe], lty = 3, col = "red")
+        cat('\n\n')
+
+        plot(year_data$Elevat, year_data$chp1_temperature_SD,
+             pch  = 19,
+             cex  = .5,
+             main = paste("CHP1 temperature SD", YYYY ),
+             xlab = "Elevation",
+             ylab = "CHP1 temperature SD ")
+        abline(h = yearlims[ an == "chp1_temperature_SD", low], lty = 3, col = "red")
+        abline(h = yearlims[ an == "chp1_temperature_SD", upe], lty = 3, col = "red")
+        cat('\n\n')
+
+    }
 
 }
 

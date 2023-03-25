@@ -19,13 +19,15 @@ if (!interactive()) {
     sink(file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-cat("\n\nInspect CHP-1 signal\n\n")
 
+cat("\n\nInspect CHP-1 signal CLEAN\n\n")
 render(input       = "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R",
        params      = list(CLEAN = TRUE),
        output_file = "Inspect_CHP1_sig_snc_temp_CLEAN.pdf",
        output_dir  = "~/BBand_LAP/REPORTS/")
 
+
+cat("\n\nInspect CHP-1 signal DIRTY\n\n")
 render(input       = "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R",
        params      = list(CLEAN = FALSE),
        output_file = "Inspect_CHP1_sig_snc_temp_CLEAN.pdf",

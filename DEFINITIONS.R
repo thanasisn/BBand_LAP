@@ -31,5 +31,9 @@ DB_start_date <- as.Date("2016-01-01")
 
 
 
-
+####    Filters for CHP 1 temperatures    ######################################
+CHP_TEMP_MIN      <- -25    ## Drop temperatures below this value
+CHP_TEMP_MAX      <-  60    ## Drop temperatures above this value
+CHP_TEMP_STD_LIM  <-   2    ## Drop temperatures with standard deviation above this value
+CHP_TEMP_UNC_LIM  <-   0.8  ## Drop temperatures with uncertainty above this value
 
