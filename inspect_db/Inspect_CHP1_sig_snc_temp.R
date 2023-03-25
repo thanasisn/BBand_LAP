@@ -122,7 +122,7 @@ BB_meta   <- read_parquet(DB_META_fl)
 ## TODO compare output files with parsed dates from meta
 years_to_do <- datayears
 
-years_to_do <- 2022
+# years_to_do <- 2022
 
 #'
 #' ## Intro

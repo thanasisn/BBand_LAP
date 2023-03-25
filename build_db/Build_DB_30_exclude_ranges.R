@@ -81,7 +81,7 @@ cat('\n\n')
 
 
 
-## Load CM-21 exclusions -------------------------------------------------------
+## Load CM-21 temperature exclusions -------------------------------------------
 cm21_exclude_mtime <- file.mtime(CM21_EXCLUDE)
 ranges_CM21        <- read.table(CM21_EXCLUDE,
                                 sep          = ";",
@@ -103,6 +103,20 @@ ranges_CM21$Comment[ranges_CM21$Comment == ""] <- "NO DESCRIPTION"
 ## compute time span
 ranges_CM21$HourSpan <- (as.numeric(ranges_CM21$Until) - as.numeric(ranges_CM21$From)) / 3600
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+stop()
 
 #'
 #' Check time ranges span in hours
@@ -152,7 +166,22 @@ if (!any(names(BB) == var)) {
 }
 rm(BB)
 
+var <- "cm21_temp_bad_data"
+if (!any(names(BB) == var)) {
+    cat("Create column  ", var ,"  in dataset\n")
+    BB <- BB |> mutate(cm21_bad_data = as.character(NA)) |> compute()
+    BB |> writedata()
+    if (file.exists(DB_META_fl)) {
+        BB_meta <- read_parquet(DB_META_fl)
+        BB_meta$cm21_bad_data_flagged <- as.POSIXct(NA)
+        write_parquet(BB_meta, DB_META_fl)
+    }
+}
+rm(BB)
 
+
+
+stop()
 
 ##  Initialize meta data file  -------------------------------------------------
 if (file.exists(DB_META_fl)) {
