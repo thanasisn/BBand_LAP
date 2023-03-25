@@ -23,11 +23,11 @@ RADMON_DIR <- "~/DATA_RAW/Raddata/3"
 
 
 ####    DB specifications    ###################################################
-DB_DIR        <- "~/ZHOST/Broad_Band_BD"
-DB_lock       <- "~/ZHOST/Broad_Band_BD.stopfile"
-DB_META_fl    <- "~/ZHOST/Broad_Band_metadata.parquet"
-DB_start_date <- as.Date("1993-01-01")   ## <- start in 1993-01-19!!!!!
-DB_start_date <- as.Date("2021-01-01")
+DB_DIR        <- "~/DATA/Broad_Band/Broad_Band_BD"
+DB_lock       <- "~/DATA/Broad_Band/Broad_Band_BD.stopfile"
+DB_META_fl    <- "~/DATA/Broad_Band/Broad_Band_metadata.parquet"
+DB_start_date <- as.Date("1993-01-01")   ## <- start in 1993-04-19??
+DB_start_date <- as.Date("2016-01-01")
 
 
 
