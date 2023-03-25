@@ -29,6 +29,6 @@ writedata <- function(.) {
                   format       = "parquet",
                   partitioning = c("year", "month"),
                   hive_style   = FALSE)
-    cat("Data set written at", DB_DIR)
+    cat("Data set written at", DB_DIR, "\n")
 }
 
