@@ -20,14 +20,14 @@ if (!interactive()) {
 }
 
 
-cat("\n\nInspect CHP-1 signal CLEAN\n\n")
+cat("\n\nInspect CHP-1 signal CLEAN\n")
 render(input       = "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R",
        params      = list(CLEAN = TRUE),
        output_file = "Inspect_CHP1_sig_snc_temp_CLEAN.pdf",
        output_dir  = "~/BBand_LAP/REPORTS/")
 
 
-cat("\n\nInspect CHP-1 signal DIRTY\n\n")
+cat("\n\nInspect CHP-1 signal DIRTY\n")
 render(input       = "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R",
        params      = list(CLEAN = FALSE),
        output_file = "Inspect_CHP1_sig_snc_temp_CLEAN.pdf",

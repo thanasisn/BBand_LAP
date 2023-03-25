@@ -7,19 +7,20 @@ BASED      <- "~/BBand_LAP/"
 
 
 ####    Input paths    #########################################################
-SUN_FOLDER <- "~/DATA_RAW/SUN/PySolar_LAP/"
-SIRENA_GLB <- "~/DATA_RAW/Bband/AC21_LAP.GLB/"
-SIRENA_DIR <- "~/DATA_RAW/Bband/CHP1_lap.DIR/"
-trSYNC_DIR <- "~/DATA_RAW/tracker_chp1/tracker_SYNC"
-CHPTMP_DIR <- "~/DATA_RAW/tracker_chp1/Tracker_THERM"
-SIRENA_TOT <- "~/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
+SUN_FOLDER   <- "~/DATA_RAW/SUN/PySolar_LAP/"
+SIRENA_GLB   <- "~/DATA_RAW/Bband/AC21_LAP.GLB/"
+SIRENA_DIR   <- "~/DATA_RAW/Bband/CHP1_lap.DIR/"
+trSYNC_DIR   <- "~/DATA_RAW/tracker_chp1/tracker_SYNC"
+CHPTMP_DIR   <- "~/DATA_RAW/tracker_chp1/Tracker_THERM"
+SIRENA_TOT   <- "~/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
+RADMON_DIR   <- "~/DATA_RAW/Raddata/3"
+RADMON_GLB   <- "~/DATA_RAW/Raddata/6"
 
 
 CM21_EXCLUDE <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CM21.dat"
 CHP1_EXCLUDE <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CHP1.dat"
 CHP1_TEMP_EX <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CHP1_Temp.dat"
 
-RADMON_DIR <- "~/DATA_RAW/Raddata/3"
 
 
 ####    DB specifications    ###################################################
