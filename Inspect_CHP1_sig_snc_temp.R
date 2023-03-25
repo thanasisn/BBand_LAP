@@ -35,6 +35,9 @@
 #'
 #' date: "`r format(Sys.time(), '%F')`"
 #'
+#' params:
+#'   CLEAN: TRUE
+#'
 #' ---
 
 #'
