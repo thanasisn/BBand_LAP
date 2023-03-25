@@ -113,6 +113,7 @@ cat("\n**CHP-1:", paste(length(radmon_files), "files from Radmon**\n"))
 
 missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
+    warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
     cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n")
     cat(missing_from_sir, sep = " ")
     cat("\n\n")
@@ -161,6 +162,7 @@ cat("\n**CM-21:", paste(length(radmon_files), "files from Radmon**\n"))
 
 missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
+    warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
     cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n")
     cat(missing_from_sir, sep = " ")
     cat("\n\n")
