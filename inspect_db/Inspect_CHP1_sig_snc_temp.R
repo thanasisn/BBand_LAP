@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Inspect raw CHP1 data **SIG** "
+#' title:         "Inspect raw CHP-1 data **SIG** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
