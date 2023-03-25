@@ -171,6 +171,11 @@ cat('\n\n\\normalsize\n\n')
 ##  Load data just to check the columns
 BB <- opendata()
 
+# BB |> select(chp1_bad_data) %>% filter(!is.na(chp1_bad_data)) %>%  collect()
+# BB |> select(cm21_bad_data) %>% filter(!is.na(cm21_bad_data)) %>%  collect()
+# BB |> select(chp1_temp_bad_data) %>% filter(!is.na(chp1_temp_bad_data)) %>%  collect()
+
+
 ##  Create new column if not exist in the dataset  -----------------------------
 var <- "chp1_bad_data"
 if (!any(names(BB) == var)) {
@@ -362,7 +367,6 @@ rm(ranges_CM21)
 #             yearsvec  <- unique(year(tempex$Date))
 #             monthsvec <- unique(month(tempex$Date))
 #
-#
 #             stop()
 #
 #             # mutate(BB, chp1_bad_data = base::replace(chp1_bad_data,
@@ -409,7 +413,6 @@ rm(ranges_CM21)
 #             #
 #             # stop()
 #         }
-#
 #
 #         # as_arrow_table(datapart) %>% filter(!is.na(chp1_bad_data)) %>% collect()
 #
