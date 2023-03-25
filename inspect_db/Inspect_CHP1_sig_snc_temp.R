@@ -41,7 +41,7 @@
 #' ---
 
 #'
-#'  **LAP -> SIG**
+#'  **SIG**
 #'
 #' **Source code: [github.com/thanasisn/BBand_LAP](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -125,11 +125,27 @@ years_to_do <- datayears
 years_to_do <- 2022
 
 #'
-#' Mark outlies with:
+#' ## Intro
+#'
+#' Produce yearly plots for **CHP-1**.
+#'
+#' Shows only **raw data** aspects.
+#'
+#' It can use flags to show 'CLEAN'/'DIRTY' data.
+#'
+#' For 'CLEAN' data, it removes from view:
+#'
+#' - Bad recordings ranges `chp1_bad_data`
+#' - Tracker async cases `Async_tracker`
+#' - Physical recording limits `chp1_signal_lower_limit()` and `chp1_signal_upper_limit()`
+#'
+#' Mark outliers for signal and SD with:
 #'
 #' **mean(variable) -/+ `r OutliersPlot` * sd(variable)**
 #'
-
+#' This is just a report it doesn't alter the data.
+#'
+#'
 
 #+ include=TRUE, echo=FALSE, results="asis"
 for (YYYY in years_to_do) {
@@ -282,7 +298,7 @@ for (YYYY in years_to_do) {
 
 
 
-    par(mar = c(2,4,2,1))
+    # par(mar = c(2,4,2,1))
     month_vec <- strftime(  year_data$Date, format = "%m")
     dd        <- aggregate( year_data[, .(CHP1_sig, CHP1_sig_sd, Elevat, Azimuth)],
                             list(month_vec), FUN = summary, digits = 6 )
@@ -336,6 +352,6 @@ for (YYYY in years_to_do) {
 
 #' **END**
 #+ include=T, echo=F
-myunlock(DB_lock)
+# myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
