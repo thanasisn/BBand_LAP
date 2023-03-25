@@ -67,7 +67,7 @@ Script.Name <- "~/BBand_LAP/Inspect_CHP1_sig_snc_temp.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")
-source("~/BBand_LAP/Functions_BBand_LAP.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 # mylock(DB_lock)
 
