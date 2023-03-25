@@ -94,7 +94,7 @@ ranges_CHP1_temp$Until <- as.POSIXct(strptime(ranges_CHP1_temp$Until, format = "
 ## check negative ranges
 if (!all((ranges_CHP1_temp$Until - ranges_CHP1_temp$From) >= 1)) {
     pander(ranges_CHP1_temp[ !ranges_CHP1_temp$From < ranges_CHP1_temp$Until, ])
-    # stop("Inverted ranges in ", CHP1_TEMP_EX, "!!!")
+    stop("Inverted ranges in ", CHP1_TEMP_EX, "!!!")
 }
 ## capitalize
 ranges_CHP1_temp$Comment <- sub("(.)", "\\U\\1", ranges_CHP1_temp$Comment, perl = TRUE)
@@ -186,7 +186,7 @@ if (!any(names(BB) == var)) {
 var <- "chp1_temp_bad_data"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
-    BB <- BB |> mutate(chp1_bad_data = as.character(NA)) |> compute()
+    BB <- BB |> mutate(chp1_temp_bad_data = as.character(NA)) |> compute()
     BB |> writedata()
     if (file.exists(DB_META_fl)) {
         BB_meta <- read_parquet(DB_META_fl)
@@ -283,7 +283,6 @@ for (af in filelist$names) {
 
         ## mark bad regions of data
         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
-        # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
         rm(tempex)
     }
 
@@ -297,7 +296,6 @@ for (af in filelist$names) {
 
         ## mark bad regions of data
         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
-        # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
         rm(tempex)
     }
 
@@ -317,10 +315,11 @@ for (af in filelist$names) {
 
     chg_days <- unique(as.Date(datapart$Date))
 
-    ## flag metadata
-    BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime]
-    BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime]
-
+    ## save flagged metadata
+    BB_meta[day %in% chg_days, cm21_bad_data_flagged      := cm21_exclude_mtime     ]
+    BB_meta[day %in% chg_days, chp1_temp_bad_data_flagged := chp1_temp_exclude_mtime]
+    BB_meta[day %in% chg_days, chp1_bad_data_flagged      := chp1_exclude_mtime     ]
+    ## store data
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
     cat("Save: ", af, "\n\n")
