@@ -297,20 +297,6 @@ for (YYYY in years_to_do) {
     dd        <- aggregate( year_data[, .(CHP1_sig, CHP1_sig_sd, Elevat, Azimuth)],
                             list(month_vec), FUN = summary, digits = 6 )
 
-    # cat("\n\n### CHP 1 measurements, monthly aggregation\n")
-    # cat("\n\n")
-    # cat(pander(dd$CHP1value))
-    # cat("\n\n")
-    #
-    # cat("\n\n### CHP 1 standard deviation, monthly aggregation\n")
-    # cat(pander(dd$CHP1sd))
-    #
-    # cat("\n\n### Sun Elevation\n")
-    # cat(pander(dd$Elevat))
-    #
-    # cat("\n\n### Sun Azimuth\n")
-    # cat(pander(dd$Azimuth))
-
     boxplot(year_data$CHP1_sig ~ month_vec )
     title(main = paste("CHP1value by month", YYYY))
     cat('\n\n')
