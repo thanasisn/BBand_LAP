@@ -9,7 +9,7 @@ tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
                             return("inspect_days_") })
-sink(file   = paste0("~/CHP_1_DIR/LOGs/", basename(sub("\\.R$", ".log", Script.Name))),
+sink(file   = paste0("~/BBand_LAP/LOGs/", basename(sub("\\.R$", ".log", Script.Name))),
      split  = TRUE,
      append = TRUE)
 
@@ -24,7 +24,7 @@ library(optparse,   quietly = T, warn.conflicts = F)
 library(plotly,     quietly = T, warn.conflicts = F)
 
 source("~/CM_21_GLB/Functions_CM21_factor.R")
-source("~/CHP_1_DIR/Functions_CHP1.R")
+source("~/BBand_LAP/functions/Functions_CHP1.R")
 
 ## excluded data mark
 ## if can not read skip files there me be formatting error!!
@@ -71,8 +71,8 @@ system(paste( "killall", gsub(" .*", "", BROWSER_CMD)))
 ## --
 
 ## Data folder
-# FOLDER <- "/home/athan/DATA_RAW/Raddata"
-FOLDER <- "/home/athan/DATA_RAW/Bband"
+# FOLDER <- "~/DATA_RAW/Raddata"
+FOLDER <- "~/DATA_RAW/Bband"
 
 
 ####   Get input    ############################################################

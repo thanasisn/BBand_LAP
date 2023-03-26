@@ -1,9 +1,9 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
-#' 
+#'
 #' Apply flags on data
-#' 
+#'
 #' - CHP-1 bad data ranges
 #' - CHP-1 temperature bad data ranges
 #' - CM-21 bad data ranges
@@ -23,7 +23,7 @@ Script.Name <- "~/BBand_LAP/Mark_excluded_data_ranges.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")
-source("~/BBand_LAP/Functions_BBand_LAP.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
 
