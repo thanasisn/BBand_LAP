@@ -218,9 +218,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
         # BBdaily <- rows_patch(BBdaily, gathermeta, by = "day", unmatched = "ignore")
 
-        ## mark days without a sync file
-
-
+        ## mark all days without a sync file as Async cases
+        gather$Async_tracker[!as.Date(gather$Date) %in% syncfldates] <- FALSE
 
         setorder(gather, Date)
 
