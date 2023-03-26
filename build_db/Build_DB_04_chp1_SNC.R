@@ -17,6 +17,7 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB_04_chp1_SNC.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
 
@@ -89,6 +90,10 @@ inp_filelist$day <- as.Date(parse_date_time(
     "Ymd"))
 setorder(inp_filelist, day)
 cat("\n**Found:",paste(nrow(inp_filelist), "tracker sync files**\n"))
+
+
+## days with a sync file
+syncfldates  <- inp_filelist$day
 
 ## only new files in the date range
 inp_filelist <- inp_filelist[!inp_filelist$chp1_sync_basename %in% BB_meta$chp1_sync_basename]
@@ -212,6 +217,10 @@ for (YYYY in unique(year(inp_filelist$day))) {
 
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
         # BBdaily <- rows_patch(BBdaily, gathermeta, by = "day", unmatched = "ignore")
+
+        ## mark days without a sync file
+
+
 
         setorder(gather, Date)
 
