@@ -149,15 +149,16 @@ for (YYYY in unique(year(inp_filelist$day))) {
         ##  read this month set files
         gathermeta <- data.table()
         for (ad in submonth$day) {
+            ## get file info
             ss <- submonth[day == ad]
 
-            asyncstp <- rep( NA,    1440 )
-            async    <- rep( FALSE, 1440 )
+            asyncstp <- rep(NA,    1440)  # Async magnitude (steps missed)
+            async    <- rep(FALSE, 1440)
 
             suppressWarnings(rm(D_minutes))
             D_minutes <- seq(from       = as.POSIXct(paste(as_date(ad), "00:00:30 UTC")),
                              length.out = 1440,
-                             by         = "min" )
+                             by         = "min")
 
             ## __  Read tracker sync file  -------------------------------------
             ## TODO we should use step files as more reliable to detect async events!!!
@@ -167,14 +168,15 @@ for (YYYY in unique(year(inp_filelist$day))) {
             uniq_async  <- unique(async_minu)
 
             ## async time distance
-            syc_temp$timeDist <- apply(syc_temp[,c('V7','V8')], MARGIN = 1, FUN = max, na.rm = T)
+            syc_temp$timeDist <- apply(syc_temp[, c('V7', 'V8')], MARGIN = 1, FUN = max, na.rm = T)
 
             for (amin in uniq_async) {
                 min_ind <- async_minu == amin
-                stepgo  <- syc_temp$V4[ min_ind ]
-                stepis  <- syc_temp$V5[ min_ind ]
-                stepout <- suppressWarnings( max( abs( stepgo - stepis ), na.rm = TRUE ) )
+                stepgo  <- syc_temp$V4[min_ind]
+                stepis  <- syc_temp$V5[min_ind]
+                stepout <- suppressWarnings(max(abs( stepgo - stepis ), na.rm = TRUE))
                 if (is.finite(stepout)) {
+                    # Async magnitude (steps missed)
                     asyncstp[ which( D_minutes == amin ) ] <- stepout
                 }
             }
