@@ -66,7 +66,7 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
-source("~/CHP_1_DIR/Functions_CHP1.R")
+source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 # mylock(DB_lock)
@@ -179,11 +179,12 @@ for (YYYY in years_to_do) {
         year_data$CHP1_sig   [year_data$Async_tracker == TRUE] <- NA
         year_data$CHP1_sig_sd[year_data$Async_tracker == TRUE] <- NA
 
-        cat("\nRemove data outside physical limits\n")
+        cat("\nRemove data above physical limits\n")
         cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
         year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
         year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
 
+        cat("\nRemove data below physical limits\n")
         cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
         year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
         year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
