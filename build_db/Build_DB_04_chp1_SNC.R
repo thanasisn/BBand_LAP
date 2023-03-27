@@ -131,8 +131,9 @@ for (YYYY in unique(year(inp_filelist$day))) {
             ## add columns for this set
             var <- "Async_tracker"
             if (!any(names(gather) == var)) {
-                gather[[var]] <- NA
-                gather[[var]] <- as.logical(gather[[var]])
+                ## init with tracker as async
+                gather[[var]] <- TRUE
+                # gather[[var]] <- as.logical(gather[[var]])
             }
             var <- "Async_step_count"
             if (!any(names(gather) == var)) {
@@ -162,8 +163,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
             ## get file info
             ss <- submonth[day == ad]
 
+            async    <- rep(FALSE, 1440)  # The snc file exist, so start with all not async
             asyncstp <- rep(NA,    1440)  # Async magnitude (steps missed)
-            async    <- rep(FALSE, 1440)
 
             suppressWarnings(rm(D_minutes))
             D_minutes <- seq(from       = as.POSIXct(paste(as_date(ad), "00:00:30 UTC")),
@@ -186,7 +187,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
                 stepis  <- syc_temp$V5[min_ind]
                 stepout <- suppressWarnings(max(abs( stepgo - stepis ), na.rm = TRUE))
                 if (is.finite(stepout)) {
-                    # Async magnitude (steps missed)
+                    # Async magnitude (count steps missed)
                     asyncstp[ which( D_minutes == amin ) ] <- stepout
                 }
             }
@@ -198,7 +199,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
             ## create vector of asyncs
             for (ik in 1:nrow(syc_temp)) {
                 async[ which( D_minutes <= syc_temp$async_end[   ik ] &
-                                  D_minutes >= syc_temp$async_start[ ik ]  ) ] <- TRUE
+                              D_minutes >= syc_temp$async_start[ ik ]  ) ] <- TRUE   ## !!
             }
 
             day_data <- data.frame(Date             = D_minutes,

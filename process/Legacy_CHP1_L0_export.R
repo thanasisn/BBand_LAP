@@ -122,82 +122,82 @@ datayears <- opendata() |> filter(year >= 2016) |> select(year) |> unique() |> c
 BB_meta   <- read_parquet(DB_META_fl)
 BB        <- opendata()
 
-for (YYYY in datayears) {
-    ## get data from DB
-    year_data <- BB |>
-        filter(year == YYYY) |>
-        select(c("Date", "CHP1_sig", "CHP1_sig_sd","Async_step_count",
-                 "Async_tracker", "Azimuth", "Elevat", "chp1_temperature",
-                 "chp1_temperature_SD", "chp1_temp_UNC",
-                 "chp1_bad_data")) |>
-        collect()
-    year_data <- data.table(year_data)
-
-    ## Recording limits
-    year_data[, sig_lowlim := chp1_signal_lower_limit(Date)]
-    year_data[, sig_upplim := chp1_signal_upper_limit(Date)]
-
-
-    year_data[!is.na(CHP1_sig), .N]
-    cat("\nRemove bad data regions\n")
-    cat(year_data[!is.na(chp1_bad_data), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    year_data$CM21_sig   [!is.na(year_data$chp1_bad_data)] <- NA
-    year_data$CM21_sig_sd[!is.na(year_data$chp1_bad_data)] <- NA
-
-    cat("\nRemove tracker async cases\n")
-    cat(year_data[Async_tracker == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    year_data$CHP1_sig   [year_data$Async_tracker == TRUE] <- NA
-    year_data$CHP1_sig_sd[year_data$Async_tracker == TRUE] <- NA
-
-    # cat("\nRemove data above physical limits\n")
-    # cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    # year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
-    # year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
-    #
-    # cat("\nRemove data below physical limits\n")
-    # cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    # year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
-    # year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
-
-    year_data$sig_lowlim    <- NULL
-    year_data$sig_upplim    <- NULL
-    year_data$chp1_bad_data <- NULL
-
-
-    CHP_TEMP_MIN       <- -20    # Drop temperatures below this value
-    CHP_TEMP_MAX       <-  50    # Drop temperatures above this value
-    CHP_TEMP_STD_LIM   <-  10    # Drop temperatures with standard deviation above this value
-
-    year_data$chp1_temperature_SD[ year_data$chp1_temperature > CHP_TEMP_MAX] <- NA
-    year_data$chp1_temp_UNC      [ year_data$chp1_temperature > CHP_TEMP_MAX] <- NA
-    year_data$chp1_temperature   [ year_data$chp1_temperature > CHP_TEMP_MAX] <- NA
-
-    year_data$chp1_temperature_SD[ year_data$chp1_temperature < CHP_TEMP_MIN] <- NA
-    year_data$chp1_temp_UNC      [ year_data$chp1_temperature < CHP_TEMP_MIN] <- NA
-    year_data$chp1_temperature   [ year_data$chp1_temperature < CHP_TEMP_MIN] <- NA
-
-    year_data$chp1_temperature   [ year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
-    year_data$chp1_temp_UNC      [ year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
-    year_data$chp1_temperature_SD[ year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
-
-
-    setorder(year_data, Date)
-
-    ## use the old names for output
-    names(year_data)[names(year_data) == "Date"]                <- "Date30"
-    names(year_data)[names(year_data) == "CHP1_sig"]            <- "CHP1value"
-    names(year_data)[names(year_data) == "CHP1_sig_sd"]         <- "CHP1sd"
-    names(year_data)[names(year_data) == "Async_step_count"]    <- "AsynStep"
-    names(year_data)[names(year_data) == "Async_tracker"]       <- "Async"
-    names(year_data)[names(year_data) == "chp1_temperature"]    <- "CHP1temp"
-    names(year_data)[names(year_data) == "chp1_temperature_SD"] <- "CHP1tempSD"
-    names(year_data)[names(year_data) == "chp1_temp_UNC"]       <- "CHP1tempUNC"
-
-    ## write data to old file format
-    write_RDS(year_data,
-              paste0("~/DATA/Broad_Band/Legacy_L0_CHP1_", YYYY, ".Rds"),
-              clean = TRUE)
-}
+# for (YYYY in datayears) {
+#     ## get data from DB
+#     year_data <- BB |>
+#         filter(year == YYYY) |>
+#         select(c("Date", "CHP1_sig", "CHP1_sig_sd","Async_step_count",
+#                  "Async_tracker", "Azimuth", "Elevat", "chp1_temperature",
+#                  "chp1_temperature_SD", "chp1_temp_UNC",
+#                  "chp1_bad_data")) |>
+#         collect()
+#     year_data <- data.table(year_data)
+#
+#     ## Recording limits
+#     year_data[, sig_lowlim := chp1_signal_lower_limit(Date)]
+#     year_data[, sig_upplim := chp1_signal_upper_limit(Date)]
+#
+#
+#     year_data[!is.na(CHP1_sig), .N]
+#     cat("\nRemove bad data regions\n")
+#     cat(year_data[!is.na(chp1_bad_data), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+#     year_data$CM21_sig   [!is.na(year_data$chp1_bad_data)] <- NA
+#     year_data$CM21_sig_sd[!is.na(year_data$chp1_bad_data)] <- NA
+#
+#     cat("\nRemove tracker async cases\n")
+#     cat(year_data[Async_tracker == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+#     year_data$CHP1_sig   [year_data$Async_tracker == TRUE] <- NA
+#     year_data$CHP1_sig_sd[year_data$Async_tracker == TRUE] <- NA
+#
+#     # cat("\nRemove data above physical limits\n")
+#     # cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+#     # year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+#     # year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+#     #
+#     # cat("\nRemove data below physical limits\n")
+#     # cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+#     # year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+#     # year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+#
+#     year_data$sig_lowlim    <- NULL
+#     year_data$sig_upplim    <- NULL
+#     year_data$chp1_bad_data <- NULL
+#
+#
+#     CHP_TEMP_MIN       <- -20    # Drop temperatures below this value
+#     CHP_TEMP_MAX       <-  50    # Drop temperatures above this value
+#     CHP_TEMP_STD_LIM   <-  10    # Drop temperatures with standard deviation above this value
+#
+#     year_data$chp1_temperature_SD[ year_data$chp1_temperature > CHP_TEMP_MAX] <- NA
+#     year_data$chp1_temp_UNC      [ year_data$chp1_temperature > CHP_TEMP_MAX] <- NA
+#     year_data$chp1_temperature   [ year_data$chp1_temperature > CHP_TEMP_MAX] <- NA
+#
+#     year_data$chp1_temperature_SD[ year_data$chp1_temperature < CHP_TEMP_MIN] <- NA
+#     year_data$chp1_temp_UNC      [ year_data$chp1_temperature < CHP_TEMP_MIN] <- NA
+#     year_data$chp1_temperature   [ year_data$chp1_temperature < CHP_TEMP_MIN] <- NA
+#
+#     year_data$chp1_temperature   [ year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
+#     year_data$chp1_temp_UNC      [ year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
+#     year_data$chp1_temperature_SD[ year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
+#
+#
+#     setorder(year_data, Date)
+#
+#     ## use the old names for output
+#     names(year_data)[names(year_data) == "Date"]                <- "Date30"
+#     names(year_data)[names(year_data) == "CHP1_sig"]            <- "CHP1value"
+#     names(year_data)[names(year_data) == "CHP1_sig_sd"]         <- "CHP1sd"
+#     names(year_data)[names(year_data) == "Async_step_count"]    <- "AsynStep"
+#     names(year_data)[names(year_data) == "Async_tracker"]       <- "Async"
+#     names(year_data)[names(year_data) == "chp1_temperature"]    <- "CHP1temp"
+#     names(year_data)[names(year_data) == "chp1_temperature_SD"] <- "CHP1tempSD"
+#     names(year_data)[names(year_data) == "chp1_temp_UNC"]       <- "CHP1tempUNC"
+#
+#     ## write data to old file format
+#     write_RDS(year_data,
+#               paste0("~/DATA/Broad_Band/Legacy_L0_CHP1_", YYYY, ".Rds"),
+#               clean = TRUE)
+# }
 
 
 
@@ -226,10 +226,13 @@ listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
                          full.names = TRUE, ignore.case = TRUE)
 library(arsenal)
 
+#+ echo=F, include=F, results="asis"
 for (alf in listlegacy) {
     legacy <- readRDS(alf)
     yyyy   <- unique(year(legacy$Date30))[1]
     baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CHP1_L0_",yyyy,".Rds")))
+
+    cat(paste("\n\n##", yyyy, "\n\n"))
 
     baseDT$Date <- NULL
 
@@ -267,9 +270,8 @@ for (alf in listlegacy) {
     vec <- sss[CHP1temp.x == CHP1temp.y]
     sss[vec, CHP1temp.x := NA ]
     sss[vec, CHP1temp.y := NA ]
-    plot(  sss$Date30, sss$CHP1temp.y, col = "red")
-    points(sss$Date30, sss$CHP1temp.x, col = "blue")
-
+    # plot(  sss$Date30, sss$CHP1temp.y, col = "red")
+    # points(sss$Date30, sss$CHP1temp.x, col = "blue")
 
 
     vec <- sss[Async.x == Async.y]
@@ -282,24 +284,17 @@ for (alf in listlegacy) {
     sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < 12]
 
 
+    cat("\n\n")
+    pander(summary(sss))
+    cat("\n\n")
+
     ss <- comparedf(legacy, baseDT,
                     by = "Date30",
                     int.as.num = TRUE)
 
-    all.equal(baseDT, legacy,
-              ignore.col.order = TRUE,
-              ignore.row.order = TRUE)
 
     summary(ss)
-
-    ss$frame.summary
-    ss$vars.summary
-    ss$control
-
-
-
-
-stop()
+    cat("\n\n")
 
 }
 
