@@ -233,6 +233,16 @@ for (alf in listlegacy) {
 
     baseDT$Date <- NULL
 
+    baseDT$Azimuth <- NULL
+    legacy$Azimuth <- NULL
+    baseDT$Elevat  <- NULL
+    legacy$Elevat  <- NULL
+    baseDT$CHP1tempSD <- NULL
+    legacy$CHP1tempSD <- NULL
+    baseDT$CHP1tempUNC <- NULL
+    legacy$CHP1tempUNC <- NULL
+
+
     baseDT <- baseDT[!is.na(CHP1value)]
     legacy <- legacy[!is.na(CHP1value)]
 
@@ -260,18 +270,6 @@ for (alf in listlegacy) {
     plot(  sss$Date30, sss$CHP1temp.y, col = "red")
     points(sss$Date30, sss$CHP1temp.x, col = "blue")
 
-    vec <- sss[Elevat.x == Elevat.y]
-    sss[vec, Elevat.x := NA ]
-    sss[vec, Elevat.y := NA ]
-    plot(  sss$Date30, sss$Elevat.y, col = "red")
-    points(sss$Date30, sss$Elevat.x, col = "blue")
-
-
-    vec <- sss[Azimuth.x == Azimuth.y]
-    sss[vec, Azimuth.x := NA ]
-    sss[vec, Azimuth.y := NA ]
-    plot(  sss$Date30, sss$Azimuth.y, col = "red")
-    points(sss$Date30, sss$Azimuth.x, col = "blue")
 
 
     vec <- sss[Async.x == Async.y]
@@ -281,7 +279,7 @@ for (alf in listlegacy) {
     points(sss$Date30, sss$Async.x, col = "blue")
 
 
-    sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) != 18]
+    sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < 12]
 
 
     ss <- comparedf(legacy, baseDT,
