@@ -226,7 +226,7 @@ listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
                          full.names = TRUE, ignore.case = TRUE)
 library(arsenal)
 
-#+ echo=F, include=F, results="asis"
+#+ echo=F, include=T, results="asis"
 for (alf in listlegacy) {
     legacy <- readRDS(alf)
     yyyy   <- unique(year(legacy$Date30))[1]
@@ -285,7 +285,7 @@ for (alf in listlegacy) {
 
 
     cat("\n\n")
-    pander(summary(sss))
+    cat(pander(summary(sss)))
     cat("\n\n")
 
     ss <- comparedf(legacy, baseDT,
@@ -293,7 +293,7 @@ for (alf in listlegacy) {
                     int.as.num = TRUE)
 
 
-    summary(ss)
+    print(summary(ss))
     cat("\n\n")
 
 }
