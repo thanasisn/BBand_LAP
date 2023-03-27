@@ -174,14 +174,84 @@ for (YYYY in datayears) {
 listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
                          pattern = "Legacy_L0_CHP1_[0-9]{4}\\.Rds",
                          full.names = TRUE, ignore.case = TRUE)
+library(arsenal)
 
 for (alf in listlegacy) {
     legacy <- readRDS(alf)
     yyyy   <- unique(year(legacy$Date30))[1]
+    baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CHP1_L0_",yyyy,".Rds")))
 
-    paste0("c")
+    baseDT$Date <- NULL
+
+    baseDT <- baseDT[!is.na(CHP1value)]
+    legacy <- legacy[!is.na(CHP1value)]
+
+    setorder(baseDT, Date30)
+    setorder(legacy, Date30)
 
 
+    sss <- merge(baseDT, legacy, by = "Date30")
+
+    vec <- sss[CHP1value.x == CHP1value.y]
+    sss[vec, CHP1value.x := NA ]
+    sss[vec, CHP1value.y := NA ]
+    plot(  sss$Date30, sss$CHP1value.x, col = "red")
+    points(sss$Date30, sss$CHP1value.y, col = "blue")
+
+    vec <- sss[CHP1sd.x == CHP1sd.y]
+    sss[vec, CHP1sd.x := NA ]
+    sss[vec, CHP1sd.y := NA ]
+    plot(  sss$Date30, sss$CHP1sd.x, col = "red")
+    points(sss$Date30, sss$CHP1sd.y, col = "blue")
+
+    vec <- sss[CHP1temp.x == CHP1temp.y]
+    sss[vec, CHP1temp.x := NA ]
+    sss[vec, CHP1temp.y := NA ]
+    plot(  sss$Date30, sss$CHP1temp.y, col = "red")
+    points(sss$Date30, sss$CHP1temp.x, col = "blue")
+
+    vec <- sss[Elevat.x == Elevat.y]
+    sss[vec, Elevat.x := NA ]
+    sss[vec, Elevat.y := NA ]
+    plot(  sss$Date30, sss$Elevat.y, col = "red")
+    points(sss$Date30, sss$Elevat.x, col = "blue")
+
+
+    vec <- sss[Azimuth.x == Azimuth.y]
+    sss[vec, Azimuth.x := NA ]
+    sss[vec, Azimuth.y := NA ]
+    plot(  sss$Date30, sss$Azimuth.y, col = "red")
+    points(sss$Date30, sss$Azimuth.x, col = "blue")
+
+
+    vec <- sss[Async.x == Async.y]
+    sss[vec, Async.x := NA ]
+    sss[vec, Async.y := NA ]
+    plot(  sss$Date30, sss$Async.y, col = "red")
+    points(sss$Date30, sss$Async.x, col = "blue")
+
+
+    sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) != 18]
+
+
+    ss <- comparedf(legacy, baseDT,
+                    by = "Date30",
+                    int.as.num = TRUE)
+
+    all.equal(baseDT, legacy,
+              ignore.col.order = TRUE,
+              ignore.row.order = TRUE)
+
+    summary(ss)
+
+    ss$frame.summary
+    ss$vars.summary
+    ss$control
+
+    compare
+    summary(comparedf(df1, df2))
+
+stop()
 
 }
 
