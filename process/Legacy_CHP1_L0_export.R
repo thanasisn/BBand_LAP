@@ -245,6 +245,8 @@ for (alf in listlegacy) {
     baseDT$CHP1tempUNC <- NULL
     legacy$CHP1tempUNC <- NULL
 
+    legacy$Date30 <- as.POSIXct(legacy$Date30, tz = "UTC")
+    baseDT$Date30 <- as.POSIXct(baseDT$Date30, tz = "UTC")
 
     baseDT <- baseDT[!is.na(CHP1value)]
     legacy <- legacy[!is.na(CHP1value)]
