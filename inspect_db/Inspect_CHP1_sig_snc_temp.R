@@ -63,7 +63,7 @@ knitr::opts_chunk$set(fig.pos    = '!h'     )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/Inspect_CHP1_sig_snc_temp.R"
+Script.Name <- "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CHP_1_DIR/Functions_CHP1.R")

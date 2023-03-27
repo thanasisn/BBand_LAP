@@ -28,6 +28,10 @@ To process the data from broadband instruments of LAP.
 - Convertions
 - process more instruments
 - interactive plot of db variables
+- Import Astropy
+- Import TSI
+- Import libratran
+- Import pressure
 - may import QCrad and CSid
 
 

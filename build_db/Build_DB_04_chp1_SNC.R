@@ -134,6 +134,11 @@ for (YYYY in unique(year(inp_filelist$day))) {
                 gather[[var]] <- NA
                 gather[[var]] <- as.logical(gather[[var]])
             }
+            var <- "Async_step_count"
+            if (!any(names(gather) == var)) {
+                gather[[var]] <- NA
+                gather[[var]] <- as.integer(gather[[var]])
+            }
             var <- "year"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
@@ -196,10 +201,11 @@ for (YYYY in unique(year(inp_filelist$day))) {
                                   D_minutes >= syc_temp$async_start[ ik ]  ) ] <- TRUE
             }
 
-            day_data <- data.frame(Date          = D_minutes,
-                                   year          = year(D_minutes),
-                                   month         = month(D_minutes),
-                                   Async_tracker = async)
+            day_data <- data.frame(Date             = D_minutes,
+                                   year             = year(D_minutes),
+                                   month            = month(D_minutes),
+                                   Async_tracker    = async,
+                                   Async_step_count = asyncstp)
 
             ## get file metadata
             file_meta <- data.table(day                = as_date(ad),
