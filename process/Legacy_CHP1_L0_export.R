@@ -242,89 +242,127 @@ listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
 gather <- data.table()
 #+ echo=F, include=T, results="asis"
 for (alf in listlegacy) {
+    ## load new files
     legacy <- readRDS(alf)
     yyyy   <- unique(year(legacy$Date30))[1]
+    ## load old files
     baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CHP1_L0_",yyyy,".Rds")))
+
+    baseDT[Async == TRUE, CHP1value:=NA]
+    baseDT[Async == TRUE, CHP1sd   :=NA]
+
+    legacy[CHP1sd == 0, CHP1sd := NA]
 
     cat(paste("\n\n##", yyyy, "\n\n"))
 
-    baseDT$Date <- NULL
 
-    baseDT$Azimuth <- NULL
-    legacy$Azimuth <- NULL
-    baseDT$Elevat  <- NULL
-    legacy$Elevat  <- NULL
-    baseDT$CHP1tempSD <- NULL
-    legacy$CHP1tempSD <- NULL
+    ## Drop some columns
+    baseDT$Date        <- NULL
+    baseDT$Azimuth     <- NULL
+    legacy$Azimuth     <- NULL
+    baseDT$Elevat      <- NULL
+    legacy$Elevat      <- NULL
+    baseDT$CHP1temp    <- NULL
+    legacy$CHP1temp    <- NULL
+    baseDT$CHP1tempSD  <- NULL
+    legacy$CHP1tempSD  <- NULL
     baseDT$CHP1tempUNC <- NULL
     legacy$CHP1tempUNC <- NULL
 
-    legacy[Async == FALSE, Async:=NA]
-    baseDT[Async == FALSE, Async:=NA]
+    legacy[Async == FALSE, Async := NA]
+    baseDT[Async == FALSE, Async := NA]
 
     legacy$Date30 <- as.POSIXct(legacy$Date30, tz = "UTC")
     baseDT$Date30 <- as.POSIXct(baseDT$Date30, tz = "UTC")
 
-    baseDT <- baseDT[!is.na(CHP1value)]
-    legacy <- legacy[!is.na(CHP1value)]
+    # baseDT <- baseDT[!is.na(CHP1value)]
+    # legacy <- legacy[!is.na(CHP1value)]
 
 
     setorder(baseDT, Date30)
     setorder(legacy, Date30)
-stop()
-
-    sss <- merge(baseDT, legacy, by = "Date30", all = T)
-
-    vec <- sss[CHP1value.x == CHP1value.y]
-    sss[vec, CHP1value.x := NA ]
-    sss[vec, CHP1value.y := NA ]
-    plot(  sss$Date30, sss$CHP1value.x, col = "red")
-    points(sss$Date30, sss$CHP1value.y, col = "blue")
-
-    vec <- sss[CHP1sd.x == CHP1sd.y]
-    sss[vec, CHP1sd.x := NA ]
-    sss[vec, CHP1sd.y := NA ]
-    plot(  sss$Date30, sss$CHP1sd.x, col = "red")
-    points(sss$Date30, sss$CHP1sd.y, col = "blue")
-
-    vec <- sss[CHP1temp.x == CHP1temp.y]
-    sss[vec, CHP1temp.x := NA ]
-    sss[vec, CHP1temp.y := NA ]
-    # plot(  sss$Date30, sss$CHP1temp.y, col = "red")
-    # points(sss$Date30, sss$CHP1temp.x, col = "blue")
 
 
-    vec <- sss[Async.x == Async.y]
-    sss[vec, Async.x := NA ]
-    sss[vec, Async.y := NA ]
-    plot(  sss$Date30, sss$Async.y, col = "red")
-    points(sss$Date30, sss$Async.x, col = "blue")
+    ## merge two streams
+    sss <- merge(baseDT, legacy, by = "Date30", all = T, suffixes = c(".old", ".new"))
+
+    ## keep non empty
+    sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
 
 
-    sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < 10]
+    vec <- sss[CHP1value.old == CHP1value.new]
+    sss[vec, CHP1value.old := NA ]
+    sss[vec, CHP1value.new := NA ]
+    # plot(  sss$Date30, sss$CHP1value.old, col = "red")
+    # points(sss$Date30, sss$CHP1value.new, col = "blue")
+
+
+    vec <- sss[CHP1sd.old == CHP1sd.new]
+    sss[vec, CHP1sd.old := NA ]
+    sss[vec, CHP1sd.new := NA ]
+    # plot(  sss$Date30, sss$CHP1sd.old, col = "red")
+    # points(sss$Date30, sss$CHP1sd.new, col = "blue")
+
+
+    vec <- sss[Async.old == Async.new]
+    sss[vec, Async.old := NA ]
+    sss[vec, Async.new := NA ]
+    # plot(  sss$Date30, sss$Async.old, col = "red")
+    # points(sss$Date30, sss$Async.new, col = "blue")
+
+    vec <- sss[AsynStep.old == AsynStep.new]
+    sss[vec, AsynStep.old := NA ]
+    sss[vec, AsynStep.new := NA ]
+    # plot(  sss$Date30, sss$AsynStep.old, col = "red")
+    # points(sss$Date30, sss$AsynStep.new, col = "blue")
+
+    # vec <- sss[CHP1temp.old == CHP1temp.new]
+    # sss[vec, CHP1temp.old := NA ]
+    # sss[vec, CHP1temp.new := NA ]
+    # plot(  sss$Date30, sss$CHP1temp.old, col = "red")
+    # points(sss$Date30, sss$CHP1temp.new, col = "blue")
+
+
+    ## keep non empty
+    sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
+
 
     gather <- rbind(gather,sss, fill=T)
 
-    cat("\n\n")
-    cat(pander(summary(sss)))
-    cat("\n\n")
+
 
     ss <- arsenal::comparedf(legacy, baseDT,
                     by = "Date30",
                     int.as.num = TRUE)
 
 
+    cat(paste("\n\n###  compareDF ", yyyy, "\n\n"))
+
+    print(
+        compareDF::compare_df(legacy, baseDT,
+                              group_col = "Date30",
+                              tolerance = 0.00001)
+    )
 
 
-    dd <- compareDF::compare_df(legacy, baseDT,
-                          group_col = "Date30",
-                          tolerance = 0.00001)
+
+    cat(paste("\n\n###  arselan::comparedf ", yyyy, "\n\n"))
 
     print(summary(ss))
     cat("\n\n")
 
+
+    cat(paste("\n\n###  sumury ", yyyy, "\n\n"))
+
+    cat("\n\n")
+    cat(pander(summary(sss)))
+    cat("\n\n")
+
 }
 
+cat(paste("\n\n##  summary \n\n"))
+
+pander(summary(gather))
 
 
 

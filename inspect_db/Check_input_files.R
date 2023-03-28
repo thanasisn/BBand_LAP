@@ -41,14 +41,16 @@
 #' ---
 
 #'
-#'
 #' **Source code: [github.com/thanasisn/BBand_LAP](https://github.com/thanasisn/BBand_LAP)**
 #'
 #' **Data display: [thanasisn.netlify.app/3-data_display/](https://thanasisn.netlify.app/3-data_display/)**
 #'
+#' - Lists Sirena files
+#' - Lists Radmon files
+#' 
+#' ### TODO
 #'
-#'   - Lists Sirena files
-#'   - Lists Radmon files
+#' - check files chksum
 #'
 #+ echo=F, include=T
 

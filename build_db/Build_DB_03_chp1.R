@@ -180,8 +180,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
             stopifnot(is.numeric(lap$V1))
             stopifnot(is.numeric(lap$V2))
             stopifnot(dim(lap)[1] == 1440)
-            lap[V1 < -8, V1 := NA]
-            lap[V2 < -8, V2 := NA]
+            lap[V1 <= -5, V1 := NA]
+            lap[V2 <= -5, V2 := NA]
 
             ## get data
             day_data <- data.table(Date        = D_minutes,      # Date of the data point
