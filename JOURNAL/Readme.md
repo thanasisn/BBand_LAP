@@ -1,24 +1,27 @@
 
-# Instructions
+# Use instructions
 
-##  To build journal:
 
-- "`make`"      for defaults
+## Build a document form journal files
+
+- "`make`"      for default
 - "`make all`"  the defaults (pdf and html)
-- "`make pdf`"  ... 
-- "`make html`" ...
-- "`make odt`"  ...
+- "`make pdf`"  nice!
+- "`make html`" why not?
+- "`make odt`"  are you kidding?
 
 
-## Format
 
-Filenames should be numerical sorted:
+
+## Keep this format for entries
+
+### Filenames should be numerical sorted
 
 - `./YYYY/YYYYMMDD_0000.md`
 - `./YYYY/YYYYMMDD.md`
 
 
-File template:
+### File template
 
 
 ```
@@ -29,3 +32,4 @@ File template:
 Text for this entry
 
 ```
+
