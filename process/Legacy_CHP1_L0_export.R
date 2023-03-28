@@ -330,6 +330,17 @@ for (alf in listlegacy) {
     sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
 
 
+    cat("\n\n")
+    cat(paste(dim(sss)), "\n")
+    cat("\n\n")
+
+
+    cat("\n\n")
+    cat(print(Hmisc::describe(sss)), sep = "\n")
+    cat("\n\n")
+
+
+
     gather <- rbind(gather,sss, fill=T)
 
 
@@ -340,20 +351,20 @@ for (alf in listlegacy) {
 
     cat("\n\n")
     cat(paste("\n\n###  compareDF ", yyyy, "\n\n"))
+    cat("\n\n")
 
-    print(
-        compareDF::compare_df(legacy, baseDT,
-                              group_col = "Date30",
-                              tolerance = 0.00001)
-    )
+    # print(
+    #     compareDF::compare_df(legacy, baseDT,
+    #                           group_col = "Date30",
+    #                           tolerance = 0.00001)
+    # )
 
 
+    cat(paste("\n\n###  arsenal::comparedf ", yyyy, "\n\n"))
 
-    # cat(paste("\n\n###  arselan::comparedf ", yyyy, "\n\n"))
-    #
-    # cat("\n\n")
-    # print(summary(ss))
-    # cat("\n\n")
+    cat("\n\n")
+    print(summary(ss))
+    cat("\n\n")
 
 
     cat(paste("\n\n###  Data summary ", yyyy, "\n\n"))
