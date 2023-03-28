@@ -166,18 +166,20 @@ for (YYYY in unique(year(inp_filelist$day))) {
             async    <- rep(FALSE, 1440)  # The snc file exist, so start with all not async
             asyncstp <- rep(NA,    1440)  # Async magnitude (steps missed)
 
-            suppressWarnings(rm(D_minutes))
-            D_minutes <- seq(from       = as.POSIXct(paste(as_date(ad), "00:00:30 UTC")),
+            ## Recreate time stamp for all minutes of day starting from zero!!!
+            D_minutes <- seq(from       = as.POSIXct(paste(as_date(ad), "00:00:00 UTC")),
                              length.out = 1440,
                              by         = "min")
 
             ## __  Read tracker sync file  -------------------------------------
             ## TODO we should use step files as more reliable to detect async events!!!
             syc_temp    <- read.table(ss$fullname, sep = "\t", as.is = TRUE, na.strings = "None")
+            ## get dates from file
             syc_temp$V1 <- as.POSIXct(syc_temp$V1)
+            ## round to start of each minute
             async_minu  <- as.POSIXct(format(syc_temp$V1,format = "%F %R"))  ## async end
+            ## get minutes with async
             uniq_async  <- unique(async_minu)
-
             ## async time distance
             syc_temp$timeDist <- apply(syc_temp[, c('V7', 'V8')], MARGIN = 1, FUN = max, na.rm = T)
 
@@ -201,6 +203,9 @@ for (YYYY in unique(year(inp_filelist$day))) {
                 async[ which( D_minutes <= syc_temp$async_end[   ik ] &
                               D_minutes >= syc_temp$async_start[ ik ]  ) ] <- TRUE   ## !!
             }
+
+            ## Move dates to the center of each minute, as the rest of DB
+            D_minutes <- D_minutes + 30
 
             day_data <- data.frame(Date             = D_minutes,
                                    year             = year(D_minutes),
