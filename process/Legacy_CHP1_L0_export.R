@@ -141,8 +141,8 @@ BB        <- opendata()
 #     year_data[!is.na(CHP1_sig), .N]
 #     cat("\nRemove bad data regions\n")
 #     cat(year_data[!is.na(chp1_bad_data), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-#     year_data$CHP1_sig   [!is.na(year_data$chp1_bad_data)] <- NA
-#     year_data$CHP1_sig_sd[!is.na(year_data$chp1_bad_data)] <- NA
+#     year_data$CM21_sig   [!is.na(year_data$chp1_bad_data)] <- NA
+#     year_data$CM21_sig_sd[!is.na(year_data$chp1_bad_data)] <- NA
 #
 #     cat("\nRemove tracker async cases\n")
 #     cat(year_data[Async_tracker == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
@@ -162,6 +162,7 @@ BB        <- opendata()
 #     year_data$sig_lowlim    <- NULL
 #     year_data$sig_upplim    <- NULL
 #     year_data$chp1_bad_data <- NULL
+#
 #
 #     CHP_TEMP_MIN       <- -20    # Drop temperatures below this value
 #     CHP_TEMP_MAX       <-  50    # Drop temperatures above this value
@@ -223,6 +224,7 @@ BB        <- opendata()
 listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
                          pattern = "Legacy_L0_CHP1_[0-9]{4}\\.Rds",
                          full.names = TRUE, ignore.case = TRUE)
+library(arsenal)
 
 #+ echo=F, include=T, results="asis"
 for (alf in listlegacy) {
@@ -248,8 +250,6 @@ for (alf in listlegacy) {
 
     baseDT <- baseDT[!is.na(CHP1value)]
     legacy <- legacy[!is.na(CHP1value)]
-
-
 
     setorder(baseDT, Date30)
     setorder(legacy, Date30)
@@ -290,18 +290,10 @@ for (alf in listlegacy) {
     cat(pander(summary(sss)))
     cat("\n\n")
 
-    ss <- arsenal::comparedf(legacy, baseDT,
+    ss <- comparedf(legacy, baseDT,
                     by = "Date30",
                     int.as.num = TRUE)
 
-
-
-
-    compareDF::compare_df(legacy, baseDT,
-                          group_col = "Date30")
-
-
-stop()
 
     print(summary(ss))
     cat("\n\n")
