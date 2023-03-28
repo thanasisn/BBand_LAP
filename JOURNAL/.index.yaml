@@ -1,0 +1,13 @@
+---
+title:    Instruments Journal
+author:   Thanasis N
+geometry: "a4paper,left=1.3cm,right=1.3cm,top=1.3cm,bottom=1.3cm"
+
+header-includes: |
+    \usepackage{fontspec}
+    \usepackage{xunicode}
+    \usepackage{xltxtra}
+    \setmainfont[Scale=1.0]{Linux Libertine O}
+
+#   \usepackage{xgreek}
+---
