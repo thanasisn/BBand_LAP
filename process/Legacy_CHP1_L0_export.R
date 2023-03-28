@@ -26,6 +26,7 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
+#'     toc_depth:        4
 #'     fig_width:        8
 #'     fig_height:       5
 #'   html_document:
@@ -239,6 +240,8 @@ listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
                          pattern = "Legacy_L0_CHP1_[0-9]{4}\\.Rds",
                          full.names = TRUE, ignore.case = TRUE)
 
+# listlegacy <- listlegacy[1]
+
 gather <- data.table()
 #+ echo=F, include=T, results="asis"
 for (alf in listlegacy) {
@@ -293,8 +296,8 @@ for (alf in listlegacy) {
     vec <- sss[CHP1value.old == CHP1value.new]
     sss[vec, CHP1value.old := NA ]
     sss[vec, CHP1value.new := NA ]
-    # plot(  sss$Date30, sss$CHP1value.old, col = "red")
-    # points(sss$Date30, sss$CHP1value.new, col = "blue")
+    plot(  sss$Date30, sss$CHP1value.old, col = "red")
+    points(sss$Date30, sss$CHP1value.new, col = "blue")
 
 
     vec <- sss[CHP1sd.old == CHP1sd.new]
@@ -335,7 +338,7 @@ for (alf in listlegacy) {
                     by = "Date30",
                     int.as.num = TRUE)
 
-
+    cat("\n\n")
     cat(paste("\n\n###  compareDF ", yyyy, "\n\n"))
 
     print(
@@ -346,13 +349,14 @@ for (alf in listlegacy) {
 
 
 
-    cat(paste("\n\n###  arselan::comparedf ", yyyy, "\n\n"))
+    # cat(paste("\n\n###  arselan::comparedf ", yyyy, "\n\n"))
+    #
+    # cat("\n\n")
+    # print(summary(ss))
+    # cat("\n\n")
 
-    print(summary(ss))
-    cat("\n\n")
 
-
-    cat(paste("\n\n###  sumury ", yyyy, "\n\n"))
+    cat(paste("\n\n###  Data summary ", yyyy, "\n\n"))
 
     cat("\n\n")
     cat(pander(summary(sss)))
@@ -360,7 +364,7 @@ for (alf in listlegacy) {
 
 }
 
-cat(paste("\n\n##  summary \n\n"))
+cat(paste("\n\n##  All data summary \n\n"))
 
 pander(summary(gather))
 
