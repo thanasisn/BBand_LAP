@@ -70,4 +70,12 @@ echo
 cat "./Readme.md" 
 ) >> "$targetfile"
 
+echo "--------------"
+echo " LIST OF KEYS "
+echo "--------------"
+
+grep "\[//\]" **/*.md | cut -d"#" -f2- | cut -d":" -f2- | sed 's/)//g' | tr "," "\n" | sed -e 's/^[ ]\+//' -e 's|[ ]\+$||' | sort -u
+
+
+
 exit 0 
