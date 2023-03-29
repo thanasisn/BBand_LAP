@@ -240,7 +240,7 @@ listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
                          pattern = "Legacy_L0_CHP1_[0-9]{4}\\.Rds",
                          full.names = TRUE, ignore.case = TRUE)
 
-listlegacy <- listlegacy[1]
+# listlegacy <- listlegacy[1]
 
 gather <- data.table()
 #+ echo=F, include=T, results="asis"
@@ -349,6 +349,13 @@ for (alf in listlegacy) {
 
     gather <- rbind(gather,sss, fill=T)
 
+
+
+
+
+
+
+
     cat("\n\n")
     cat(paste("\n\n###  compareDF ", yyyy, "\n\n"))
     cat("\n\n")
@@ -358,13 +365,39 @@ for (alf in listlegacy) {
                                 group_col = "Date30",
                                 tolerance = 0.00001)
 
-    print(aa)
+    ## remove some data
+    aa$comparison_table_ts2char <- aa$comparison_table_ts2char[
+        apply(aa$comparison_table_ts2char, MARGIN = 1,
+              function(x) sum(is.na(x))) < ncol(aa$comparison_table_ts2char) - 2,
+    ]
+
+    ## remove results for clarity
+    aa$comparison_table_diff_numbers <- NULL
+
+    aa$comparison_df <- aa$comparison_df[
+        apply(aa$comparison_df, MARGIN = 1,
+              function(x) sum(is.na(x))) < ncol(aa$comparison_df) - 2,
+    ]
+
+    aa$comparison_table_diff <- NULL
+
+    aa$change_count <- NULL
+
+    cat("\n\n")
+    cat(pander(aa$change_summary),"\n")
+    cat("\n\n")
+    cat(pander(aa$comparison_df),"\n")
+    cat("\n\n")
+    cat(pander(aa$comparison_table_ts2char),"\n")
+    cat("\n\n")
+
+
+
 
 
 
 
     cat(paste("\n\n###  arsenal::comparedf ", yyyy, "\n\n"))
-
 
     ss <- arsenal::comparedf(legacy, baseDT,
                              by = "Date30",
@@ -376,6 +409,10 @@ for (alf in listlegacy) {
     cat("\n\n")
     print(summary(ss))
     cat("\n\n")
+
+
+
+
 
 
     cat(paste("\n\n### NON common data summary ", yyyy, "\n\n"))
@@ -390,6 +427,14 @@ cat(paste("\n\n##  All data summary \n\n"))
 
 pander(summary(gather))
 
+cat("\n\n")
+cat(pander(dim(gather)))
+cat("\n\n")
+
+
+cat("\n\n```")
+cat(print(Hmisc::describe(gather)), sep = "\n")
+cat("```\n\n")
 
 
 
