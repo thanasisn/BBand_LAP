@@ -145,6 +145,7 @@ for (YYYY in datayears) {
         cat("Will export ", legacyout, "\n")
     } else {
         cat("SKIPPING ", legacyout, "\n")
+        stop()
         next()
     }
 
@@ -168,7 +169,7 @@ for (YYYY in datayears) {
     # cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
     # year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
     # year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
-    #
+
     # cat("\nRemove data below physical limits\n")
     # cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
     # year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
@@ -179,22 +180,19 @@ for (YYYY in datayears) {
     year_data$chp1_bad_data <- NULL
 
     ## Clean temperature data --------------------------------------------------
-    CHP_TEMP_MIN       <- -20    # Drop temperatures below this value
-    CHP_TEMP_MAX       <-  50    # Drop temperatures above this value
-    CHP_TEMP_STD_LIM   <-  10    # Drop temperatures with standard deviation above this value
+    CHP_TEMP_MIN       <- -20  # Drop temperatures below this value
+    CHP_TEMP_MAX       <-  50  # Drop temperatures above this value
+    CHP_TEMP_STD_LIM   <-  10  # Drop temperatures with standard deviation above this value
 
-    year_data$chp1_temperature_SD[ year_data$chp1_temperature > CHP_TEMP_MAX] <- NA
-    year_data$chp1_temp_UNC      [ year_data$chp1_temperature > CHP_TEMP_MAX] <- NA
-    year_data$chp1_temperature   [ year_data$chp1_temperature > CHP_TEMP_MAX] <- NA
-
-    year_data$chp1_temperature_SD[ year_data$chp1_temperature < CHP_TEMP_MIN] <- NA
-    year_data$chp1_temp_UNC      [ year_data$chp1_temperature < CHP_TEMP_MIN] <- NA
-    year_data$chp1_temperature   [ year_data$chp1_temperature < CHP_TEMP_MIN] <- NA
-
-    year_data$chp1_temperature   [ year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
-    year_data$chp1_temp_UNC      [ year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
-    year_data$chp1_temperature_SD[ year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
-
+    year_data$chp1_temperature_SD[year_data$chp1_temperature    > CHP_TEMP_MAX] <- NA
+    year_data$chp1_temp_UNC      [year_data$chp1_temperature    > CHP_TEMP_MAX] <- NA
+    year_data$chp1_temperature   [year_data$chp1_temperature    > CHP_TEMP_MAX] <- NA
+    year_data$chp1_temperature_SD[year_data$chp1_temperature    < CHP_TEMP_MIN] <- NA
+    year_data$chp1_temp_UNC      [year_data$chp1_temperature    < CHP_TEMP_MIN] <- NA
+    year_data$chp1_temperature   [year_data$chp1_temperature    < CHP_TEMP_MIN] <- NA
+    year_data$chp1_temperature   [year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
+    year_data$chp1_temp_UNC      [year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
+    year_data$chp1_temperature_SD[year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
 
     setorder(year_data, Date)
 
@@ -207,18 +205,19 @@ for (YYYY in datayears) {
     names(year_data)[names(year_data) == "chp1_temperature"]    <- "CHP1temp"
     names(year_data)[names(year_data) == "chp1_temperature_SD"] <- "CHP1tempSD"
     names(year_data)[names(year_data) == "chp1_temp_UNC"]       <- "CHP1tempUNC"
+    year_data$Date <- year_data$Date30 - 30
 
+    year_data |> glimpse()
     ## Write data to old file format  ------------------------------------------
-    write_RDS(year_data,
-              legacyout,
-              clean = TRUE)
+    year_data <- data.table(year_data)
+    write_RDS(object = year_data,
+              file   = legacyout,
+              clean  = TRUE)
 }
-
-
 
 ## Old format of CHP1 L0
 # 'data.frame':	383040 obs. of  11 variables:
-# $ Date       : POSIXct, format: "2016-01-22 00:00:00" "2016-01-22 00:01:00" "2016-01-22 00:02:00" "2016-01-22 00:03:00" ...
+# $ Date       : POSIXct, format: "2016-01-22 00:00:00" "2016-01-22 00:01:00"
 # $ CHP1value  : num  NA NA NA NA NA NA NA NA NA NA ...
 # $ CHP1sd     : num  NA NA NA NA NA NA NA NA NA NA ...
 # $ AsynStep   : int  NA NA NA NA NA NA NA NA NA NA ...
@@ -228,7 +227,7 @@ for (YYYY in datayears) {
 # $ CHP1temp   : num  NA NA NA NA NA NA NA NA NA NA ...
 # $ CHP1tempSD : num  NA NA NA NA NA NA NA NA NA NA ...
 # $ CHP1tempUNC: num  NA NA NA NA NA NA NA NA NA NA ...
-# $ Date30     : POSIXct, format: "2016-01-22 00:00:30" "2016-01-22 00:01:30" "2016-01-22 00:02:30" "2016-01-22 00:03:30" ...
+# $ Date30     : POSIXct, format: "2016-01-22 00:00:30" "2016-01-22 00:01:30"
 
 
 
@@ -270,7 +269,6 @@ for (alf in listlegacy) {
 
     cat(paste("\n\n##", yyyy, "\n\n"))
 
-
     ## Drop some columns
     baseDT$CHP1temp    <- NULL
     legacy$CHP1temp    <- NULL
@@ -288,10 +286,8 @@ for (alf in listlegacy) {
     # baseDT <- baseDT[!is.na(CHP1value)]
     # legacy <- legacy[!is.na(CHP1value)]
 
-
     setorder(baseDT, Date30)
     setorder(legacy, Date30)
-
 
     ## merge two streams
     sss <- merge(baseDT, legacy, by = "Date30", all = T, suffixes = c(".old", ".new"))
@@ -299,20 +295,17 @@ for (alf in listlegacy) {
     ## keep non empty
     sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
 
-
     vec <- sss[CHP1value.old == CHP1value.new]
     sss[vec, CHP1value.old := NA ]
     sss[vec, CHP1value.new := NA ]
     plot(  sss$Date30, sss$CHP1value.old, col = "red")
     points(sss$Date30, sss$CHP1value.new, col = "blue")
 
-
     vec <- sss[CHP1sd.old == CHP1sd.new]
     sss[vec, CHP1sd.old := NA ]
     sss[vec, CHP1sd.new := NA ]
     # plot(  sss$Date30, sss$CHP1sd.old, col = "red")
     # points(sss$Date30, sss$CHP1sd.new, col = "blue")
-
 
     vec <- sss[Async.old == Async.new]
     sss[vec, Async.old := NA ]
@@ -345,11 +338,8 @@ for (alf in listlegacy) {
     cat("\n\n```")
     cat(print(Hmisc::describe(sss)), sep = "\n")
     cat("```\n\n")
-
     cat("\n\n")
-
     print(plot(Hmisc::describe(sss)))
-
     cat("\n\n")
     Hmisc::html(Hmisc::describe(sss))
     cat("\n\n")
@@ -430,15 +420,14 @@ cat(paste("\n\n##  All data summary \n\n"))
 
 pander(summary(gather))
 
-cat("\n\n")
-cat(pander(dim(gather)))
-cat("\n\n")
-
-
 cat("\n\n```")
 cat(print(Hmisc::describe(gather)), sep = "\n")
 cat("```\n\n")
-
+cat("\n\n")
+print(plot(Hmisc::describe(gather)))
+cat("\n\n")
+Hmisc::html(Hmisc::describe(gather))
+cat("\n\n")
 
 
 
