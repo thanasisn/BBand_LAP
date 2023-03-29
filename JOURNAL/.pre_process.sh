@@ -7,6 +7,8 @@
 ## list of files from Makefile
 args=( "$@" )
 
+taglist="Tag_list.md"
+
 ## init document
 targetfile=".markdowncontent"
 echo "" > "$targetfile"
@@ -70,12 +72,21 @@ echo
 cat "./Readme.md" 
 ) >> "$targetfile"
 
-echo "--------------"
-echo " LIST OF KEYS "
-echo "--------------"
+(
+echo ""
+echo "List of tags"
+echo "============"
+grep "\[//\]" **/*.md |\
+    cut -d"#" -f2- |\
+    cut -d":" -f2- |\
+    sed 's/)//g' |\
+    tr "," "\n" |\
+    sed -e 's/^[ ]\+//' -e 's|[ ]\+$||' |\
+    sort |\
+    uniq -c
+) > "$taglist"
 
-grep "\[//\]" **/*.md | cut -d"#" -f2- | cut -d":" -f2- | sed 's/)//g' | tr "," "\n" | sed -e 's/^[ ]\+//' -e 's|[ ]\+$||' | sort -u
-
+cat "$taglist" >> "$targetfile"
 
 
 exit 0 

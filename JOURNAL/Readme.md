@@ -1,19 +1,9 @@
 
-# Use instructions
+# Journal instructions
 
 
-## Build a document form journal files
+## Format for entries
 
-- "`make`"      for default
-- "`make all`"  the defaults (pdf and html)
-- "`make pdf`"  nice!
-- "`make html`" why not?
-- "`make odt`"  are you kidding?
-
-
-
-
-## Keep this format for entries
 
 ### Filenames should be numerical sorted
 
@@ -23,13 +13,33 @@
 
 ### File template
 
-
 ```
 ## 2022-02-21 00:00 [USERNAME]
 
 [//]: # (Keywords: #key_1, #key_2)
 
-Text for this entry
+Text for this entry.
+Use simple text, it will parsed as
+markdown.
 
 ```
+
+## Build a journal document entries files
+
+There is a `Makefile` to automate the process.
+
+- "`make`"      for default
+- "`make all`"  the defaults (pdf and html)
+- "`make pdf`"  nice!
+- "`make html`" why not?
+- "`make odt`"  are you kidding?
+
+Document options are defined by:
+
+- `Makefile`
+- `.index.yaml` 
+- `.pre_process.sh`
+- `.columns.lua`
+
+At least you need `pandoc` installed.
 
