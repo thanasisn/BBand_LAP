@@ -338,7 +338,7 @@ for (alf in listlegacy) {
 
 
     cat("\n\n")
-    cat(pander(dim(sss)))
+    cat(paste("\n\n###  Hmisc::describe ", yyyy, "\n\n"))
     cat("\n\n")
 
 
@@ -346,14 +346,17 @@ for (alf in listlegacy) {
     cat(print(Hmisc::describe(sss)), sep = "\n")
     cat("```\n\n")
 
+    cat("\n\n")
+
+    print(plot(Hmisc::describe(sss)))
+
+    cat("\n\n")
+    Hmisc::html(Hmisc::describe(sss))
+    cat("\n\n")
+
+
 
     gather <- rbind(gather,sss, fill=T)
-
-
-
-
-
-
 
 
     cat("\n\n")
