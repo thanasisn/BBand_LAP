@@ -247,24 +247,31 @@ gather <- data.table()
 for (alf in listlegacy) {
     ## load new files
     legacy <- readRDS(alf)
-    yyyy   <- unique(year(legacy$Date30))[1]
+    legacy$Azimuth     <- NULL
+    legacy$Elevat      <- NULL
+    legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
+
     ## load old files
+    yyyy   <- unique(year(legacy$Date30))[1]
     baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CHP1_L0_",yyyy,".Rds")))
+    baseDT$Azimuth     <- NULL
+    baseDT$Elevat      <- NULL
+    baseDT$Date        <- NULL
 
-    baseDT[Async == TRUE, CHP1value:=NA]
-    baseDT[Async == TRUE, CHP1sd   :=NA]
+    baseDT[Async == TRUE, CHP1value := NA]
+    baseDT[Async == TRUE, CHP1sd    := NA]
 
-    legacy[CHP1sd == 0, CHP1sd := NA]
+    baseDT <- baseDT[!(is.na(CHP1value)  &
+                           is.na(CHP1sd)     &
+                           is.na(CHP1temp)   &
+                           is.na(CHP1tempSD) &
+                           is.na(AsynStep)   &
+                           is.na(CHP1tempUNC)) ]
 
     cat(paste("\n\n##", yyyy, "\n\n"))
 
 
     ## Drop some columns
-    baseDT$Date        <- NULL
-    baseDT$Azimuth     <- NULL
-    legacy$Azimuth     <- NULL
-    baseDT$Elevat      <- NULL
-    legacy$Elevat      <- NULL
     baseDT$CHP1temp    <- NULL
     legacy$CHP1temp    <- NULL
     baseDT$CHP1tempSD  <- NULL
@@ -330,48 +337,48 @@ for (alf in listlegacy) {
     sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
 
 
-    cat("\n1\n")
-    cat(paste(dim(sss)), "\n")
     cat("\n\n")
-
-    cat("\n2\n")
-    pander(dim(sss))
+    cat(pander(dim(sss)))
     cat("\n\n")
 
 
-    cat("\n3\n")
+    cat("\n\n```")
     cat(print(Hmisc::describe(sss)), sep = "\n")
-    cat("\n\n")
-
+    cat("```\n\n")
 
 
     gather <- rbind(gather,sss, fill=T)
-
-
-
-    ss <- arsenal::comparedf(legacy, baseDT,
-                    by = "Date30",
-                    int.as.num = TRUE)
 
     cat("\n\n")
     cat(paste("\n\n###  compareDF ", yyyy, "\n\n"))
     cat("\n\n")
 
-    # print(
-    #     compareDF::compare_df(legacy, baseDT,
-    #                           group_col = "Date30",
-    #                           tolerance = 0.00001)
-    # )
+
+    aa <- compareDF::compare_df(legacy, baseDT,
+                                group_col = "Date30",
+                                tolerance = 0.00001)
+
+    print(aa)
+
+
 
 
     cat(paste("\n\n###  arsenal::comparedf ", yyyy, "\n\n"))
+
+
+    ss <- arsenal::comparedf(legacy, baseDT,
+                             by = "Date30",
+                             int.as.num = TRUE)
+
+    ## remove a long table for display
+    ss$frame.summary$unique[[1]] <- ss$frame.summary$unique[[1]][1]
 
     cat("\n\n")
     print(summary(ss))
     cat("\n\n")
 
 
-    cat(paste("\n\n###  Data summary ", yyyy, "\n\n"))
+    cat(paste("\n\n### NON common data summary ", yyyy, "\n\n"))
 
     cat("\n\n")
     cat(pander(summary(sss)))
