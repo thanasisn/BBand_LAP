@@ -145,7 +145,6 @@ for (YYYY in datayears) {
         cat("Will export ", legacyout, "\n")
     } else {
         cat("SKIPPING ", legacyout, "\n")
-        stop()
         next()
     }
 
@@ -248,6 +247,7 @@ for (alf in listlegacy) {
     legacy <- readRDS(alf)
     legacy$Azimuth     <- NULL
     legacy$Elevat      <- NULL
+    legacy$Date        <- NULL
     legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
 
     ## load old files
