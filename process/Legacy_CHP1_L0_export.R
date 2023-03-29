@@ -240,7 +240,7 @@ listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
                          pattern = "Legacy_L0_CHP1_[0-9]{4}\\.Rds",
                          full.names = TRUE, ignore.case = TRUE)
 
-# listlegacy <- listlegacy[1]
+listlegacy <- listlegacy[1]
 
 gather <- data.table()
 #+ echo=F, include=T, results="asis"
@@ -330,12 +330,16 @@ for (alf in listlegacy) {
     sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
 
 
-    cat("\n\n")
+    cat("\n1\n")
     cat(paste(dim(sss)), "\n")
     cat("\n\n")
 
-
+    cat("\n2\n")
+    pander(dim(sss))
     cat("\n\n")
+
+
+    cat("\n3\n")
     cat(print(Hmisc::describe(sss)), sep = "\n")
     cat("\n\n")
 
