@@ -87,7 +87,7 @@ if (file.exists(DB_META_fl)) {
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
     ## new columns
-    var <- "chp1_bad_data_flagged"
+    var <- "chp1_dark_flag"
     if (!any(names(BB_meta) == var)) {
         BB_meta[[var]] <- NA
         BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
@@ -101,17 +101,6 @@ if (file.exists(DB_META_fl)) {
 ## Flag exclusions file by file  -----------------------------------------------
 ## FIXME should find a better method through arrow dataset
 
-## list data base files
-filelist <- data.table(
-    names = list.files(DB_DIR,
-                       pattern = "*.parquet",
-                       recursive  = TRUE,
-                       full.names = TRUE))
-dd      <- dirname(filelist$names)
-dd      <- tstrsplit(dd, "/")
-
-filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
-filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
 ## list data set to touch
 todosets <- unique(rbind(
@@ -132,12 +121,6 @@ for (af in filelist$names) {
 
 
 }
-
-## clean
-rm(BB_meta)
-rm(filelist)
-rm(ranges_CHP1)
-rm(ranges_CM21)
 
 
 
