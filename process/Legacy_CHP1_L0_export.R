@@ -125,7 +125,12 @@ BB        <- opendata()
 
 dddddd <- BB |> filter(CHP1_sig <= -5 ) |> collect()
 
-datayears <- 2023
+# datayears <- 2023
+
+editedyears <- as.vector(na.omit(unique(
+    year(BB_meta$day)[year(BB_meta$day) >= year(BB_meta$chp1_parsed)]
+)))
+
 
 ## export legacy files
 for (YYYY in datayears) {
@@ -140,10 +145,10 @@ for (YYYY in datayears) {
                  "chp1_bad_data")) |>
         collect()
     year_data <- data.table(year_data)
-stop()
+
     if (!file.exists(legacyout) |
-        file.mtime(legacyout) < max(BB_meta$cm21_bad_data_flagged, na.rm = T) |
-        file.mtime(legacyout) < max(BB_meta$cm21_parsed, na.rm = T)) {
+        file.mtime(legacyout) < max(BB_meta$chp1_bad_data_flagged, na.rm = T) |
+        YYYY %in% editedyears) {
         cat("Will export ", legacyout, "\n")
     } else {
         cat("SKIPPING ", legacyout, "\n")
