@@ -5,7 +5,7 @@
 #' Reads tracker synchronization data form `sun_tracker_.*.snc$`
 #'
 #' Populates:
-#'  - Async_tracker
+#'  - Async_tracker_flag
 #'
 #' There are more data but are parsed here
 #'
@@ -129,7 +129,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
             cat(" Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## add columns for this set
-            var <- "Async_tracker"
+            var <- "Async_tracker_flag"
             if (!any(names(gather) == var)) {
                 ## init with tracker as async
                 gather[[var]] <- TRUE
@@ -207,11 +207,11 @@ for (YYYY in unique(year(inp_filelist$day))) {
             ## Move dates to the center of each minute, as the rest of DB
             D_minutes <- D_minutes + 30
 
-            day_data <- data.frame(Date             = D_minutes,
-                                   year             = year(D_minutes),
-                                   month            = month(D_minutes),
-                                   Async_tracker    = async,
-                                   Async_step_count = asyncstp)
+            day_data <- data.frame(Date               = D_minutes,
+                                   year               = year(D_minutes),
+                                   month              = month(D_minutes),
+                                   Async_tracker_flag = async,
+                                   Async_step_count   = asyncstp)
 
             ## get file metadata
             file_meta <- data.table(day                = as_date(ad),
@@ -231,7 +231,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         # BBdaily <- rows_patch(BBdaily, gathermeta, by = "day", unmatched = "ignore")
 
         ## mark all days without a sync file as Async cases
-        gather$Async_tracker[!as.Date(gather$Date) %in% syncfldates] <- FALSE
+        gather$Async_tracker_flag[!as.Date(gather$Date) %in% syncfldates] <- FALSE
 
         setorder(gather, Date)
 
