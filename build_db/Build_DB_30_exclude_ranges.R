@@ -19,10 +19,10 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/Mark_excluded_data_ranges.R"
+Script.Name <- "~/BBand_LAP/build_db/Build_DB_30_exclude_ranges.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
-source("~/CHP_1_DIR/Functions_CHP1.R")
+source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
