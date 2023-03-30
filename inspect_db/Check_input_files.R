@@ -47,7 +47,7 @@
 #'
 #' - Lists Sirena files
 #' - Lists Radmon files
-#' 
+#'
 #' ### TODO
 #'
 #' - check files chksum
@@ -178,7 +178,11 @@ rm(rad_names, radmon_files, sirena_files)
 
 
 
-
+## TODO
+## - list snc
+## - list therm
+## - list step
+## - check md5sum
 
 
 
