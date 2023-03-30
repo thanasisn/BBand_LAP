@@ -177,7 +177,7 @@ cat('\n\n\\normalsize\n\n')
 BB <- opendata()
 
 # BB |> select(chp1_bad_data) %>% filter(!is.na(chp1_bad_data)) %>%  collect()
-# BB |> select(cm21_bad_data) %>% filter(!is.na(cm21_bad_data)) %>%  collect()
+# BB |> select(cm21_bad_data_flag) %>% filter(!is.na(cm21_bad_data_flag)) %>%  collect()
 # BB |> select(chp1_temp_bad_data) %>% filter(!is.na(chp1_temp_bad_data)) %>%  collect()
 
 
@@ -204,10 +204,10 @@ if (!any(names(BB) == var)) {
         write_parquet(BB_meta, DB_META_fl)
     }
 }
-var <- "cm21_bad_data"
+var <- "cm21_bad_data_flag"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
-    BB <- BB |> mutate(cm21_bad_data = as.character(NA)) |> compute()
+    BB <- BB |> mutate(cm21_bad_data_flag = as.character(NA)) |> compute()
     BB |> writedata()
     if (file.exists(DB_META_fl)) {
         BB_meta <- read_parquet(DB_META_fl)
@@ -315,11 +315,11 @@ for (af in filelist$names) {
         upper  <- ranges_CM21$Until[  i]
         comme  <- ranges_CM21$Comment[i]
         tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                             cm21_bad_data = comme)
+                             cm21_bad_data_flag = comme)
 
         ## mark bad regions of data
         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
-        # datapart[Date >= lower & Date < upper, cm21_bad_data := comme]
+        # datapart[Date >= lower & Date < upper, cm21_bad_data_flag := comme]
         rm(tempex)
     }
 
@@ -483,7 +483,7 @@ rm(ranges_CM21)
 #
 # BB %>% filter(!is.na(chp1_bad_data)) %>% collect()
 # BB %>% select(chp1_bad_data) %>% unique() %>% collect()
-# BB %>% select(cm21_bad_data) %>% unique() %>% collect()
+# BB %>% select(cm21_bad_data_flag) %>% unique() %>% collect()
 #
 # BB %>% select(Date) %>% collect()
 #
