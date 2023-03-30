@@ -43,9 +43,9 @@ cat("\n Initialize DB or import  PySolar  Sun data\n\n")
 if (file.exists(DB_META_fl)) {
     BB_meta <- read_parquet(DB_META_fl)
     BB_meta <- merge(BB_meta,
-                     data.table(day = seq(from = min(max(BB_meta$day),
-                                                     as_date(DB_start_date)),
-                                          to   = Sys.Date(),
+                     data.table(day = seq(from = min(max(BB_meta$day),        ## start of meta data table
+                                                     as_date(DB_start_date)), ## start of project
+                                          to   = (Sys.Date() - 1),            ## don't include today
                                           by   = "day")),
                      by = "day",
                      all = TRUE)
