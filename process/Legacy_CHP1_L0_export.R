@@ -139,10 +139,10 @@ for (YYYY in datayears) {
     ## get data from DB
     year_data <- BB |>
         filter(year == YYYY) |>
-        select(c("Date", "CHP1_sig", "CHP1_sig_sd","Async_step_count",
+        select(c("Date", "CHP1_sig", "CHP1_sig_sd", "Async_step_count",
                  "Async_tracker", "Azimuth", "Elevat", "chp1_temperature",
                  "chp1_temperature_SD", "chp1_temp_UNC",
-                 "chp1_bad_data")) |>
+                 "chp1_bad_data_flag")) |>
         collect()
     year_data <- data.table(year_data)
 
@@ -162,9 +162,9 @@ for (YYYY in datayears) {
     ## Apply some filtering ----------------------------------------------------
     year_data[!is.na(CHP1_sig), .N]
     cat("\nRemove bad data regions\n")
-    cat(year_data[!is.na(chp1_bad_data), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    year_data$CHP1_sig   [!is.na(year_data$chp1_bad_data)] <- NA
-    year_data$CHP1_sig_sd[!is.na(year_data$chp1_bad_data)] <- NA
+    cat(year_data[!is.na(chp1_bad_data_flag), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+    year_data$CHP1_sig   [!is.na(year_data$chp1_bad_data_flag)] <- NA
+    year_data$CHP1_sig_sd[!is.na(year_data$chp1_bad_data_flag)] <- NA
 
     cat("\nRemove tracker async cases\n")
     cat(year_data[Async_tracker == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
@@ -183,7 +183,7 @@ for (YYYY in datayears) {
 
     year_data$sig_lowlim    <- NULL
     year_data$sig_upplim    <- NULL
-    year_data$chp1_bad_data <- NULL
+    year_data$chp1_bad_data_flag <- NULL
 
     ## Clean temperature data --------------------------------------------------
     CHP_TEMP_MIN       <- -20  # Drop temperatures below this value
