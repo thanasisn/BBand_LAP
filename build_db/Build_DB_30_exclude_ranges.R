@@ -217,6 +217,7 @@ if (!any(names(BB) == var)) {
         write_parquet(BB_meta, DB_META_fl)
     }
 }
+## we will not use the DB directly
 rm(BB)
 
 
