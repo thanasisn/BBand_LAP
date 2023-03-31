@@ -15,6 +15,7 @@ Script.Name <- "~/BBand_LAP/settname.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
+source("~/CM_21_GLB/Functions_dark_calculation.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 # mylock(DB_lock)
@@ -33,49 +34,6 @@ library(pander,     warn.conflicts = TRUE, quietly = TRUE)
 
 
 
-
-## Create SZA ------------------------------------------------------------------
-BB <- opendata()
-
-
-# ## init SZA column
-# var <- "SZA"
-# if (!any(names(BB) == var)) {
-#     cat("Create column: ", var, "\n")
-#     BB |> mutate("{var}" := 90 - Elevat) |> writedata()
-# }
-
-BB |> dim()
-
-## TODO test
-# ## remove some data
-# pp <- BB |> filter(Date > as_datetime("2023-03-02 00:00:00")) |> mutate(SZA = NA)
-#
-# ## recreate table
-# pp <- pp |> to_duckdb()
-# CC <- BB |> to_duckdb()
-# CC <- rows_upsert(CC, pp, by = "Date")
-# CC |> to_arrow() |> writedata()
-
-## destroy some data for testing this updates all files
-# BB |> mutate(SZA = if_else(Date > as_datetime("2023-03-02 00:00:00"), NA, SZA, NA )) |> writedata()
-
-# BB |> filter(is.na(SZA)) |> collect()
-
-## fill missing
-# BB |> mutate(SZA = if_else(is.na(SZA), 90 - Elevat, NA, NA ))
-# BB |> mutate_if(is.na(SZA), 90 - Elevat )
-
-
-
-
-stop()
-
-
-
-
-
-
 ##  Initialize meta data file  -------------------------------------------------
 if (file.exists(DB_META_fl)) {
     BB_meta <- read_parquet(DB_META_fl)
@@ -89,24 +47,31 @@ if (file.exists(DB_META_fl)) {
     ## new columns
     var <- "chp1_dark_flag"
     if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
+        BB_meta[[var]] <- as.character(NA)
     }
 } else {
-    stop("STAR A NEW DB!!")
+    stop("NO METADATA FILE!!")
 }
 
 
 
-## Flag exclusions file by file  -----------------------------------------------
-## FIXME should find a better method through arrow dataset
+##  Dark calculations on dataset  ----------------------------------------------
 
+## list data base files
+filelist <- data.table(
+    names = list.files(DB_DIR,
+                       pattern = "*.parquet",
+                       recursive  = TRUE,
+                       full.names = TRUE))
+dd      <- dirname(filelist$names)
+dd      <- tstrsplit(dd, "/")
 
-## list data set to touch
+filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
+filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
+
+## list data set files to touch
 todosets <- unique(rbind(
-    BB_meta[is.na(chp1_bad_data_flagged),
-            .(month = month(day), year = year(day))],
-    BB_meta[is.na(cm21_bad_data_flagged),
+    BB_meta[is.na(chp1_dark_flag),
             .(month = month(day), year = year(day))]
 ))
 
@@ -115,10 +80,22 @@ filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 rm(todosets, dd)
 
 
+## loop data base files computing black
 for (af in filelist$names) {
-    datapart <- read_parquet(af)
+    datapart <- data.table(read_parquet(af))
     cat("Load: ", af, "\n")
 
+
+    ## ignore data!!
+    grep("chp1", names(datapart), ignore.case = TRUE, value = TRUE)
+
+    datapart
+
+
+
+
+
+    stop()
 
 }
 
