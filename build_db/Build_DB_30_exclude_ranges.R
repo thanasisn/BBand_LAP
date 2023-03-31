@@ -26,7 +26,7 @@ source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -183,7 +183,7 @@ BB <- opendata()
 
 
 ##  Create new column if not exist in the dataset  -----------------------------
-var <- "chp1_bad_data"
+var <- "chp1_bad_data_flag"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
     BB <- BB |> mutate(chp1_bad_data = as.character(NA)) |> compute()
@@ -251,10 +251,6 @@ if (file.exists(DB_META_fl)) {
 }
 
 
-stop("test")
-
-
-BB_meta$chp1_bad_data_flagged <- NA
 
 
 
@@ -288,7 +284,7 @@ filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 rm(todosets, dd)
 
 
-filelist <- filelist[10,]
+# filelist <- filelist[10,]
 
 for (af in filelist$names) {
     datapart <- read_parquet(af)
@@ -300,7 +296,7 @@ for (af in filelist$names) {
         upper  <- ranges_CHP1$Until[  i]
         comme  <- ranges_CHP1$Comment[i]
         tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                             chp1_bad_data = comme)
+                             chp1_bad_data_flag = comme)
 
         ## mark bad regions of data
         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
@@ -309,10 +305,10 @@ for (af in filelist$names) {
 
     ## CHP-1 flag physical limits anomalies  -----------------------------------
     datapart <- data.table(datapart)
-    datapart[CHP1_sig < chp1_signal_lower_limit(Date) & !is.na(chp1_bad_data),
-             chp1_bad_data := "Abnormal LOW signal"]
-    datapart[CHP1_sig > chp1_signal_upper_limit(Date) & !is.na(chp1_bad_data),
-             chp1_bad_data := "Abnormal HIGH signal"]
+    datapart[CHP1_sig < chp1_signal_lower_limit(Date) & !is.na(chp1_bad_data_flag),
+             chp1_bad_data_flag := "Abnormal LOW signal"]
+    datapart[CHP1_sig > chp1_signal_upper_limit(Date) & !is.na(chp1_bad_data_flag),
+             chp1_bad_data_flag := "Abnormal HIGH signal"]
     datapart <- as_tibble(datapart)
 
     ## CHP-1 flag temperature --------------------------------------------------
@@ -331,8 +327,6 @@ for (af in filelist$names) {
 
 
 
-
-    stop()
     ## CM-21 flag data ---------------------------------------------------------
     for (i in 1:nrow(ranges_CM21)) {
         lower  <- ranges_CM21$From[   i]
@@ -347,13 +341,12 @@ for (af in filelist$names) {
         rm(tempex)
     }
 
-
     ## CM-21 flag physical limits anomalies  -----------------------------------
     datapart <- data.table(datapart)
-    datapart[CM21_sig < cm21_signal_lower_limit(Date) & !is.na(cm21_bad_data),
-             cm21_bad_data := "Abnormal LOW signal"]
-    datapart[CM21_sig > cm21_signal_upper_limit(Date) & !is.na(cm21_bad_data),
-             cm21_bad_data := "Abnormal HIGH signal"]
+    datapart[CM21_sig < cm21_signal_lower_limit(Date) & !is.na(cm21_bad_data_flag),
+             cm21_bad_data_flag := "Abnormal LOW signal"]
+    datapart[CM21_sig > cm21_signal_upper_limit(Date) & !is.na(cm21_bad_data_flag),
+             cm21_bad_data_flag := "Abnormal HIGH signal"]
     datapart <- as_tibble(datapart)
 
 
@@ -539,6 +532,6 @@ rm(ranges_CM21)
 # BB %>% filter(is.na(month)) %>% collect()
 # BB %>% filter(is.na(year)) %>% collect()
 
-# myunlock(DB_lock)
+myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
