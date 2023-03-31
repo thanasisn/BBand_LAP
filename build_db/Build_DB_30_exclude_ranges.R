@@ -220,6 +220,8 @@ if (!any(names(BB) == var)) {
 rm(BB)
 
 
+stop()
+
 
 ##  Initialize meta data file  -------------------------------------------------
 if (file.exists(DB_META_fl)) {
