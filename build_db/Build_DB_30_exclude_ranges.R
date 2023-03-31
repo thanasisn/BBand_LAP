@@ -26,7 +26,8 @@ source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
+
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -186,8 +187,8 @@ BB <- opendata()
 var <- "chp1_bad_data_flag"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var, "  in dataset\n")
-    BB |> mutate(!!var := as.character(NA)) |> compute() |> writedata()
-
+    BB <- BB |> mutate(!!var := as.character(NA)) |> compute()
+    BB |> writedata()
     if (file.exists(DB_META_fl)) {
         BB_meta <- read_parquet(DB_META_fl)
         BB_meta$chp1_bad_data_flagged <- as.POSIXct(NA)
@@ -197,7 +198,8 @@ if (!any(names(BB) == var)) {
 var <- "chp1_temp_bad_data_flag"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var, "  in dataset\n")
-    BB |> mutate(!!var := as.character(NA)) |> compute() |> writedata()
+    BB <- BB |> mutate(!!var := as.character(NA)) |> compute()
+    BB |> writedata()
     if (file.exists(DB_META_fl)) {
         BB_meta <- read_parquet(DB_META_fl)
         BB_meta$chp1_bad_data_flagged <- as.POSIXct(NA)
@@ -207,9 +209,8 @@ if (!any(names(BB) == var)) {
 var <- "cm21_bad_data_flag"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
-    BB |> mutate(!!var := as.character(NA)) |> compute() |> writedata()
-    # BB <- BB |> mutate(cm21_bad_data_flag = as.character(NA)) |> compute()
-    # BB |> writedata()
+    BB <- BB |> mutate(!!var := as.character(NA)) |> compute()
+    BB |> writedata()
     if (file.exists(DB_META_fl)) {
         BB_meta <- read_parquet(DB_META_fl)
         BB_meta$cm21_bad_data_flagged <- as.POSIXct(NA)
@@ -219,8 +220,6 @@ if (!any(names(BB) == var)) {
 ## we will not use the DB directly
 rm(BB)
 
-
-stop()
 
 
 ##  Initialize meta data file  -------------------------------------------------
@@ -250,7 +249,7 @@ if (file.exists(DB_META_fl)) {
         BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
     }
 } else {
-    stop("STAR A NEW DB!!")
+    stop("HAVE TO STAR A NEW DB!!")
 }
 
 
@@ -285,7 +284,6 @@ todosets <- unique(rbind(
 ## select what to touch
 filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 rm(todosets, dd)
-
 
 # filelist <- filelist[10,]
 
@@ -374,6 +372,20 @@ rm(BB_meta)
 rm(filelist)
 rm(ranges_CHP1)
 rm(ranges_CM21)
+
+
+## Show some info of the data
+BB <- opendata()
+
+
+wecare <- c("cm21_bad_data_flag", "chp1_bad_data_flag", "chp1_temp_bad_data_flag")
+
+
+for (acol in wecare) {
+    stats <- BB |> select(acol) |> collect() |> table(useNA = "always")
+    pander(data.frame(stats))
+}
+
 
 
 
@@ -509,30 +521,8 @@ rm(ranges_CM21)
 #     # stop()
 #     ## mark bad regions of data
 # }
-#
-#
-#
-# BB %>% filter(!is.na(chp1_bad_data)) %>% collect()
-# BB %>% select(chp1_bad_data) %>% unique() %>% collect()
-# BB %>% select(cm21_bad_data_flag) %>% unique() %>% collect()
-#
-# BB %>% select(Date) %>% collect()
-#
-#
-# BB %>% filter(Date >= lower) %>% collect()
-#
-# BB |> glimpse()
-#
-# aa <- data.table(as_tibble(BB))
-# aa[!is.na(chp1_bad_data)]
-#
-# data.table(BB)
-#
-# ss <- BB |> head(n = 10000)
-#
-# BB %>% filter(is.na(month)) %>% collect()
-# BB %>% filter(is.na(year)) %>% collect()
 
-# myunlock(DB_lock)
+
+myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
