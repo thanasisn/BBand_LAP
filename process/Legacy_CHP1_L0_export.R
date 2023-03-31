@@ -192,7 +192,7 @@ for (YYYY in datayears) {
     names(year_data)[names(year_data) == "CHP1_sig"]            <- "CHP1value"
     names(year_data)[names(year_data) == "CHP1_sig_sd"]         <- "CHP1sd"
     names(year_data)[names(year_data) == "Async_step_count"]    <- "AsynStep"
-    names(year_data)[names(year_data) == "Async_tracker"]       <- "Async"
+    names(year_data)[names(year_data) == "Async_tracker_flag"]  <- "Async"
     names(year_data)[names(year_data) == "chp1_temperature"]    <- "CHP1temp"
     names(year_data)[names(year_data) == "chp1_temperature_SD"] <- "CHP1tempSD"
     names(year_data)[names(year_data) == "chp1_temp_UNC"]       <- "CHP1tempUNC"
@@ -253,11 +253,11 @@ for (alf in listlegacy) {
     baseDT[Async == TRUE, CHP1sd    := NA]
 
     baseDT <- baseDT[!(is.na(CHP1value)  &
-                           is.na(CHP1sd)     &
-                           is.na(CHP1temp)   &
-                           is.na(CHP1tempSD) &
-                           is.na(AsynStep)   &
-                           is.na(CHP1tempUNC)) ]
+                       is.na(CHP1sd)     &
+                       is.na(CHP1temp)   &
+                       is.na(CHP1tempSD) &
+                       is.na(AsynStep)   &
+                       is.na(CHP1tempUNC)) ]
 
     cat(paste("\n\n##", yyyy, "\n\n"))
 
@@ -321,13 +321,11 @@ for (alf in listlegacy) {
     ## keep non empty
     sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
 
-
     cat("\n\n")
     cat(paste("\n\n###  Hmisc::describe ", yyyy, "\n\n"))
     cat("\n\n")
 
-
-    cat("\n\n```")
+    cat("\n\n```\n")
     cat(print(Hmisc::describe(sss)), sep = "\n")
     cat("```\n\n")
     cat("\n\n")
@@ -336,15 +334,11 @@ for (alf in listlegacy) {
     Hmisc::html(Hmisc::describe(sss))
     cat("\n\n")
 
-
-
     gather <- rbind(gather,sss, fill=T)
-
 
     cat("\n\n")
     cat(paste("\n\n###  compareDF ", yyyy, "\n\n"))
     cat("\n\n")
-
 
     aa <- compareDF::compare_df(legacy, baseDT,
                                 group_col = "Date30",
@@ -379,9 +373,6 @@ for (alf in listlegacy) {
 
 
 
-
-
-
     cat(paste("\n\n###  arsenal::comparedf ", yyyy, "\n\n"))
 
     ss <- arsenal::comparedf(legacy, baseDT,
@@ -398,21 +389,18 @@ for (alf in listlegacy) {
 
 
 
-
-
     cat(paste("\n\n### NON common data summary ", yyyy, "\n\n"))
 
     cat("\n\n")
     cat(pander(summary(sss)))
     cat("\n\n")
-
 }
 
 cat(paste("\n\n##  All data summary \n\n"))
 
 pander(summary(gather))
 
-cat("\n\n```")
+cat("\n\n```\n")
 cat(print(Hmisc::describe(gather)), sep = "\n")
 cat("```\n\n")
 cat("\n\n")
