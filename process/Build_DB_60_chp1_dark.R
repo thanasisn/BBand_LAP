@@ -39,7 +39,8 @@ if (file.exists(DB_META_fl)) {
     BB_meta <- read_parquet(DB_META_fl)
     ## add more days
     BB_meta <- merge(BB_meta,
-                     data.table(day = seq(max(BB_meta$day), Sys.Date(),
+                     data.table(day = seq(max(BB_meta$day),
+                                          Sys.Date() - 1,
                                           by = "day")),
                      by = "day",
                      all = TRUE)

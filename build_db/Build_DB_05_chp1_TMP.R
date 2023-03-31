@@ -1,9 +1,9 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
-#' 
+#'
 #' Reads temperature data for CHP-1 into the database
-#' 
+#'
 #'  - Reads raw resistance data
 #'  - Converts resistance to temperature
 #'
@@ -237,6 +237,6 @@ rm(inp_filelist)
 
 
 
-on.exit(myunlock(DB_lock))
+myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

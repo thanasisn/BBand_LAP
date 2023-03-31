@@ -26,7 +26,7 @@ source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -184,21 +184,21 @@ BB <- opendata()
 
 ##  Create new column if not exist in the dataset  -----------------------------
 var <- "chp1_bad_data_flag"
+
 if (!any(names(BB) == var)) {
-    cat("Create column  ", var ,"  in dataset\n")
-    BB <- BB |> mutate(chp1_bad_data = as.character(NA)) |> compute()
-    BB |> writedata()
+    cat("Create column  ", var, "  in dataset\n")
+    BB |> mutate(!!var := as.character(NA)) |> writedata()
+
     if (file.exists(DB_META_fl)) {
         BB_meta <- read_parquet(DB_META_fl)
         BB_meta$chp1_bad_data_flagged <- as.POSIXct(NA)
         write_parquet(BB_meta, DB_META_fl)
     }
 }
-var <- "chp1_temp_bad_data"
+var <- "chp1_temp_bad_data_flag"
 if (!any(names(BB) == var)) {
-    cat("Create column  ", var ,"  in dataset\n")
-    BB <- BB |> mutate(chp1_temp_bad_data = as.character(NA)) |> compute()
-    BB |> writedata()
+    cat("Create column  ", var, "  in dataset\n")
+    BB |> mutate(!!var := as.character(NA)) |> writedata()
     if (file.exists(DB_META_fl)) {
         BB_meta <- read_parquet(DB_META_fl)
         BB_meta$chp1_bad_data_flagged <- as.POSIXct(NA)
@@ -208,8 +208,9 @@ if (!any(names(BB) == var)) {
 var <- "cm21_bad_data_flag"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
-    BB <- BB |> mutate(cm21_bad_data_flag = as.character(NA)) |> compute()
-    BB |> writedata()
+    BB |> mutate(!!var := as.character(NA)) |> writedata()
+    # BB <- BB |> mutate(cm21_bad_data_flag = as.character(NA)) |> compute()
+    # BB |> writedata()
     if (file.exists(DB_META_fl)) {
         BB_meta <- read_parquet(DB_META_fl)
         BB_meta$cm21_bad_data_flagged <- as.POSIXct(NA)
@@ -317,7 +318,7 @@ for (af in filelist$names) {
         upper  <- ranges_CHP1_temp$Until[  i]
         comme  <- ranges_CHP1_temp$Comment[i]
         tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                             chp1_temp_bad_data = comme)
+                             chp1_temp_bad_data_flag = comme)
 
         ## mark bad regions of data
         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
@@ -351,16 +352,14 @@ for (af in filelist$names) {
 
 
 
-
-
-
+    ## Store data --------------------------------------------------------------
     chg_days <- unique(as.Date(datapart$Date))
 
     ## save flagged metadata
     BB_meta[day %in% chg_days, cm21_bad_data_flagged      := cm21_exclude_mtime     ]
     BB_meta[day %in% chg_days, chp1_temp_bad_data_flagged := chp1_temp_exclude_mtime]
     BB_meta[day %in% chg_days, chp1_bad_data_flagged      := chp1_exclude_mtime     ]
-    ## store data
+    ## store actual data
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
     cat("Save: ", af, "\n\n")
@@ -532,6 +531,6 @@ rm(ranges_CM21)
 # BB %>% filter(is.na(month)) %>% collect()
 # BB %>% filter(is.na(year)) %>% collect()
 
-myunlock(DB_lock)
+# myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
