@@ -140,7 +140,7 @@ for (YYYY in datayears) {
     year_data <- BB |>
         filter(year == YYYY) |>
         select(c("Date", "CHP1_sig", "CHP1_sig_sd", "Async_step_count",
-                 "Async_tracker", "Azimuth", "Elevat", "chp1_temperature",
+                 "Async_tracker_flag", "Azimuth", "Elevat", "chp1_temperature",
                  "chp1_temperature_SD", "chp1_temp_UNC",
                  "chp1_bad_data_flag")) |>
         collect()
@@ -155,35 +155,20 @@ for (YYYY in datayears) {
         next()
     }
 
-    ## Create physical Recording limits ----------------------------------------
-    year_data[, sig_lowlim := chp1_signal_lower_limit(Date)]
-    year_data[, sig_upplim := chp1_signal_upper_limit(Date)]
 
     ## Apply some filtering ----------------------------------------------------
-    year_data[!is.na(CHP1_sig), .N]
     cat("\nRemove bad data regions\n")
     cat(year_data[!is.na(chp1_bad_data_flag), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
     year_data$CHP1_sig   [!is.na(year_data$chp1_bad_data_flag)] <- NA
     year_data$CHP1_sig_sd[!is.na(year_data$chp1_bad_data_flag)] <- NA
 
     cat("\nRemove tracker async cases\n")
-    cat(year_data[Async_tracker == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    year_data$CHP1_sig   [year_data$Async_tracker == TRUE] <- NA
-    year_data$CHP1_sig_sd[year_data$Async_tracker == TRUE] <- NA
+    cat(year_data[Async_tracker_flag == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+    year_data$CHP1_sig   [year_data$Async_tracker_flag == TRUE] <- NA
+    year_data$CHP1_sig_sd[year_data$Async_tracker_flag == TRUE] <- NA
 
-    # cat("\nRemove data above physical limits\n")
-    # cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    # year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
-    # year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
-
-    # cat("\nRemove data below physical limits\n")
-    # cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    # year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
-    # year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
-
-    year_data$sig_lowlim    <- NULL
-    year_data$sig_upplim    <- NULL
     year_data$chp1_bad_data_flag <- NULL
+
 
     ## Clean temperature data --------------------------------------------------
     CHP_TEMP_MIN       <- -20  # Drop temperatures below this value
