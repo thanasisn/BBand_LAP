@@ -184,10 +184,9 @@ BB <- opendata()
 
 ##  Create new column if not exist in the dataset  -----------------------------
 var <- "chp1_bad_data_flag"
-
 if (!any(names(BB) == var)) {
     cat("Create column  ", var, "  in dataset\n")
-    BB |> mutate(!!var := as.character(NA)) |> writedata()
+    BB |> mutate(!!var := as.character(NA)) |> compute() |> writedata()
 
     if (file.exists(DB_META_fl)) {
         BB_meta <- read_parquet(DB_META_fl)
@@ -198,7 +197,7 @@ if (!any(names(BB) == var)) {
 var <- "chp1_temp_bad_data_flag"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var, "  in dataset\n")
-    BB |> mutate(!!var := as.character(NA)) |> writedata()
+    BB |> mutate(!!var := as.character(NA)) |> compute() |> writedata()
     if (file.exists(DB_META_fl)) {
         BB_meta <- read_parquet(DB_META_fl)
         BB_meta$chp1_bad_data_flagged <- as.POSIXct(NA)
@@ -208,7 +207,7 @@ if (!any(names(BB) == var)) {
 var <- "cm21_bad_data_flag"
 if (!any(names(BB) == var)) {
     cat("Create column  ", var ,"  in dataset\n")
-    BB |> mutate(!!var := as.character(NA)) |> writedata()
+    BB |> mutate(!!var := as.character(NA)) |> compute() |> writedata()
     # BB <- BB |> mutate(cm21_bad_data_flag = as.character(NA)) |> compute()
     # BB |> writedata()
     if (file.exists(DB_META_fl)) {
