@@ -4,21 +4,24 @@ Sys.setenv(TZ = "UTC")
 ## Check date help function
 is.POSIXct <- function(x) inherits(x, "POSIXct")
 
-## Calibration values for CHP1
-##        Date,         Sensitivity [μV/W/m^2], Acquisition Gain []
+
+##  Compute radiation from signal  ---------------------------------------------
+
+##  Calibration values for CHP1
 chp1_calibration_data <- matrix(
-       c("2016-04-01",  8.08,  2000,
-         "2016-04-02",  8.08,  2000,  ## <- fake, just for interpolation
+##        Date,         Sensitivity [μV/W/m^2], Acquisition Gain []
+       c("2016-04-01",  8.08,                   2000,
+         "2016-04-02",  8.08,                   2000,  ## <- fake, just for interpolation
           NULL),
        byrow = TRUE,
-       ncol = 3)
+       ncol  = 3)
 
 ## Format to data frame
 chp1_calibration_data <- data.frame(Date        = as.POSIXct(chp1_calibration_data[,1]),
                                     Sensitivity = as.numeric(chp1_calibration_data[,2]),
                                     Gain        = as.numeric(chp1_calibration_data[,3]))
 
-## Interpolation functions with extend right rule
+## Interpolation functions with extend to right rule
 chp1_sensitivity <- approxfun(
     x      = chp1_calibration_data$Date,
     y      = chp1_calibration_data$Sensitivity,
@@ -33,6 +36,8 @@ chp1_gain        <- approxfun(
 )
 
 
+
+## Conversion factor from volt to watt for CHP1 --------------------------------
 #' Conversion factor from volt to watt for CHP1
 #'
 #' @details    This uses both the sensitivity of the instruments and the gain
@@ -53,11 +58,14 @@ chp1factor <- function(date) {
 
 
 
-####  Set possible signal range on acquisition  ####
-##
-## Be careful !! those values are used to define an envelope for the accepted
-## range ot the dark signal.
-##
+
+##  Get possible signal range on acquisition  ----------------------------------
+#'
+#' Be careful !! those values are used to define an envelope for the accepted
+#' range for the dark signal also.
+#'
+
+## Upper and lower limits of the signal by period
 chp1_signal_physical_limits <- matrix(
     c("2016-04-01 00:00:00",  -0.2,   5.0,
        NULL
@@ -72,11 +80,12 @@ chp1_signal_physical_limits <- data.frame(
 )
 
 
+## Test the values in watts
 # signal_physical_limits$Lower_radiation_lim <- cm21factor(signal_physical_limits$Date) * signal_physical_limits$Lower_lim
 # signal_physical_limits$Upper_radiation_lim <- cm21factor(signal_physical_limits$Date) * signal_physical_limits$Upper_lim
 
 
-####  Functions to get upper and lower limit for acquisition signal  ####
+##  Functions of upper and lower limits for acquisition signal  ----------------
 chp1_signal_lower_limit <- approxfun(
     x      = chp1_signal_physical_limits$Date,
     y      = chp1_signal_physical_limits$Lower_lim,
@@ -93,28 +102,23 @@ chp1_signal_upper_limit <- approxfun(
 
 
 
-
-#' Function of CHP temperature dependency
+## Temperature dependency of CHP-1  --------------------------------------------
+#' Temperature dependency of CHP-1
 #'
 #' @param fun     Method of interpolation. "lin" Performing the linear interpolation.
 #'                "spl_natural" Perform cubic (spline interpolation with "natural" method.
-#' @param statlog File to output statistics
 #' @details       The returned function take a temperature vector and returns
 #'                a new vector of the CHP 1 signal dependency for each temperature given.
-#' @return        Temperature dependency function
+#' @return        A function of temperature dependency
 #'
 #' @family CHP 1 functions
 #' @export
-CHP_temp_dep <- function(fun='lin', statlog){
+CHP_temp_dep <- function(fun = 'lin'){
 
-    #### This controls the output
-    catlog_prv <- function(x) {
-        # cat( sprintf("%s\n",x), file = statlog, append = TRUE)
-        cat( sprintf("%s",x), sep = "\n")
-    }
-
-    temperature_dependency <- data.frame(temperature = c( 50,  40,  30,  20,  10,   0, -10,  -20),
-                                         dependency  = c(.08, .05, .03, .00, .01, .28, .12, -.26))
+    temperature_dependency <- data.frame(
+        temperature = c( 50,  40,  30,  20,  10,   0, -10,  -20),
+        dependency  = c(.08, .05, .03, .00, .01, .28, .12, -.26)
+    )
 
     if (fun == "lin") {
         tem_dep <- approxfun(x = temperature_dependency$temperature,
@@ -125,14 +129,16 @@ CHP_temp_dep <- function(fun='lin', statlog){
                              y = temperature_dependency$dependency,
                              method = "natural", ties = mean)
     } else {
-        catlog_prv("unknown option for CHP1 temperature dependency used")
+        cat("unknown option for CHP1 temperature dependency used\n")
+        stop("unknown option for CHP1 temperature dependency used")
     }
 
     return(tem_dep)
 }
 
 
-#' Convert CHP 1 Thermistor resistance to temperature.
+## Thermistor resistance to temperature for CHP-1 ------------------------------
+#' Convert Thermistor resistance to temperature for CHP-1.
 #'
 #' @details   Convert resistance in temperature using the equation:
 #'            \deqn{ T = \left( a\cdot \left( b \cdot \ln(R) + c \cdot \ln^3(R) \right)  \right)^{-1} - 273.15}{T = ( a + ( b*log(res) + c*(log(res))^3 ) )^-1 - 273.15}
@@ -152,9 +158,11 @@ CHP_thermistor_R_to_T <- function(res){
         return(NA)
     }
 }
-CHP_thermistor_R_to_T            <- Vectorize(CHP_thermistor_R_to_T)
+CHP_thermistor_R_to_T <- Vectorize(CHP_thermistor_R_to_T)
 
 
+
+## Uncertainty for the function `CHP_thermistor_R_to_T` ------------------------
 #' Calculate uncertainty with error propagation theory for \code{\link{CHP_thermistor_R_to_T}}
 #'
 #' @details      Use the error propagation to implement the following equation:
@@ -183,6 +191,7 @@ CHP_thermistor_ResUnc_to_TempUnc <- Vectorize(CHP_thermistor_ResUnc_to_TempUnc)
 
 
 
+## Protek 506 uncertainty for a resistance measurement -------------------------
 #' Gives the Protek 506 uncertainty for a resistance measurement
 #'
 #' @details   In the range of 400 to 400kOhm, Protek 506 has uncertainty: \eqn{ \pm(0.5\% + 2d)}.
@@ -205,4 +214,6 @@ Protek_506_R_error <- function(res){
     return(Merr)
 }
 Protek_506_R_error               <- Vectorize(Protek_506_R_error)
+
+
 
