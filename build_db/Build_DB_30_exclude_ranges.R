@@ -23,9 +23,10 @@ Script.Name <- "~/BBand_LAP/build_db/Build_DB_30_exclude_ranges.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
+source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -250,6 +251,14 @@ if (file.exists(DB_META_fl)) {
 }
 
 
+stop("test")
+
+
+BB_meta$chp1_bad_data_flagged <- NA
+
+
+
+
 
 ## Flag exclusions file by file  -----------------------------------------------
 ## FIXME should find a better method through arrow dataset
@@ -266,7 +275,7 @@ dd      <- tstrsplit(dd, "/")
 filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
-## list data set to touch
+## list data set to be touched
 todosets <- unique(rbind(
     BB_meta[is.na(chp1_bad_data_flagged),
             .(month = month(day), year = year(day))],
@@ -279,11 +288,13 @@ filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 rm(todosets, dd)
 
 
+filelist <- filelist[10,]
+
 for (af in filelist$names) {
     datapart <- read_parquet(af)
     cat("Load: ", af, "\n")
 
-    ## CHP-1 flag data ---------------------------------------------------------
+    ## CHP-1 flag bad data -----------------------------------------------------
     for (i in 1:nrow(ranges_CHP1)) {
         lower  <- ranges_CHP1$From[   i]
         upper  <- ranges_CHP1$Until[  i]
@@ -295,6 +306,14 @@ for (af in filelist$names) {
         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
         rm(tempex)
     }
+
+    ## CHP-1 flag physical limits anomalies  -----------------------------------
+    datapart <- data.table(datapart)
+    datapart[CHP1_sig < chp1_signal_lower_limit(Date) & !is.na(chp1_bad_data),
+             chp1_bad_data := "Abnormal LOW signal"]
+    datapart[CHP1_sig > chp1_signal_upper_limit(Date) & !is.na(chp1_bad_data),
+             chp1_bad_data := "Abnormal HIGH signal"]
+    datapart <- as_tibble(datapart)
 
     ## CHP-1 flag temperature --------------------------------------------------
     for (i in 1:nrow(ranges_CHP1_temp)) {
@@ -309,6 +328,11 @@ for (af in filelist$names) {
         rm(tempex)
     }
 
+
+
+
+
+    stop()
     ## CM-21 flag data ---------------------------------------------------------
     for (i in 1:nrow(ranges_CM21)) {
         lower  <- ranges_CM21$From[   i]
@@ -322,6 +346,20 @@ for (af in filelist$names) {
         # datapart[Date >= lower & Date < upper, cm21_bad_data_flag := comme]
         rm(tempex)
     }
+
+
+    ## CM-21 flag physical limits anomalies  -----------------------------------
+    datapart <- data.table(datapart)
+    datapart[CM21_sig < cm21_signal_lower_limit(Date) & !is.na(cm21_bad_data),
+             cm21_bad_data := "Abnormal LOW signal"]
+    datapart[CM21_sig > cm21_signal_upper_limit(Date) & !is.na(cm21_bad_data),
+             cm21_bad_data := "Abnormal HIGH signal"]
+    datapart <- as_tibble(datapart)
+
+
+
+
+
 
     chg_days <- unique(as.Date(datapart$Date))
 
@@ -381,7 +419,6 @@ rm(ranges_CM21)
 #             # mutate(BB, chp1_bad_data = replace(chp1_bad_data,
 #             #                                      Date >= lower & Date < upper,
 #             #                                      comme))
-#             #
 #
 #             # BB %>%
 #             # filter(year %in% yearsvec & month %in% monthsvec) %>%
@@ -502,6 +539,6 @@ rm(ranges_CM21)
 # BB %>% filter(is.na(month)) %>% collect()
 # BB %>% filter(is.na(year)) %>% collect()
 
-myunlock(DB_lock)
+# myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
