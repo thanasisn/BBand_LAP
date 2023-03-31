@@ -374,12 +374,10 @@ rm(ranges_CHP1)
 rm(ranges_CM21)
 
 
-## Show some info of the data
+## Show some info for the dataset flags
 BB <- opendata()
 
-
 wecare <- c("cm21_bad_data_flag", "chp1_bad_data_flag", "chp1_temp_bad_data_flag")
-
 
 for (acol in wecare) {
     stats <- BB |> select(acol) |> collect() |> table(useNA = "always")
