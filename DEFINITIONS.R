@@ -44,6 +44,6 @@ CHP_TEMP_UNC_LIM  <-   0.8  ## Drop temperatures with uncertainty above this val
 DSTRETCH    <-  20 * 3600  ## Extend of dark signal for morning and evening of the same day (R30)
 DCOUNTLIM   <-  10         ## Number of valid measurements to compute dark (R30)
 DARK_ELEV   <- -10         ## Sun elevation limit to get dark signal (R20, R30)
-# MINLIMnight <- -15         ## Lower radiation limit  when dark       (R20) -> ToolowDark
-# MAXLIMnight <- +15         ## Higher radiation limit when dark       (R20) -> ToohigDark
+MINLIMnight <- -15         ## Lower radiation limit  when dark       (R20) -> ToolowDark
+MAXLIMnight <- +15         ## Higher radiation limit when dark       (R20) -> ToohigDark
 
