@@ -42,7 +42,7 @@ if (file.exists(DB_META_fl)) {
     ## add more days
     BB_meta <- merge(BB_meta,
                      data.table(day = seq(max(BB_meta$day),
-                                          Sys.Date() - 1,
+                                          Sys.Date(),
                                           by = "day")),
                      by = "day",
                      all = TRUE)
@@ -78,12 +78,15 @@ todosets <- unique(rbind(
             .(month = month(day), year = year(day))]
 ))
 
+
+## to do check done
+
 ## select what to touch
 filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 rm(todosets, dd)
 
 
-## loop data base files computing black
+## loop data base files computing black for CHP-1
 for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
     cat("Load: ", af, "\n")
@@ -95,7 +98,6 @@ for (af in filelist$names) {
         next()
     }
 
-
     ## loop days
     for (aday in unique(as.Date(usedata$Date))) {
         daydata <- usedata[ as.Date(Date) == aday ]
@@ -106,6 +108,8 @@ for (af in filelist$names) {
                                       nightlimit = DARK_ELEV,
                                       dstretch   = DSTRETCH)
 
+
+        stop()
     }
 
 
