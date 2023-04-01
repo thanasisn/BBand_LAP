@@ -77,6 +77,7 @@ if (!interactive()) {
 }
 
 library(data.table)
+library(arrow)
 
 
 ##  CHP-1 raw data check  ------------------------------------------------------
@@ -175,6 +176,40 @@ rm(rad_names, radmon_files, sirena_files)
 
 
 
+## Checksum test -------
+
+
+## get a fresh hash table from meta data
+parthash <- read_parquet(DB_META_fl) |>
+    select(ends_with("_mtime",    ignore.case = TRUE),
+           ends_with("_md5sum",   ignore.case = TRUE),
+           ends_with("_basename", ignore.case = TRUE))
+## remove constructed files
+parthash$pysolar_mtime    <- NULL
+parthash$pysolar_basename <- NULL
+## unify variables
+parthash <- melt(data = parthash,
+                 measure = patterns("_mtime$",
+                                    "_md5sum$",
+                                    "_basename$"),
+                 value.name = c("mtime",
+                                "md5sum",
+                                "basename"),
+                 na.rm = TRUE)
+parthash$variable <- NULL
+
+
+if (!file.exists(DB_HASH_fl)) {
+    ## Nothing to compare to, just store table
+    write_parquet(x = parthash, sink = DB_HASH_fl)
+} else {
+    ## Add new hashes to permanent storage
+    mainhash <- read_parquet(DB_HASH_fl)
+    mainhash <- unique(rbind(mainhash, parthash))
+}
+
+## chech for the same hash!
+## chech same name different hash
 
 
 
