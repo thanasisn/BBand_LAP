@@ -9,6 +9,7 @@
 #'  - Azimuth
 #'  - Elevat
 #'  - SZA
+#'  - preNoon
 #'
 
 ## __ Set environment  ---------------------------------------------------------
@@ -125,7 +126,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         gathermeta <- data.table()
         for (ad in submonth$day) {
             ss <- submonth[day == ad]
-            ## read sun data file
+            ## Read sun data file  ---------------------------------------------
             sun_temp <- fread(ss$fullname, na.strings = "None")
             names(sun_temp)[names(sun_temp) == "DATE"] <- "Date"
             names(sun_temp)[names(sun_temp) == "AZIM"] <- "Azimuth"
@@ -135,11 +136,24 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, year  := year( Date)]
             sun_temp[, month := month(Date)]
             sun_temp[, doy   := yday( Date)]
-            ## get metadata for each file
+            ## Get metadata for each sun file ----------------------------------
             sun_meta <- data.table(day              = as_date(ad),
                                    pysolar_basename = basename(ss$fullname),
                                    pysolar_mtime    = file.mtime(ss$fullname),
                                    pysolar_parsed   = Sys.time())
+            ## Here we can init more variables of the database!! ---------------
+            sun_temp[Azimuth <= 180, preNoon := TRUE ]
+            sun_temp[Azimuth >  180, preNoon := FALSE]
+
+            ## TODO init variables for next processes here
+            sun_temp[, CM21_sig    := as.numeric(NA)]
+            sun_temp[, CM21_sig_sd := as.numeric(NA)]
+            sun_temp[, CHP1_sig    := as.numeric(NA)]
+            sun_temp[, CHP1_sig_sd := as.numeric(NA)]
+
+
+            "Async_step_count"
+
             ## aggregate data
             if (nrow(gather) == 0) {
                 ## this inits the database table!!
