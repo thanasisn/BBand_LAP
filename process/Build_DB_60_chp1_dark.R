@@ -15,7 +15,7 @@ Script.Name <- "~/BBand_LAP/settname.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
-source("~/CM_21_GLB/Functions_dark_calculation.R")
+source("~/BBand_LAP/functions/Functions_dark_calculation.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 # mylock(DB_lock)
@@ -99,6 +99,64 @@ for (af in filelist$names) {
     stop()
 
 }
+
+#
+#
+#
+#
+# ####    Calculate Dark signal   ########################################
+# dark_day <- dark_calculations( dates      = daydata$Date,
+#                                values     = daydata$CM21value,
+#                                elevatio   = daydata$Eleva,
+#                                nightlimit = DARK_ELEV,
+#                                dstretch   = DSTRETCH)
+#
+#
+#
+# # if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
+# if ( ! ((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
+#         (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
+#     # cat("Can not apply dark\n")
+#     todays_dark_correction <- NA
+#     dark_flag              <- "MISSING"
+#     missingdark            <- NA
+#
+#     ## get dark from pre-computed file
+#     if (exists("construct")) {
+#         ## can not find date
+#         if (! theday %in% construct$Date) {
+#             todays_dark_correction <- NA
+#             dark_flag              <- "MISSING"
+#             missingdark            <- NA
+#         } else {
+#             ## get data from recomputed dark database
+#             todays_dark_correction <- construct[ Date == theday, DARK]
+#             dark_flag              <- "CONSTRUCTED"
+#         }
+#     }
+# } else {
+#     ####    Dark Correction function   #################################
+#     dark_generator <- dark_function(dark_day    = dark_day,
+#                                     DCOUNTLIM   = DCOUNTLIM,
+#                                     type        = "median",
+#                                     adate       = theday ,
+#                                     test        = test,
+#                                     missfiles   = missfiles,
+#                                     missingdark = missingdark )
+#
+#     ####    Create dark signal for correction    #######################
+#     todays_dark_correction <- dark_generator(daydata$Date)
+#     dark_flag              <- "COMPUTED"
+# }
+#
+# ####    Apply dark correction    #######################################
+# daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
+#
+#
+#
+
+
+
 
 
 
