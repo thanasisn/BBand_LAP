@@ -5,7 +5,7 @@
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Inspect raw data from CHP1."
+#' abstract:      "Inspect raw data for potensial problems."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -78,6 +78,8 @@ if (!interactive()) {
 
 library(data.table)
 library(arrow)
+library(dplyr)
+library(pander)
 
 
 ##  CHP-1 raw data check  ------------------------------------------------------
@@ -116,8 +118,8 @@ cat("\n**CHP-1:", paste(length(radmon_files), "files from Radmon**\n"))
 
 missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
-    warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
-    cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n")
+    # warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
+    cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n\n")
     cat(missing_from_sir, sep = " ")
     cat("\n\n")
 } else {
@@ -165,8 +167,8 @@ cat("\n**CM-21:", paste(length(radmon_files), "files from Radmon**\n"))
 
 missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
-    warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
-    cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n")
+    # warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
+    cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n\n")
     cat(missing_from_sir, sep = " ")
     cat("\n\n")
 } else {
@@ -176,8 +178,13 @@ rm(rad_names, radmon_files, sirena_files)
 
 
 
-## Checksum test -------
 
+##  Checksum test  -------------------------------------------------------------
+
+#'
+#' ## Check the `md5` check sum of raw files.
+#'
+#+ echo=F, include=T, results="asis"
 
 ## get a fresh hash table from meta data
 parthash <- read_parquet(DB_META_fl) |>
@@ -198,7 +205,7 @@ parthash <- melt(data = parthash,
                  na.rm = TRUE)
 parthash$variable <- NULL
 
-
+## __ Update hash table --------------------------------------------------------
 if (!file.exists(DB_HASH_fl)) {
     ## Nothing to compare to, just store table
     write_parquet(x = parthash, sink = DB_HASH_fl)
@@ -207,6 +214,25 @@ if (!file.exists(DB_HASH_fl)) {
     mainhash <- read_parquet(DB_HASH_fl)
     mainhash <- unique(rbind(mainhash, parthash))
 }
+
+## __ Check for problems -------------------------------------------------------
+
+dups <- mainhash[duplicated(mainhash$md5sum)]
+
+if (nrow(dups) > 0) {
+    cat("\n**There are ", nrow(dups), " files with the same checksum**\n")
+    # \scriptsize
+    # \footnotesize
+    # \small
+    cat("\n \\footnotesize \n\n")
+    pander(dups,
+           caption = "Files with the same md5sum")
+    # cat(" \n \n \\normalsize \n \n ")
+} else {
+    cat("\n**All checksum are unique**\n")
+}
+
+
 
 ## chech for the same hash!
 ## chech same name different hash
