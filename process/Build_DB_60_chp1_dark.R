@@ -102,12 +102,59 @@ for (af in filelist$names) {
     for (aday in unique(as.Date(usedata$Date))) {
         daydata <- usedata[ as.Date(Date) == aday ]
 
-        dark_day <- dark_calculations(dates      = daydata$Date,
-                                      values     = daydata$CM21_sig,
-                                      elevatio   = daydata$Eleva,
-                                      nightlimit = DARK_ELEV,
-                                      dstretch   = DSTRETCH)
+        # dark_day <- dark_calculations(
+            dates      = daydata$Date
+            values     = daydata$CM21_sig
+            elevatio   = daydata$Eleva
+            nightlimit = DARK_ELEV
+            dstretch   = DSTRETCH
+        # )
 
+
+        ## suppress warnings zoo::index
+        suppressWarnings({
+
+            ## find local noun
+            nounindex    <- which.max(elevatio)
+            ## split day in half
+            selectmorn   <- elevatio < nightlimit & index(elevatio) < nounindex
+            selecteven   <- elevatio < nightlimit & index(elevatio) > nounindex
+            ## all morning and evening dates
+            morning      <- dates[selectmorn]
+            evening      <- dates[selecteven]
+
+            ## morning selection with time limit
+            mornigend    <- morning[max(index(morning))]
+            mornigstart  <- mornigend - dstretch
+            ## selection for morning dark
+            morningdark  <- selectmorn & dates <= mornigend    & mornigstart < dates
+
+            ## evening selection with time limit
+            if (length(index(evening)) == 0) {
+                ii <- NA
+            } else {
+                ii <- index(evening)
+            }
+            eveningstart <- evening[min(ii)]
+            eveningend   <- eveningstart + dstretch
+            ## selection for evening dark
+            eveningdark  <- selecteven & dates >= eveningstart & dates < eveningend
+        })
+
+        return(
+            data.frame(
+                Mavg = mean(      values[morningdark],  na.rm = TRUE ),
+                Mmed = median(    values[morningdark],  na.rm = TRUE ),
+                Msta = max(       dates[ morningdark],  na.rm = TRUE ),
+                Mend = min(       dates[ morningdark],  na.rm = TRUE ),
+                Mcnt = sum(!is.na(values[morningdark])),
+                Eavg = mean(      values[eveningdark],  na.rm = TRUE ),
+                Emed = median(    values[eveningdark],  na.rm = TRUE ),
+                Esta = min(       dates[ eveningdark],  na.rm = TRUE ),
+                Eend = max(       dates[ eveningdark],  na.rm = TRUE ),
+                Ecnt = sum(!is.na(values[eveningdark]))
+            )
+        )
 
         stop()
     }
