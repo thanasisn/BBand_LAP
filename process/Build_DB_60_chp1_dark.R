@@ -86,24 +86,36 @@ for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
     cat("Load: ", af, "\n")
 
+    ## Ignore bad and missing data
+    usedata <- datapart[is.na(chp1_bad_data_flag) & !is.na(CHP1_sig) ]
+    if (nrow(usedata) == 0) {
+        cat("\nNo usefull CHP-1 data in this file\n\n")
+        next()
+    }
+
+
+    ## loop days
+    for (aday in unique(as.Date(usedata$Date))) {
+        daydata <- usedata[ as.Date(Date) == aday ]
+
+        dark_day <- dark_calculations(dates      = daydata$Date,
+                                      values     = daydata$CM21_sig,
+                                      elevatio   = daydata$Eleva,
+                                      nightlimit = DARK_ELEV,
+                                      dstretch   = DSTRETCH)
+
+    }
+
+
 
     ## ignore data!!
-    grep("chp1", names(datapart), ignore.case = TRUE, value = TRUE)
-
-    datapart
-
-
-
+    grep("chp1", names(usedata), ignore.case = TRUE, value = TRUE)
 
 
     stop()
 
 }
 
-#
-#
-#
-#
 # ####    Calculate Dark signal   ########################################
 # dark_day <- dark_calculations( dates      = daydata$Date,
 #                                values     = daydata$CM21value,
@@ -151,9 +163,6 @@ for (af in filelist$names) {
 #
 # ####    Apply dark correction    #######################################
 # daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
-#
-#
-#
 
 
 
