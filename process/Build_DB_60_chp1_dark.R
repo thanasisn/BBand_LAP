@@ -2,7 +2,9 @@
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #'
-#' Apply flags on data
+#' TODO:
+#'
+#' - Darck and radiation for CHP-1 and CM-21
 #'
 #'
 #+ include=T, echo=F
