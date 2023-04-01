@@ -61,6 +61,13 @@ if (file.exists(DB_META_fl)) {
     BB_meta$pysolar_basename <- as.character(BB_meta$pysolar_basename)
     BB_meta$pysolar_mtime    <- as.POSIXct(BB_meta$pysolar_mtime )
     BB_meta$pysolar_parsed   <- as.POSIXct(BB_meta$pysolar_parsed)
+    ## For CM-21
+    BB_meta$cm21_basename    <- as.character(NA)
+    BB_meta$cm21_md5sum      <- as.character(NA)
+    BB_meta$cm21_mtime       <- as.POSIXct(NA)
+    BB_meta$cm21_parsed      <- as.POSIXct(NA)
+    cm21_sig_NAs             <- as.integer(NA)
+    cm21_sig_sd_NA           <- as.integer(NA)
 }
 
 
@@ -146,13 +153,25 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[Azimuth >  180, preNoon := FALSE]
 
             ## TODO init variables for next processes here
-            sun_temp[, CM21_sig    := as.numeric(NA)]
-            sun_temp[, CM21_sig_sd := as.numeric(NA)]
-            sun_temp[, CHP1_sig    := as.numeric(NA)]
-            sun_temp[, CHP1_sig_sd := as.numeric(NA)]
+            ## For CM-21
+            sun_temp[, CM21_sig            := as.numeric(NA)]
+            sun_temp[, CM21_sig_sd         := as.numeric(NA)]
+            ## For CHP-1
+            sun_temp[, CHP1_sig            := as.numeric(NA)]
+            sun_temp[, CHP1_sig_sd         := as.numeric(NA)]
+            sun_temp[, Async_tracker_flag  := TRUE          ]
+            sun_temp[, Async_step_count    := as.integer(NA)]
+            sun_temp[, chp1_R_therm        := as.numeric(NA)]
+            sun_temp[, chp1_R_SD_therm     := as.numeric(NA)]
+            sun_temp[, chp1_R_meas_ERR     := as.numeric(NA)]
+            sun_temp[, chp1_temperature    := as.numeric(NA)]
+            sun_temp[, chp1_temperature_SD := as.numeric(NA)]
+            sun_temp[, chp1_temp_UNC       := as.numeric(NA)]
+            ## For TOT
+            sun_temp[, tot_glb             := as.numeric(NA)]
+            sun_temp[, tot_glb_sd          := as.numeric(NA)]
+            sun_temp[, lap_sza             := as.numeric(NA)]
 
-
-            "Async_step_count"
 
             ## aggregate data
             if (nrow(gather) == 0) {
