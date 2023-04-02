@@ -113,7 +113,7 @@ for (af in filelist$names) {
 
         ## suppress warnings zoo::index
         suppressWarnings({
-
+require(zoo)
             ## find local noun
             nounindex    <- which.max(elevatio)
             ## split day in half
@@ -159,6 +159,8 @@ for (af in filelist$names) {
         stop()
     }
 
+    min(dates[ eveningdark])
+    range(dates[ eveningdark])
 
 
     ## ignore data!!
