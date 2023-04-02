@@ -113,13 +113,9 @@ for (af in filelist$names) {
 
 
 
-
-
-
-
         # if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
-        if ( ! ((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
-                (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
+        if ( !((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
+               (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
             # cat("Can not apply dark\n")
             todays_dark_correction <- NA
             dark_flag              <- "MISSING"
