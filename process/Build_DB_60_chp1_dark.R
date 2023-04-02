@@ -102,65 +102,63 @@ for (af in filelist$names) {
     for (aday in unique(as.Date(usedata$Date))) {
         daydata <- usedata[ as.Date(Date) == aday ]
 
-        # dark_day <- dark_calculations(
-            dates      = daydata$Date
-            values     = daydata$CM21_sig
-            elevatio   = daydata$Eleva
-            nightlimit = DARK_ELEV
+        ## get available dark stats
+        dark_day <- dark_calculations_2(
+            dates      = daydata$Date,
+            values     = daydata$CM21_sig,
+            elevatio   = daydata$Eleva,
+            nightlimit = DARK_ELEV,
             dstretch   = DSTRETCH
-        # )
-
-
-        ## suppress warnings zoo::index
-        suppressWarnings({
-require(zoo)
-            ## find local noun
-            nounindex    <- which.max(elevatio)
-            ## split day in half
-            selectmorn   <- elevatio < nightlimit & index(elevatio) < nounindex
-            selecteven   <- elevatio < nightlimit & index(elevatio) > nounindex
-            ## all morning and evening dates
-            morning      <- dates[selectmorn]
-            evening      <- dates[selecteven]
-
-            ## morning selection with time limit
-            mornigend    <- morning[max(index(morning))]
-            mornigstart  <- mornigend - dstretch
-            ## selection for morning dark
-            morningdark  <- selectmorn & dates <= mornigend    & mornigstart < dates
-
-            ## evening selection with time limit
-            if (length(index(evening)) == 0) {
-                ii <- NA
-            } else {
-                ii <- index(evening)
-            }
-            eveningstart <- evening[min(ii)]
-            eveningend   <- eveningstart + dstretch
-            ## selection for evening dark
-            eveningdark  <- selecteven & dates >= eveningstart & dates < eveningend
-        })
-
-        return(
-            data.frame(
-                Mavg = mean(      values[morningdark],  na.rm = TRUE ),
-                Mmed = median(    values[morningdark],  na.rm = TRUE ),
-                Msta = max(       dates[ morningdark],  na.rm = TRUE ),
-                Mend = min(       dates[ morningdark],  na.rm = TRUE ),
-                Mcnt = sum(!is.na(values[morningdark])),
-                Eavg = mean(      values[eveningdark],  na.rm = TRUE ),
-                Emed = median(    values[eveningdark],  na.rm = TRUE ),
-                Esta = min(       dates[ eveningdark],  na.rm = TRUE ),
-                Eend = max(       dates[ eveningdark],  na.rm = TRUE ),
-                Ecnt = sum(!is.na(values[eveningdark]))
-            )
         )
 
-        stop()
+
+
+
+
+
+
+        # if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
+        if ( ! ((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
+                (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
+            # cat("Can not apply dark\n")
+            todays_dark_correction <- NA
+            dark_flag              <- "MISSING"
+            missingdark            <- NA
+
+            ## get dark from pre-computed file
+            if (exists("construct")) {
+                ## can not find date
+                if (! theday %in% construct$Date) {
+                    todays_dark_correction <- NA
+                    dark_flag              <- "MISSING"
+                    missingdark            <- NA
+                } else {
+                    ## get data from recomputed dark database
+                    todays_dark_correction <- construct[ Date == theday, DARK]
+                    dark_flag              <- "CONSTRUCTED"
+                }
+            }
+        } else {
+            ####    Dark Correction function   #################################
+            dark_generator <- dark_function_2(dark_day    = dark_day,
+                                              DCOUNTLIM   = DCOUNTLIM,
+                                              type        = "median",
+                                              missingdark = missingdark )
+
+            ####    Create dark signal for correction    #######################
+            todays_dark_correction <- dark_generator(daydata$Date)
+            dark_flag              <- "COMPUTED"
+        }
+
+        ####    Apply dark correction    #######################################
+        daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
+
+
+
+
+
     }
 
-    min(dates[ eveningdark])
-    range(dates[ eveningdark])
 
 
     ## ignore data!!
