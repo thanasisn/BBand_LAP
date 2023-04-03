@@ -4,6 +4,9 @@
 #'
 #' Compute or construct dark signal offset for CM-21.
 #'
+#' Fills:
+#' - `CM21_sig_wo_dark` when it's appropriate
+#'
 #+ include=T, echo=F
 
 ## __ Set environment  ---------------------------------------------------------
@@ -108,19 +111,23 @@ rm(todosets, dd, test)
 ## loop data base files computing black for CM-21
 for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
-    datapart[, month := month(Date)]
-    datapart[, year  := year(Date) ]
+    datapart[, month := as.integer(month(Date))]
+    datapart[, year  := as.integer(year(Date)) ]
+
+    ## use only valid data for dark
+    data_use <- datapart[is.na(cm21_bad_data_flag) & !is.na(CM21_sig) ]
+
     cat("Load: ", af, "\n")
 
     ## Ignore bad and missing data
-    if (datapart[is.na(cm21_bad_data_flag) & !is.na(CM21_sig), .N ] == 0) {
+    if (nrow(data_use) == 0) {
         cat("\nNo usefull CM-21 data in this file\n\n")
         next()
     }
 
     ## loop days
-    for (aday in unique(as.Date(datapart$Date))) {
-        daydata <- datapart[ as.Date(Date) == aday ]
+    for (aday in unique(as.Date(data_use$Date))) {
+        daydata <- data_use[ as.Date(Date) == aday ]
 
         if (any(is.na(daydata$Elevat))) {
             cat("The day is not initialized:", format(as.Date(aday)),"\n")
@@ -190,9 +197,8 @@ for (af in filelist$names) {
 
         ## import new data
         BB_meta  <- rows_update(BB_meta, meta_day, by = "day")
+        ## update initial data with valid only
         datapart <- rows_update(datapart, daydata, by = "Date")
-
-        stop()
         rm(daydata, meta_day, dark_day)
     }
 

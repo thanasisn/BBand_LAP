@@ -39,10 +39,15 @@ BB <- opendata()
 vars <- grep("Date|Azimuth|doy|year|month", names(BB), invert = TRUE, value = TRUE)
 
 
-tte <- BB |> select(is.na(CHP1_sig_wo_dark)) |> collect()
+ttd <- BB |> filter(is.na(CHP1_sig_wo_dark)) |> collect()
 
-tte <- BB |> select(is.na(CHP1_sig_wo_dark)) |> collect()
+ttg <- BB |> filter(is.na(CM21_sig_wo_dark)) |> collect()
 
+
+source("~/CODE/FUNCTIONS/R/data.R")
+
+ttd <- rm.cols.NA.DT(ttd)
+ttg <- rm.cols.NA.DT(ttg)
 
 names(BB)
 
