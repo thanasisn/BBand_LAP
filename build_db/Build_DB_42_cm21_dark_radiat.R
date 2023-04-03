@@ -7,6 +7,8 @@
 #' Fills:
 #' - `CM21_sig_wo_dark` when it's appropriate
 #'
+#' On the second run will replace 'MISSING' dark with 'CONSTRUCTED' dark.
+#'
 #+ include=T, echo=F
 
 ## __ Set environment  ---------------------------------------------------------
@@ -17,6 +19,7 @@ Script.Name <- "~/BBand_LAP/build_db/Build_DB_42_cm21_dark.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_dark_calculation.R")
+source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
@@ -68,10 +71,13 @@ filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
 ## list data set files to touch
+dark_to_do <- BB_meta[ cm21_dark_flag %in% c(NA, "MISSING") & !is.na(cm21_basename) & cm21_sig_NAs != 1440]
+cat("There are ", nrow(dark_to_do), "days with missing dark\n\n")
+cat(format(dark_to_do$day), " ")
+cat("\n")
+
 todosets <- unique(rbind(
-    BB_meta[is.na(cm21_dark_flag) |
-            cm21_dark_flag == "MISSING",
-            .(month = month(day), year = year(day))]
+    dark_to_do[, .(month = month(day), year = year(day))]
 ))
 
 ## select what dataset files to touch
@@ -89,7 +95,8 @@ if (BB_meta[!is.na(cm21_dark_flag), .N] > 100) {
     cm21MORdark   <- approxfun( test$day, test$cm21_dark_Mor_med )
     cm21DAILYdark <- approxfun( test$day, test$cm21_Daily_dark )
     ## get dark missing days
-    missingdays <- BB_meta[ !is.na(cm21_basename) & cm21_dark_flag == "MISSING", day]
+    missingdays <- BB_meta[!is.na(cm21_basename) &
+                           cm21_dark_flag %in% c("MISSING", "CONSTRUCTED"), day]
 
     ## Create missing dark
     construct <- data.table(
@@ -115,7 +122,9 @@ for (af in filelist$names) {
     datapart[, year  := as.integer(year(Date)) ]
 
     ## use only valid data for dark
-    data_use <- datapart[is.na(cm21_bad_data_flag) & !is.na(CM21_sig) ]
+    data_use <- datapart[is.na(cm21_bad_data_flag) &
+                         !is.na(CM21_sig) &
+                         is.na(CM21_sig_wo_dark)]
 
     cat("Load: ", af, "\n")
 
@@ -160,11 +169,11 @@ for (af in filelist$names) {
             ## get dark from pre-computed file
             if (exists("construct")) {
                 ## can not find date
-                if (!aday %in% construct$Date) {
-                    todays_dark_correction <- as.numeric(NA)
-                    dark_flag              <- "MISSING"
-                    missingdark            <- as.numeric(NA)
-                } else {
+                if (aday %in% construct$Date) {
+                #     todays_dark_correction <- as.numeric(NA)
+                #     dark_flag              <- "MISSING"
+                #     missingdark            <- as.numeric(NA)
+                # } else {
                     ## get data from recomputed dark database
                     todays_dark_correction <- construct[Date == aday, DARK]
                     dark_flag              <- "CONSTRUCTED"
@@ -185,6 +194,10 @@ for (af in filelist$names) {
 
         ## __ Apply dark correction for the day  -------------------------------
         daydata[, CM21_sig_wo_dark := CM21_sig - todays_dark_correction ]
+
+        ## __ Convert signal to radiation --------------------------------------
+        daydata[, GLB_wpsm    := CM21_sig    * cm21factor(Date)]
+        daydata[, GLB_SD_wpsm := CM21_sig_sd * cm21factor(Date)]
 
         ## __ Day stats --------------------------------------------------------
         names(dark_day) <- paste0("cm21_", names(dark_day))
