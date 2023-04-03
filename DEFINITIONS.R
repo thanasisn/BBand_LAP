@@ -1,5 +1,5 @@
 #'
-#' Here are some variables for this project to build the raw database.
+#' Variables for the Broab Band project
 #'
 
 ####    Project root folder    #################################################
@@ -30,7 +30,7 @@ DB_META_fl    <- "~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
 DB_HASH_fl    <- "~/DATA/Broad_Band/Broad_Band_DB_hash_table.paquet"
 DB_start_date <- as.Date("1993-01-01")   ## ~ start in 1993-04-19??
 DB_start_date <- as.Date("2016-01-01")   ## ~ start of chp1
-DB_start_date <- as.Date("2020-01-01")   ##  For testing
+DB_start_date <- as.Date("2021-01-01")   ##  For testing
 
 
 ####    Filters for CHP 1 temperatures    ######################################
