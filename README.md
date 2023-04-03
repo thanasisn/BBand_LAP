@@ -12,11 +12,12 @@ To process the data from broadband instruments of LAP.
 
 - Digest raw data
   - Signal from CHP-1
-  - Tracker "async" data from radmon
+  - Tracker "async" 
   - CHP-1 internal temperature from thermistor
 - Bad data ranges flagging
   - From manual set execution ranges
   - From acquisition signal physical limits
+- Converts signal to radiation
 
 ### CM-21
 
@@ -25,6 +26,7 @@ To process the data from broadband instruments of LAP.
 - Bad data ranges flagging
   - From manual set execution ranges
   - From acquisition signal physical limits
+- Converts signal to radiation
 
 
 ## TODO
