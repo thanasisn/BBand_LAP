@@ -43,9 +43,9 @@
 #'
 #'  **SIG**
 #'
-#' **Source code: [github.com/thanasisn/BBand_LAP](https://github.com/thanasisn/BBand_LAP)**
+#' **Source code: [`github.com/thanasisn/BBand_LAP`](`https://github.com/thanasisn/BBand_LAP`)**
 #'
-#' **Data display: [thanasisn.netlify.app/3-data_display/](https://thanasisn.netlify.app/3-data_display/)**
+#' **Data display: [`thanasisn.netlify.app/3-data_display`](`https://thanasisn.netlify.app/3-data_display`)**
 #'
 #'
 #+ echo=F, include=T
@@ -136,8 +136,8 @@ years_to_do <- datayears
 #'
 #' For 'CLEAN' data, it removes from view:
 #'
-#' - Bad recordings ranges `chp1_bad_data`
-#' - Tracker async cases `Async_tracker`
+#' - Bad recordings ranges `chp1_bad_data_flag`
+#' - Tracker async cases `Async_tracker_flag`
 #' - Physical recording limits `chp1_signal_lower_limit()` and `chp1_signal_upper_limit()`
 #'
 #' Mark outliers for signal and SD with:
@@ -170,14 +170,14 @@ for (YYYY in years_to_do) {
     if (CLEAN) {
         year_data[!is.na(CHP1_sig), .N]
         cat("\nRemove bad data regions\n")
-        cat(year_data[!is.na(chp1_bad_data), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CM21_sig   [!is.na(year_data$chp1_bad_data)] <- NA
-        year_data$CM21_sig_sd[!is.na(year_data$chp1_bad_data)] <- NA
+        cat(year_data[!is.na(chp1_bad_data_flag), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+        year_data$CM21_sig   [!is.na(year_data$chp1_bad_data_flag)] <- NA
+        year_data$CM21_sig_sd[!is.na(year_data$chp1_bad_data_flag)] <- NA
 
         cat("\nRemove tracker async cases\n")
-        cat(year_data[Async_tracker == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CHP1_sig   [year_data$Async_tracker == TRUE] <- NA
-        year_data$CHP1_sig_sd[year_data$Async_tracker == TRUE] <- NA
+        cat(year_data[Async_tracker_flag == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+        year_data$CHP1_sig   [year_data$Async_tracker_flag == TRUE] <- NA
+        year_data$CHP1_sig_sd[year_data$Async_tracker_flag == TRUE] <- NA
 
         cat("\nRemove data above physical limits\n")
         cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
@@ -244,7 +244,7 @@ for (YYYY in years_to_do) {
     ))
 
     cat('\n\n\\footnotesize\n\n')
-    cat(pander(summary(year_data[, .(Date, SZA, CHP1_sig, CHP1_sig_sd, Async_tracker)])))
+    cat(pander(summary(year_data[, .(Date, SZA, CHP1_sig, CHP1_sig_sd, Async_tracker_flag)])))
     cat('\n\n\\normalsize\n\n')
 
     hist(year_data$CHP1_sig,
@@ -306,7 +306,7 @@ for (YYYY in years_to_do) {
     title(main = paste("CHP1sd by month", YYYY))
     cat('\n\n')
 
-    count <- year_data[ , .(Asyncs = sum(Async_tracker)), by = .(Day = as.Date(Date))]
+    count <- year_data[ , .(Asyncs = sum(Async_tracker_flag)), by = .(Day = as.Date(Date))]
 
     plot(count$Day, count$Asyncs,
          main = paste("Daily Async cases", YYYY))
