@@ -108,8 +108,8 @@ rm(todosets, dd, test)
 ## loop data base files computing black for CHP-1
 for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
-    datapart[, month := month(Date)]
-    datapart[, year  := year(Date) ]
+    datapart[, month := as.integer(month(Date))]
+    datapart[, year  := as.integer(year(Date)) ]
     cat("Load: ", af, "\n")
 
     ## Ignore bad and missing data
@@ -191,8 +191,6 @@ for (af in filelist$names) {
         ## import new data
         BB_meta  <- rows_update(BB_meta, meta_day, by = "day")
         datapart <- rows_update(datapart, daydata, by = "Date")
-
-        stop()
         rm(daydata, meta_day, dark_day)
     }
 
