@@ -90,8 +90,9 @@ rm(todosets, dd)
 ## loop data base files computing black for CHP-1
 for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
-    datapart[, month := month(Date) ]
-    datapart[, year  := year(Date)  ]
+    datapart[, month := month(Date)]
+    datapart[, year  := year(Date) ]
+    meta_gather <- data.table()
     cat("Load: ", af, "\n")
 
     ## Ignore bad and missing data
@@ -105,7 +106,6 @@ for (af in filelist$names) {
     for (aday in unique(as.Date(usedata$Date))) {
         daydata <- usedata[ as.Date(Date) == aday ]
 
-
         ## __ Compute dark values for day  -------------------------------------
         dark_day <- dark_calculations_2(
             dates      = daydata$Date,
@@ -115,25 +115,22 @@ for (af in filelist$names) {
             dstretch   = DSTRETCH
         )
 
-
-
-
         ## __ Resolve problematic dark calculations ----------------------------
-        if ( !((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
-               (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
+        if ( !((!is.na(dark_day$dark_Mor_med) & dark_day$dark_Mor_cnt >= DCOUNTLIM) |
+               (!is.na(dark_day$dark_Eve_med) & dark_day$dark_Eve_cnt >= DCOUNTLIM))) {
             # cat("Can not apply dark\n")
-            todays_dark_correction <- NA
+            todays_dark_correction <- as.numeric(NA)
             dark_flag              <- "MISSING"
-            missingdark            <- NA
+            missingdark            <- as.numeric(NA)
 
             stop("gdsgsdg")
             ## get dark from pre-computed file
             if (exists("construct")) {
                 ## can not find date
-                if (! aday %in% construct$Date) {
-                    todays_dark_correction <- NA
+                if (!aday %in% construct$Date) {
+                    todays_dark_correction <- as.numeric(NA)
                     dark_flag              <- "MISSING"
-                    missingdark            <- NA
+                    missingdark            <- as.numeric(NA)
                 } else {
                     ## get data from recomputed dark database
                     todays_dark_correction <- construct[ Date == aday, DARK]
@@ -154,23 +151,22 @@ for (af in filelist$names) {
         ## __ Apply dark correction for the day  -------------------------------
         daydata[, CM21_sig_wo_dark := CM21_sig - todays_dark_correction ]
 
-
-
-        ####    Day stats    ###################################################
-        day <- data.frame(Date      = as.Date(aday),
-                          SunUP     = sum( daydata$Eleva >= 0 ),
-                          Dmean     = mean(todays_dark_correction, na.rm = T),
-                          sunMeas   = sum( daydata$Eleva >= 0 & !is.na(daydata$CM21value)),
-                          dark_flag = dark_flag,
-                          dark_day,
-                          CalcDate  = Sys.time()
+        ## __ Day stats --------------------------------------------------------
+        names(dark_day) <- paste0("chp1_", names(dark_day))
+        meta_day <- data.frame(day                = as.Date(aday),
+                               chp1_Daily_dark    = mean(todays_dark_correction, na.rm = T),
+                               chp1_dark_flag     = dark_flag,
+                               dark_day,
+                               chp1_dark_computed = Sys.time()
         )
 
 
+        meta_gather <- rbind(meta_gather, meta_day)
 
 
 
 
+names(meta_gather)
 
 
 

@@ -45,36 +45,36 @@ if (file.exists(DB_META_fl)) {
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
     ## new columns
-    var <- "chp1_basename"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.character(BB_meta[[var]])
-    }
-    var <- "chp1_md5sum"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.character(BB_meta[[var]])
-    }
-    var <- "chp1_mtime"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    }
-    var <- "chp1_parsed"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    }
-    var <- "chp1_sig_NAs"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.integer(BB_meta[[var]])
-    }
-    var <- "chp1_sig_sd_NAs"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.integer(BB_meta[[var]])
-    }
+    # var <- "chp1_basename"
+    # if (!any(names(BB_meta) == var)) {
+    #     BB_meta[[var]] <- NA
+    #     BB_meta[[var]] <- as.character(BB_meta[[var]])
+    # }
+    # var <- "chp1_md5sum"
+    # if (!any(names(BB_meta) == var)) {
+    #     BB_meta[[var]] <- NA
+    #     BB_meta[[var]] <- as.character(BB_meta[[var]])
+    # }
+    # var <- "chp1_mtime"
+    # if (!any(names(BB_meta) == var)) {
+    #     BB_meta[[var]] <- NA
+    #     BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
+    # }
+    # var <- "chp1_parsed"
+    # if (!any(names(BB_meta) == var)) {
+    #     BB_meta[[var]] <- NA
+    #     BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
+    # }
+    # var <- "chp1_sig_NAs"
+    # if (!any(names(BB_meta) == var)) {
+    #     BB_meta[[var]] <- NA
+    #     BB_meta[[var]] <- as.integer(BB_meta[[var]])
+    # }
+    # var <- "chp1_sig_sd_NAs"
+    # if (!any(names(BB_meta) == var)) {
+    #     BB_meta[[var]] <- NA
+    #     BB_meta[[var]] <- as.integer(BB_meta[[var]])
+    # }
 } else {
     stop("STAR A NEW DB!!")
 }
