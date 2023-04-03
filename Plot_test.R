@@ -11,10 +11,11 @@ Script.Name <- "~/BBand_LAP/Mark_excluded_data_ranges.R"
 
 
 source("~/BBand_LAP/DEFINITIONS.R")
-source("~/CHP_1_DIR/Functions_CHP1.R")
+source("~/BBand_LAP/functions/Functions_CHP1.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
-on.exit(myunlock(DB_lock))
+# mylock(DB_lock)
+
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -29,19 +30,6 @@ library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(shiny)
 library(plotly)
 
-opendata <- function() {
-    open_dataset(sources       = DB_DIR,
-                 unify_schemas = TRUE,
-                 hive_style    = FALSE,
-                 partitioning  = c("year", "month"))
-}
-
-writedata <- function(.) {
-    write_dataset(., path      = DB_DIR,
-                  format       = "parquet",
-                  partitioning = c("year", "month"),
-                  hive_style   = FALSE)
-}
 
 
 BB <- opendata()
@@ -49,6 +37,14 @@ BB <- opendata()
 
 
 vars <- grep("Date|Azimuth|doy|year|month", names(BB), invert = TRUE, value = TRUE)
+
+
+tte <- BB |> select(is.na(CHP1_sig_wo_dark)) |> collect()
+
+tte <- BB |> select(is.na(CHP1_sig_wo_dark)) |> collect()
+
+
+names(BB)
 
 
 
@@ -128,7 +124,7 @@ shinyApp(ui,server)
 
 
 
-
+myunlock(DB_lock)
 
 
 

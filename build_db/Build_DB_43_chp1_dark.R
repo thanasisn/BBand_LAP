@@ -2,10 +2,7 @@
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #'
-#' TODO:
-#'
-#' - Darck and radiation for CHP-1 and CM-21
-#'
+#' Compute or construct dark signal offset for CHP-1.
 #'
 #+ include=T, echo=F
 
@@ -13,14 +10,13 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/settname.R"
+Script.Name <- "~/BBand_LAP/build_db/Build_DB_43_chp1_dark.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
-source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_dark_calculation.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -29,11 +25,7 @@ if (!interactive()) {
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
-library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
-library(tools,      warn.conflicts = TRUE, quietly = TRUE)
-library(pander,     warn.conflicts = TRUE, quietly = TRUE)
-
 
 
 ##  Initialize meta data file  -------------------------------------------------
@@ -48,10 +40,10 @@ if (file.exists(DB_META_fl)) {
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
     ## new columns
-    var <- "chp1_dark_flag"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- as.character(NA)
-    }
+    # var <- "chp1_dark_flag"
+    # if (!any(names(BB_meta) == var)) {
+    #     BB_meta[[var]] <- as.character(NA)
+    # }
 } else {
     stop("NO METADATA FILE!!")
 }
@@ -79,25 +71,37 @@ todosets <- unique(rbind(
             .(month = month(day), year = year(day))]
 ))
 
-
-## TODO check done
-
-## select what to touch
+## select what dataset files to touch
 filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 
 
-wecare <- c("day",grep("chp1",names(BB_meta), value = T))
 
-BB_meta[is.na(chp1_dark_flag) & !is.na(chp1_basename), ..wecare ]
+## Create a dark construct!  ---------------------------------------------------
 
-## create a dark construct!
+## create construct if are available data
+if (BB_meta[!is.na(chp1_dark_flag), .N] > 100) {
+    test <- BB_meta[, .(day, chp1_dark_flag, chp1_dark_Eve_med, chp1_dark_Mor_med, chp1_Daily_dark) ]
+    ## will use mean Daily dark
+    chp1EVEdark   <- approxfun( test$day, test$chp1_dark_Eve_med )
+    chp1MORdark   <- approxfun( test$day, test$chp1_dark_Mor_med )
+    chp1DAILYdark <- approxfun( test$day, test$chp1_Daily_dark )
+    ## get dark missing days
+    missingdays <- BB_meta[ !is.na(chp1_basename) & chp1_dark_flag == "MISSING", day]
+
+    ## Create missing dark
+    construct <- data.table(
+        Date = missingdays,
+        DARK = chp1DAILYdark(missingdays)
+    )
+    # plot(test$day, test$chp1_dark_Eve_med)
+    # plot(test$day, test$chp1_dark_Mor_med)
+    plot(test$day, test$chp1_Daily_dark,
+         main = "Constructed Dark values for CHP-1")
+    points(construct$Date, construct$DARK, col = "red")
+}
 
 
-
-BB_meta[, .(day, chp1_dark_flag, chp1_dark_Eve_med, chp1_dark_Mor_med, chp1d) ]
-
-
-rm(todosets, dd)
+rm(todosets, dd, test)
 
 
 
@@ -155,7 +159,7 @@ for (af in filelist$names) {
                     missingdark            <- as.numeric(NA)
                 } else {
                     ## get data from recomputed dark database
-                    todays_dark_correction <- construct[ Date == aday, DARK]
+                    todays_dark_correction <- construct[Date == aday, DARK]
                     dark_flag              <- "CONSTRUCTED"
                 }
             } else {
@@ -187,7 +191,9 @@ for (af in filelist$names) {
         ## import new data
         BB_meta  <- rows_update(BB_meta, meta_day, by = "day")
         datapart <- rows_update(datapart, daydata, by = "Date")
-        rm(daydata, meta_day)
+
+        stop()
+        rm(daydata, meta_day, dark_day)
     }
 
     ## store actual data
@@ -200,15 +206,12 @@ for (af in filelist$names) {
 }
 
 
-BB_meta[is.na(chp1_dark_flag)]
-
-table(BB_meta[,(chp1_dark_flag)])
-
-
+print(
+    table(BB_meta[,(chp1_dark_flag)])
+)
 
 
 
-
-# myunlock(DB_lock)
+myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
