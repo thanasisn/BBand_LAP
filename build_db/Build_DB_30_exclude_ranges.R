@@ -388,8 +388,6 @@ for (acol in wecare) {
 
 
 
-# stop()  ###
-# ###
 # ## touch only needed
 # yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
 # # for (ay in yearstodo) {
@@ -415,14 +413,6 @@ for (acol in wecare) {
 #             monthsvec <- unique(month(tempex$Date))
 #
 #             stop()
-#
-#             # mutate(BB, chp1_bad_data = base::replace(chp1_bad_data,
-#             #                                          Date >= lower & Date < upper,
-#             #                                          comme))
-#             #
-#             # mutate(BB, chp1_bad_data = replace(chp1_bad_data,
-#             #                                      Date >= lower & Date < upper,
-#             #                                      comme))
 #
 #             # BB %>%
 #             # filter(year %in% yearsvec & month %in% monthsvec) %>%
@@ -516,8 +506,6 @@ for (acol in wecare) {
 #     # BB <- BB %>% mutate(chp1_bad_data = ifelse(Date >= lower & Date < upper,
 #     #                                            chp1_bad_data,
 #     #                                            comme), .keep = "all") %>% compute()
-#     # stop()
-#     ## mark bad regions of data
 # }
 
 
