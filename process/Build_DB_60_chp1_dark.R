@@ -20,7 +20,7 @@ source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_dark_calculation.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -74,7 +74,8 @@ filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
 ## list data set files to touch
 todosets <- unique(rbind(
-    BB_meta[is.na(chp1_dark_flag),
+    BB_meta[is.na(chp1_dark_flag) |
+            chp1_dark_flag == "MISSING",
             .(month = month(day), year = year(day))]
 ))
 
@@ -84,15 +85,21 @@ todosets <- unique(rbind(
 ## select what to touch
 filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 
-BB_meta[is.na(chp1_dark_flag)]
+
+wecare <- c("day",grep("chp1",names(BB_meta), value = T))
+
+BB_meta[is.na(chp1_dark_flag) & !is.na(chp1_basename), ..wecare ]
+
+## create a dark construct!
 
 
 
+BB_meta[, .(day, chp1_dark_flag, chp1_dark_Eve_med, chp1_dark_Mor_med, chp1d) ]
 
 
 rm(todosets, dd)
 
-stop()
+
 
 ## loop data base files computing black for CHP-1
 for (af in filelist$names) {
@@ -102,15 +109,19 @@ for (af in filelist$names) {
     cat("Load: ", af, "\n")
 
     ## Ignore bad and missing data
-    usedata <- datapart[is.na(chp1_bad_data_flag) & !is.na(CHP1_sig) ]
-    if (nrow(usedata) == 0) {
+    if (datapart[is.na(chp1_bad_data_flag) & !is.na(CHP1_sig), .N ] == 0) {
         cat("\nNo usefull CHP-1 data in this file\n\n")
         next()
     }
 
     ## loop days
-    for (aday in unique(as.Date(usedata$Date))) {
-        daydata <- usedata[ as.Date(Date) == aday ]
+    for (aday in unique(as.Date(datapart$Date))) {
+        daydata <- datapart[ as.Date(Date) == aday ]
+
+        if (any(is.na(daydata$Elevat))) {
+            cat("The day is not initialized:", format(as.Date(aday)),"\n")
+            next()
+        }
 
         ## __ Compute dark values for day  -------------------------------------
         dark_day <- dark_calculations_2(
@@ -122,17 +133,19 @@ for (af in filelist$names) {
         )
 
         ## __ Resolve problematic dark calculations ----------------------------
-        if ( !((!is.na(dark_day$dark_Mor_med) & dark_day$dark_Mor_cnt >= DCOUNTLIM) |
-               (!is.na(dark_day$dark_Eve_med) & dark_day$dark_Eve_cnt >= DCOUNTLIM))) {
-            # cat("Can not apply dark\n")
+
+        ## no data to use
+        if (all(is.na(daydata$CHP1_sig))) {
+            dark_flag              <- "NO SIGNAL DATA"
+            todays_dark_correction <- as.numeric(NA)
+            missingdark            <- as.numeric(NA)
+        ## data to compute dark are missing
+        } else if ( !((!is.na(dark_day$dark_Mor_med) & dark_day$dark_Mor_cnt >= DCOUNTLIM) |
+                      (!is.na(dark_day$dark_Eve_med) & dark_day$dark_Eve_cnt >= DCOUNTLIM))) {
             todays_dark_correction <- as.numeric(NA)
             dark_flag              <- "MISSING"
             missingdark            <- as.numeric(NA)
 
-            cat("skip day\n")
-            next()
-
-            stop("gdsgsdg")
             ## get dark from pre-computed file
             if (exists("construct")) {
                 ## can not find date
@@ -145,6 +158,8 @@ for (af in filelist$names) {
                     todays_dark_correction <- construct[ Date == aday, DARK]
                     dark_flag              <- "CONSTRUCTED"
                 }
+            } else {
+                cat("Need to constract dark:", format(as.Date(aday)),"\n")
             }
         } else {
             ## __ Dark Correction function for non missing  --------------------
@@ -185,15 +200,15 @@ for (af in filelist$names) {
 }
 
 
+BB_meta[is.na(chp1_dark_flag)]
+
+table(BB_meta[,(chp1_dark_flag)])
 
 
 
 
 
 
-
-
-
-myunlock(DB_lock)
+# myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
