@@ -17,9 +17,9 @@ List of tags
       5 #leveling
       1 #mounting
       2 #panic
-      4 #problem
+      5 #problem
       2 #pysolar
-      1 #radmon
+      2 #radmon
       1 #radmon_reboot
       6 #silica
       2 #sun_vector
