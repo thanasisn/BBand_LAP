@@ -135,16 +135,16 @@ for (YYYY in unique(year(inp_filelist$day))) {
             cat(" Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## add columns for this set
-            var <- "CM21_sig"
-            if (!any(names(gather) == var)) {
-                gather[[var]] <- NA
-                gather[[var]] <- as.numeric(gather[[var]])
-            }
-            var <- "CM21_sig_sd"
-            if (!any(names(gather) == var)) {
-                gather[[var]] <- NA
-                gather[[var]] <- as.numeric(gather[[var]])
-            }
+            # var <- "CM21_sig"
+            # if (!any(names(gather) == var)) {
+            #     gather[[var]] <- NA
+            #     gather[[var]] <- as.numeric(gather[[var]])
+            # }
+            # var <- "CM21_sig_sd"
+            # if (!any(names(gather) == var)) {
+            #     gather[[var]] <- NA
+            #     gather[[var]] <- as.numeric(gather[[var]])
+            # }
             var <- "year"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
