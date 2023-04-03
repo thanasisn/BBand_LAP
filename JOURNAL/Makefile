@@ -8,15 +8,15 @@ markdowns := $(shell find -name "*.md" | sort -V)
 
 
 ## pre pandoc run
-preprocess: .markdowncontent
-.markdowncontent: $(markdowns)
+preprocess: Readme.md
+Readme.md: $(markdowns)
 	./.pre_process.sh $(markdowns)
 
 
 ## create pdf file
 TARGET = Journal.pdf
 pdf: $(TARGET)
-$(TARGET): Makefile .markdowncontent
+$(TARGET): Makefile Readme.md
 	-pandoc                           \
 	  --standalone                    \
 	  --listings                      \
@@ -29,13 +29,13 @@ $(TARGET): Makefile .markdowncontent
 	  --pdf-engine      xelatex       \
 	  --pdf-engine-opt  -shell-escape \
 	  --out             '$@'          \
-	  .markdowncontent
+	  Readme.md
 
 
 ## create doc file
 TARGET = Journal.odt
 odt: $(TARGET)
-$(TARGET): Makefile .markdowncontent
+$(TARGET): Makefile Readme.md
 	-pandoc                           \
 	  --standalone                    \
 	  --toc                           \
@@ -43,13 +43,13 @@ $(TARGET): Makefile .markdowncontent
 	  --from            markdown      \
 	  --to              odt           \
 	  --out             '$@'          \
-	  .markdowncontent
+	  Readme.md
 
 
 ## create html file
 TARGET = Journal.html
 html: $(TARGET)
-$(TARGET): Makefile .markdowncontent
+$(TARGET): Makefile Readme.md
 	-pandoc                           \
 	  --standalone                    \
 	  --toc                           \
@@ -60,6 +60,6 @@ $(TARGET): Makefile .markdowncontent
 	  --from            markdown      \
 	  --to              html          \
 	  --out             '$@'          \
-	  .markdowncontent
+	  Readme.md
 
 
