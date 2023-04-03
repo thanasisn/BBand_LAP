@@ -41,9 +41,9 @@
 #' ---
 
 #'
-#' **Source code: [github.com/thanasisn/BBand_LAP](https://github.com/thanasisn/BBand_LAP)**
+#' **Source code: [`github.com/thanasisn/BBand_LAP`](`https://github.com/thanasisn/BBand_LAP`)**
 #'
-#' **Data display: [thanasisn.netlify.app/3-data_display/](https://thanasisn.netlify.app/3-data_display/)**
+#' **Data display: [`thanasisn.netlify.app/3-data_display`](`https://thanasisn.netlify.app/3-data_display`)**
 #'
 #' - Lists Sirena files
 #' - Lists Radmon files
