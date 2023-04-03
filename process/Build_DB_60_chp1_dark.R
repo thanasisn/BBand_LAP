@@ -20,7 +20,7 @@ source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_dark_calculation.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -83,16 +83,22 @@ todosets <- unique(rbind(
 
 ## select what to touch
 filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
+
+BB_meta[is.na(chp1_dark_flag)]
+
+
+
+
+
 rm(todosets, dd)
 
-
+stop()
 
 ## loop data base files computing black for CHP-1
 for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
     datapart[, month := month(Date)]
     datapart[, year  := year(Date) ]
-    meta_gather <- data.table()
     cat("Load: ", af, "\n")
 
     ## Ignore bad and missing data
@@ -109,7 +115,7 @@ for (af in filelist$names) {
         ## __ Compute dark values for day  -------------------------------------
         dark_day <- dark_calculations_2(
             dates      = daydata$Date,
-            values     = daydata$CM21_sig,
+            values     = daydata$CHP1_sig,
             elevatio   = daydata$Eleva,
             nightlimit = DARK_ELEV,
             dstretch   = DSTRETCH
@@ -122,6 +128,9 @@ for (af in filelist$names) {
             todays_dark_correction <- as.numeric(NA)
             dark_flag              <- "MISSING"
             missingdark            <- as.numeric(NA)
+
+            cat("skip day\n")
+            next()
 
             stop("gdsgsdg")
             ## get dark from pre-computed file
@@ -149,7 +158,7 @@ for (af in filelist$names) {
         }
 
         ## __ Apply dark correction for the day  -------------------------------
-        daydata[, CM21_sig_wo_dark := CM21_sig - todays_dark_correction ]
+        daydata[, CHP1_sig_wo_dark := CHP1_sig - todays_dark_correction ]
 
         ## __ Day stats --------------------------------------------------------
         names(dark_day) <- paste0("chp1_", names(dark_day))
@@ -160,75 +169,22 @@ for (af in filelist$names) {
                                chp1_dark_computed = Sys.time()
         )
 
-
-        meta_gather <- rbind(meta_gather, meta_day)
-
-
-
-
-names(meta_gather)
-
-
-
+        ## import new data
+        BB_meta  <- rows_update(BB_meta, meta_day, by = "day")
+        datapart <- rows_update(datapart, daydata, by = "Date")
+        rm(daydata, meta_day)
     }
 
-
-
-    ## ignore data!!
-    grep("chp1", names(usedata), ignore.case = TRUE, value = TRUE)
-
-
-    stop()
+    ## store actual data
+    write_parquet(x = datapart, sink = af)
+    write_parquet(BB_meta, DB_META_fl)
+    cat("Save: ", af, "\n\n")
+    ## clean
+    rm(datapart, meta_day)
 
 }
 
-# ####    Calculate Dark signal   ########################################
-# dark_day <- dark_calculations( dates      = daydata$Date,
-#                                values     = daydata$CM21value,
-#                                elevatio   = daydata$Eleva,
-#                                nightlimit = DARK_ELEV,
-#                                dstretch   = DSTRETCH)
-#
-#
-#
-# # if ( is.na(dark_day$Mmed) & is.na(dark_day$Emed) ) {
-# if ( ! ((!is.na(dark_day$Mmed) & dark_day$Mcnt >= DCOUNTLIM) |
-#         (!is.na(dark_day$Emed) & dark_day$Ecnt >= DCOUNTLIM)) ) {
-#     # cat("Can not apply dark\n")
-#     todays_dark_correction <- NA
-#     dark_flag              <- "MISSING"
-#     missingdark            <- NA
-#
-#     ## get dark from pre-computed file
-#     if (exists("construct")) {
-#         ## can not find date
-#         if (! theday %in% construct$Date) {
-#             todays_dark_correction <- NA
-#             dark_flag              <- "MISSING"
-#             missingdark            <- NA
-#         } else {
-#             ## get data from recomputed dark database
-#             todays_dark_correction <- construct[ Date == theday, DARK]
-#             dark_flag              <- "CONSTRUCTED"
-#         }
-#     }
-# } else {
-#     ####    Dark Correction function   #################################
-#     dark_generator <- dark_function(dark_day    = dark_day,
-#                                     DCOUNTLIM   = DCOUNTLIM,
-#                                     type        = "median",
-#                                     adate       = theday ,
-#                                     test        = test,
-#                                     missfiles   = missfiles,
-#                                     missingdark = missingdark )
-#
-#     ####    Create dark signal for correction    #######################
-#     todays_dark_correction <- dark_generator(daydata$Date)
-#     dark_flag              <- "COMPUTED"
-# }
-#
-# ####    Apply dark correction    #######################################
-# daydata[, CM21valueWdark := CM21value - todays_dark_correction ]
+
 
 
 
