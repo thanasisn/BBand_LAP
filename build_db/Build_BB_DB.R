@@ -24,9 +24,12 @@ source("~/BBand_LAP/build_db/Build_DB_03_chp1.R"          )
 source("~/BBand_LAP/build_db/Build_DB_04_chp1_SNC.R"      )
 source("~/BBand_LAP/build_db/Build_DB_05_chp1_TMP.R"      )
 source("~/BBand_LAP/build_db/Build_DB_06_cm21_TOT.R"      )
-
-## Flag data
+## Flag data bad data
 source("~/BBand_LAP/build_db/Build_DB_30_exclude_ranges.R")
+## Apply dark offset
+source("~/BBand_LAP/build_db/Build_DB_42_cm21_dark.R"     )
+source("~/BBand_LAP/build_db/Build_DB_43_chp1_dark.R"     )
+## Convert to radiation
 
 
 
