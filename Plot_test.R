@@ -30,6 +30,21 @@ library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(shiny)
 library(plotly)
 
+TEST_DB <- TRUE
+
+if (TEST_DB) {
+    ## copy data to temp
+    tyear <- 2022
+    system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
+    system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
+    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
+    ## replace paths with test paths
+    DB_DIR     <- test_DB_DIR
+    DB_lock    <- test_DB_lock
+    DB_META_fl <- test_DB_META_fl
+    DB_HASH_fl <- test_DB_HASH_fl
+}
+
 
 
 BB <- opendata()
@@ -40,16 +55,8 @@ vars <- grep("Date|Azimuth|doy|year|month", names(BB), invert = TRUE, value = TR
 
 
 ttd <- BB |> filter(is.na(CHP1_sig_wo_dark)) |> collect()
-
 ttg <- BB |> filter(is.na(CM21_sig_wo_dark)) |> collect()
 
-
-source("~/CODE/FUNCTIONS/R/data.R")
-
-ttd <- rm.cols.NA.DT(ttd)
-ttg <- rm.cols.NA.DT(ttg)
-
-names(BB)
 
 
 

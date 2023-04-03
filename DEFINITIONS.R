@@ -32,6 +32,13 @@ DB_start_date <- as.Date("1993-01-01")   ## ~ start in 1993-04-19??
 DB_start_date <- as.Date("2016-01-01")   ## ~ start of chp1
 # DB_start_date <- as.Date("2022-01-01")   ##  For testing
 
+## test paths
+test_DB_DIR     <- "~/ZHOST/Broad_Band_DB"
+test_DB_lock    <- "~/ZHOST/Broad_Band_DB.stopfile"
+test_DB_META_fl <- "~/ZHOST/Broad_Band_DB_metadata.parquet"
+test_DB_HASH_fl <- "~/ZHOST/Broad_Band_DB_hash_table.paquet"
+
+
 
 ####    Filters for CHP 1 temperatures    ######################################
 CHP_TEMP_MIN      <- -25    ## Drop temperatures below this value
