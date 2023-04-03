@@ -4,6 +4,16 @@
 #'
 #' Compute or construct dark signal offset for CHP-1.
 #'
+#' Fills with valid only data:
+#'
+#' - `CHP1_sig_wo_dark`
+#' - `DIR_wpsm`
+#' - `DIR_SD_wpsm`
+#' - `HOR_wpsm`
+#' - `HOR_SD_wpsm`
+#'
+#' On the second run will replace 'MISSING' dark with 'CONSTRUCTED' dark.
+#'
 #+ include=T, echo=F
 
 ## __ Set environment  ---------------------------------------------------------
@@ -14,7 +24,9 @@ Script.Name <- "~/BBand_LAP/build_db/Build_DB_43_chp1_dark.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_dark_calculation.R")
+source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
+source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
 
@@ -65,10 +77,13 @@ filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
 ## list data set files to touch
+dark_to_do <- BB_meta[chp1_dark_flag %in% c(NA, "MISSING") & !is.na(chp1_basename) & chp1_sig_NAs != 1440]
+cat("There are ", nrow(dark_to_do), "days with missing dark\n\n")
+cat(format(dark_to_do$day), " ")
+cat("\n")
+
 todosets <- unique(rbind(
-    BB_meta[is.na(chp1_dark_flag) |
-            chp1_dark_flag == "MISSING",
-            .(month = month(day), year = year(day))]
+    dark_to_do[, .(month = month(day), year = year(day))]
 ))
 
 ## select what dataset files to touch
@@ -110,6 +125,12 @@ for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
     datapart[, month := as.integer(month(Date))]
     datapart[, year  := as.integer(year(Date)) ]
+
+    ## use only valid data for dark
+    data_use <- datapart[is.na(chp1_bad_data_flag) &
+                         !is.na(CHP1_sig) &
+                         is.na(CHP1_sig_wo_dark)]
+
     cat("Load: ", af, "\n")
 
     ## Ignore bad and missing data
@@ -179,6 +200,12 @@ for (af in filelist$names) {
         ## __ Apply dark correction for the day  -------------------------------
         daydata[, CHP1_sig_wo_dark := CHP1_sig - todays_dark_correction ]
 
+        ## __ Convert signal to radiation --------------------------------------
+        daydata[, DIR_wpsm    := CHP1_sig    * chp1factor(Date)]
+        daydata[, DIR_SD_wpsm := CHP1_sig_sd * chp1factor(Date)]
+        daydata[, HOR_wpsm    := DIR_wpsm    * cosde(SZA)      ]
+        daydata[, HOR_SD_wpsm := DIR_SD_wpsm * cosde(SZA)      ]
+
         ## __ Day stats --------------------------------------------------------
         names(dark_day) <- paste0("chp1_", names(dark_day))
         meta_day <- data.frame(day                = as.Date(aday),
@@ -190,6 +217,7 @@ for (af in filelist$names) {
 
         ## import new data
         BB_meta  <- rows_update(BB_meta, meta_day, by = "day")
+        ## update initial data with valid only
         datapart <- rows_update(datapart, daydata, by = "Date")
         rm(daydata, meta_day, dark_day)
     }
