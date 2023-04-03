@@ -62,7 +62,20 @@ if (file.exists(DB_META_fl)) {
     BB_meta$pysolar_mtime       <- as.POSIXct(BB_meta$pysolar_mtime )
     BB_meta$pysolar_parsed      <- as.POSIXct(BB_meta$pysolar_parsed)
     ## For CM-21 meta data
+    BB_meta$cm21_Daily_dark     <- as.numeric(NA)
     BB_meta$cm21_basename       <- as.character(NA)
+    BB_meta$cm21_dark_Eve_avg   <- as.numeric(NA)
+    BB_meta$cm21_dark_Eve_cnt   <- as.integer(NA)
+    BB_meta$cm21_dark_Eve_end   <- as.POSIXct(NA)
+    BB_meta$cm21_dark_Eve_med   <- as.numeric(NA)
+    BB_meta$cm21_dark_Eve_sta   <- as.POSIXct(NA)
+    BB_meta$cm21_dark_Mor_avg   <- as.numeric(NA)
+    BB_meta$cm21_dark_Mor_cnt   <- as.integer(NA)
+    BB_meta$cm21_dark_Mor_end   <- as.POSIXct(NA)
+    BB_meta$cm21_dark_Mor_med   <- as.numeric(NA)
+    BB_meta$cm21_dark_Mor_sta   <- as.POSIXct(NA)
+    BB_meta$cm21_dark_computed  <- as.POSIXct(NA)
+    BB_meta$cm21_dark_flag      <- as.character(NA)
     BB_meta$cm21_md5sum         <- as.character(NA)
     BB_meta$cm21_mtime          <- as.POSIXct(NA)
     BB_meta$cm21_parsed         <- as.POSIXct(NA)
@@ -172,7 +185,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[Azimuth <= 180, preNoon := TRUE ]
             sun_temp[Azimuth >  180, preNoon := FALSE]
 
-            ## TODO init variables for next processes here
+            ## Init DB variables for next processes ----------------------------
             ## For CM-21
             sun_temp[, CM21_sig                := as.numeric(NA)  ]
             sun_temp[, CM21_sig_sd             := as.numeric(NA)  ]
@@ -196,14 +209,18 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, tot_glb                 := as.numeric(NA)  ]
             sun_temp[, tot_glb_sd              := as.numeric(NA)  ]
             sun_temp[, lap_sza                 := as.numeric(NA)  ]
+            ## Radiation
+            sun_temp[, DIR_wpsm                := as.numeric(NA)  ]
+            sun_temp[, DIR_SD_wpsm             := as.numeric(NA)  ]
+            sun_temp[, GLB_wpsm                := as.numeric(NA)  ]
+            sun_temp[, GLB_SD_wpsm             := as.numeric(NA)  ]
+            sun_temp[, HOR_wpsm                := as.numeric(NA)  ]
+            sun_temp[, HOR_SD_wpsm             := as.numeric(NA)  ]
 
-
-            ## aggregate data
+            ## gather data
             if (nrow(gather) == 0) {
                 ## this inits the database table!!
                 gather     <- as_tibble(sun_temp)
-                # stop()
-                # gather     <- rbind(gather, sun_temp, fill = TRUE)
             } else {
                 gather     <- rows_upsert(gather, sun_temp, by = "Date")
             }
@@ -212,7 +229,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
         }
 
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
-        # BBdaily <- rows_patch(BBdaily, gathermeta, by = "day", unmatched = "ignore")
 
         setorder(gather, Date)
 
