@@ -31,10 +31,8 @@ To process the data from broadband instruments of LAP.
 
 ## TODO
 
-- Dark signal correction
-- Conversions
-- process more instruments
-- interactive plot of db variables
+- Process more instruments
+- Interactive plot of db variables
 - Import Astropy
 - Import TSI
 - Import libRadtran data
