@@ -22,6 +22,10 @@ echo
 )>> "$targetfile"
 
 
+args=( $(find -name "*.md" | grep "[0-9]\{4\}" | sort -V) )
+
+echo "${args[@]}"
+
 ## get all the years from files
 years=($(for af in "${args[@]}"; do echo "$(basename "$(dirname "$af")")"; done | sort -u | grep "[0-9]*" ))
 

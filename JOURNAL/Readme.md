@@ -14,16 +14,6 @@ Other journals and log exist, but are not included here.
 
 \newpage
 
-# .
-
-::: {.columns columngap=4em column-rule="1px solid black"}
-
-
-:::
-
-
-\newpage
-
 # 2015
 
 ::: {.columns columngap=4em column-rule="1px solid black"}

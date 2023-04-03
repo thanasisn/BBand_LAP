@@ -4,7 +4,7 @@
 all: pdf html 
 
 ## list source files
-markdowns := $(shell find -name "*.md" | sort -V)
+markdowns := $(shell find -name "*.md" | grep "[0-9]\{4\}" | sort -V)
 
 
 ## pre pandoc run
