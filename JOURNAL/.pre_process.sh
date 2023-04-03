@@ -10,13 +10,13 @@ args=( "$@" )
 taglist="Tag_list.md"
 
 ## init document
-targetfile=".markdowncontent"
+targetfile="Readme.md"
 echo "" > "$targetfile"
 
 ## add preamble
 (
 cat "./About.md"
-echo 
+echo
 echo "-----"
 echo
 )>> "$targetfile"
@@ -29,19 +29,19 @@ years=($(for af in "${args[@]}"; do echo "$(basename "$(dirname "$af")")"; done 
 for ay in "${years[@]}"; do
     echo
     echo "** $ay **"
-    ( 
+    (
     echo
     echo "\newpage"
     echo
     echo "# $ay"
     echo
     # .justified
-    # .ragged 
+    # .ragged
     echo '::: {.columns columngap=4em column-rule="1px solid black"}'
     # echo ":::columns"
     echo
     ) >> "$targetfile"
-    
+
     ## loop all files of year
     for af in "${args[@]}"; do
         infile="$(echo "$af" | grep "/$ay/")"
@@ -49,10 +49,10 @@ for ay in "${years[@]}"; do
         if [[ -n "$infile" ]]; then
             echo " - $infile"
             (
-            cat "$infile" 
-            echo ""       
-            # echo "------" 
-            echo ""        
+            cat "$infile"
+            echo ""
+            # echo "------"
+            echo ""
             ) >> "$targetfile"
         fi
     done
@@ -61,7 +61,7 @@ for ay in "${years[@]}"; do
     echo ":::"
     echo
     ) >> "$targetfile"
-done 
+done
 
 ## add tail
 (
@@ -69,7 +69,7 @@ echo
 # echo "\newpage"
 echo "-------"
 echo
-cat "./Readme.md" 
+cat "./Instructions.md"
 ) >> "$targetfile"
 
 (
@@ -89,4 +89,4 @@ grep "\[//\]" **/*.md |\
 cat "$taglist" >> "$targetfile"
 
 
-exit 0 
+exit 0
