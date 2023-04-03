@@ -69,25 +69,25 @@ if (file.exists(DB_META_fl)) {
     BB_meta$cm21_sig_NAs        <- as.integer(NA)
     BB_meta$cm21_sig_sd_NAs     <- as.integer(NA)
     ## Fro CHP-1 meta data
+    BB_meta$chp1_Daily_dark     <- as.numeric(NA)
     BB_meta$chp1_basename       <- as.character(NA)
+    BB_meta$chp1_dark_Eve_avg   <- as.numeric(NA)
+    BB_meta$chp1_dark_Eve_cnt   <- as.integer(NA)
+    BB_meta$chp1_dark_Eve_end   <- as.POSIXct(NA)
+    BB_meta$chp1_dark_Eve_med   <- as.numeric(NA)
+    BB_meta$chp1_dark_Eve_sta   <- as.POSIXct(NA)
+    BB_meta$chp1_dark_Mor_avg   <- as.numeric(NA)
+    BB_meta$chp1_dark_Mor_cnt   <- as.integer(NA)
+    BB_meta$chp1_dark_Mor_end   <- as.POSIXct(NA)
+    BB_meta$chp1_dark_Mor_med   <- as.numeric(NA)
+    BB_meta$chp1_dark_Mor_sta   <- as.POSIXct(NA)
+    BB_meta$chp1_dark_computed  <- as.POSIXct(NA)
+    BB_meta$chp1_dark_flag      <- as.character(NA)
     BB_meta$chp1_md5sum         <- as.character(NA)
     BB_meta$chp1_mtime          <- as.POSIXct(NA)
     BB_meta$chp1_parsed         <- as.POSIXct(NA)
     BB_meta$chp1_sig_NAs        <- as.integer(NA)
     BB_meta$chp1_sig_sd_NAs     <- as.integer(NA)
-    BB_meta$chp1_Daily_dark     <- as.numeric(NA)
-    BB_meta$chp1_dark_flag      <- as.character(NA)
-    BB_meta$chp1_dark_Mor_avg   <- as.numeric(NA)
-    BB_meta$chp1_dark_Mor_med   <- as.numeric(NA)
-    BB_meta$chp1_dark_Mor_sta   <- as.POSIXct(NA)
-    BB_meta$chp1_dark_Mor_end   <- as.POSIXct(NA)
-    BB_meta$chp1_dark_Mor_cnt   <- as.integer(NA)
-    BB_meta$chp1_dark_Eve_avg   <- as.numeric(NA)
-    BB_meta$chp1_dark_Eve_med   <- as.numeric(NA)
-    BB_meta$chp1_dark_Eve_sta   <- as.POSIXct(NA)
-    BB_meta$chp1_dark_Eve_end   <- as.POSIXct(NA)
-    BB_meta$chp1_dark_Eve_cnt   <- as.integer(NA)
-    BB_meta$chp1_dark_computed  <- as.POSIXct(NA)
 }
 
 
@@ -175,23 +175,23 @@ for (YYYY in unique(year(inp_filelist$day))) {
             ## TODO init variables for next processes here
             ## For CM-21
             sun_temp[, CM21_sig                := as.numeric(NA)  ]
-            sun_temp[, CM21_sig_wo_dark        := as.numeric(NA)  ]
             sun_temp[, CM21_sig_sd             := as.numeric(NA)  ]
+            sun_temp[, CM21_sig_wo_dark        := as.numeric(NA)  ]
             sun_temp[, cm21_bad_data_flag      := as.character(NA)]
             ## For CHP-1
-            sun_temp[, CHP1_sig                := as.numeric(NA)  ]
-            sun_temp[, CHP1_sig_wo_dark        := as.numeric(NA)  ]
-            sun_temp[, CHP1_sig_sd             := as.numeric(NA)  ]
-            sun_temp[, Async_tracker_flag      := TRUE            ]
             sun_temp[, Async_step_count        := as.integer(NA)  ]
-            sun_temp[, chp1_R_therm            := as.numeric(NA)  ]
+            sun_temp[, Async_tracker_flag      := TRUE            ]
+            sun_temp[, CHP1_sig                := as.numeric(NA)  ]
+            sun_temp[, CHP1_sig_sd             := as.numeric(NA)  ]
+            sun_temp[, CHP1_sig_wo_dark        := as.numeric(NA)  ]
             sun_temp[, chp1_R_SD_therm         := as.numeric(NA)  ]
             sun_temp[, chp1_R_meas_ERR         := as.numeric(NA)  ]
+            sun_temp[, chp1_R_therm            := as.numeric(NA)  ]
+            sun_temp[, chp1_bad_data_flag      := as.character(NA)]
+            sun_temp[, chp1_temp_UNC           := as.numeric(NA)  ]
+            sun_temp[, chp1_temp_bad_data_flag := as.character(NA)]
             sun_temp[, chp1_temperature        := as.numeric(NA)  ]
             sun_temp[, chp1_temperature_SD     := as.numeric(NA)  ]
-            sun_temp[, chp1_temp_UNC           := as.numeric(NA)  ]
-            sun_temp[, chp1_bad_data_flag      := as.character(NA)]
-            sun_temp[, chp1_temp_bad_data_flag := as.character(NA)]
             ## For TOT
             sun_temp[, tot_glb                 := as.numeric(NA)  ]
             sun_temp[, tot_glb_sd              := as.numeric(NA)  ]
