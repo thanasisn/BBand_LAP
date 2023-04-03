@@ -26,11 +26,9 @@ source("~/BBand_LAP/build_db/Build_DB_05_chp1_TMP.R"        )
 source("~/BBand_LAP/build_db/Build_DB_06_cm21_TOT.R"        )
 ## Flag data bad data
 source("~/BBand_LAP/build_db/Build_DB_30_exclude_ranges.R"  )
-## Apply dark offset
+## Apply dark offset and convert to radiation
 source("~/BBand_LAP/build_db/Build_DB_42_cm21_dark_radiat.R")
 source("~/BBand_LAP/build_db/Build_DB_43_chp1_dark_radiat.R")
-## Convert to radiation
-
 
 
 cat("\n\nEND of Building the DB\n\n")
