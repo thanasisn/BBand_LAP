@@ -5,22 +5,26 @@ Developed in the Laboratory of Atmospheric Physics of Thessaloniki, Greece.
 
 To process the data from broadband instruments of LAP.
 
-## DOES
+
+## What it does
 
 ### CHP-1
 
 - Digest raw data
   - Signal from CHP-1
-  - Tracker async data from radmon
-  - Instrument temperature from thermistor
+  - Tracker "async" data from radmon
+  - CHP-1 internal temperature from thermistor
 - Bad data ranges flagging
-
+  - From manual set execution ranges
+  - From acquisition signal physical limits
 
 ### CM-21
 
 - Digest raw data
   - Signal from CHP-1
 - Bad data ranges flagging
+  - From manual set execution ranges
+  - From acquisition signal physical limits
 
 
 ## TODO
@@ -31,9 +35,9 @@ To process the data from broadband instruments of LAP.
 - interactive plot of db variables
 - Import Astropy
 - Import TSI
-- Import libratran
+- Import libRadtran data
 - Import pressure
-- may import QCrad and CSid
+- May import QCrad and CSid
 
 
 
