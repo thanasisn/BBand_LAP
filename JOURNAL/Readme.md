@@ -1266,6 +1266,17 @@ Reboot seems to fixed the problem.
 
 
 
+## 2023-04-04 12:59
+
+[//]: # (Keywords: #chp1, #tracker)
+
+The tracker didn't start at the morning due to an error of the `com port`.
+
+Tracker program was restarted manual.
+
+
+
+
 :::
 
 
@@ -1320,7 +1331,7 @@ At least you need `pandoc` installed.
 List of tags
 ============
       5 #async
-     47 #chp1
+     48 #chp1
       1 #cleaned
      15 #cleaning
      11 #cm21
@@ -1345,5 +1356,5 @@ List of tags
       1 #sync
       1 #temp
       1 #test
-      6 #tracker
+      7 #tracker
      20 #tracker2
