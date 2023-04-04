@@ -20,6 +20,8 @@ To process the data from broadband instruments of LAP.
   - From manual set execution ranges
   - From acquisition signal physical limits
 - Converts signal to radiation
+- Plots
+  - Signal with and without dark
 
 
 ### For CM-21
@@ -30,11 +32,13 @@ To process the data from broadband instruments of LAP.
   - From manual set execution ranges
   - From acquisition signal physical limits
 - Converts signal to radiation
+- Plots
+  - Signal with and without dark
 
 
 ### Other processes
 
-- Import data from [`github.com/thanasisn/TSI`](`https://github.com/thanasisn/TSI`)
+- Import data from [github.com/thanasisn/TSI](https://github.com/thanasisn/TSI)
   - `Sun_Dist_Astropy` Sun - LAP distance
   - `TSI_TOA`          TSI at TOA at LAP
   - `TSI_1au`          TSI 
