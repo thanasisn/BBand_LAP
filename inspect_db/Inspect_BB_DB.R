@@ -40,6 +40,8 @@ render(input       = "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R",
        output_dir  = "~/BBand_LAP/REPORTS/")
 
 
+source("~/BBand_LAP/inspect_db/Plot_daily_CHP1_sig.R")
+source("~/BBand_LAP/inspect_db/Plot_daily_CM21_sig.R")
 
 
 tac <- Sys.time()
