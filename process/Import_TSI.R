@@ -16,6 +16,7 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/tttttttt.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 # mylock(DB_lock)
 
@@ -46,9 +47,6 @@ if (TEST_DB) {
 
 
 
-
-
-
 ##  Initialize meta data file  -------------------------------------------------
 if (file.exists(DB_META_fl)) {
     BB_meta <- read_parquet(DB_META_fl)
@@ -60,19 +58,16 @@ if (file.exists(DB_META_fl)) {
                      by = "day",
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
-    ## new columns
-    # var <- "chp1_dark_flag"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- as.character(NA)
-    # }
 } else {
     stop("NO METADATA FILE!!")
 }
 
 
+##  Find data set files to update  ---------------------------------------------
 
+BB <- opendata()
 
-
+BB |> select(Date, TSI_source) |> filter(TSI_source %in% c(NA, TSIS_adjusted))
 
 
 stop()
