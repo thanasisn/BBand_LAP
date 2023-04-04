@@ -365,11 +365,10 @@ for (alf in listlegacy) {
     cat("\n\n")
     cat(pander(aa$change_summary),"\n")
     cat("\n\n")
-    cat(pander(aa$comparison_df),"\n")
+    # cat(pander(aa$comparison_df),"\n")
     cat("\n\n")
-    cat(pander(aa$comparison_table_ts2char),"\n")
+    # cat(pander(aa$comparison_table_ts2char),"\n")
     cat("\n\n")
-
 
 
 
