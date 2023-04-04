@@ -2,7 +2,7 @@
 List of tags
 ============
       5 #async
-     47 #chp1
+     48 #chp1
       1 #cleaned
      15 #cleaning
      11 #cm21
@@ -27,5 +27,5 @@ List of tags
       1 #sync
       1 #temp
       1 #test
-      6 #tracker
+      7 #tracker
      20 #tracker2
