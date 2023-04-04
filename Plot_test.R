@@ -33,8 +33,9 @@ library(plotly)
 TEST_DB <- TRUE
 
 if (TEST_DB) {
+    source("~/BBand_LAP/DEFINITIONS.R")
     ## copy data to temp
-    tyear <- 2022
+    tyear <- 2023
     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
