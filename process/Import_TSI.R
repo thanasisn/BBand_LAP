@@ -67,13 +67,12 @@ if (file.exists(DB_META_fl)) {
 
 BB <- opendata()
 
-BB |> select(Date, TSI_source) |> filter(TSI_source %in% c(NA, TSIS_adjusted))
+BB |> select(Date, TSI_source) |> filter(TSI_source %in% c(NA, "TSIS_adjusted")) |> collect()
 
 
 stop()
 
 
-##  Dark calculations on dataset  ----------------------------------------------
 
 ## list data base files
 filelist <- data.table(
@@ -87,18 +86,29 @@ dd      <- tstrsplit(dd, "/")
 filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
-## list data set files to touch
-dark_to_do <- BB_meta[chp1_dark_flag %in% c(NA, "MISSING") & !is.na(chp1_basename) & chp1_sig_NAs != 1440]
-cat("There are ", nrow(dark_to_do), "days with missing dark\n\n")
-cat(format(dark_to_do$day), " ")
-cat("\n")
+## list data set files posible to touch
+posiblelist <- BB |>
+    select(Date, TSI_source) |>
+    filter(TSI_source %in% c(NA, "TSIS_adjusted")) |>
+    mutate(month = month(Date),
+           year  = year(Date)) |>
+    select(TSI_source, month, year) |>
+    unique() |>
+    collect()
 
-todosets <- unique(rbind(
-    dark_to_do[, .(month = month(day), year = year(day))]
-))
+
+
+# list_to_do <- BB_meta[chp1_dark_flag %in% c(NA, "MISSING") & !is.na(chp1_basename) & chp1_sig_NAs != 1440]
+# cat("There are ", nrow(dark_to_do), "days with missing dark\n\n")
+# cat(format(dark_to_do$day), " ")
+# cat("\n")
+#
+# todosets <- unique(rbind(
+#     dark_to_do[, .(month = month(day), year = year(day))]
+# ))
 
 ## select what dataset files to touch
-filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
+# filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 
 
 
@@ -124,29 +134,15 @@ for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
     datapart[, month := as.integer(month(Date))]
     datapart[, year  := as.integer(year(Date)) ]
-
-
-    stop()
-
-
-    ## use only valid data for dark
-    data_use <- datapart[is.na(chp1_bad_data_flag) &
-                         !is.na(CHP1_sig) &
-                         is.na(CHP1_sig_wo_dark)]
-
     cat("Load: ", af, "\n")
 
-    ## Ignore bad and missing data
-    if (datapart[is.na(chp1_bad_data_flag) & !is.na(CHP1_sig), .N ] == 0) {
-        cat("\nNo usefull CHP-1 data in this file\n\n")
-        next()
-    }
+    ## update the whole datapart on one go
+    datapart <- rows_update(datapart, TSI, by = "Date", unmatched = "ignore")
 
-
-    # ## store actual data
-    # write_parquet(x = datapart, sink = af)
+    ## store actual data
+    write_parquet(x = datapart, sink = af)
     # write_parquet(BB_meta, DB_META_fl)
-    # cat("Save: ", af, "\n\n")
+    cat("Save: ", af, "\n\n")
     # ## clean
     # rm(datapart, meta_day)
 
