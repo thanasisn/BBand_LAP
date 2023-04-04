@@ -9,7 +9,8 @@ To process the data from broadband instruments of LAP.
 
 ## What it does
 
-### CHP-1
+
+### For CHP-1
 
 - Digest raw data
   - Signal from CHP-1
@@ -20,7 +21,8 @@ To process the data from broadband instruments of LAP.
   - From acquisition signal physical limits
 - Converts signal to radiation
 
-### CM-21
+
+### For CM-21
 
 - Digest raw data
   - Signal from CHP-1
@@ -30,16 +32,22 @@ To process the data from broadband instruments of LAP.
 - Converts signal to radiation
 
 
+### Other processes
+
+- Import data from [`github.com/thanasisn/TSI`](`https://github.com/thanasisn/TSI`)
+  - `Sun_Dist_Astropy` Sun - LAP distance
+  - `TSI_TOA`          TSI at TOA at LAP
+  - `TSI_1au`          TSI 
+  - `TSI_source`       TSI data source
+
+
+
 ## TODO
 
 - Process more instruments
 - Interactive plot of db variables
-- Import Astropy
-- Import TSI
 - Import libRadtran data
 - Import pressure
 - May import QCrad and CSid
-
-
 
 

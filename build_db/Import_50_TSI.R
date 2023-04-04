@@ -2,7 +2,8 @@
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #'
-#' Add TSI data in DB from preexistence data.
+#' Add TSI data in DB from preexistence data
+#' [`github.com/thanasisn/TSI`](`https://github.com/thanasisn/TSI`)
 #'
 #' Populates:
 #'
