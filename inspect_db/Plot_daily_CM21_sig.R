@@ -1,11 +1,11 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Inspect raw CHP-1 data **SIG** "
+#' title:         "Inspect raw CM-21 data **SIG** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Inspect raw data from CHP1."
+#' abstract:      "Inspect raw data from CM21."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -60,7 +60,7 @@ knitr::opts_chunk$set(fig.pos    = '!h'     )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_db/Plot_daily_CHP1_sig.R"
+Script.Name <- "~/BBand_LAP/inspect_db/Plot_daily_CM21_sig.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
@@ -80,8 +80,8 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 
 
 ## __  Variables  --------------------------------------------------------------
-OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CHP1_signal/"
-OUT_PREFIX <- "CHP1_signal_"
+OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CM21_signal/"
+OUT_PREFIX <- "CM21_signal_"
 dir.create(OUT_FOLDER, showWarnings = FALSE, recursive = TRUE)
 
 
@@ -89,14 +89,14 @@ dir.create(OUT_FOLDER, showWarnings = FALSE, recursive = TRUE)
 BB_meta   <- read_parquet(DB_META_fl)
 
 
-# BB_meta |> select(matches("Day|chp1")) |> filter(!is.na(chp1_basename)) |> select("day", where(is.POSIXct))
+# BB_meta |> select(matches("Day|cm21")) |> filter(!is.na(cm21_basename)) |> select("day", where(is.POSIXct))
 
 metalist <- BB_meta               |>
-    select(matches("Day|chp1"))   |>
-    filter(!is.na(chp1_basename)) |>
-    select("day", chp1_dark_computed)
+    select(matches("Day|cm21"))   |>
+    filter(!is.na(cm21_basename)) |>
+    select("day", cm21_dark_computed)
 metalist$year <- year(metalist$day)
-metalist <- metalist[, .(updated = max(chp1_dark_computed, na.rm = TRUE)), by = year ]
+metalist <- metalist[, .(updated = max(cm21_dark_computed, na.rm = TRUE)), by = year ]
 
 
 plotfiles <- data.table(path = list.files(path    = OUT_FOLDER,
@@ -105,7 +105,7 @@ plotfiles <- data.table(path = list.files(path    = OUT_FOLDER,
                                           ignore.case = TRUE))
 plotfiles$mtime <- file.mtime(plotfiles$path)
 plotfiles$year  <- as.numeric(
-    sub("CHP1_signal_", "", sub("\\.pdf", "", basename(plotfiles$path))))
+    sub("CM21_signal_", "", sub("\\.pdf", "", basename(plotfiles$path))))
 
 selected <- merge(metalist, plotfiles, all = TRUE)
 
@@ -149,15 +149,15 @@ for (YYYY in years_to_do) {
         ## Night signal
         par("mar" = c(0,4,2,1))
 
-        if  (all(is.na(dd[Elevat < 0, CHP1_sig]))) {
+        if  (all(is.na(dd[Elevat < 0, CM21_sig]))) {
             plot.new()
         } else {
-            plot(dd[Elevat < 0, Date], dd[Elevat < 0, CHP1_sig],
-                 ylim = range( dd[Elevat < 0, .(CHP1_sig, CHP1_sig_wo_dark) ], na.rm = TRUE),
+            plot(dd[Elevat < 0, Date], dd[Elevat < 0, CM21_sig],
+                 ylim = range( dd[Elevat < 0, .(CM21_sig, CM21_sig_wo_dark) ], na.rm = TRUE),
                  pch = 19,  cex = 0.5, col = "cyan",
                  xaxt = "n",
                  xlab = "", ylab = "Night [V]")
-            points(dd[Elevat < 0, Date], dd[Elevat < 0, CHP1_sig_wo_dark],
+            points(dd[Elevat < 0, Date], dd[Elevat < 0, CM21_sig_wo_dark],
                    pch = 19,  cex = 0.5, col = "blue")
             abline(h = 0, col = "grey")
         }
@@ -166,17 +166,17 @@ for (YYYY in years_to_do) {
 
         ## Signal SD
         par("mar" = c(0,4,0,1))
-        plot(dd$Date, dd$CHP1_sig_sd,
+        plot(dd$Date, dd$CM21_sig_sd,
              pch = 19,  cex = 0.5, col = "red",
              xaxt = "n", xlab = "", ylab = "Signal SD [V]")
 
         ## Signal
         par("mar" = c(3,4,0,1))
-        plot(dd$Date, dd$CHP1_sig,
+        plot(dd$Date, dd$CM21_sig,
              ylim = ylim,
              pch = 19,  cex = 0.5, col = "cyan",
              xlab = "", ylab = "Signal [V]")
-        points(dd$Date, dd$CHP1_sig_wo_dark,
+        points(dd$Date, dd$CM21_sig_wo_dark,
                pch = 19,  cex = 0.5, col = "blue",)
 
         legend("bottom", pch = 19, bty = "n", ncol = 3,
@@ -189,11 +189,9 @@ for (YYYY in years_to_do) {
                        "red")   )
 
     }
-
     dev.off()
 }
 
-## TODO add temperature?
 
 
 
