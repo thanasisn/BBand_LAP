@@ -139,14 +139,14 @@ for (af in filelist$names) {
     cat("Load: ", af, "\n")
 
     ## Ignore bad and missing data
-    if (datapart[is.na(chp1_bad_data_flag) & !is.na(CHP1_sig), .N ] == 0) {
+    if (nrow(data_use) == 0) {
         cat("\nNo usefull CHP-1 data in this file\n\n")
         next()
     }
 
     ## loop days
-    for (aday in unique(as.Date(datapart$Date))) {
-        daydata <- datapart[ as.Date(Date) == aday ]
+    for (aday in unique(as.Date(data_use$Date))) {
+        daydata <- data_use[ as.Date(Date) == aday ]
 
         if (any(is.na(daydata$Elevat))) {
             cat("The day is not initialized:", format(as.Date(aday)),"\n")
