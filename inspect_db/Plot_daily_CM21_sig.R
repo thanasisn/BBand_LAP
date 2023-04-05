@@ -83,13 +83,10 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CM21_signal/"
 OUT_PREFIX <- "CM21_signal_"
 dir.create(OUT_FOLDER, showWarnings = FALSE, recursive = TRUE)
-
+tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 ## __ Execution control  -------------------------------------------------------
-BB_meta   <- read_parquet(DB_META_fl)
-
-
-# BB_meta |> select(matches("Day|cm21")) |> filter(!is.na(cm21_basename)) |> select("day", where(is.POSIXct))
+BB_meta  <- read_parquet(DB_META_fl)
 
 metalist <- BB_meta               |>
     select(matches("Day|cm21"))   |>
@@ -107,36 +104,24 @@ plotfiles$mtime <- file.mtime(plotfiles$path)
 plotfiles$year  <- as.numeric(
     sub("CM21_signal_", "", sub("\\.pdf", "", basename(plotfiles$path))))
 
-selected <- merge(metalist, plotfiles, all = TRUE)
-
-selected[is.na(path) | updated > mtime, year ]
-
+selected    <- merge(metalist, plotfiles, all = TRUE)
 years_to_do <- selected[is.na(path) | updated > mtime, year ]
 
 # TEST
 # years_to_do <- 2022
 
-## get overall limits
-BB <- opendata()
-ylimwo  <- BB |> select(CM21_sig_wo_dark) |> collect() |> range(na.rm = TRUE)
-ylimsig <- BB |> select(CM21_sig) |> collect() |> range(na.rm = TRUE)
-ylim    <- range(ylimwo, ylimsig)
-
-
-
 for (YYYY in years_to_do) {
-    days_of_year <- seq.Date(as.Date(paste0(YYYY, "-01-01")),
-                             as.Date(paste0(YYYY, "-12-31")), by = "day")
-    ## don't go to the future
-    days_of_year <- days_of_year[days_of_year <= Sys.Date()]
-
     ## load data for year
     year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
+    cat(YYYY, "rows:", nrow(year_data) )
     ## days with data
-    daystodo <- year_data[!is.na(CM21_sig), unique(as.Date(Date)) ]
+    daystodo <- year_data[!is.na(CM21_sig), unique(as.Date(Date))]
+    ## signal limit for year
+    # ylim <- range(year_data[, .(CM21_sig, CM21_sig_wo_dark)], na.rm = TRUE)
 
     if (!interactive()) {
         pdffile <- paste0(OUT_FOLDER, "/", OUT_PREFIX, YYYY, ".pdf")
+        cat("Ploting:", pdffile, "\n")
         pdf(file = pdffile)
     }
 
@@ -154,15 +139,15 @@ for (YYYY in years_to_do) {
         } else {
             plot(dd[Elevat < 0, Date], dd[Elevat < 0, CM21_sig],
                  ylim = range( dd[Elevat < 0, .(CM21_sig, CM21_sig_wo_dark) ], na.rm = TRUE),
-                 pch = 19,  cex = 0.5, col = "cyan",
+                 pch = 19,  cex = 0.5, col = "darkolivegreen",
                  xaxt = "n",
                  xlab = "", ylab = "Night [V]")
             points(dd[Elevat < 0, Date], dd[Elevat < 0, CM21_sig_wo_dark],
-                   pch = 19,  cex = 0.5, col = "blue")
+                   pch = 19,  cex = 0.5, col = "green")
             abline(h = 0, col = "grey")
         }
 
-        title(paste0("doy:", yday(aday), "  ",  aday))
+        title(paste0("CM-21  doy:", yday(aday), "  ",  aday))
 
         ## Signal SD
         par("mar" = c(0,4,0,1))
@@ -172,21 +157,28 @@ for (YYYY in years_to_do) {
 
         ## Signal
         par("mar" = c(3,4,0,1))
-        plot(dd$Date, dd$CM21_sig,
-             ylim = ylim,
-             pch = 19,  cex = 0.5, col = "cyan",
+        plot(dd$Date, dd$CM21_sig, type = "l",
+             # ylim = ylim,
+             lwd = 1.5,
+             pch = 19,  cex = 0.5, col = "darkolivegreen",
              xlab = "", ylab = "Signal [V]")
-        points(dd$Date, dd$CM21_sig_wo_dark,
-               pch = 19,  cex = 0.5, col = "blue",)
+        lines(dd$Date, dd$CM21_sig_wo_dark,
+              col = "green",)
+        # points(dd$Date, dd$CM21_sig_wo_dark,
+        #        pch = 19,  cex = 0.5, col = "blue",)
 
-        legend("bottom", pch = 19, bty = "n", ncol = 3,
+        text(dd$Date[1], max(dd$CM21_sig, dd$CM21_sig_wo_dark, na.rm = TRUE ),
+             labels = tag, pos = 4, cex =.9)
+
+        legend("topright", pch = 19, bty = "n",
                legend = c(
                    "Signal",
                    "Signal dark corrected",
                    "Signal SD"),
-               col = c("cyan",
-                       "blue",
-                       "red")   )
+               col = c("darkolivegreen",
+                       "green",
+                       "red")
+               )
 
     }
     dev.off()
