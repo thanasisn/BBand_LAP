@@ -109,7 +109,7 @@ years_to_do <- selected[is.na(path) | updated > mtime, year ]
 # TEST
 # years_to_do <- 2022
 
-for (YYYY in years_to_do) {
+for (YYYY in sort(years_to_do)) {
     ## load data for year
     year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
     cat(YYYY, "rows:", nrow(year_data), "\n")
@@ -125,7 +125,7 @@ for (YYYY in years_to_do) {
         pdf(file = pdffile)
     }
 
-    for (aday in daystodo) {
+    for (aday in sort(daystodo)) {
         dd   <- year_data[as.Date(Date) == aday]
         aday <- as.Date(aday, origin = "1970-01-01")
 
@@ -147,7 +147,9 @@ for (YYYY in years_to_do) {
             abline(h = 0, col = "grey")
         }
 
-        title(paste0("CHP-1  doy:", yday(aday), "  ",  aday))
+        title(paste0("CHP-1  doy: ", yday(aday), "  ",
+                     aday, "  dark ",
+                     tolower(BB_meta[day == aday, chp1_dark_flag])))
 
         ## Signal SD
         par("mar" = c(0,4,0,1))
@@ -170,7 +172,7 @@ for (YYYY in years_to_do) {
         # points(dd$Date, dd$CHP1_sig_wo_dark,
         #        pch = 19,  cex = 0.5, col = "blue",)
 
-        text(dd$Date[1], max(dd$CHP1_sig, dd$CHP1_sig_wo_dark, na.rm = TRUE ),
+        text(dd$Date[1], max(dd$CHP1_sig, dd$CHP1_sig_wo_dark, na.rm = TRUE),
              labels = tag, pos = 4, cex =.9)
 
         legend("topright", pch = 19, bty = "n",

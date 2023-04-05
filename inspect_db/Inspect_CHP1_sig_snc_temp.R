@@ -148,7 +148,7 @@ years_to_do <- datayears
 #'
 
 #+ include=TRUE, echo=FALSE, results="asis"
-for (YYYY in years_to_do) {
+for (YYYY in sort(years_to_do)) {
     days_of_year <- seq.Date(as.Date(paste0(YYYY, "-01-01")),
                              as.Date(paste0(YYYY, "-12-31")), by = "day")
     ## don't go to the future

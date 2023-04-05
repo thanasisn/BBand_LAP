@@ -6,7 +6,7 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_db/Inspect_BB_DB.R"
+Script.Name <- "~/BBand_LAP/process/Process_BB_DB.R"
 
 
 library(rmarkdown)
@@ -22,9 +22,9 @@ if (!interactive()) {
 
 cat("\n\nCheck legacy export\n")
 
-render(input       = "~/BBand_LAP/process/Legacy_CHP1_L0_export.R",
-       params      = list(CLEAN = TRUE),
-       output_dir  = "~/BBand_LAP/REPORTS/")
+render(input      = "~/BBand_LAP/process/Legacy_CHP1_L0_export.R",
+       params     = list(CLEAN = TRUE),
+       output_dir = "~/BBand_LAP/REPORTS/")
 
 
 
