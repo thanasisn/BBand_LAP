@@ -14,9 +14,6 @@
 #'
 #' On the second run will replace 'MISSING' dark with 'CONSTRUCTED' dark.
 #'
-#' TODO
-#' - print dark type on graphs from metadata
-#'
 #+ include=T, echo=F
 
 ## __ Set environment  ---------------------------------------------------------
@@ -51,7 +48,7 @@ if (file.exists(DB_META_fl)) {
                      data.table(day = seq(max(BB_meta$day),
                                           Sys.Date(),
                                           by = "day")),
-                     by  = "day",
+                     by = "day",
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
     ## new columns
@@ -100,13 +97,11 @@ filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 if (BB_meta[!is.na(chp1_dark_flag), .N] > 100) {
     test <- BB_meta[, .(day, chp1_dark_flag, chp1_dark_Eve_med, chp1_dark_Mor_med, chp1_Daily_dark) ]
     ## will use mean Daily dark
-    chp1EVEdark   <- approxfun(test$day, test$chp1_dark_Eve_med)
-    chp1MORdark   <- approxfun(test$day, test$chp1_dark_Mor_med)
-    chp1DAILYdark <- approxfun(test$day, test$chp1_Daily_dark  )
+    chp1EVEdark   <- approxfun( test$day, test$chp1_dark_Eve_med )
+    chp1MORdark   <- approxfun( test$day, test$chp1_dark_Mor_med )
+    chp1DAILYdark <- approxfun( test$day, test$chp1_Daily_dark )
     ## get dark missing days
-    missingdays <- BB_meta[!is.na(chp1_basename) &
-                           chp1_dark_flag %in% c("MISSING", "CONSTRUCTED"), day]
-    ## should we use missing only?
+    missingdays <- BB_meta[ !is.na(chp1_basename) & chp1_dark_flag == "MISSING", day]
 
     ## Create missing dark
     construct <- data.table(
@@ -139,14 +134,14 @@ for (af in filelist$names) {
     cat("Load: ", af, "\n")
 
     ## Ignore bad and missing data
-    if (nrow(data_use) == 0) {
+    if (datapart[is.na(chp1_bad_data_flag) & !is.na(CHP1_sig), .N ] == 0) {
         cat("\nNo usefull CHP-1 data in this file\n\n")
         next()
     }
 
     ## loop days
-    for (aday in unique(as.Date(data_use$Date))) {
-        daydata <- data_use[ as.Date(Date) == aday ]
+    for (aday in unique(as.Date(datapart$Date))) {
+        daydata <- datapart[ as.Date(Date) == aday ]
 
         if (any(is.na(daydata$Elevat))) {
             cat("The day is not initialized:", format(as.Date(aday)),"\n")

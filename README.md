@@ -47,7 +47,6 @@ This is partial used as operatioanal procedures.
   - `TSI_TOA`          TSI at TOA at LAP
   - `TSI_1au`          TSI 
   - `TSI_source`       TSI data source
-- Keeps an `md5sum` of all input files to check for bit rot and other data corruption.
 
 
 
@@ -58,13 +57,5 @@ This is partial used as operatioanal procedures.
 - Import libRadtran data
 - Import pressure
 - May import QCrad and CSid
-
-----------------------
-
-# Details
-
-We use a dataset of parquet files as a database for all measurements and additional data.
-And some files with extra meta data for the database.
-It should be easy to migrate to a pure database like duckdb or sqlite.
 
 
