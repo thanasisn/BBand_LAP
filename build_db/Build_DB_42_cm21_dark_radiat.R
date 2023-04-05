@@ -74,7 +74,7 @@ filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
 ## list data set files to touch
-dark_to_do <- BB_meta[ cm21_dark_flag %in% c(NA, "MISSING") & !is.na(cm21_basename) & cm21_sig_NAs != 1440]
+dark_to_do <- BB_meta[cm21_dark_flag %in% c(NA, "MISSING") & !is.na(cm21_basename) & cm21_sig_NAs != 1440]
 cat("There are ", nrow(dark_to_do), "days with missing dark\n\n")
 cat(format(dark_to_do$day), " ")
 cat("\n")
@@ -94,12 +94,13 @@ filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 if (BB_meta[!is.na(cm21_dark_flag), .N] > 100) {
     test <- BB_meta[, .(day, cm21_dark_flag, cm21_dark_Eve_med, cm21_dark_Mor_med, cm21_Daily_dark) ]
     ## will use mean Daily dark
-    cm21EVEdark   <- approxfun( test$day, test$cm21_dark_Eve_med )
-    cm21MORdark   <- approxfun( test$day, test$cm21_dark_Mor_med )
-    cm21DAILYdark <- approxfun( test$day, test$cm21_Daily_dark )
+    cm21EVEdark   <- approxfun(test$day, test$cm21_dark_Eve_med)
+    cm21MORdark   <- approxfun(test$day, test$cm21_dark_Mor_med)
+    cm21DAILYdark <- approxfun(test$day, test$cm21_Daily_dark  )
     ## get dark missing days
     missingdays <- BB_meta[!is.na(cm21_basename) &
                            cm21_dark_flag %in% c("MISSING", "CONSTRUCTED"), day]
+    ## should we use missing only?
 
     ## Create missing dark
     construct <- data.table(
@@ -172,11 +173,11 @@ for (af in filelist$names) {
             ## get dark from pre-computed file
             if (exists("construct")) {
                 ## can not find date
-                if (aday %in% construct$Date) {
-                #     todays_dark_correction <- as.numeric(NA)
-                #     dark_flag              <- "MISSING"
-                #     missingdark            <- as.numeric(NA)
-                # } else {
+                if (!aday %in% construct$Date) {
+                    todays_dark_correction <- as.numeric(NA)
+                    dark_flag              <- "MISSING"
+                    missingdark            <- as.numeric(NA)
+                } else {
                     ## get data from recomputed dark database
                     todays_dark_correction <- construct[Date == aday, DARK]
                     dark_flag              <- "CONSTRUCTED"
