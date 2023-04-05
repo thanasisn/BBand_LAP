@@ -1,11 +1,10 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Inspect raw CM-21 data **SIG** "
+#' title:         "Daily raw CM-21 data **SIG** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Inspect raw data from CM21."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -116,6 +115,7 @@ for (YYYY in years_to_do) {
     cat(YYYY, "rows:", nrow(year_data), "\n")
     ## days with data
     daystodo <- year_data[!is.na(CM21_sig), unique(as.Date(Date))]
+    daystodo <- sort(daystodo)
     ## signal limit for year
     # ylim <- range(year_data[, .(CM21_sig, CM21_sig_wo_dark)], na.rm = TRUE)
 
@@ -138,7 +138,7 @@ for (YYYY in years_to_do) {
             plot.new()
         } else {
             plot(dd[Elevat < 0, Date], dd[Elevat < 0, CM21_sig],
-                 ylim = range( dd[Elevat < 0, .(CM21_sig, CM21_sig_wo_dark) ], na.rm = TRUE),
+                 ylim = range(dd[Elevat < 0, .(CM21_sig, CM21_sig_wo_dark)], na.rm = TRUE),
                  pch = 19,  cex = 0.5, col = "darkolivegreen",
                  xaxt = "n",
                  xlab = "", ylab = "Night [V]")
@@ -152,18 +152,21 @@ for (YYYY in years_to_do) {
         ## Signal SD
         par("mar" = c(0,4,0,1))
         plot(dd$Date, dd$CM21_sig_sd,
+             ylim = range(c(0, dd$CM21_sig_sd), na.rm = T),
              pch = 19,  cex = 0.5, col = "red",
              xaxt = "n", xlab = "", ylab = "Signal SD [V]")
+        abline(h = 0, col = "grey", lty = 2)
 
         ## Signal
         par("mar" = c(3,4,0,1))
         plot(dd$Date, dd$CM21_sig, type = "l",
-             # ylim = ylim,
-             lwd = 1.5,
-             pch = 19,  cex = 0.5, col = "darkolivegreen",
+             ylim = range(dd[, .(CM21_sig, CM21_sig_wo_dark)], na.rm = TRUE),
+             lwd  = 1.5,
+             pch  = 19,  cex = 0.5, col = "darkolivegreen",
              xlab = "", ylab = "Signal [V]")
         lines(dd$Date, dd$CM21_sig_wo_dark,
               col = "green",)
+        abline(h = 0, col = "grey", lty = 2)
         # points(dd$Date, dd$CM21_sig_wo_dark,
         #        pch = 19,  cex = 0.5, col = "blue",)
 
@@ -179,7 +182,6 @@ for (YYYY in years_to_do) {
                        "green",
                        "red")
                )
-
     }
     dev.off()
 }

@@ -1,11 +1,10 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Inspect raw CHP-1 data **SIG** "
+#' title:         "Daily raw CHP-1 data **SIG** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Inspect raw data from CHP1."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -116,6 +115,7 @@ for (YYYY in years_to_do) {
     cat(YYYY, "rows:", nrow(year_data), "\n")
     ## days with data
     daystodo <- year_data[!is.na(CHP1_sig), unique(as.Date(Date))]
+    daystodo <- sort(daystodo)
     ## signal limit for year
     # ylim <- range(year_data[, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE)
 
@@ -138,7 +138,7 @@ for (YYYY in years_to_do) {
             plot.new()
         } else {
             plot(dd[Elevat < 0, Date], dd[Elevat < 0, CHP1_sig],
-                 ylim = range( dd[Elevat < 0, .(CHP1_sig, CHP1_sig_wo_dark) ], na.rm = TRUE),
+                 ylim = range(dd[Elevat < 0, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE),
                  pch = 19,  cex = 0.5, col = "cyan",
                  xaxt = "n",
                  xlab = "", ylab = "Night [V]")
@@ -147,23 +147,26 @@ for (YYYY in years_to_do) {
             abline(h = 0, col = "grey")
         }
 
-        title(paste0("doy:", yday(aday), "  ",  aday))
+        title(paste0("CHP-1  doy:", yday(aday), "  ",  aday))
 
         ## Signal SD
         par("mar" = c(0,4,0,1))
         plot(dd$Date, dd$CHP1_sig_sd,
-             pch = 19,  cex = 0.5, col = "red",
+             ylim = range(c(0, dd$CHP1_sig_sd), na.rm = T),
+             pch  = 19,  cex = 0.5, col = "red",
              xaxt = "n", xlab = "", ylab = "Signal SD [V]")
+        abline(h = 0, col = "grey", lty = 2)
 
         ## Signal
         par("mar" = c(3,4,0,1))
         plot(dd$Date, dd$CHP1_sig, type = "l",
-             # ylim = ylim,
-             lwd = 1.5,
-             pch = 19,  cex = 0.5, col = "cyan",
+             ylim = range(dd[, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE),
+             lwd  = 1.5,
+             pch  = 19,  cex = 0.5, col = "cyan",
              xlab = "", ylab = "Signal [V]")
         lines(dd$Date, dd$CHP1_sig_wo_dark,
               col = "blue",)
+        abline(h = 0, col = "grey", lty = 2)
         # points(dd$Date, dd$CHP1_sig_wo_dark,
         #        pch = 19,  cex = 0.5, col = "blue",)
 
@@ -179,7 +182,6 @@ for (YYYY in years_to_do) {
                        "blue",
                        "red")
                )
-
     }
     dev.off()
 }
