@@ -113,7 +113,7 @@ years_to_do <- selected[is.na(path) | updated > mtime, year ]
 for (YYYY in years_to_do) {
     ## load data for year
     year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
-    cat(YYYY, "rows:", nrow(year_data) )
+    cat(YYYY, "rows:", nrow(year_data), "\n")
     ## days with data
     daystodo <- year_data[!is.na(CM21_sig), unique(as.Date(Date))]
     ## signal limit for year
