@@ -5,6 +5,8 @@ Developed in the Laboratory of Atmospheric Physics of Thessaloniki, Greece.
 
 To process the data from broadband instruments of LAP.
 
+This is partial used as operatioanal procedures.
+
 
 
 ## What it does
@@ -21,7 +23,8 @@ To process the data from broadband instruments of LAP.
   - From acquisition signal physical limits
 - Converts signal to radiation
 - Plots
-  - Signal with and without dark
+  - Overview of Clean/Dirty signal
+  - Daily signal with and without dark
 
 
 ### For CM-21
@@ -33,7 +36,8 @@ To process the data from broadband instruments of LAP.
   - From acquisition signal physical limits
 - Converts signal to radiation
 - Plots
-  - Signal with and without dark
+  - Overview of Clean/Dirty signal
+  - Daily signal with and without dark
 
 
 ### Other processes

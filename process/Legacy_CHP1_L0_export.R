@@ -95,7 +95,7 @@ panderOptions("table.split.table",        120   )
 
 ## __ Execution control  -------------------------------------------------------
 COMPARE <- TRUE
-# COMPARE <- FALSE
+COMPARE <- FALSE
 
 
 ## years in the data base
@@ -116,7 +116,8 @@ editedyears <- as.vector(na.omit(unique(
 ## export legacy files
 for (YYYY in datayears) {
     ## legacy filename
-    legacyout <- paste0("~/DATA/Broad_Band/Legacy_L0_CHP1_", YYYY, ".Rds")
+    # legacyout <- paste0("~/DATA/Broad_Band/Legacy_L0_CHP1_", YYYY, ".Rds")
+    legacyout <- paste0("~/DATA/Broad_Band/LAP_CHP1_L0_", YYYY, ".Rds")
     ## get data from DB
     year_data <- BB |>
         filter(year == YYYY) |>
@@ -183,8 +184,8 @@ for (YYYY in datayears) {
     ## Write data to old file format  ------------------------------------------
     year_data <- data.table(year_data)
     write_RDS(object = year_data,
-              file   = legacyout,
-              clean  = TRUE)
+              file   = legacyout)
+
 }
 
 ## Old format of CHP1 L0
@@ -212,7 +213,6 @@ for (YYYY in datayears) {
 
 #+ echo=F, include=T, results="asis"
 if (COMPARE) {
-
     listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
                              pattern = "Legacy_L0_CHP1_[0-9]{4}\\.Rds",
                              full.names = TRUE, ignore.case = TRUE)

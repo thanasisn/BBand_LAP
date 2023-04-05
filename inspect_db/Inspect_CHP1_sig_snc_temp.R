@@ -5,7 +5,6 @@
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Inspect raw data from CHP1."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
