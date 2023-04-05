@@ -9,6 +9,9 @@
 #'
 #' On the second run will replace 'MISSING' dark with 'CONSTRUCTED' dark.
 #'
+#' TODO
+#' - print dark type on graphs from metadata
+#'
 #+ include=T, echo=F
 
 ## __ Set environment  ---------------------------------------------------------
