@@ -26,12 +26,12 @@ render(input       = "~/BBand_LAP/inspect_db/Check_input_files.R",
        output_dir  = "~/BBand_LAP/REPORTS/")
 
 
+
 cat("\n\nInspect CHP-1 signal CLEAN\n")
 render(input       = "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R",
        params      = list(CLEAN = TRUE),
        output_file = "Inspect_CHP1_sig_snc_temp_CLEAN.pdf",
        output_dir  = "~/BBand_LAP/REPORTS/")
-
 
 cat("\n\nInspect CHP-1 signal DIRTY\n")
 render(input       = "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R",
@@ -40,6 +40,22 @@ render(input       = "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R",
        output_dir  = "~/BBand_LAP/REPORTS/")
 
 
+
+cat("\n\nInspect CM-21 signal CLEAN\n")
+render(input       = "~/BBand_LAP/inspect_db/Inspect_CM21_sig.R",
+       params      = list(CLEAN = TRUE),
+       output_file = "Inspect_CM21_sig_CLEAN.pdf",
+       output_dir  = "~/BBand_LAP/REPORTS/")
+
+cat("\n\nInspect CM-21 signal DIRTY\n")
+render(input       = "~/BBand_LAP/inspect_db/Inspect_CM21_sig.R",
+       params      = list(CLEAN = FALSE),
+       output_file = "Inspect_CM21_sig_DIRTY.pdf",
+       output_dir  = "~/BBand_LAP/REPORTS/")
+
+
+
+cat("\nPlot signals\n\n")
 source("~/BBand_LAP/inspect_db/Plot_daily_CHP1_sig.R")
 source("~/BBand_LAP/inspect_db/Plot_daily_CM21_sig.R")
 
