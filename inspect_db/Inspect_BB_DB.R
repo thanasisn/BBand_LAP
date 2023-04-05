@@ -11,7 +11,7 @@ Script.Name <- "~/BBand_LAP/inspect_db/Inspect_BB_DB.R"
 
 library(rmarkdown)
 
-source("~/BBand_LAP//DEFINITIONS.R")
+source("~/BBand_LAP/DEFINITIONS.R")
 
 
 if (!interactive()) {
