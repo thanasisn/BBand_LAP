@@ -4,6 +4,8 @@
 #'
 #' Read PySolar files `sun_path_.*.dat.gz`
 #'
+#' This also initialises a lot of columns in the dataset and meta data.
+#'
 #' Populates:
 #'  - Date
 #'  - Azimuth
@@ -104,6 +106,10 @@ if (file.exists(DB_META_fl)) {
     BB_meta$chp1_parsed           <- as.POSIXct(NA)
     BB_meta$chp1_sig_NAs          <- as.integer(NA)
     BB_meta$chp1_sig_sd_NAs       <- as.integer(NA)
+    BB_meta$chp1_temp_basename    <- as.character(NA)
+    BB_meta$chp1_temp_md5sum      <- as.character(NA)
+    BB_meta$chp1_temp_mtime       <- as.POSIXct(NA)
+    BB_meta$chp1_temp_parsed      <- as.POSIXct(NA)
 }
 
 
@@ -204,11 +210,10 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, chp1_R_meas_ERR         := as.numeric(NA)  ]
             sun_temp[, chp1_R_therm            := as.numeric(NA)  ]
             sun_temp[, chp1_bad_data_flag      := as.character(NA)]
+            sun_temp[, chp1_bad_temp_flag      := as.character(NA)]
             sun_temp[, chp1_temp_UNC           := as.numeric(NA)  ]
-            sun_temp[, chp1_temp_bad_data_flag := as.character(NA)]
             sun_temp[, chp1_temperature        := as.numeric(NA)  ]
             sun_temp[, chp1_temperature_SD     := as.numeric(NA)  ]
-            sun_temp[, chp1_bad_temp_flag      := as.character(NA)]
             ## For TOT
             sun_temp[, tot_glb                 := as.numeric(NA)  ]
             sun_temp[, tot_glb_sd              := as.numeric(NA)  ]

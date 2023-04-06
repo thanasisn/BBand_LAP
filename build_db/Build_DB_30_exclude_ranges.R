@@ -270,13 +270,22 @@ for (af in filelist$names) {
         upper  <- ranges_CHP1_temp$Until[  i]
         comme  <- ranges_CHP1_temp$Comment[i]
         tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                             chp1_temp_bad_data_flag = comme)
+                             chp1_bad_temp_flag = comme)
 
         ## mark bad regions of data
         datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
         rm(tempex)
     }
 
+    ## CHP-1 flag temperature physical limits ----------------------------------
+    datapart <- data.table(datapart)
+    datapart[chp1_temperature > CHP_TEMP_MAX        & !is.na(chp1_bad_temp_flag),
+             chp1_bad_temp_flag := "Abnormal HIGH temperature"]
+    datapart[chp1_temperature < CHP_TEMP_MIN        & !is.na(chp1_bad_temp_flag),
+             chp1_bad_temp_flag := "Abnormal LOW temperature"]
+    datapart[chp1_temperature_SD > CHP_TEMP_STD_LIM & !is.na(chp1_bad_temp_flag),
+             chp1_bad_temp_flag := "Abnormal temperature SD"]
+    datapart <- as_tibble(datapart)
 
 
 
@@ -308,9 +317,9 @@ for (af in filelist$names) {
     chg_days <- unique(as.Date(datapart$Date))
 
     ## save flagged metadata
-    BB_meta[day %in% chg_days, cm21_bad_data_flagged      := cm21_exclude_mtime     ]
+    BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime     ]
     BB_meta[day %in% chg_days, chp1_bad_temp_flagged := chp1_temp_exclude_mtime]
-    BB_meta[day %in% chg_days, chp1_bad_data_flagged      := chp1_exclude_mtime     ]
+    BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime     ]
     ## store actual data
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
@@ -329,136 +338,13 @@ rm(ranges_CM21)
 ## Show some info for the dataset flags
 BB <- opendata()
 
-wecare <- c("cm21_bad_data_flag", "chp1_bad_data_flag", "chp1_temp_bad_data_flag")
+wecare <- c("cm21_bad_data_flag", "chp1_bad_data_flag", "chp1_bad_temp_flag")
 
 for (acol in wecare) {
     stats <- BB |> select(acol) |> collect() |> table(useNA = "always")
     pander(data.frame(stats))
 }
 
-
-
-
-
-# ## touch only needed
-# yearstodo <- unique(year(c(ranges_CHP1$From, ranges_CHP1$Until)))
-# # for (ay in yearstodo) {
-# #     for (ami in 1:12) {
-# #         ami = 5
-# #         ## pull data to work
-# #         datapart <- BB %>% filter(year == ay & month == ami) %>% compute()
-# #         datapart <- as.data.table(datapart)
-#
-#         for (i in 1:nrow(ranges_CHP1)) {
-#             lower <- ranges_CHP1$From[   i]
-#             upper <- ranges_CHP1$Until[  i]
-#             comme <- ranges_CHP1$Comment[i]
-#             ## mark bad regions of data
-#             # datapart[Date >= lower & Date < upper, chp1_bad_data := comme]
-#
-#             tempex <- data.table(Date = seq(lower, upper - 60, by = "min"))
-#
-#             tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-#                                  chp1_bad_data = comme)
-#
-#             yearsvec  <- unique(year(tempex$Date))
-#             monthsvec <- unique(month(tempex$Date))
-#
-#             stop()
-#
-#             # BB %>%
-#             # filter(year %in% yearsvec & month %in% monthsvec) %>%
-#             #     filter(Date >= lower & Date < upper) %>%
-#             #     filter(is.na(chp1_bad_data)) %>% collect()
-#
-#             # filter(Date >= lower & Date < upper) %>%
-#             # filter(!is.na(chp1_bad_data)) %>%  collect()
-#
-#             ## update values only part
-#             # temp <- BB %>%
-#             #     filter(year %in% yearsvec & Date >= lower & Date < upper & is.na(chp1_bad_data)) %>%
-#             #     mutate(chp1_bad_data = comme, .keep = "all") %>%
-#             #     collect()
-#             #
-#             # temp <- to_duckdb(as_tibble(temp))
-#             #
-#             #
-#             DB <- to_duckdb(BB)
-#             BB <- rows_update(DB , tempex, by = "Date", unmatched = "ignore", copy = TRUE ) %>%
-#                 compute() %>% to_arrow()
-#
-#             stop()
-#             # right_join(BB, as_tibble(temp), by = join_by(Date), keep = T) %>% compute()
-#             # BB <- left_join(BB, as_tibble(temp), by = join_by(Date)) %>% compute()
-#
-#             # DF <- mutate(DF, V2 = base::replace(V2, V2 < 4, 0L))
-#             # tempex <- data.table(Date = seq(lower, upper - 60, by = "min"),
-#             #                      chp1_bad_data = as.factor(comme))
-#             # datapart <- datapart %>%
-#             #     mutate(chp1_bad_data = ifelse((datapart$Date >= lower & datapart$Date < upper),
-#             #                                    NA,
-#             #                                    comme) , .keep = "all") %>% collect()
-#             #
-#             # stop()
-#         }
-#
-#         # as_arrow_table(datapart) %>% filter(!is.na(chp1_bad_data)) %>% collect()
-#
-#         # aaa<-BB %>% filter(!is.na(chp1_bad_data)) %>% collect()
-#
-#         ## works but updates file unnecessary
-#         # datapart <- as_arrow_table(datapart)
-#         # datapart %>% writedata()
-#
-#         # datapart %>% collect()
-#         # datapart %>% writedata()
-# #
-# #         stop()
-# #     }
-# # }
-#
-# aaa <- BB %>% filter(!is.na(chp1_bad_data)) %>% collect()
-# bbb <- CC %>% filter(!is.na(chp1_bad_data)) %>% collect()
-#
-#
-# stop()
-# for (i in 1:nrow(ranges_CHP1)) {
-#     lower <- ranges_CHP1$From[   i]
-#     upper <- ranges_CHP1$Until[  i]
-#     comme <- ranges_CHP1$Comment[i]
-#
-#     ## TODO check those shifts!!!!
-#     tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-#                          chp1_bad_data = comme)
-#
-#     # stop()
-#
-#     # rows_update(to_duckdb(BB), tempex, by = "Date")
-#
-#     # BB <- left_join(BB, tempex, by = "Date") %>% compute()
-#
-#     # BB %>%
-#     #     filter(Date >= lower & Date < upper) %>%
-#     #     mutate(chp1_bad_data = (comme)) %>%
-#     #     collect()
-#     #
-#     # BB %>%
-#     #     filter(Date >= lower & Date < upper) %>%
-#     #     mutate(chp1_bad_data = (comme)) %>%
-#     #     compute()
-#
-#     # BB %>%
-#     #     filter( Date >= lower & Date < upper ) %>% collect()
-#
-#     # BB %>% mutate(chp1_bad_data = replace(chp1_bad_data,
-#     #                                       Date >= lower & Date < upper ,
-#     #                                       comme))
-#
-#     ## ~ no work??
-#     # BB <- BB %>% mutate(chp1_bad_data = ifelse(Date >= lower & Date < upper,
-#     #                                            chp1_bad_data,
-#     #                                            comme), .keep = "all") %>% compute()
-# }
 
 
 myunlock(DB_lock)

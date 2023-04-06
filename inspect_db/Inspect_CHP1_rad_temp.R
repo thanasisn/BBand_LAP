@@ -158,34 +158,13 @@ for (YYYY in sort(years_to_do)) {
     ## load data for year
     year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
 
-
-    # ## Choose what to plot (data.table slicing dong work)
-    # if (CLEAN) {
-    #     year_data[!is.na(CHP1_sig), .N]
-    #     cat("\nRemove bad data regions\n")
-    #     cat(year_data[!is.na(chp1_bad_data_flag), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    #     year_data$CM21_sig   [!is.na(year_data$chp1_bad_data_flag)] <- NA
-    #     year_data$CM21_sig_sd[!is.na(year_data$chp1_bad_data_flag)] <- NA
-    #
-    #     cat("\nRemove tracker async cases\n")
-    #     cat(year_data[Async_tracker_flag == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    #     year_data$CHP1_sig   [year_data$Async_tracker_flag == TRUE] <- NA
-    #     year_data$CHP1_sig_sd[year_data$Async_tracker_flag == TRUE] <- NA
-    #
-    #     cat("\nRemove data above physical limits\n")
-    #     cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    #     year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
-    #     year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
-    #
-    #     cat("\nRemove data below physical limits\n")
-    #     cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    #     year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
-    #     year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
-    # }
+    ## do some cleaning for displaying
+    year_data[ !is.na(chp1_bad_temp_flag), chp1_temperature    := NA]
+    year_data[ !is.na(chp1_bad_temp_flag), chp1_temperature_SD := NA]
 
 
     wattlimit <- 50
-    hist(year_data[HOR_wpsm > wattlimit, DIR_wpsm ],
+    hist(year_data[ DIR_wpsm > wattlimit, DIR_wpsm ],
          main = paste(YYYY, "Direct  >", wattlimit, "watt/m^2"),
          breaks = 100 , las = 1, probability = T, xlab = "watt/m^2")
     lines(density(year_data$DIR_wpsm, na.rm = T), col = "orange", lwd = 3)
@@ -197,6 +176,49 @@ for (YYYY in sort(years_to_do)) {
     lines(density(year_data$DIR_SD_wpsm, na.rm = T), col = "orange", lwd = 3)
 
 
+
+
+    plot(year_data$Elevat, year_data$DIR_wpsm,
+         pch  = 19,
+         cex  = .1,
+         main = paste("Direct ", YYYY ),
+         xlab = "Elevation",
+         ylab = "Direct" )
+    cat('\n\n')
+
+    plot(year_data$Azimuth, year_data$DIR_wpsm,
+         pch  = 19,
+         cex  = .1,
+         main = paste("Direct ", YYYY ),
+         xlab = "Azimuth",
+         ylab = "Direct" )
+    cat('\n\n')
+
+
+    plot(year_data$Date, year_data$DIR_wpsm,
+         pch  = 19,
+         cex  = .1,
+         main = paste("Direct ", YYYY ),
+         ylab = "",
+         ylab = "Direct" )
+    cat('\n\n')
+
+
+    plot(year_data$Date, year_data$chp1_temperature,
+         pch  = 19,
+         cex  = .1,
+         main = paste("CHP-1 Temperature ", YYYY ),
+         xlab = "",
+         ylab = "[C]" )
+    cat('\n\n')
+
+
+
+
+
+
+
+
     stop()
 
 
@@ -205,29 +227,6 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n\\normalsize\n\n')
 
 
-    plot(year_data$Elevat, year_data$DIR_wpsm,
-         pch  = 19,
-         cex  = .5,
-         main = paste("Direct ", YYYY ),
-         xlab = "Elevation",
-         ylab = "Direct" )
-    cat('\n\n')
-
-    plot(year_data$Date, year_data$DIR_SD_wpsm,
-         pch  = 19,
-         cex  = .5,
-         main = paste("Diredct SD ", YYYY ),
-         xlab = "",
-         ylab = "Diredct SD" )
-    cat('\n\n')
-
-    plot(year_data$Elevat, year_data$CHP1_sig_sd,
-         pch  = 19,
-         cex  = .5,
-         main = paste("CHP1 signal SD", YYYY ),
-         xlab = "Elevation",
-         ylab = "CHP1 signal SD")
-    cat('\n\n')
 
     # par(mar = c(2,4,2,1))
     month_vec <- strftime(  year_data$Date, format = "%m")
@@ -244,7 +243,6 @@ for (YYYY in sort(years_to_do)) {
 
 
 
-
     # boxplot(year_data$Elevat ~ month_vec )
     # title(main = paste("Elevation by month", YYYY) )
     # cat('\n\n')
@@ -257,20 +255,6 @@ for (YYYY in sort(years_to_do)) {
     if (year_data[!is.na(chp1_temperature), .N] > 0) {
         cat("\n\n\\FloatBarrier\n\n")
         cat("\n## Temperature data:", YYYY, "\n\n")
-
-        if (CLEAN) {
-            year_data$chp1_temperature[year_data$chp1_temperature > CHP_TEMP_MAX]        <- NA
-            year_data$chp1_temperature[year_data$chp1_temperature < CHP_TEMP_MIN]        <- NA
-            year_data$chp1_temperature[!is.na(year_data$chp1_temp_bad_data)]             <- NA
-            year_data$chp1_temperature[year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
-
-            year_data$chp1_temperature_SD[year_data$chp1_temperature > CHP_TEMP_MAX]        <- NA
-            year_data$chp1_temperature_SD[year_data$chp1_temperature < CHP_TEMP_MIN]        <- NA
-            year_data$chp1_temperature_SD[!is.na(year_data$chp1_temp_bad_data)]             <- NA
-            year_data$chp1_temperature_SD[year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
-        }
-
-
 
         hist(year_data$chp1_temperature,
              breaks = 50,
