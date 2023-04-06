@@ -58,7 +58,7 @@ BB <- opendata()
 for (avar in c("chp1_t_cor_factor")) {
     if (!any(names(BB) == avar)) {
         cat("Create column: ", avar, "\n")
-        BB <- BB |> mutate( !!avar := as.numeric(NA))
+        BB <- BB |> mutate( !!avar := as.numeric(NA)) |> compute()
         writedata(BB)
     }
 }

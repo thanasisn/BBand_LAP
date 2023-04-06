@@ -113,8 +113,6 @@ if (BB_meta[!is.na(chp1_dark_flag), .N] > 100) {
         Date = missingdays,
         DARK = chp1DAILYdark(missingdays)
     )
-    # plot(test$day, test$chp1_dark_Eve_med)
-    # plot(test$day, test$chp1_dark_Mor_med)
     plot(test$day, test$chp1_Daily_dark,
          main = "Constructed Dark values for CHP-1")
     points(construct$Date, construct$DARK, col = "red")
@@ -149,7 +147,7 @@ for (af in filelist$names) {
         daydata <- data_use[ as.Date(Date) == aday ]
 
         if (any(is.na(daydata$Elevat))) {
-            cat("The day is not initialized:", format(as.Date(aday)),"\n")
+            cat("The day is not initialized:", format(as.Date(aday)), "\n")
             next()
         }
 
@@ -196,14 +194,14 @@ for (af in filelist$names) {
             dark_generator <- dark_function_2(dark_day    = dark_day,
                                               DCOUNTLIM   = DCOUNTLIM,
                                               type        = "median",
-                                              missingdark = missingdark )
+                                              missingdark = missingdark)
             ## Create dark signal for every minute
             todays_dark_correction <- dark_generator(daydata$Date)
             dark_flag              <- "COMPUTED"
         }
 
         ## __ Apply dark correction for the day  -------------------------------
-        daydata[, CHP1_sig_wo_dark := CHP1_sig - todays_dark_correction ]
+        daydata[, CHP1_sig_wo_dark := CHP1_sig - todays_dark_correction]
 
         ## __ Convert signal to radiation --------------------------------------
         daydata[, DIR_wpsm    := CHP1_sig    * chp1factor(Date)]
