@@ -200,31 +200,25 @@ for (YYYY in sort(years_to_do)) {
     stop()
 
 
-
-
     cat('\n\n\\footnotesize\n\n')
-    cat(pander(summary(year_data[, .(Date, SZA, CHP1_sig, CHP1_sig_sd, Async_tracker_flag)])))
+    cat(pander(summary(year_data[, .(Date, SZA, DIR_wpsm, DIR_SD_wpsm, HOR_wpsm, HOR_SD_wpsm, chp1_temperature)])))
     cat('\n\n\\normalsize\n\n')
 
 
-    plot(year_data$Elevat, year_data$CHP1_sig,
+    plot(year_data$Elevat, year_data$DIR_wpsm,
          pch  = 19,
          cex  = .5,
-         main = paste("CHP1 signal ", YYYY ),
+         main = paste("Direct ", YYYY ),
          xlab = "Elevation",
-         ylab = "CHP1 signal" )
-    points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
-    points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
+         ylab = "Direct" )
     cat('\n\n')
 
-    plot(year_data$Date, year_data$CHP1_sig,
+    plot(year_data$Date, year_data$DIR_SD_wpsm,
          pch  = 19,
          cex  = .5,
-         main = paste("CHP1 signal ", YYYY ),
+         main = paste("Diredct SD ", YYYY ),
          xlab = "",
-         ylab = "CHP1 signal" )
-    points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
-    points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
+         ylab = "Diredct SD" )
     cat('\n\n')
 
     plot(year_data$Elevat, year_data$CHP1_sig_sd,
@@ -276,18 +270,6 @@ for (YYYY in sort(years_to_do)) {
             year_data$chp1_temperature_SD[year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
         }
 
-
-        suppressWarnings({
-            ## Try to find outliers
-            yearlims <- data.table()
-            for (an in grep("chp1_temperature", names(year_data), value = TRUE)) {
-                daily <- year_data[ , .(dmin = min(get(an),na.rm = T),
-                                        dmax = max(get(an),na.rm = T)), by = as.Date(Date) ]
-                low <- daily[!is.infinite(dmin), mean(dmin) - OutliersPlot * sd(dmin)]
-                upe <- daily[!is.infinite(dmax), mean(dmax) + OutliersPlot * sd(dmax)]
-                yearlims <- rbind(yearlims, data.table(an = an,low = low, upe = upe))
-            }
-        })
 
 
         hist(year_data$chp1_temperature,
