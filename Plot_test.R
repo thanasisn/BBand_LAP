@@ -1,13 +1,14 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
-dd <- ""
+
+
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/Mark_excluded_data_ranges.R"
+Script.Name <- "~/BBand_LAP/Plot_test.R"
 
 
 source("~/BBand_LAP/DEFINITIONS.R")
@@ -30,6 +31,9 @@ library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(shiny)
 library(plotly)
 
+
+##  Create a test database  ----------------------------------------------------
+
 TEST_DB <- TRUE
 
 if (TEST_DB) {
@@ -47,9 +51,20 @@ if (TEST_DB) {
 }
 
 
+##  Create a new variable to the whole database  -------------------------------
 
 BB <- opendata()
 
+avar <- "chp1_t_cor_factor"
+if (!any(names(BB) == avar)) {
+    cat("Create column: ", avar, "\n")
+    BB <- BB |> mutate( !!avar := as.numeric(NA))
+    writedata(BB)
+}
+
+
+
+##  Interactive tests  ---------------------------------------------------------
 
 
 vars <- grep("Date|Azimuth|doy|year|month", names(BB), invert = TRUE, value = TRUE)
@@ -60,12 +75,7 @@ ttg <- BB |> filter(is.na(CM21_sig_wo_dark)) |> collect()
 
 
 
-
 stop()
-
-
-
-
 
 
 
@@ -94,9 +104,6 @@ if (interactive()) {
     }
     shinyApp(ui, server)
 }
-
-
-
 
 
 

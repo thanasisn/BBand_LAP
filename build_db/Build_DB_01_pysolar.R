@@ -37,8 +37,7 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
-TEST <- FALSE
-# TEST <- TRUE
+
 
 cat("\n Initialize DB or import  PySolar  Sun data\n\n")
 
@@ -136,16 +135,6 @@ inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 
 cat("\n**Parse:",paste(nrow(inp_filelist), "PySolar files**\n\n"))
 
-## test random
-if (TEST) {
-    cat("\nTEST MODE IS ON!!  ", Script.Name, "\n\n")
-    inp_filelist <- unique(rbind(
-        inp_filelist[ 1:100 ],
-        inp_filelist[sample(1:nrow(inp_filelist), 100)],
-        NULL
-    ))
-    setorder(inp_filelist, day)
-}
 
 
 
