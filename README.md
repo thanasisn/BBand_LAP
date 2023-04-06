@@ -5,7 +5,7 @@ Developed in the Laboratory of Atmospheric Physics of Thessaloniki, Greece.
 
 To process the data from broadband instruments of LAP.
 
-This is partial used as operatioanal procedures.
+This is partial used as operational procedures.
 
 
 
@@ -22,6 +22,7 @@ This is partial used as operatioanal procedures.
   - From manual set execution ranges
   - From acquisition signal physical limits
 - Converts signal to radiation
+  - Computes temperature correction when possible
 - Plots
   - Overview of Clean/Dirty signal
   - Daily signal with and without dark
