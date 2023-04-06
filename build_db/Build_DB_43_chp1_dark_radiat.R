@@ -96,7 +96,7 @@ filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 
 ## Create a dark construct!  ---------------------------------------------------
 
-## construct dark if are available data
+## create construct if are available data
 if (BB_meta[!is.na(chp1_dark_flag), .N] > 100) {
     test <- BB_meta[, .(day, chp1_dark_flag, chp1_dark_Eve_med, chp1_dark_Mor_med, chp1_Daily_dark) ]
     ## will use mean Daily dark
@@ -226,14 +226,6 @@ for (af in filelist$names) {
         datapart <- rows_update(datapart, daydata, by = "Date")
         rm(daydata, meta_day, dark_day)
     }
-
-
-
-
-
-
-
-
 
     ## store actual data
     write_parquet(x = datapart, sink = af)

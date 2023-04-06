@@ -38,6 +38,7 @@ TEST_DB <- TRUE
 
 if (TEST_DB) {
     source("~/BBand_LAP/DEFINITIONS.R")
+    cat("\n * * * Using a temp DB * * * \n\n")
     ## copy data to temp
     tyear <- 2023
     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
@@ -54,14 +55,13 @@ if (TEST_DB) {
 ##  Create a new variable to the whole database  -------------------------------
 
 BB <- opendata()
-
-avar <- "chp1_t_cor_factor"
-if (!any(names(BB) == avar)) {
-    cat("Create column: ", avar, "\n")
-    BB <- BB |> mutate( !!avar := as.numeric(NA))
-    writedata(BB)
+for (avar in c("chp1_t_cor_factor")) {
+    if (!any(names(BB) == avar)) {
+        cat("Create column: ", avar, "\n")
+        BB <- BB |> mutate( !!avar := as.numeric(NA))
+        writedata(BB)
+    }
 }
-
 
 
 ##  Interactive tests  ---------------------------------------------------------
