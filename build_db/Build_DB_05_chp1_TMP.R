@@ -133,31 +133,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
             #     gather[[var]] <- NA
             #     gather[[var]] <- as.numeric(gather[[var]])
             # }
-            # var <- "chp1_R_SD_therm"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
-            # var <- "chp1_R_meas_ERR"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
-            # var <- "chp1_temperature"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
-            # var <- "chp1_temperature_SD"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
-            # var <- "chp1_temp_UNC"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
             var <- "year"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
