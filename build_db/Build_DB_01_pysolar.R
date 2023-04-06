@@ -4,7 +4,7 @@
 #'
 #' Read PySolar files `sun_path_.*.dat.gz`
 #'
-#' This also initialises a lot of columns in the dataset and meta data.
+#' This also initializes a lot of columns in the dataset and meta data.
 #'
 #' Populates:
 #'  - Date
@@ -200,6 +200,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, chp1_R_therm            := as.numeric(NA)  ]
             sun_temp[, chp1_bad_data_flag      := as.character(NA)]
             sun_temp[, chp1_bad_temp_flag      := as.character(NA)]
+            sun_temp[, chp1_t_cor_factor       := as.numeric(NA)  ]
             sun_temp[, chp1_temp_UNC           := as.numeric(NA)  ]
             sun_temp[, chp1_temperature        := as.numeric(NA)  ]
             sun_temp[, chp1_temperature_SD     := as.numeric(NA)  ]
@@ -208,18 +209,19 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, tot_glb_sd              := as.numeric(NA)  ]
             sun_temp[, lap_sza                 := as.numeric(NA)  ]
             ## Radiation
-            sun_temp[, DIR_wpsm                := as.numeric(NA)  ]
             sun_temp[, DIR_SD_wpsm             := as.numeric(NA)  ]
-            sun_temp[, GLB_wpsm                := as.numeric(NA)  ]
+            sun_temp[, DIR_wpsm                := as.numeric(NA)  ]
+            sun_temp[, DIR_wpsm_temp_cor       := as.numeric(NA)  ]
             sun_temp[, GLB_SD_wpsm             := as.numeric(NA)  ]
-            sun_temp[, HOR_wpsm                := as.numeric(NA)  ]
+            sun_temp[, GLB_wpsm                := as.numeric(NA)  ]
             sun_temp[, HOR_SD_wpsm             := as.numeric(NA)  ]
+            sun_temp[, HOR_wpsm                := as.numeric(NA)  ]
+            sun_temp[, HOR_wpsm_temp_cor       := as.numeric(NA)  ]
             ## Sun
             sun_temp[, Sun_Dist_Astropy        := as.numeric(NA)  ]
             sun_temp[, TSI_TOA                 := as.numeric(NA)  ]
             sun_temp[, TSI_1au                 := as.numeric(NA)  ]
             sun_temp[, TSI_source              := as.character(NA)]
-
 
             ## gather data
             if (nrow(gather) == 0) {
