@@ -183,79 +183,29 @@ for (YYYY in sort(years_to_do)) {
     #     year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
     # }
 
-    year_data[HOR_wpsm > 2000]
-
 
     wattlimit <- 50
-    hist(year_data[ HOR_wpsm > wattlimit, HOR_wpsm ],
-         main = paste(YYYY, "Horizontal  > ",wattlimit, "watt/m^2"),
-         breaks = 100 , las=1, probability =  T, xlab = "watt/m^2")
-    lines(density(year_data$HOR_wpsm, na.rm = T), col = "green" , lwd = 3)
+    hist(year_data[HOR_wpsm > wattlimit, DIR_wpsm ],
+         main = paste(YYYY, "Direct  >", wattlimit, "watt/m^2"),
+         breaks = 100 , las = 1, probability = T, xlab = "watt/m^2")
+    lines(density(year_data$DIR_wpsm, na.rm = T), col = "orange", lwd = 3)
+
+
+    hist(year_data$DIR_SD_wpsm,
+         main = paste(YYYY, "Direct SD"),
+         breaks = 100 , las = 1, probability = T, xlab = "watt/m^2")
+    lines(density(year_data$DIR_SD_wpsm, na.rm = T), col = "orange", lwd = 3)
 
 
     stop()
-    ## Get outliers limits
-    suppressWarnings({
-        ## Try to find outliers
-        yearlims <- data.table()
-        for (an in grep("CHP1_sig", names(year_data), value = TRUE)) {
-            daily <- year_data[ , .(dmin = min(get(an),na.rm = T),
-                                    dmax = max(get(an),na.rm = T)), by = as.Date(Date) ]
-            low <- daily[!is.infinite(dmin), mean(dmin) - OutliersPlot * sd(dmin)]
-            upe <- daily[!is.infinite(dmax), mean(dmax) + OutliersPlot * sd(dmax)]
-            yearlims <- rbind(yearlims, data.table(an = an,low = low, upe = upe))
-        }
-    })
 
-    cat("\n\n### Proposed outliers limits \n")
-    cat('\n\n\\footnotesize\n\n')
-    cat(pander(yearlims))
-    cat('\n\n\\normalsize\n\n')
 
-    cat("\n**Days with outliers:**\n\n")
-    cat(format(
-        year_data[CHP1_sig > yearlims[ an == "CHP1_sig", upe], unique(as.Date(Date))]
-        ))
-    cat("\n\n")
-    cat(format(
-        year_data[CHP1_sig < yearlims[ an == "CHP1_sig", low], unique(as.Date(Date))]
-    ))
-    cat("\n\n")
-    cat(format(
-        year_data[CHP1_sig_sd > yearlims[ an == "CHP1_sig_sd", upe], unique(as.Date(Date))]
-    ))
-    cat("\n\n")
-    cat(format(
-        year_data[CHP1_sig_sd < yearlims[ an == "CHP1_sig_sd", low], unique(as.Date(Date))]
-    ))
-    cat("\n\n")
 
-    cat("\n**Days hitting physical limit:**\n\n")
-    cat(format(
-        year_data[CHP1_sig > sig_upplim, unique(as.Date(Date))]
-    ))
-    cat("\n\n")
-    cat(format(
-        year_data[CHP1_sig < sig_lowlim, unique(as.Date(Date))]
-    ))
 
     cat('\n\n\\footnotesize\n\n')
     cat(pander(summary(year_data[, .(Date, SZA, CHP1_sig, CHP1_sig_sd, Async_tracker_flag)])))
     cat('\n\n\\normalsize\n\n')
 
-    hist(year_data$CHP1_sig,
-         breaks = 50,
-         main   = paste("CHP1 signal ",  YYYY))
-    abline(v = yearlims[ an == "CHP1_sig", low], lty = 3, col = "red")
-    abline(v = yearlims[ an == "CHP1_sig", upe], lty = 3, col = "red")
-    cat('\n\n')
-
-    hist(year_data$CHP1_sig_sd,
-         breaks = 50,
-         main   = paste("CHP1 signal SD", YYYY))
-    abline(v = yearlims[ an == "CHP1_sig_sd", low], lty = 3, col = "red")
-    abline(v = yearlims[ an == "CHP1_sig_sd", upe], lty = 3, col = "red")
-    cat('\n\n')
 
     plot(year_data$Elevat, year_data$CHP1_sig,
          pch  = 19,
@@ -275,8 +225,6 @@ for (YYYY in sort(years_to_do)) {
          ylab = "CHP1 signal" )
     points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
-    abline(h = yearlims[ an == "CHP1_sig", low], lty = 3, col = "red")
-    abline(h = yearlims[ an == "CHP1_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
     plot(year_data$Elevat, year_data$CHP1_sig_sd,
@@ -285,8 +233,6 @@ for (YYYY in sort(years_to_do)) {
          main = paste("CHP1 signal SD", YYYY ),
          xlab = "Elevation",
          ylab = "CHP1 signal SD")
-    abline(h = yearlims[ an == "CHP1_sig_sd", low], lty = 3, col = "red")
-    abline(h = yearlims[ an == "CHP1_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
 
     # par(mar = c(2,4,2,1))
@@ -302,15 +248,8 @@ for (YYYY in sort(years_to_do)) {
     title(main = paste("CHP1sd by month", YYYY))
     cat('\n\n')
 
-    count <- year_data[ , .(Asyncs = sum(Async_tracker_flag)), by = .(Day = as.Date(Date))]
 
-    plot(count$Day, count$Asyncs,
-         main = paste("Daily Async cases", YYYY))
-    cat("\n\n")
 
-    hist(count$Asyncs,
-         main = paste("Daily Async cases", YYYY))
-    cat("\n\n")
 
     # boxplot(year_data$Elevat ~ month_vec )
     # title(main = paste("Elevation by month", YYYY) )
@@ -350,28 +289,15 @@ for (YYYY in sort(years_to_do)) {
             }
         })
 
-        cat("\n**Days with outliers:**\n\n")
-        cat(format(
-            year_data[chp1_temperature > yearlims[ an == "chp1_temperature", upe], unique(as.Date(Date))]
-        ))
-        cat("\n\n")
-        cat(format(
-            year_data[chp1_temperature < yearlims[ an == "chp1_temperature", low], unique(as.Date(Date))]
-        ))
-        cat("\n\n")
 
         hist(year_data$chp1_temperature,
              breaks = 50,
              main   = paste("CHP1 temperature ",  YYYY))
-        abline(v = yearlims[ an == "chp1_temperature", low], lty = 3, col = "red")
-        abline(v = yearlims[ an == "chp1_temperature", upe], lty = 3, col = "red")
         cat('\n\n')
 
         hist(year_data$chp1_temperature_SD,
              breaks = 50,
              main   = paste("CHP1 temperature SD", YYYY))
-        abline(v = yearlims[ an == "chp1_temperature_SD", low], lty = 3, col = "red")
-        abline(v = yearlims[ an == "chp1_temperature_SD", upe], lty = 3, col = "red")
         cat('\n\n')
 
         plot(year_data$Date, year_data$chp1_temperature,
@@ -380,8 +306,6 @@ for (YYYY in sort(years_to_do)) {
              main = paste("CHP1 temperature ", YYYY ),
              xlab = "",
              ylab = "CHP1 temperature" )
-        abline(h = yearlims[ an == "chp1_temperature", low], lty = 3, col = "red")
-        abline(h = yearlims[ an == "chp1_temperature", upe], lty = 3, col = "red")
         cat('\n\n')
 
         plot(year_data$Elevat, year_data$chp1_temperature_SD,
@@ -390,8 +314,6 @@ for (YYYY in sort(years_to_do)) {
              main = paste("CHP1 temperature SD", YYYY ),
              xlab = "Elevation",
              ylab = "CHP1 temperature SD ")
-        abline(h = yearlims[ an == "chp1_temperature_SD", low], lty = 3, col = "red")
-        abline(h = yearlims[ an == "chp1_temperature_SD", upe], lty = 3, col = "red")
         cat('\n\n')
 
     }
