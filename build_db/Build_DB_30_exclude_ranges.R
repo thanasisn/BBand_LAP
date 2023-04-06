@@ -189,11 +189,6 @@ if (!any(names(BB) == var)) {
     cat("Create column  ", var, "  in dataset\n")
     BB <- BB |> mutate(!!var := as.character(NA)) |> compute()
     BB |> writedata()
-    if (file.exists(DB_META_fl)) {
-        BB_meta <- read_parquet(DB_META_fl)
-        BB_meta$chp1_bad_data_flagged <- as.POSIXct(NA)
-        write_parquet(BB_meta, DB_META_fl)
-    }
 }
 var <- "chp1_temp_bad_data_flag"
 if (!any(names(BB) == var)) {

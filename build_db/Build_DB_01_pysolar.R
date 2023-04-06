@@ -82,25 +82,26 @@ if (file.exists(DB_META_fl)) {
     BB_meta$cm21_sig_NAs        <- as.integer(NA)
     BB_meta$cm21_sig_sd_NAs     <- as.integer(NA)
     ## Fro CHP-1 meta data
-    BB_meta$chp1_Daily_dark     <- as.numeric(NA)
-    BB_meta$chp1_basename       <- as.character(NA)
-    BB_meta$chp1_dark_Eve_avg   <- as.numeric(NA)
-    BB_meta$chp1_dark_Eve_cnt   <- as.integer(NA)
-    BB_meta$chp1_dark_Eve_end   <- as.POSIXct(NA)
-    BB_meta$chp1_dark_Eve_med   <- as.numeric(NA)
-    BB_meta$chp1_dark_Eve_sta   <- as.POSIXct(NA)
-    BB_meta$chp1_dark_Mor_avg   <- as.numeric(NA)
-    BB_meta$chp1_dark_Mor_cnt   <- as.integer(NA)
-    BB_meta$chp1_dark_Mor_end   <- as.POSIXct(NA)
-    BB_meta$chp1_dark_Mor_med   <- as.numeric(NA)
-    BB_meta$chp1_dark_Mor_sta   <- as.POSIXct(NA)
-    BB_meta$chp1_dark_computed  <- as.POSIXct(NA)
-    BB_meta$chp1_dark_flag      <- as.character(NA)
-    BB_meta$chp1_md5sum         <- as.character(NA)
-    BB_meta$chp1_mtime          <- as.POSIXct(NA)
-    BB_meta$chp1_parsed         <- as.POSIXct(NA)
-    BB_meta$chp1_sig_NAs        <- as.integer(NA)
-    BB_meta$chp1_sig_sd_NAs     <- as.integer(NA)
+    BB_meta$chp1_Daily_dark       <- as.numeric(NA)
+    BB_meta$chp1_basename         <- as.character(NA)
+    BB_meta$chp1_dark_Eve_avg     <- as.numeric(NA)
+    BB_meta$chp1_dark_Eve_cnt     <- as.integer(NA)
+    BB_meta$chp1_dark_Eve_end     <- as.POSIXct(NA)
+    BB_meta$chp1_dark_Eve_med     <- as.numeric(NA)
+    BB_meta$chp1_dark_Eve_sta     <- as.POSIXct(NA)
+    BB_meta$chp1_dark_Mor_avg     <- as.numeric(NA)
+    BB_meta$chp1_dark_Mor_cnt     <- as.integer(NA)
+    BB_meta$chp1_dark_Mor_end     <- as.POSIXct(NA)
+    BB_meta$chp1_dark_Mor_med     <- as.numeric(NA)
+    BB_meta$chp1_dark_Mor_sta     <- as.POSIXct(NA)
+    BB_meta$chp1_dark_computed    <- as.POSIXct(NA)
+    BB_meta$chp1_dark_flag        <- as.character(NA)
+    BB_meta$chp1_bad_data_flagged <- as.POSIXct(NA)
+    BB_meta$chp1_md5sum           <- as.character(NA)
+    BB_meta$chp1_mtime            <- as.POSIXct(NA)
+    BB_meta$chp1_parsed           <- as.POSIXct(NA)
+    BB_meta$chp1_sig_NAs          <- as.integer(NA)
+    BB_meta$chp1_sig_sd_NAs       <- as.integer(NA)
 }
 
 
@@ -205,6 +206,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, chp1_temp_bad_data_flag := as.character(NA)]
             sun_temp[, chp1_temperature        := as.numeric(NA)  ]
             sun_temp[, chp1_temperature_SD     := as.numeric(NA)  ]
+            sun_temp[, chp1_bad_temp_flag      := as.character(NA)]
             ## For TOT
             sun_temp[, tot_glb                 := as.numeric(NA)  ]
             sun_temp[, tot_glb_sd              := as.numeric(NA)  ]
