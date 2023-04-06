@@ -129,17 +129,11 @@ for (YYYY in unique(year(inp_filelist$day))) {
             cat(" Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## add columns for this set
-            var <- "Async_tracker_flag"
-            if (!any(names(gather) == var)) {
-                ## init with tracker as async
-                gather[[var]] <- TRUE
-                # gather[[var]] <- as.logical(gather[[var]])
-            }
-            var <- "Async_step_count"
-            if (!any(names(gather) == var)) {
-                gather[[var]] <- NA
-                gather[[var]] <- as.integer(gather[[var]])
-            }
+            # var <- "Async_step_count"
+            # if (!any(names(gather) == var)) {
+            #     gather[[var]] <- NA
+            #     gather[[var]] <- as.integer(gather[[var]])
+            # }
             var <- "year"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
