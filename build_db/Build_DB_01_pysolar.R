@@ -60,7 +60,7 @@ if (file.exists(DB_META_fl)) {
     BB_meta$pysolar_mtime         <- as.POSIXct(NA)
     BB_meta$pysolar_parsed        <- as.POSIXct(NA)
     BB_meta$pysolar_basename      <- as.character(BB_meta$pysolar_basename)
-    BB_meta$pysolar_mtime         <- as.POSIXct(BB_meta$pysolar_mtime )
+    BB_meta$pysolar_mtime         <- as.POSIXct(BB_meta$pysolar_mtime)
     BB_meta$pysolar_parsed        <- as.POSIXct(BB_meta$pysolar_parsed)
     ## For CM-21 meta data
     BB_meta$cm21_Daily_dark       <- as.numeric(NA)
