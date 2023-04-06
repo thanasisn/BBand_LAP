@@ -183,39 +183,6 @@ BB <- opendata()
 # BB |> select(chp1_temp_bad_data) %>% filter(!is.na(chp1_temp_bad_data)) %>%  collect()
 
 
-##  Create new column if not exist in the dataset  -----------------------------
-var <- "chp1_bad_data_flag"
-if (!any(names(BB) == var)) {
-    cat("Create column  ", var, "  in dataset\n")
-    BB <- BB |> mutate(!!var := as.character(NA)) |> compute()
-    BB |> writedata()
-}
-var <- "chp1_temp_bad_data_flag"
-if (!any(names(BB) == var)) {
-    cat("Create column  ", var, "  in dataset\n")
-    BB <- BB |> mutate(!!var := as.character(NA)) |> compute()
-    BB |> writedata()
-    if (file.exists(DB_META_fl)) {
-        BB_meta <- read_parquet(DB_META_fl)
-        BB_meta$chp1_bad_data_flagged <- as.POSIXct(NA)
-        write_parquet(BB_meta, DB_META_fl)
-    }
-}
-var <- "cm21_bad_data_flag"
-if (!any(names(BB) == var)) {
-    cat("Create column  ", var ,"  in dataset\n")
-    BB <- BB |> mutate(!!var := as.character(NA)) |> compute()
-    BB |> writedata()
-    if (file.exists(DB_META_fl)) {
-        BB_meta <- read_parquet(DB_META_fl)
-        BB_meta$cm21_bad_data_flagged <- as.POSIXct(NA)
-        write_parquet(BB_meta, DB_META_fl)
-    }
-}
-## we will not use the DB directly
-rm(BB)
-
-
 
 ##  Initialize meta data file  -------------------------------------------------
 if (file.exists(DB_META_fl)) {
@@ -228,21 +195,11 @@ if (file.exists(DB_META_fl)) {
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
     ## new columns
-    var <- "chp1_bad_data_flagged"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    }
-    var <- "chp1_temp_bad_data_flagged"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    }
-    var <- "cm21_bad_data_flagged"
-    if (!any(names(BB_meta) == var)) {
-        BB_meta[[var]] <- NA
-        BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    }
+    # var <- "cm21_bad_data_flagged"
+    # if (!any(names(BB_meta) == var)) {
+    #     BB_meta[[var]] <- NA
+    #     BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
+    # }
 } else {
     stop("HAVE TO STAR A NEW DB!!")
 }
@@ -352,7 +309,7 @@ for (af in filelist$names) {
 
     ## save flagged metadata
     BB_meta[day %in% chg_days, cm21_bad_data_flagged      := cm21_exclude_mtime     ]
-    BB_meta[day %in% chg_days, chp1_temp_bad_data_flagged := chp1_temp_exclude_mtime]
+    BB_meta[day %in% chg_days, chp1_bad_temp_flagged := chp1_temp_exclude_mtime]
     BB_meta[day %in% chg_days, chp1_bad_data_flagged      := chp1_exclude_mtime     ]
     ## store actual data
     write_parquet(x = datapart, sink = af)
