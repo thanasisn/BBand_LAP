@@ -30,8 +30,8 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
-TEST <- FALSE
-# TEST <- TRUE
+
+
 
 cat("\n Import  CM-21  data\n\n")
 
@@ -49,31 +49,6 @@ if (file.exists(DB_META_fl)) {
     # if (!any(names(BB_meta) == var)) {
     #     BB_meta[[var]] <- NA
     #     BB_meta[[var]] <- as.character(BB_meta[[var]])
-    # }
-    # var <- "cm21_md5sum"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.character(BB_meta[[var]])
-    # }
-    # var <- "cm21_mtime"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    # }
-    # var <- "cm21_parsed"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    # }
-    # var <- "cm21_sig_NAs"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.integer(BB_meta[[var]])
-    # }
-    # var <- "cm21_sig_sd_NAs"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.integer(BB_meta[[var]])
     # }
 } else {
     stop("STAR A NEW DB!!")
@@ -107,16 +82,6 @@ inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 
 cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
 
-## test random
-if (TEST) {
-    cat("\nTEST MODE IS ON!!  ", Script.Name, "\n\n")
-    inp_filelist <- unique(rbind(
-        inp_filelist[ 1:60 ],
-        inp_filelist[sample(1:nrow(inp_filelist), 60)],
-        NULL
-    ))
-    setorder(inp_filelist, day)
-}
 
 
 
@@ -136,11 +101,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
             gather <- read_parquet(partfile)
             ## add columns for this set
             # var <- "CM21_sig"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
-            # var <- "CM21_sig_sd"
             # if (!any(names(gather) == var)) {
             #     gather[[var]] <- NA
             #     gather[[var]] <- as.numeric(gather[[var]])

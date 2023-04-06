@@ -30,8 +30,7 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
-TEST <- FALSE
-# TEST <- TRUE
+
 
 cat("\n Import  CHP-1  data\n\n")
 
@@ -49,31 +48,6 @@ if (file.exists(DB_META_fl)) {
     # if (!any(names(BB_meta) == var)) {
     #     BB_meta[[var]] <- NA
     #     BB_meta[[var]] <- as.character(BB_meta[[var]])
-    # }
-    # var <- "chp1_md5sum"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.character(BB_meta[[var]])
-    # }
-    # var <- "chp1_mtime"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    # }
-    # var <- "chp1_parsed"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    # }
-    # var <- "chp1_sig_NAs"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.integer(BB_meta[[var]])
-    # }
-    # var <- "chp1_sig_sd_NAs"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.integer(BB_meta[[var]])
     # }
 } else {
     stop("STAR A NEW DB!!")
@@ -108,16 +82,7 @@ inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 
 cat("\n**Parse:",paste(nrow(inp_filelist), "CHP-1 files**\n\n"))
 
-## test random
-if (TEST) {
-    cat("\nTEST MODE IS ON!!  ", Script.Name, "\n\n")
-    inp_filelist <- unique(rbind(
-        inp_filelist[ 1:30 ],
-        inp_filelist[sample(1:nrow(inp_filelist), 30)],
-        NULL
-    ))
-    setorder(inp_filelist, day)
-}
+
 
 
 
@@ -137,11 +102,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
             gather <- read_parquet(partfile)
             ## add columns for this set
             # var <- "CHP1_sig"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
-            # var <- "CHP1_sig_sd"
             # if (!any(names(gather) == var)) {
             #     gather[[var]] <- NA
             #     gather[[var]] <- as.numeric(gather[[var]])
@@ -171,9 +131,9 @@ for (YYYY in unique(year(inp_filelist$day))) {
             suppressWarnings(rm(D_minutes))
             D_minutes <- seq(from       = as.POSIXct(paste(as_date(ad), "00:00:30 UTC")),
                              length.out = 1440,
-                             by         = "min" )
+                             by         = "min")
 
-            ## __  Read LAP file  --------------------------------------------------
+            ## __  Read LAP file  ----------------------------------------------
             lap   <- fread(ss$fullname, na.strings = "-9")
             lap$V1 <- as.numeric(lap$V1)
             lap$V2 <- as.numeric(lap$V2)
