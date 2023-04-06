@@ -266,7 +266,7 @@ for (YYYY in sort(years_to_do)) {
 
     plot(year_data$Date, year_data$CM21_sig,
          pch  = 19,
-         cex  = .5,
+         cex  = .1,
          main = paste("CM21 signal ", YYYY ),
          xlab = "",
          ylab = "CM21 signal" )
@@ -278,7 +278,7 @@ for (YYYY in sort(years_to_do)) {
 
     plot(year_data$Elevat, year_data$CM21_sig_sd,
          pch  = 19,
-         cex  = .5,
+         cex  = .1,
          main = paste("CM21 signal SD", YYYY ),
          xlab = "Elevation",
          ylab = "CM21 signal SD")
