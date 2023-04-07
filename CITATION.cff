@@ -1,0 +1,21 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Broadband Sun Radiation Processing
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Athanasios
+    family-names: Natsis
+    email: natsisphysicist@gmail.com
+    affiliation: 'LAP, AUTH'
+    orcid: 'https://orcid.org/0000-0002-5199-4119'
+repository-code: 'https://github.com/thanasisn/BBand_LAP'
+abstract: Process data from pyranometers and pyheliometers
+keywords:
+  - Sun
+  - radiation
+version: '3.0'
