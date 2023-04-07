@@ -107,7 +107,7 @@ selected    <- merge(metalist, plotfiles, all = TRUE)
 years_to_do <- selected[is.na(path) | updated > mtime, year ]
 
 # TEST
-years_to_do <- 2022
+# years_to_do <- 2022
 
 for (YYYY in sort(years_to_do)) {
     ## load data for year
@@ -169,17 +169,15 @@ for (YYYY in sort(years_to_do)) {
         lines(dd$Date, dd$CHP1_sig_wo_dark,
               col = "blue",)
         abline(h = 0, col = "grey", lty = 2)
-        # points(dd$Date, dd$CHP1_sig_wo_dark,
-        #        pch = 19,  cex = 0.5, col = "blue",)
 
-
-
-        dd$chp1_bad_data_flag
-        dd$Async_tracker_flag
-
+        ## Plot bad data
         points(dd[Async_tracker_flag == TRUE, CHP1_sig, Date],
                col = "magenta", cex = 1.2)
 
+        points(dd[!is.na(chp1_bad_data_flag), CHP1_sig, Date],
+               col = "black", cex = 1.2, pch = 0)
+
+        ## Decorations
         text(dd$Date[1], max(dd$CHP1_sig, dd$CHP1_sig_wo_dark, na.rm = TRUE),
              labels = tag, pos = 4, cex =.9)
 
@@ -188,13 +186,15 @@ for (YYYY in sort(years_to_do)) {
                    "Signal",
                    "Signal dark corrected",
                    "Signal SD",
-                   "Tracker Async"),
+                   "Tracker Async",
+                   "Excluded bad data"),
                col = c("cyan",
                        "blue",
                        "red",
-                       "magenta")
+                       "magenta",
+                       "black")
                )
-        stop()
+
     }
     dev.off()
 }
