@@ -252,6 +252,7 @@ if (COMPARE) {
         ## load new files
         legacy <- readRDS(alf)
         yyyy   <- unique(year(legacy$Date30))[1]
+        legacy <- legacy[!is.na(CHP1value),]
         legacy$Azimuth     <- NULL
         legacy$preNoon     <- NULL
         legacy$SZA         <- NULL
@@ -275,6 +276,8 @@ if (COMPARE) {
         baseDT$rel_Elev       <- NULL
         baseDT$Times          <- NULL
 
+        setequal(names(baseDT), names(legacy))
+
         cat(paste("\n\n##", yyyy, "\n\n"))
 
         setorder(baseDT, Date30)
@@ -284,7 +287,8 @@ if (COMPARE) {
         wecare <- grep("Date", wecare, invert = TRUE, value = TRUE )
 
         ## merge two streams
-        sss <- merge(baseDT, legacy, by = "Date30", all = T, suffixes = c(".old", ".new"))
+        sss <- merge(baseDT, legacy,
+                     by = "Date30", all = T, suffixes = c(".old", ".new"))
 
         for (av in wecare) {
             vold <- paste0(av,".old")
@@ -309,7 +313,7 @@ if (COMPARE) {
 
             ## remove low diff data
             differ <- 100 * abs( (sss[[vold]] - sss[[nodl]]) / sss[[vold]] )
-            vec    <- differ <  0.5
+            vec    <- differ <  0.1
 
             sss[[vold]] <- NA
             sss[[nodl]] <- NA
@@ -333,49 +337,9 @@ if (COMPARE) {
 
 
         source("~/CODE/FUNCTIONS/R/data.R")
-
-
         sss <- rm.cols.NA.DT(sss)
-stop("jjj")
 
 
-
-
-
-
-        vec <- sss[CHP1value.old == CHP1value.new]
-        sss[vec, CHP1value.old := NA ]
-        sss[vec, CHP1value.new := NA ]
-        plot(  sss$Date30, sss$CHP1value.old, col = "red")
-        points(sss$Date30, sss$CHP1value.new, col = "blue")
-
-        vec <- sss[CHP1sd.old == CHP1sd.new]
-        sss[vec, CHP1sd.old := NA ]
-        sss[vec, CHP1sd.new := NA ]
-        # plot(  sss$Date30, sss$CHP1sd.old, col = "red")
-        # points(sss$Date30, sss$CHP1sd.new, col = "blue")
-
-        vec <- sss[Async.old == Async.new]
-        sss[vec, Async.old := NA ]
-        sss[vec, Async.new := NA ]
-        # plot(  sss$Date30, sss$Async.old, col = "red")
-        # points(sss$Date30, sss$Async.new, col = "blue")
-
-        vec <- sss[AsynStep.old == AsynStep.new]
-        sss[vec, AsynStep.old := NA ]
-        sss[vec, AsynStep.new := NA ]
-        # plot(  sss$Date30, sss$AsynStep.old, col = "red")
-        # points(sss$Date30, sss$AsynStep.new, col = "blue")
-
-        # vec <- sss[CHP1temp.old == CHP1temp.new]
-        # sss[vec, CHP1temp.old := NA ]
-        # sss[vec, CHP1temp.new := NA ]
-        # plot(  sss$Date30, sss$CHP1temp.old, col = "red")
-        # points(sss$Date30, sss$CHP1temp.new, col = "blue")
-
-
-        ## keep non empty
-        sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
 
         cat("\n\n")
         cat(paste("\n\n###  Hmisc::describe ", yyyy, "\n\n"))
