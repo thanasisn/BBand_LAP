@@ -328,9 +328,16 @@ if (COMPARE) {
 
             ## remove low diff data
             vec <- sss[[vold]]/sss[[nodl]]
+            rat <- abs(vec) > 0.997
+
+            sss[[vold]][rat] <- NA
+            sss[[nodl]][rat] <- NA
+
+
+            vec <- sss[[vold]]/sss[[nodl]]
 
             if (!all(is.na(vec))) {
-                hist( vec )
+                hist( vec, breaks = 100 )
                 summary( vec )
 
                 plot(sss[[vold]], sss[[nodl]],
@@ -348,8 +355,6 @@ if (COMPARE) {
             sss[[vold]][vec] <- NA
             sss[[nodl]][vec] <- NA
 
-
-
             # plot(sss[[vold]], sss[[nodl]],
             #      xlab = vold, ylab = nodl)
 
@@ -364,7 +369,7 @@ if (COMPARE) {
             #          ylab = nodl)
             # }
         }
-stop()
+
 
 
         # ## keep non empty
