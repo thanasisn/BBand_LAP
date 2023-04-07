@@ -115,7 +115,7 @@ editedyears <- as.vector(na.omit(unique(
 
 
 ## test
-datayears <- NULL
+# datayears <- NULL
 
 
 ## export legacy files
@@ -259,7 +259,8 @@ if (COMPARE) {
         legacy$Elevat      <- NULL
         legacy$Date        <- NULL
         legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
-        legacy[is.na(CHP1value), Async := NA]
+        legacy[is.na(CHP1value), Async    := NA]
+        legacy[is.na(CHP1value), AsynStep := NA]
 
         ## load old files
         baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CHP1_L1_",yyyy,".Rds")))
@@ -275,6 +276,9 @@ if (COMPARE) {
         baseDT$rel_Time       <- NULL
         baseDT$rel_Elev       <- NULL
         baseDT$Times          <- NULL
+        baseDT[is.na(CHP1value), Async    := NA]
+        baseDT[is.na(CHP1value), AsynStep := NA]
+
 
         setequal(names(baseDT), names(legacy))
 
@@ -302,7 +306,6 @@ if (COMPARE) {
                 sss[[vold]] <- NULL
                 sss[[nodl]] <- NULL
             }
-
             # if (!all(is.na(sss[[vold]]))) {
             #     plot(sss$Date30, sss[[vold]], col = "red",
             #          main = vold)
@@ -334,22 +337,30 @@ if (COMPARE) {
             differ <- 100 * abs( (sss[[vold]] - sss[[nodl]]) / sss[[vold]] )
             vec    <- differ <  0.1
 
+            if (!all(is.na(differ))) {
+                hist( differ )
+                summary( differ )
+            }
+
             sss[[vold]][vec] <- NA
             sss[[nodl]][vec] <- NA
 
-            if (!all(is.na(sss[[vold]]))) {
-                plot(  sss$Date30, sss[[vold]], col = "red",
-                       main = vold,
-                       ylab = "")
-            }
-            if (!all(is.na(sss[[nodl]]))) {
-                par(new = T)
-                plot(sss$Date30, sss[[nodl]], col = "blue",
-                     ylab = nodl)
-            }
+            plot(sss[[vold]], sss[[nodl]],
+                 xlab = vold, ylab = nodl)
+
+            # if (!all(is.na(sss[[vold]]))) {
+            #     plot(  sss$Date30, sss[[vold]], col = "red",
+            #            main = vold,
+            #            ylab = "")
+            # }
+            # if (!all(is.na(sss[[nodl]]))) {
+            #     par(new = T)
+            #     plot(sss$Date30, sss[[nodl]], col = "blue",
+            #          ylab = nodl)
+            # }
         }
 
-
+stop()
 
         # ## keep non empty
         # sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
