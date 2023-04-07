@@ -8,6 +8,19 @@ To process the data from broadband instruments of LAP.
 This is partial used as operational procedures.
 
 
+Table of Contents
+=================
+
+* [Broad Band LAP](#broad-band-lap)
+   * [What it does](#what-it-does)
+      * [For CHP-1](#for-chp-1)
+      * [For CM-21](#for-cm-21)
+      * [Other processes](#other-processes)
+   * [TODO](#todo)
+* [Details](#details)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+
 
 ## What it does
 
