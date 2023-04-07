@@ -328,7 +328,7 @@ if (COMPARE) {
 
             ## remove low diff data
             vec <- sss[[vold]]/sss[[nodl]]
-            rat <- abs(vec) > 0.997
+            rat <- abs(vec) > 0.996
 
             sss[[vold]][rat] <- NA
             sss[[nodl]][rat] <- NA
@@ -348,130 +348,112 @@ if (COMPARE) {
             vec    <- differ <  0.1
 
             if (!all(is.na(differ))) {
-                hist( differ )
+                hist( differ, breaks = 100 )
                 summary( differ )
             }
 
             sss[[vold]][vec] <- NA
             sss[[nodl]][vec] <- NA
 
-            # plot(sss[[vold]], sss[[nodl]],
-            #      xlab = vold, ylab = nodl)
+            if (!all(is.na(sss[[vold]])) & !all(is.na(sss[[nodl]]))) {
+                plot(sss[[vold]], sss[[nodl]],
+                     xlab = vold, ylab = nodl)
+            }
 
-            # if (!all(is.na(sss[[vold]]))) {
-            #     plot(  sss$Date30, sss[[vold]], col = "red",
-            #            main = vold,
-            #            ylab = "")
-            # }
-            # if (!all(is.na(sss[[nodl]]))) {
-            #     par(new = T)
-            #     plot(sss$Date30, sss[[nodl]], col = "blue",
-            #          ylab = nodl)
-            # }
         }
 
+        ## keep non empty
+        sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
+
+        source("~/CODE/FUNCTIONS/R/data.R")
+        sss <- rm.cols.NA.DT(sss)
+
+        cat("\n\n")
+        cat(paste("\n\n###  Hmisc::describe ", yyyy, "\n\n"))
+        cat("\n\n")
+
+        cat("\n\n```\n")
+        cat(print(Hmisc::describe(sss)), sep = "\n")
+        cat("```\n\n")
+        cat("\n\n")
+        print(plot(Hmisc::describe(sss)))
+        cat("\n\n")
+        Hmisc::html(Hmisc::describe(sss))
+        cat("\n\n")
+
+        gather <- rbind(gather,sss, fill=T)
+
+        cat("\n\n")
+        cat(paste("\n\n###  compareDF ", yyyy, "\n\n"))
+        cat("\n\n")
+
+        aa <- compareDF::compare_df(legacy, baseDT,
+                                    group_col = "Date30",
+                                    tolerance = 0.00001)
+
+        ## remove some data
+        aa$comparison_table_ts2char <- aa$comparison_table_ts2char[
+            apply(aa$comparison_table_ts2char, MARGIN = 1,
+                  function(x) sum(is.na(x))) < ncol(aa$comparison_table_ts2char) - 2,
+        ]
+
+        ## remove results for clarity
+        aa$comparison_table_diff_numbers <- NULL
+
+        aa$comparison_df <- aa$comparison_df[
+            apply(aa$comparison_df, MARGIN = 1,
+                  function(x) sum(is.na(x))) < ncol(aa$comparison_df) - 2,
+        ]
+
+        aa$comparison_table_diff <- NULL
+
+        aa$change_count <- NULL
+
+        cat("\n\n")
+        cat(pander(aa$change_summary),"\n")
+        cat("\n\n")
+        # cat(pander(aa$comparison_df),"\n")
+        cat("\n\n")
+        # cat(pander(aa$comparison_table_ts2char),"\n")
+        cat("\n\n")
 
 
-        # ## keep non empty
-        # sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
-        #
-        # sss[Async.old == FALSE, Async.old := NA ]
-        #
-        # sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
-        #
-        #
-        #
-        # source("~/CODE/FUNCTIONS/R/data.R")
-        # sss <- rm.cols.NA.DT(sss)
-        #
-        #
-        #
-        # cat("\n\n")
-        # cat(paste("\n\n###  Hmisc::describe ", yyyy, "\n\n"))
-        # cat("\n\n")
-        #
-        # cat("\n\n```\n")
-        # cat(print(Hmisc::describe(sss)), sep = "\n")
-        # cat("```\n\n")
-        # cat("\n\n")
-        # print(plot(Hmisc::describe(sss)))
-        # cat("\n\n")
-        # Hmisc::html(Hmisc::describe(sss))
-        # cat("\n\n")
-        #
-        # gather <- rbind(gather,sss, fill=T)
-        #
-        # cat("\n\n")
-        # cat(paste("\n\n###  compareDF ", yyyy, "\n\n"))
-        # cat("\n\n")
-        #
-        # aa <- compareDF::compare_df(legacy, baseDT,
-        #                             group_col = "Date30",
-        #                             tolerance = 0.00001)
-        #
-        # ## remove some data
-        # aa$comparison_table_ts2char <- aa$comparison_table_ts2char[
-        #     apply(aa$comparison_table_ts2char, MARGIN = 1,
-        #           function(x) sum(is.na(x))) < ncol(aa$comparison_table_ts2char) - 2,
-        # ]
-        #
-        # ## remove results for clarity
-        # aa$comparison_table_diff_numbers <- NULL
-        #
-        # aa$comparison_df <- aa$comparison_df[
-        #     apply(aa$comparison_df, MARGIN = 1,
-        #           function(x) sum(is.na(x))) < ncol(aa$comparison_df) - 2,
-        # ]
-        #
-        # aa$comparison_table_diff <- NULL
-        #
-        # aa$change_count <- NULL
-        #
-        # cat("\n\n")
-        # cat(pander(aa$change_summary),"\n")
-        # cat("\n\n")
-        # # cat(pander(aa$comparison_df),"\n")
-        # cat("\n\n")
-        # # cat(pander(aa$comparison_table_ts2char),"\n")
-        # cat("\n\n")
-        #
-        #
-        #
-        # cat(paste("\n\n###  arsenal::comparedf ", yyyy, "\n\n"))
-        #
-        # ss <- arsenal::comparedf(legacy, baseDT,
-        #                          by = "Date30",
-        #                          int.as.num = TRUE)
-        #
-        # ## remove a long table for display
-        # ss$frame.summary$unique[[1]] <- ss$frame.summary$unique[[1]][1]
-        #
-        # cat("\n\n")
-        # print(summary(ss))
-        # cat("\n\n")
-        #
-        #
-        #
-        #
-        # cat(paste("\n\n### NON common data summary ", yyyy, "\n\n"))
-        #
-        # cat("\n\n")
-        # cat(pander(summary(sss)))
-        # cat("\n\n")
+
+        cat(paste("\n\n###  arsenal::comparedf ", yyyy, "\n\n"))
+
+        ss <- arsenal::comparedf(legacy, baseDT,
+                                 by = "Date30",
+                                 int.as.num = TRUE)
+
+        ## remove a long table for display
+        ss$frame.summary$unique[[1]] <- ss$frame.summary$unique[[1]][1]
+
+        cat("\n\n")
+        print(summary(ss))
+        cat("\n\n")
+
+
+
+
+        cat(paste("\n\n### NON common data summary ", yyyy, "\n\n"))
+
+        cat("\n\n")
+        cat(pander(summary(sss)))
+        cat("\n\n")
     }
 
-    # cat(paste("\n\n##  All data summary \n\n"))
-    #
-    # pander(summary(gather))
-    #
-    # cat("\n\n```\n")
-    # cat(print(Hmisc::describe(gather)), sep = "\n")
-    # cat("```\n\n")
-    # cat("\n\n")
-    # print(plot(Hmisc::describe(gather)))
-    # cat("\n\n")
-    # Hmisc::html(Hmisc::describe(gather))
-    # cat("\n\n")
+    cat(paste("\n\n##  All data summary \n\n"))
+
+    pander(summary(gather))
+
+    cat("\n\n```\n")
+    cat(print(Hmisc::describe(gather)), sep = "\n")
+    cat("```\n\n")
+    cat("\n\n")
+    print(plot(Hmisc::describe(gather)))
+    cat("\n\n")
+    Hmisc::html(Hmisc::describe(gather))
+    cat("\n\n")
 }
 
 
