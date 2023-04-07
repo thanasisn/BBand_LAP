@@ -79,6 +79,6 @@ Table of Contents
 
 We use a dataset of parquet files as a database for all measurements and additional data.
 And some files with extra meta data for the database.
-It should be easy to migrate to a pure database like duckdb or sqlite.
+It should be easy to migrate to a pure database like `duckdb` or `sqlite`.
 
 
