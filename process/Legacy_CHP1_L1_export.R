@@ -115,7 +115,7 @@ editedyears <- as.vector(na.omit(unique(
 
 
 ## test
-# datayears <- NULL
+datayears <- NULL
 
 
 ## export legacy files
@@ -332,6 +332,9 @@ if (COMPARE) {
             if (!all(is.na(vec))) {
                 hist( vec )
                 summary( vec )
+
+                plot(sss[[vold]], sss[[nodl]],
+                     xlab = vold, ylab = nodl)
             }
 
             differ <- 100 * abs( (sss[[vold]] - sss[[nodl]]) / sss[[vold]] )
@@ -345,8 +348,10 @@ if (COMPARE) {
             sss[[vold]][vec] <- NA
             sss[[nodl]][vec] <- NA
 
-            plot(sss[[vold]], sss[[nodl]],
-                 xlab = vold, ylab = nodl)
+
+
+            # plot(sss[[vold]], sss[[nodl]],
+            #      xlab = vold, ylab = nodl)
 
             # if (!all(is.na(sss[[vold]]))) {
             #     plot(  sss$Date30, sss[[vold]], col = "red",
@@ -359,8 +364,8 @@ if (COMPARE) {
             #          ylab = nodl)
             # }
         }
-
 stop()
+
 
         # ## keep non empty
         # sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
