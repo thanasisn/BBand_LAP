@@ -248,89 +248,100 @@ if (COMPARE) {
     gather <- data.table()
 
     for (alf in listlegacy) {
+
         ## load new files
         legacy <- readRDS(alf)
+        yyyy   <- unique(year(legacy$Date30))[1]
         legacy$Azimuth     <- NULL
+        legacy$preNoon     <- NULL
+        legacy$SZA         <- NULL
         legacy$Elevat      <- NULL
         legacy$Date        <- NULL
         legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
+        legacy[is.na(CHP1value), Async := NA]
 
         ## load old files
-        yyyy   <- unique(year(legacy$Date30))[1]
         baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CHP1_L1_",yyyy,".Rds")))
-        baseDT$Azimuth     <- NULL
-        baseDT$Elevat      <- NULL
-        baseDT$Date        <- NULL
+        baseDT$Azimuth        <- NULL
+        baseDT$preNoon        <- NULL
+        baseDT$Elevat         <- NULL
+        baseDT$SZA            <- NULL
+        baseDT$Date           <- NULL
+        baseDT$wattDIR_unc_WT <- NULL
+        baseDT$wattHOR_unc_WT <- NULL
+        baseDT$wattDIR_unc_NT <- NULL
+        baseDT$wattHOR_unc_NT <- NULL
+        baseDT$rel_Time       <- NULL
+        baseDT$rel_Elev       <- NULL
+        baseDT$Times          <- NULL
+
+        cat(paste("\n\n##", yyyy, "\n\n"))
+
+        setorder(baseDT, Date30)
+        setorder(legacy, Date30)
 
         wecare <- names(legacy)
+        wecare <- grep("Date", wecare, invert = TRUE, value = TRUE )
 
         ## merge two streams
         sss <- merge(baseDT, legacy, by = "Date30", all = T, suffixes = c(".old", ".new"))
+
+        for (av in wecare) {
+            vold <- paste0(av,".old")
+            nodl <- paste0(av,".new")
+
+            vec <- sss[[vold]] == sss[[nodl]]
+            sss[[vold]][vec] <- NA
+            sss[[nodl]][vec] <- NA
+
+        }
 
 
         for (av in wecare) {
             vold <- paste0(av,".old")
             nodl <- paste0(av,".new")
 
+            vec <- sss[[vold]] == sss[[nodl]]
+            sss[[vold]][vec] <- NA
+            sss[[nodl]][vec] <- NA
 
+            if (!is.numeric(sss[[vold]])) next()
+
+            ## remove low diff data
+            differ <- 100 * abs( (sss[[vold]] - sss[[nodl]]) / sss[[vold]] )
+            vec    <- differ <  0.5
+
+            sss[[vold]] <- NA
+            sss[[nodl]] <- NA
+
+            if (!all(is.na(sss[[vold]]))) {
+                plot(  sss$Date30, sss[[vold]], col = "red")
+            }
+            if (!all(is.na(sss[[nodl]]))) {
+                par(new = T)
+                plot(sss$Date30, sss[[nodl]], col = "blue")
+            }
         }
-
-        vec <- sss[, CHP1value.old == CHP1value.new]
-        sum(vec)
-        sss[vec, CHP1value.old := NA ]
-        sss[vec, CHP1value.new := NA ]
-        plot(  sss$Date30, sss$CHP1value.old, col = "red")
-        points(sss$Date30, sss$CHP1value.new, col = "blue")
-
-
-        vec <- near(sss$CHP1value.old, sss$CHP1value.new, tol = .Machine$double.eps^0.5)
-        sum(vec, na.rm = T)
-
-stop("jjj")
-
-        baseDT[Async == TRUE, CHP1value := NA]
-        baseDT[Async == TRUE, CHP1sd    := NA]
-
-
-
-
-
-
-
-        baseDT <- baseDT[!(is.na(CHP1value)  &
-                           is.na(CHP1sd)     &
-                           is.na(CHP1temp)   &
-                           is.na(CHP1tempSD) &
-                           is.na(AsynStep)   &
-                           is.na(CHP1tempUNC)) ]
-
-        cat(paste("\n\n##", yyyy, "\n\n"))
-
-        ## Drop some columns
-        baseDT$CHP1temp    <- NULL
-        legacy$CHP1temp    <- NULL
-        baseDT$CHP1tempSD  <- NULL
-        legacy$CHP1tempSD  <- NULL
-        baseDT$CHP1tempUNC <- NULL
-        legacy$CHP1tempUNC <- NULL
-
-        legacy[Async == FALSE, Async := NA]
-        baseDT[Async == FALSE, Async := NA]
-
-        legacy$Date30 <- as.POSIXct(legacy$Date30, tz = "UTC")
-        baseDT$Date30 <- as.POSIXct(baseDT$Date30, tz = "UTC")
-
-        # baseDT <- baseDT[!is.na(CHP1value)]
-        # legacy <- legacy[!is.na(CHP1value)]
-
-        setorder(baseDT, Date30)
-        setorder(legacy, Date30)
-
-        ## merge two streams
-        sss <- merge(baseDT, legacy, by = "Date30", all = T, suffixes = c(".old", ".new"))
 
         ## keep non empty
         sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
+
+        sss[Async.old == FALSE, Async.old := NA ]
+
+        sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
+
+
+
+        source("~/CODE/FUNCTIONS/R/data.R")
+
+
+        sss <- rm.cols.NA.DT(sss)
+stop("jjj")
+
+
+
+
+
 
         vec <- sss[CHP1value.old == CHP1value.new]
         sss[vec, CHP1value.old := NA ]
