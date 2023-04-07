@@ -1,7 +1,7 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Daily raw CHP-1 data **SIG** "
+#' title:         "Daily CHP-1 radiation data **L1** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -37,7 +37,7 @@
 #' ---
 
 #'
-#'  **SIG**
+#'  **L1**
 #'
 #' **Source code: [`github.com/thanasisn/BBand_LAP`](`https://github.com/thanasisn/BBand_LAP`)**
 #'
@@ -59,7 +59,7 @@ knitr::opts_chunk$set(fig.pos    = '!h'     )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_db/Plot_daily_CHP1_sig.R"
+Script.Name <- "~/BBand_LAP/inspect_db/Plot_daily_CHP1_L1.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
@@ -79,8 +79,8 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 
 
 ## __  Variables  --------------------------------------------------------------
-OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CHP1_signal/"
-OUT_PREFIX <- "CHP1_signal_"
+OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CHP1_DIR_L1/"
+OUT_PREFIX <- "CHP1_direct_L1_"
 dir.create(OUT_FOLDER, showWarnings = FALSE, recursive = TRUE)
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
@@ -92,7 +92,7 @@ metalist <- BB_meta               |>
     filter(!is.na(chp1_basename)) |>
     select("day", chp1_dark_computed)
 metalist$year <- year(metalist$day)
-metalist <- metalist[, .(updated = max(chp1_dark_computed, na.rm = TRUE)), by = year ]
+metalist <- metalist[, .(updated = max(chp1_dark_computed, na.rm = TRUE)), by = year]
 
 
 plotfiles <- data.table(path = list.files(path    = OUT_FOLDER,
@@ -106,15 +106,18 @@ plotfiles$year  <- as.numeric(
 selected    <- merge(metalist, plotfiles, all = TRUE)
 years_to_do <- selected[is.na(path) | updated > mtime, year ]
 
+
+
+
 # TEST
-# years_to_do <- 2022
+# years_to_do <- 2016
 
 for (YYYY in sort(years_to_do)) {
     ## load data for year
     year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
     cat(YYYY, "rows:", nrow(year_data), "\n")
     ## days with data
-    daystodo <- year_data[!is.na(CHP1_sig), unique(as.Date(Date))]
+    daystodo <- year_data[!is.na(DIR_SD_wpsm), unique(as.Date(Date))]
     daystodo <- sort(daystodo)
     ## signal limit for year
     # ylim <- range(year_data[, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE)
@@ -129,77 +132,58 @@ for (YYYY in sort(years_to_do)) {
         dd   <- year_data[as.Date(Date) == aday]
         aday <- as.Date(aday, origin = "1970-01-01")
 
-        layout(matrix(c(1,2,3,3,3,3), 6, 1, byrow = TRUE))
+        layout(matrix(c(1,2,2,2,2), 5, 1, byrow = TRUE))
 
-        ## Night signal
+        ## Direct SD
         par("mar" = c(0,4,2,1))
-
-        if  (all(is.na(dd[Elevat < 0, CHP1_sig]))) {
-            plot.new()
-        } else {
-            plot(dd[Elevat < 0, Date], dd[Elevat < 0, CHP1_sig],
-                 ylim = range(dd[Elevat < 0, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE),
-                 pch = 19,  cex = 0.5, col = "cyan",
-                 xaxt = "n",
-                 xlab = "", ylab = "Night [V]")
-            points(dd[Elevat < 0, Date], dd[Elevat < 0, CHP1_sig_wo_dark],
-                   pch = 19,  cex = 0.5, col = "blue")
-            abline(h = 0, col = "grey")
-        }
-
-        title(paste0("CHP-1  doy: ", yday(aday), "  ",
-                     aday, "  dark ",
-                     tolower(BB_meta[day == aday, chp1_dark_flag])))
-
-        ## Signal SD
-        par("mar" = c(0,4,0,1))
-        plot(dd$Date, dd$CHP1_sig_sd,
-             ylim = range(c(0, dd$CHP1_sig_sd), na.rm = T),
+        plot(dd$Date, dd$DIR_SD_wpsm,
+             ylim = range(c(0, dd$DIR_SD_wpsm), na.rm = T),
              pch  = 19,  cex = 0.5, col = "red",
-             xaxt = "n", xlab = "", ylab = "Signal SD [V]")
+             xaxt = "n", xlab = "", ylab = "Direct SD [Watt/m^2]")
         abline(h = 0, col = "grey", lty = 2)
 
-        ## Signal
+        title(paste0("Direct Irradiance  doy: ", yday(aday), "  ", aday))
+
+
+        ## Radiation
         par("mar" = c(3,4,0,1))
-        plot(dd$Date, dd$CHP1_sig, type = "l",
-             ylim = range(dd[, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE),
+        plot(dd$Date, dd$HOR_wpsm, type = "l",
+             ylim = range(dd[, .(DIR_wpsm, HOR_wpsm, DIR_wpsm_temp_cor)], na.rm = TRUE),
              lwd  = 1.5,
              pch  = 19,  cex = 0.5, col = "cyan",
-             xlab = "", ylab = "Signal [V]")
-        lines(dd$Date, dd$CHP1_sig_wo_dark,
+             xlab = "", ylab = "Signal [Watt/m^2]")
+        lines(dd$Date, dd$DIR_wpsm,
               col = "blue",)
         abline(h = 0, col = "grey", lty = 2)
 
-        ## Plot bad data
-        points(dd[Async_tracker_flag == TRUE, CHP1_sig, Date],
-               col = "magenta", cex = 1.2)
-
-        points(dd[!is.na(chp1_bad_data_flag), CHP1_sig, Date],
-               col = "black", cex = 1.2, pch = 0)
+        ## Temperature correction
+        if (!all(is.na(dd$DIR_wpsm_temp_cor))) {
+            par(new = T)
+            plot(dd$Date, dd$DIR_wpsm_temp_cor, type = "l",
+                 xaxt = "n", yaxt = "n",
+                 lty = 3, col = "darkgrey")
+        }
 
         ## Decorations
-        text(dd$Date[1], max(dd$CHP1_sig, dd$CHP1_sig_wo_dark, na.rm = TRUE),
-             labels = tag, pos = 4, cex =.9)
+        text(dd$Date[1], max(dd[, .(DIR_wpsm, HOR_wpsm)], na.rm = TRUE),
+             labels = tag, pos = 4, cex = .9)
 
-        legend("topright", pch = 19, bty = "n",
+        legend("topright", bty = "n",
+               lty = c( 1,  1, NA,  3),
+               pch = c(NA, NA, 19, NA),
                legend = c(
-                   "Signal",
-                   "Signal dark corrected",
+                   "Direct on horizontal",
+                   "Direct beam",
                    "Signal SD",
-                   "Tracker Async",
-                   "Excluded bad data"),
+                   "Direct beam temp. cor."),
                col = c("cyan",
                        "blue",
                        "red",
-                       "magenta",
-                       "black")
+                       "darkgrey")
                )
-
     }
     dev.off()
 }
-
-## TODO add temperature?
 
 
 

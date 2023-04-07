@@ -205,7 +205,7 @@ parthash <- melt(data = parthash,
                  na.rm = TRUE)
 parthash$variable <- NULL
 
-## __ Update hash table --------------------------------------------------------
+## __ Update hash table  -------------------------------------------------------
 if (!file.exists(DB_HASH_fl)) {
     ## Nothing to compare to, just store table
     write_parquet(x = parthash, sink = DB_HASH_fl)
@@ -215,10 +215,9 @@ if (!file.exists(DB_HASH_fl)) {
     mainhash <- unique(rbind(mainhash, parthash))
 }
 
-## __ Check for problems -------------------------------------------------------
 
+## __ Check duplicate hashes  --------------------------------------------------
 dups <- mainhash[duplicated(mainhash$md5sum)]
-
 if (nrow(dups) > 0) {
     cat("\n**There are ", nrow(dups), " files with the same checksum**\n")
     # \scriptsize
@@ -234,8 +233,12 @@ if (nrow(dups) > 0) {
 
 
 
-## chech for the same hash!
-## chech same name different hash
+tabs <- as.data.table(table(mainhash$basename))
+
+mainhash[basename %in% tabs[ N > 1, V1 ]]
+
+## check for the same hash!
+## check same name different hash
 
 
 

@@ -60,5 +60,11 @@ source("~/BBand_LAP/inspect_db/Plot_daily_CHP1_sig.R")
 source("~/BBand_LAP/inspect_db/Plot_daily_CM21_sig.R")
 
 
+cat("\nPlot radiation\n\n")
+source("~/BBand_LAP/inspect_db/Plot_daily_CHP1_L1.R")
+# source("~/BBand_LAP/inspect_db/Plot_daily_CM21_sig.R")
+
+
+
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
