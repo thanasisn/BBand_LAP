@@ -31,7 +31,7 @@ render(input      = "~/BBand_LAP/process/Legacy_CHP1_L1_export.R",
        output_dir = "~/BBand_LAP/REPORTS/REPORTS")
 
 
-
+system("$HOME/BBand_LAP/process/Upload_reports.sh")
 
 
 tac <- Sys.time()

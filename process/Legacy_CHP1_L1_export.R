@@ -276,7 +276,6 @@ if (COMPARE) {
         baseDT$rel_Elev       <- NULL
         baseDT$Times          <- NULL
 
-        stop()
         setequal(names(baseDT), names(legacy))
 
         cat(paste("\n\n##", yyyy, "\n\n"))
@@ -298,9 +297,8 @@ if (COMPARE) {
             vec <- sss[[vold]] == sss[[nodl]]
             sss[[vold]][vec] <- NA
             sss[[nodl]][vec] <- NA
-
         }
-
+stop()
 
         for (av in wecare) {
             vold <- paste0(av,".old")
@@ -327,6 +325,8 @@ if (COMPARE) {
                 plot(sss$Date30, sss[[nodl]], col = "blue")
             }
         }
+
+        stop()
 
         ## keep non empty
         sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
