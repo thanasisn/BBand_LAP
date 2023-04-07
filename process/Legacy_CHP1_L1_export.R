@@ -114,8 +114,8 @@ editedyears <- as.vector(na.omit(unique(
 
 
 
-
-
+## test
+datayears <- NULL
 
 
 ## export legacy files
@@ -321,27 +321,32 @@ if (COMPARE) {
             vold <- paste0(av,".old")
             nodl <- paste0(av,".new")
 
-
             if (!is.numeric(sss[[vold]])) next()
 
             ## remove low diff data
+            vec <- sss[[vold]]/sss[[nodl]]
 
-            hist( sss[[vold]] / sss[[nodl]] )
-            summary( sss[[vold]] / sss[[nodl]] )
+            if (!all(is.na(vec))) {
+                hist( vec )
+                summary( vec )
+            }
 
             differ <- 100 * abs( (sss[[vold]] - sss[[nodl]]) / sss[[vold]] )
             vec    <- differ <  0.1
-stop()
-        #     sss[[vold]] <- NA
-        #     sss[[nodl]] <- NA
-        #
-        #     if (!all(is.na(sss[[vold]]))) {
-        #         plot(  sss$Date30, sss[[vold]], col = "red")
-        #     }
-        #     if (!all(is.na(sss[[nodl]]))) {
-        #         par(new = T)
-        #         plot(sss$Date30, sss[[nodl]], col = "blue")
-        #     }
+
+            sss[[vold]][vec] <- NA
+            sss[[nodl]][vec] <- NA
+
+            if (!all(is.na(sss[[vold]]))) {
+                plot(  sss$Date30, sss[[vold]], col = "red",
+                       main = vold,
+                       ylab = "")
+            }
+            if (!all(is.na(sss[[nodl]]))) {
+                par(new = T)
+                plot(sss$Date30, sss[[nodl]], col = "blue",
+                     ylab = nodl)
+            }
         }
 
 
