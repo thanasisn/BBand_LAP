@@ -190,7 +190,9 @@ rm(rad_names, radmon_files, sirena_files)
 parthash <- read_parquet(DB_META_fl) |>
     select(ends_with("_mtime",    ignore.case = TRUE),
            ends_with("_md5sum",   ignore.case = TRUE),
-           ends_with("_basename", ignore.case = TRUE))
+           ends_with("_basename", ignore.case = TRUE),
+           ends_with("_parsed",   ignore.case = TRUE),
+    )
 ## remove constructed files
 parthash$pysolar_mtime    <- NULL
 parthash$pysolar_basename <- NULL
@@ -198,10 +200,12 @@ parthash$pysolar_basename <- NULL
 parthash <- melt(data = parthash,
                  measure = patterns("_mtime$",
                                     "_md5sum$",
-                                    "_basename$"),
+                                    "_basename$",
+                                    "_parsed"),
                  value.name = c("mtime",
                                 "md5sum",
-                                "basename"),
+                                "basename",
+                                "parsed"),
                  na.rm = TRUE)
 parthash$variable <- NULL
 
@@ -232,13 +236,18 @@ if (nrow(dups) > 0) {
 }
 
 
+## __ Check files with different hashes  ---------------------------------------
 
+## TODO
 tabs <- as.data.table(table(mainhash$basename))
 
 mainhash[basename %in% tabs[ N > 1, V1 ]]
 
-## check for the same hash!
-## check same name different hash
+tabs <- mainhash[, .N, by = basename]
+
+tabs[N>1,]
+
+
 
 
 
@@ -247,10 +256,6 @@ mainhash[basename %in% tabs[ N > 1, V1 ]]
 ## - list therm
 ## - list step
 ## - check md5sum
-
-
-
-
 
 
 
