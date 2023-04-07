@@ -276,6 +276,7 @@ if (COMPARE) {
         baseDT$rel_Elev       <- NULL
         baseDT$Times          <- NULL
 
+        stop()
         setequal(names(baseDT), names(legacy))
 
         cat(paste("\n\n##", yyyy, "\n\n"))
