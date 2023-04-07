@@ -169,9 +169,12 @@ for (YYYY in sort(years_to_do)) {
         lines(dd$Date, dd$CM21_sig_wo_dark,
               col = "green",)
         abline(h = 0, col = "grey", lty = 2)
-        # points(dd$Date, dd$CM21_sig_wo_dark,
-        #        pch = 19,  cex = 0.5, col = "blue",)
 
+        ## Plot bad data
+        points(dd[!is.na(cm21_bad_data_flag), CM21_sig, Date],
+               col = "black", cex = 1.2, pch = 0)
+
+        ## Decorations
         text(dd$Date[1], max(dd$CM21_sig, dd$CM21_sig_wo_dark, na.rm = TRUE),
              labels = tag, pos = 4, cex =.9)
 
@@ -179,11 +182,14 @@ for (YYYY in sort(years_to_do)) {
                legend = c(
                    "Signal",
                    "Signal dark corrected",
-                   "Signal SD"),
+                   "Signal SD",
+                   "Excluded bad data"),
                col = c("darkolivegreen",
                        "green",
-                       "red")
+                       "red",
+                       "black")
                )
+
     }
     dev.off()
 }

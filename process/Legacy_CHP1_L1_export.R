@@ -243,7 +243,6 @@ if (COMPARE) {
     listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
                              pattern = "Legacy_L1_CHP1_[0-9]{4}\\.Rds",
                              full.names = TRUE, ignore.case = TRUE)
-stop("jjj")
 
     ## gather remaiining
     gather <- data.table()
@@ -258,20 +257,52 @@ stop("jjj")
 
         ## load old files
         yyyy   <- unique(year(legacy$Date30))[1]
-        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CHP1_L0_",yyyy,".Rds")))
+        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CHP1_L1_",yyyy,".Rds")))
         baseDT$Azimuth     <- NULL
         baseDT$Elevat      <- NULL
         baseDT$Date        <- NULL
 
+        wecare <- names(legacy)
+
+        ## merge two streams
+        sss <- merge(baseDT, legacy, by = "Date30", all = T, suffixes = c(".old", ".new"))
+
+
+        for (av in wecare) {
+            vold <- paste0(av,".old")
+            nodl <- paste0(av,".new")
+
+
+        }
+
+        vec <- sss[, CHP1value.old == CHP1value.new]
+        sum(vec)
+        sss[vec, CHP1value.old := NA ]
+        sss[vec, CHP1value.new := NA ]
+        plot(  sss$Date30, sss$CHP1value.old, col = "red")
+        points(sss$Date30, sss$CHP1value.new, col = "blue")
+
+
+        vec <- near(sss$CHP1value.old, sss$CHP1value.new, tol = .Machine$double.eps^0.5)
+        sum(vec, na.rm = T)
+
+stop("jjj")
+
         baseDT[Async == TRUE, CHP1value := NA]
         baseDT[Async == TRUE, CHP1sd    := NA]
 
+
+
+
+
+
+
         baseDT <- baseDT[!(is.na(CHP1value)  &
-                               is.na(CHP1sd)     &
-                               is.na(CHP1temp)   &
-                               is.na(CHP1tempSD) &
-                               is.na(AsynStep)   &
-                               is.na(CHP1tempUNC)) ]
+                           is.na(CHP1sd)     &
+                           is.na(CHP1temp)   &
+                           is.na(CHP1tempSD) &
+                           is.na(AsynStep)   &
+                           is.na(CHP1tempUNC)) ]
 
         cat(paste("\n\n##", yyyy, "\n\n"))
 
