@@ -212,21 +212,24 @@ if (!file.exists(DB_HASH_fl)) {
 } else {
     ## Add new hashes to permanent storage
     mainhash <- read_parquet(DB_HASH_fl)
-    mainhash <- unique(rbind(mainhash, parthash))
+    mainhash <- mainhash[!duplicated(mainhash[ , md5sum, basename]), ]
+    write_parquet(x = parthash, sink = DB_HASH_fl)
 }
+
+
 
 
 ## __ Check duplicate hashes  --------------------------------------------------
 dups <- mainhash[duplicated(mainhash$md5sum)]
 if (nrow(dups) > 0) {
-    cat("\n**There are ", nrow(dups), " files with the same checksum**\n")
+    cat("\n**There are ", nrow(dups), " files with the same checksum**\n\n")
     # \scriptsize
     # \footnotesize
     # \small
     cat("\n \\footnotesize \n\n")
     pander(dups,
            caption = "Files with the same md5sum")
-    # cat(" \n \n \\normalsize \n \n ")
+    # cat("\n\n \\normalsize \n\n")
 } else {
     cat("\n**All checksum are unique**\n")
 }
@@ -235,13 +238,12 @@ if (nrow(dups) > 0) {
 ## __ Check files with different hashes  ---------------------------------------
 
 ## TODO
-tabs <- as.data.table(table(mainhash$basename))
+# tabs <- as.data.table(table(mainhash$basename))
+# mainhash[basename %in% tabs[ N > 1, V1 ]]
 
-mainhash[basename %in% tabs[ N > 1, V1 ]]
-
+cat("\n**There are ", " files with the same filename and different hash**\n\n")
 tabs <- mainhash[, .N, by = basename]
-
-tabs[N>1,]
+tabs[N > 1, ]
 
 
 
