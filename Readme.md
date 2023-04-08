@@ -7,6 +7,8 @@ To process the data from broadband instruments of LAP.
 
 This is partial used as operational procedures.
 
+Plots and reports can be found here: [thanasisn.netlify.app/3-data_display](https://thanasisn.netlify.app/3-data_display)
+
 
 Table of Contents
 =================
