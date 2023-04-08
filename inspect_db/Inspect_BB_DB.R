@@ -54,13 +54,19 @@ render(input       = "~/BBand_LAP/inspect_db/Inspect_CM21_sig.R",
        output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 
 
-
-cat("\nPlot signals\n\n")
+cat("\nPlot daily signals\n\n")
 source("~/BBand_LAP/inspect_db/Plot_daily_CHP1_sig.R")
 source("~/BBand_LAP/inspect_db/Plot_daily_CM21_sig.R")
 
 
-cat("\nPlot radiation\n\n")
+
+cat("\n\nInspect CHP-1 radiation\n")
+render(input       = "~/BBand_LAP/inspect_db/Inspect_CHP1_rad_temp.R",
+       params      = list(CLEAN = FALSE),
+       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+
+
+cat("\nPlot daily radiation\n\n")
 source("~/BBand_LAP/inspect_db/Plot_daily_CHP1_L1.R")
 # source("~/BBand_LAP/inspect_db/Plot_daily_CM21_sig.R")
 
