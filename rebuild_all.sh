@@ -1,7 +1,20 @@
 #!/bin/bash
 ## created on 2023-04-03
 
-#### enter description here
+#### Build the Broad Band database from scratch.
+
+echo ""
+echo "ARE YOU SURE?"
+echo ""
+
+read -p "Do you want to NUKE the database and rebuild everything? " conf
+
+if   [[ $conf == "yes" ]]; then
+    echo "Start form scratch"
+else
+    echo "Exit"
+    exit 99
+fi
 
 rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB"
 rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
@@ -13,7 +26,6 @@ rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB.stopfile"
 
 "$HOME/BBand_LAP/inspect_db/Inspect_BB_DB.R"
 
+"$HOME/BBand_LAP/process/Process_BB_DB.R"
 
-
-## end coding
 exit 0 
