@@ -95,7 +95,7 @@ panderOptions("table.split.table",        120   )
 
 ## __ Execution control  -------------------------------------------------------
 COMPARE <- TRUE
-# COMPARE <- FALSE
+COMPARE <- FALSE
 
 
 ## years in the data base
@@ -115,13 +115,14 @@ editedyears <- as.vector(na.omit(unique(
 
 
 ## test
-datayears <- NULL
+# datayears <- NULL
 
 
 ## export legacy files
 for (YYYY in datayears) {
     ## legacy filename
-    legacyout <- paste0("~/DATA/Broad_Band/Legacy_L1_CHP1_", YYYY, ".Rds")
+    # legacyout <- paste0("~/DATA/Broad_Band/Legacy_L1_CHP1_", YYYY, ".Rds")
+    legacyout <- paste0("~/DATA/Broad_Band/LAP_CHP1_L1_", YYYY, ".Rds")
     ## get data from DB
     year_data <- BB |>
         filter(year == YYYY) |>
@@ -253,12 +254,16 @@ if (COMPARE) {
         legacy <- readRDS(alf)
         yyyy   <- unique(year(legacy$Date30))[1]
         legacy <- legacy[!is.na(CHP1value),]
-        legacy$Azimuth     <- NULL
-        legacy$preNoon     <- NULL
-        legacy$SZA         <- NULL
-        legacy$DumDarkCHP1 <- NULL
-        legacy$Elevat      <- NULL
-        legacy$Date        <- NULL
+        legacy$Azimuth        <- NULL
+        legacy$preNoon        <- NULL
+        legacy$SZA            <- NULL
+        legacy$DumDarkCHP1    <- NULL
+        legacy$wattHOR        <- NULL
+        legacy$wattDIR        <- NULL
+        legacy$wattHOR_sds    <- NULL
+        legacy$wattHOR_tmp_cr <- NULL
+        legacy$Elevat         <- NULL
+        legacy$Date           <- NULL
         legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
         legacy[is.na(CHP1value), Async    := NA]
         legacy[is.na(CHP1value), AsynStep := NA]
@@ -269,6 +274,10 @@ if (COMPARE) {
         baseDT$preNoon        <- NULL
         baseDT$Elevat         <- NULL
         baseDT$SZA            <- NULL
+        baseDT$wattHOR        <- NULL
+        baseDT$wattDIR        <- NULL
+        baseDT$wattHOR_sds    <- NULL
+        baseDT$wattHOR_tmp_cr <- NULL
         baseDT$Date           <- NULL
         baseDT$wattDIR_unc_WT <- NULL
         baseDT$wattHOR_unc_WT <- NULL
