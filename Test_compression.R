@@ -55,14 +55,44 @@ if (TEST_DB) {
 
 
 
+BB <- opendata()
+
+dir_size <- function(path, recursive = TRUE) {
+    stopifnot(is.character(path))
+    files <- list.files(path, full.names = T, recursive = T)
+    vect_size <- sapply(files, function(x) file.size(x))
+    size_files <- sum(vect_size)
+    size_files
+}
 
 
 
+dir_size(DB_DIR) / 1024^2
 
 
 
+DB_DIR
+
+# for (algo in c("snappy", "gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
+
+for (algo in c( "gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
+    if (codec_is_available(algo)) {
+        cat("Algo ", algo, "\n")
+        paste0(DB_DIR, "_", algo)
+
+        write_dataset(BB, path     = paste0(DB_DIR, "_", algo),
+                      compression  = algo,
+                      compression_level = 100,
+                      format       = "parquet",
+                      partitioning = c("year", "month"),
+                      hive_style   = FALSE)
+
+        # cat( dir_size(paste0(DB_DIR, "_", algo)) / 1024^2, "\n")
+    }
+}
 
 
+write_dataset()
 
 
 
