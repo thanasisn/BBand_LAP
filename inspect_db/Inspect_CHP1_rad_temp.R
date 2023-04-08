@@ -156,7 +156,13 @@ for (YYYY in sort(years_to_do)) {
     cat("\n## Year:", YYYY, "\n\n")
 
     ## load data for year
-    year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
+    year_data <- data.table(
+        opendata()           |>
+        filter(year == YYYY) |>
+        filter(Elevat > -5)  |>
+        collect()
+    )
+
 
     ## do some cleaning for displaying
     year_data[ !is.na(chp1_bad_temp_flag), chp1_temperature    := NA]
@@ -181,7 +187,7 @@ for (YYYY in sort(years_to_do)) {
     plot(year_data$Elevat, year_data$DIR_wpsm,
          pch  = 19,
          cex  = .1,
-         main = paste("Direct ", YYYY ),
+         main = paste("Direct Beam ", YYYY),
          xlab = "Elevation",
          ylab = "Direct" )
     cat('\n\n')
@@ -189,19 +195,47 @@ for (YYYY in sort(years_to_do)) {
     plot(year_data$Azimuth, year_data$DIR_wpsm,
          pch  = 19,
          cex  = .1,
-         main = paste("Direct ", YYYY ),
+         main = paste("Direct Beam ", YYYY),
          xlab = "Azimuth",
          ylab = "Direct" )
     cat('\n\n')
 
-
     plot(year_data$Date, year_data$DIR_wpsm,
          pch  = 19,
          cex  = .1,
-         main = paste("Direct ", YYYY ),
-         ylab = "",
+         main = paste("Direct Beam ", YYYY),
+         xlab = "",
          ylab = "Direct" )
     cat('\n\n')
+
+
+    plot(year_data$Elevat, year_data$HOR_wpsm,
+         pch  = 19,
+         cex  = .1,
+         main = paste("Direct Horizontal ", YYYY),
+         xlab = "Elevation",
+         ylab = "Direct" )
+    cat('\n\n')
+
+    plot(year_data$Azimuth, year_data$HOR_wpsm,
+         pch  = 19,
+         cex  = .1,
+         main = paste("Direct Horizontal ", YYYY),
+         xlab = "Azimuth",
+         ylab = "Direct" )
+    cat('\n\n')
+
+    plot(year_data$Date, year_data$HOR_wpsm,
+         pch  = 19,
+         cex  = .1,
+         main = paste("Direct Horizontal ", YYYY),
+         xlab = "",
+         ylab = "Direct" )
+    cat('\n\n')
+
+
+
+
 
 
     plot(year_data$Date, year_data$chp1_temperature,
