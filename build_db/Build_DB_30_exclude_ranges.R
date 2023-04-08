@@ -11,12 +11,26 @@
 #'
 #' TODO
 #'
-#' - Implemented in a pure arrow table method?
+#' - Implement a pure arrow table method?
 #'
-#+ include=T, echo=F
+#' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
+#'
+#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
+#'
+#'
+#+ echo=F, include=T
+
+
+#+ echo=F, include=F
+## __ Document options ---------------------------------------------------------
+knitr::opts_chunk$set(comment    = ""       )
+knitr::opts_chunk$set(dev        = "png"    )
+knitr::opts_chunk$set(out.width  = "100%"   )
+knitr::opts_chunk$set(fig.align  = "center" )
+knitr::opts_chunk$set(fig.pos    = '!h'     )
+
 
 ## __ Set environment  ---------------------------------------------------------
-rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB_30_exclude_ranges.R"
