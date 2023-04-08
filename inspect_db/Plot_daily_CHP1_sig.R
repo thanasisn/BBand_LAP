@@ -39,9 +39,9 @@
 #'
 #'  **SIG**
 #'
-#' **Source code: [`github.com/thanasisn/BBand_LAP`](`https://github.com/thanasisn/BBand_LAP`)**
+#' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](`https://thanasisn.netlify.app/3-data_display`)**
+#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
 #'
 #'
 #+ echo=F, include=T
