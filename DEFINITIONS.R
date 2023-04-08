@@ -48,10 +48,11 @@ test_DB_HASH_fl <- "~/ZHOST/Broad_Band_DB_hash_table.paquet"
 
 
 ##  Filters for CHP 1 temperatures  --------------------------------------------
-CHP_TEMP_MIN      <- -25    ## Drop temperatures below this value
+CHP_TEMP_MIN      <- -20    ## Drop temperatures below this value
 CHP_TEMP_MAX      <-  60    ## Drop temperatures above this value
-CHP_TEMP_STD_LIM  <-   2    ## Drop temperatures with standard deviation above this value
+CHP_TEMP_STD_LIM  <-   5    ## Drop temperatures with standard deviation above this value
 CHP_TEMP_UNC_LIM  <-   0.8  ## Drop temperatures with uncertainty above this value
+
 
 
 ##  Dark Calculations and definitions  -----------------------------------------

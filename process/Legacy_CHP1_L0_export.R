@@ -153,10 +153,6 @@ for (YYYY in datayears) {
 
 
     ## Clean temperature data --------------------------------------------------
-    CHP_TEMP_MIN       <- -20  # Drop temperatures below this value
-    CHP_TEMP_MAX       <-  50  # Drop temperatures above this value
-    CHP_TEMP_STD_LIM   <-  10  # Drop temperatures with standard deviation above this value
-
     year_data$chp1_temperature_SD[year_data$chp1_temperature    > CHP_TEMP_MAX]     <- NA
     year_data$chp1_temp_UNC      [year_data$chp1_temperature    > CHP_TEMP_MAX]     <- NA
     year_data$chp1_temperature   [year_data$chp1_temperature    > CHP_TEMP_MAX]     <- NA
