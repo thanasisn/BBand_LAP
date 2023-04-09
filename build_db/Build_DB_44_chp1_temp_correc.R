@@ -44,23 +44,6 @@ source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
 
-# TEST_DB <- TRUE
-#
-# if (TEST_DB) {
-#     source("~/BBand_LAP/DEFINITIONS.R")
-#     cat("\n * * * Using a temp DB * * * \n\n")
-#     ## copy data to temp
-#     tyear <- 2016
-#     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-#     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-#     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
-#     ## replace paths with test paths
-#     DB_DIR     <- test_DB_DIR
-#     DB_lock    <- test_DB_lock
-#     DB_META_fl <- test_DB_META_fl
-#     DB_HASH_fl <- test_DB_HASH_fl
-# }
-
 
 
 if (!interactive()) {
