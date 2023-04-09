@@ -18,6 +18,7 @@ RADMON_GLB   <- "~/DATA_RAW/Raddata/6"
 
 ##  Other data input  ----------------------------------------------------------
 COMP_TSI     <- "~/DATA/SUN/TSI_COMPOSITE.Rds"
+COMP_PRES    <- "~/DATA/WEATHER/Pressure_M1.Rds"
 
 
 ##  Parameters files  ----------------------------------------------------------
