@@ -2,12 +2,12 @@
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #'
-#' Add atmospheric pressure data in DB from preexistence data
-#' [`github.com/thanasisn/TSI`](`https://github.com/thanasisn/TSI`)
+#' Add atmospheric pressure data in DB from preexisting data
 #'
 #' Populates:
 #'
-#' - `Sun_Dist_Astropy`
+#' - `Pressure`
+#' - `Pressure_source`
 #'
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
@@ -35,7 +35,7 @@ Script.Name <- "~/BBand_LAP/build_db/Import_50_TSI.R"
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -48,7 +48,7 @@ library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 
 ##  Load all Pressure data  ----------------------------------------------------
-if (!file.exists(COMP_PRES)) { stop("Missing TSI file:", COMP_PRES) }
+if (!file.exists(COMP_PRES)) { stop("Missing Pressure file:", COMP_PRES) }
 PRESSURE <- data.table(readRDS(COMP_PRES))
 
 if (second(PRESSURE$Date[1]) == 0) {
@@ -99,7 +99,10 @@ filelist <- filelist[wewantlist, on = .(flmonth = month, flyear = year)]
 rm(wewantlist, BB, dd)
 
 
-PRESSURE[duplicated(PRESSURE$Date) ]
+test <- PRESSURE[duplicated(PRESSURE$Date) | duplicated(PRESSURE$Date, fromLast = TRUE)]
+if (!nrow(test) == 0) {warning("Pressure data should be cleaner\n")}
+PRESSURE <- PRESSURE[!duplicated(PRESSURE$Date)]
+
 
 ##  Update Pressure data in DB  -----------------------------------------------------
 for (af in filelist$names) {
@@ -120,10 +123,6 @@ for (af in filelist$names) {
 
 
 
-
-cat("\n\n")
-pander::pander(wehavelist)
-cat("\n\n")
 
 
 myunlock(DB_lock)
