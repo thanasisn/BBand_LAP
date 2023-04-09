@@ -238,6 +238,9 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, TSI_TOA                 := as.numeric(NA)  ]
             sun_temp[, TSI_1au                 := as.numeric(NA)  ]
             sun_temp[, TSI_source              := as.character(NA)]
+            ## Pressure
+            sun_temp[, Pressure                := as.numeric(NA)  ]
+            sun_temp[, Pressure_source         := as.character(NA)]
 
             ## gather data
             if (nrow(gather) == 0) {
