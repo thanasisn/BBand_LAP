@@ -45,22 +45,26 @@ if (!interactive()) {
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
+library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 
-##  Load all TSI data  ---------------------------------------------------------
+##  Load all Pressure data  ----------------------------------------------------
 if (!file.exists(COMP_PRES)) { stop("Missing TSI file:", COMP_PRES) }
-PRESSURE <- readRDS(COMP_PRES)
+PRESSURE <- data.table(readRDS(COMP_PRES))
 
-floor_date(PRESSURE$Date[1], "second")
+if (second(PRESSURE$Date[1]) == 0) {
+    ## move to center
+    PRESSURE[ , Date := Date + 30]
+}
+names(PRESSURE)[names(PRESSURE) == "pressure"] <- "Pressure"
+names(PRESSURE)[names(PRESSURE) == "Source"  ] <- "Pressure_source"
+InitVariableBBDB("Pressure",        as.numeric(NA))
+InitVariableBBDB("Pressure_source", as.character(NA))
 
+## clean some duplicate value
+PRESSURE[duplicated(PRESSURE$Date) & Pressure_source == "iama_corrected" ]
 
-TSI <- TSI[ !is.na(TSIextEARTH_comb) ]
-names(TSI)[names(TSI) == "sun_dist"        ] <- "Sun_Dist_Astropy"
-names(TSI)[names(TSI) == "TSIextEARTH_comb"] <- "TSI_TOA"
-names(TSI)[names(TSI) == "tsi_1au_comb"    ] <- "TSI_1au"
-names(TSI)[names(TSI) == "Source"          ] <- "TSI_source"
-TSI$measur_error_comb <- NULL
+test <- PRESSURE[duplicated(PRESSURE$Date)  ]
 
-stop()
 
 ##  Find data set files to update  ---------------------------------------------
 
@@ -77,33 +81,27 @@ filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
 ## list data set files possible to touch
 BB <- opendata()
-wewantlist <- BB                             |>
-    select(Date, TSI_source)                 |>
-    filter(TSI_source == "TSIS_adjusted" |
-           is.na(TSI_source))                |>
-    mutate(month = month(Date),
-           year  = year(Date))               |>
-    select(TSI_source, month, year)          |>
-    unique() |> collect()
-
-## list available TSI data
-tsilist <- TSI |> select(Date, TSI_source) |>
-    mutate(month = month(Date),
-           year  = year(Date))             |>
-    select(TSI_source, month, year)        |>
-    unique() |> collect()
+wewantlist <- BB                           |>
+    select(Date, Pressure)                 |>
+    filter(is.na(Pressure) &
+           Date >= min(PRESSURE$Date))     |>
+     mutate(month = month(Date),
+            year  = year(Date))            |>
+     select(month, year)                  |>
+     unique() |> collect()
 
 ## list which data set to touch
-tsilist    <- data.table(tsilist)
 wewantlist <- data.table(wewantlist)
-select     <- unique(tsilist[wewantlist, .(month, year), on = .(month, year)])
+
 
 ## touch these files only
-filelist <- filelist[select, on = .(flmonth = month, flyear = year)]
-rm(select, wewantlist, tsilist, BB)
+filelist <- filelist[wewantlist, on = .(flmonth = month, flyear = year)]
+rm(wewantlist, BB, dd)
 
 
-##  Update TSI data in DB  -----------------------------------------------------
+PRESSURE[duplicated(PRESSURE$Date) ]
+
+##  Update Pressure data in DB  -----------------------------------------------------
 for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
     datapart[, month := as.integer(month(Date))]
@@ -111,7 +109,7 @@ for (af in filelist$names) {
     cat("Load: ", af, "\n")
 
     ## update the whole data part on one go
-    datapart <- rows_update(datapart, TSI, by = "Date", unmatched = "ignore")
+    datapart <- rows_update(datapart, PRESSURE, by = "Date", unmatched = "ignore")
 
     ## store actual data
     write_parquet(x = datapart, sink = af)
@@ -121,17 +119,6 @@ for (af in filelist$names) {
 }
 
 
-##  Show some info  ------------------------------------------------------------
-BB <- opendata()
-wehavelist <- BB                                   |>
-    select(Date, TSI_source)                       |>
-    mutate(month = month(Date),
-           year  = year(Date))                     |>
-    select(TSI_source, month, year)                |>
-    unique() |> collect()
-
-wehavelist <- data.table(wehavelist)
-setorder(wehavelist, year, month)
 
 
 cat("\n\n")
