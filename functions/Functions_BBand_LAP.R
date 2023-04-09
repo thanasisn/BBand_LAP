@@ -32,3 +32,29 @@ writedata <- function(.) {
     cat("Data set written at", DB_DIR, "\n")
 }
 
+
+
+
+#' Create and init a new column/variable in the Broad Band dataset.
+#'
+#' @param varname  The name of the new column to create
+#' @param vartype  The data type use to fill the new column.
+#'
+#' @return         Nothing. It edit the dataset in place
+#' @export
+#'
+#' @examples       InitVariableBBDB("new_varile_name", as.character(NA))
+#'
+InitVariableBBDB <- function(varname, vartype) {
+    BB <- opendata()
+    if (!is.character(varname)) stop()
+    if (is.null(vartype)) stop()
+
+    if (!any(names(BB) == varname)) {
+        cat("Create column: ", varname, "\n")
+        BB <- BB |> mutate( !!varname := vartype) |> compute()
+        writedata(BB)
+    }
+    BB <- opendata()
+}
+
