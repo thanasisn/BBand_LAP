@@ -41,6 +41,8 @@ Table of Contents
 - Plots
   - Overview of Clean/Dirty signal
   - Daily signal with and without dark
+  - Overview or Direct radiation measurements
+  - Daily Direct radiation measurements
 
 
 ### For CM-21
