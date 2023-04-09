@@ -63,7 +63,7 @@ InitVariableBBDB("Pressure_source", as.character(NA))
 ## clean some duplicate value
 PRESSURE[duplicated(PRESSURE$Date) & Pressure_source == "iama_corrected" ]
 
-test <- PRESSURE[duplicated(PRESSURE$Date)  ]
+test <- PRESSURE[duplicated(PRESSURE$Date) | duplicated(PRESSURE$Date, fromLast=TRUE)  ]
 
 
 ##  Find data set files to update  ---------------------------------------------
