@@ -135,7 +135,7 @@ if (TEST_DB) {
     cat("\n * * * Using a temp DB * * * \n\n")
     ## copy data to temp
     tyear <- 2017
-    dir.create(test_DB_DIR)
+    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
@@ -149,26 +149,8 @@ if (TEST_DB) {
 
 ##  Create a new variable to the whole database  -------------------------------
 
-BB <- opendata()
-for (avar in c("chp1_t_cor_factor")) {
-    if (!any(names(BB) == avar)) {
-        cat("Create column: ", avar, "\n")
-        BB <- BB |> mutate( !!avar := as.numeric(NA)) |> compute()
-        writedata(BB)
-    }
-}
 
-InitVariable <- function(varname, vartype) {
-    BB <- opendata()
-    if (!is.character(varname)) stop()
 
-    if (!any(names(BB) == varname)) {
-        cat("Create column: ", varname, "\n")
-        BB <- BB |> mutate( !!varname := vartype) |> compute()
-        writedata(BB)
-    }
-    BB <- opendata()
-}
 
 
 ##  Interactive tests  ---------------------------------------------------------
@@ -178,6 +160,9 @@ BB <- opendata()
 
 ## gather Quality control settings
 QS <- list()
+
+
+## there are more in qrad id!!!
 
 
 
@@ -202,8 +187,8 @@ if (TEST_01) {
     cat(paste("\n1. Physically Possible Limits.\n\n"))
 
     testN        <- 1
-    flagname_dir <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN),"_dir_flag")
-    flagname_glo <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN),"_glo_flag")
+    flagname_dir <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+    flagname_glo <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glo_flag")
 
     InitVariableBBDB(flagname_dir, as.character(NA))
     InitVariableBBDB(flagname_glo, as.character(NA))
@@ -216,7 +201,7 @@ if (TEST_01) {
     QS$glo_SWdn_off <- 160  # Global departure offset above the model
     QS$glo_SWdn_amp <- 1.3  # Global departure factor above the model
 
-    ## . . Direct --------------------------------------------------------------
+    ## __ Direct --------------------------------------------------------------
     DATA[wattDIR < QS$dir_SWdn_min,
          QCF_DIR_01 := "Physical possible limit min (5)"]
     DATA[TSIextEARTH_comb - wattDIR < QS$dir_SWdn_dif,
