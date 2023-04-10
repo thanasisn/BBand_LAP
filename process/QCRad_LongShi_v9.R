@@ -94,6 +94,7 @@ library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 
 ## __  Variables  --------------------------------------------------------------
+sun_elev_min     <-  -2 * 0.103  ## Drop  radiation data when sun is below this point
 
 
 ## __  Execution control  ------------------------------------------------------
@@ -162,7 +163,35 @@ BB <- opendata()
 QS <- list()
 
 
-## there are more in qrad id!!!
+##  Create strict radiation data  ----------------------------------------------
+
+## Keep valid Direct during daytime
+BB <- BB |>
+    filter(Elevat > sun_elev_min &
+               is.na(chp1_bad_data_flag) &
+               Async_tracker_flag == FALSE) |>
+    mutate(DIR_strict = DIR_wpsm) |>
+    compute()
+
+
+BB |> select(contains("DIR_")) |>
+summarize(across(any_of(), ~ max(.))) %>%
+    collect()
+
+BB |> select(chp1_bad_data_flag) |> collect() |> table(useNA = "always")
+BB |> select(Async_tracker_flag) |> collect() |> table(useNA = "always")
+
+
+
+## for chp1 and cm21
+## - drop all night data
+## - remve negative values when sun is too low
+
+names(BB)
+
+DIR_strict
+GLB_strict
+HOR_strict
 
 
 
