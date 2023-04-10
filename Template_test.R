@@ -40,7 +40,8 @@ if (TEST_DB) {
     source("~/BBand_LAP/DEFINITIONS.R")
     cat("\n * * * Using a temp DB * * * \n\n")
     ## copy data to temp
-    tyear <- 2023
+    tyear <- 2017
+    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
@@ -52,16 +53,10 @@ if (TEST_DB) {
 }
 
 
+
 ##  Create a new variable to the whole database  -------------------------------
 
-BB <- opendata()
-for (avar in c("chp1_t_cor_factor")) {
-    if (!any(names(BB) == avar)) {
-        cat("Create column: ", avar, "\n")
-        BB <- BB |> mutate( !!avar := as.numeric(NA)) |> compute()
-        writedata(BB)
-    }
-}
+# InitVariableBBDB("somevar", as.numeric(NA))
 
 
 ##  Interactive tests  ---------------------------------------------------------
