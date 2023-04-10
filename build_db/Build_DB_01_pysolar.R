@@ -227,11 +227,14 @@ for (YYYY in unique(year(inp_filelist$day))) {
             ## Radiation
             sun_temp[, DIR_SD_wpsm             := as.numeric(NA)  ]
             sun_temp[, DIR_wpsm                := as.numeric(NA)  ]
+            sun_temp[, DIR_strict              := as.numeric(NA)  ]
             sun_temp[, DIR_wpsm_temp_cor       := as.numeric(NA)  ]
             sun_temp[, GLB_SD_wpsm             := as.numeric(NA)  ]
             sun_temp[, GLB_wpsm                := as.numeric(NA)  ]
+            sun_temp[, GLB_strict              := as.numeric(NA)  ]
             sun_temp[, HOR_SD_wpsm             := as.numeric(NA)  ]
             sun_temp[, HOR_wpsm                := as.numeric(NA)  ]
+            sun_temp[, HOR_strict              := as.numeric(NA)  ]
             sun_temp[, HOR_wpsm_temp_cor       := as.numeric(NA)  ]
             ## Sun
             sun_temp[, Sun_Dist_Astropy        := as.numeric(NA)  ]
