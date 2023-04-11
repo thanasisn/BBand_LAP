@@ -166,21 +166,39 @@ QS <- list()
 ##  Create strict radiation data  ----------------------------------------------
 
 ## Keep valid Direct during daytime
+# BB <- BB |>
+#     filter(Elevat > sun_elev_min &
+#                is.na(chp1_bad_data_flag) &
+#                Async_tracker_flag == FALSE) |>
+#     mutate(DIR_strict = DIR_wpsm) |>
+#     compute()
+
+
 BB <- BB |>
-    filter(Elevat > sun_elev_min &
-               is.na(chp1_bad_data_flag) &
-               Async_tracker_flag == FALSE) |>
-    mutate(DIR_strict = DIR_wpsm) |>
-    compute()
+    mutate(DIR_strict =
+               if_else(Elevat > sun_elev_min &
+                           is.na(chp1_bad_data_flag) &
+                           Async_tracker_flag == FALSE,
+                       DIR_wpsm, NA )) |> compute()
 
+BB |>  filter(is.na(DIR_wpsm)) |> summarise(n()) |> collect()
+BB |>  filter(is.na(DIR_strict)) |> summarise(n()) |> collect()
 
-BB |> select(contains("DIR_")) |>
-summarize(across(any_of(), ~ max(.))) %>%
-    collect()
+ss <- BB |> collect()
+
+count()
 
 BB |> select(chp1_bad_data_flag) |> collect() |> table(useNA = "always")
 BB |> select(Async_tracker_flag) |> collect() |> table(useNA = "always")
 
+ss <- BB |> mutate(day = as_date(Date)) |> select(day) |> unique() |> pull() |> sample(3)
+
+for (ad in ss) {
+    pp <- BB |> filter(as_date(Date) == as_date(ad)) |> collect()
+    summary(pp)
+
+    plot(pp$Date, pp$DIR_strict)
+}
 
 
 ## for chp1 and cm21
