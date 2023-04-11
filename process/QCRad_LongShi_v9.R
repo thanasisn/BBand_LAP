@@ -80,6 +80,7 @@ qc_ver      <- 9
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
+source("~/CODE/FUNCTIONS/R/trig_deg.R")
 # mylock(DB_lock)
 
 
@@ -165,28 +166,49 @@ QS <- list()
 
 ##  Create strict radiation data  ----------------------------------------------
 
-## Keep valid Direct during daytime
-# BB <- BB |>
-#     filter(Elevat > sun_elev_min &
-#                is.na(chp1_bad_data_flag) &
-#                Async_tracker_flag == FALSE) |>
-#     mutate(DIR_strict = DIR_wpsm) |>
-#     compute()
 
-
+## __ Daytime radiation only  --------------------------------------------------
 BB <- BB |>
     mutate(DIR_strict =
                if_else(Elevat > sun_elev_min &
                            is.na(chp1_bad_data_flag) &
                            Async_tracker_flag == FALSE,
                        DIR_wpsm, NA )) |> compute()
+BB <- BB |>
+    mutate(HOR_strict =
+               if_else(Elevat > sun_elev_min &
+                           is.na(chp1_bad_data_flag) &
+                           Async_tracker_flag == FALSE,
+                       HOR_wpsm, NA )) |> compute()
+BB <- BB |>
+    mutate(GLB_strict =
+               if_else(Elevat > sun_elev_min &
+                           is.na(cm21_bad_data_flag),
+                       GLB_wpsm, NA )) |> compute()
+
+
+## __ Negative radiation to zero  ----------------------------------------------
+BB <- BB |> mutate(DIR_strict =
+                       if_else(DIR_strict < 0, 0, DIR_strict)) |> compute()
+BB <- BB |> mutate(HOR_strict =
+                       if_else(HOR_strict < 0, 0, HOR_strict)) |> compute()
+BB <- BB |> mutate(GLB_strict =
+                       if_else(GLB_strict < 0, 0, GLB_strict)) |> compute()
+
+
+## __ Diffuse radiation  -------------------------------------------------------
+BB <- BB |> mutate(DIFF_strict = GLB_strict - DIR_strict) |> compute()
+
+## __ Clearness Index  ---------------------------------------------------------
+BB <- BB |> mutate(ClearnessIndex_kt = GLB_strict / (cosde(SZA) * TSI_TOA)) |> compute()
+
+
+
 
 BB |>  filter(is.na(DIR_wpsm)) |> summarise(n()) |> collect()
 BB |>  filter(is.na(DIR_strict)) |> summarise(n()) |> collect()
+BB |>  filter(DIR_strict == 0) |> summarise(n()) |> collect()
 
-ss <- BB |> collect()
-
-count()
 
 BB |> select(chp1_bad_data_flag) |> collect() |> table(useNA = "always")
 BB |> select(Async_tracker_flag) |> collect() |> table(useNA = "always")
@@ -198,12 +220,14 @@ for (ad in ss) {
     summary(pp)
 
     plot(pp$Date, pp$DIR_strict)
+    plot(pp$Date, pp$HOR_strict)
+    plot(pp$Date, pp$GLB_strict)
 }
 
 
 ## for chp1 and cm21
 ## - drop all night data
-## - remve negative values when sun is too low
+## - remove negative values when sun is too low
 
 names(BB)
 
