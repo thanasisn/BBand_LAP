@@ -183,7 +183,8 @@ filelist <- filelist[temp_to_do, on = .(flmonth = month, flyear = year)]
 rm(temp_to_do, dd)
 
 
-
+## gather configurations
+QS <- data.table()
 
 
 
@@ -236,6 +237,59 @@ for (af in filelist$names) {
 
 
 
+
+    ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN  -------------------------------------
+    #' \FloatBarrier
+    #' \newpage
+    #' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
+    #'
+    #' Test values are within physical/logical limits.
+    #'
+    #' Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
+    #' or need to remove data.
+    #'
+    #' Global upper constrain is an modeled GHI value.
+    #'
+    #' These limit should not be met, they are defined neat the maximum observed
+    #' values of the data set.
+    #'
+    #+ echo=TEST_01, include=T
+    if (TEST_01) {
+        cat(paste("\n1. Physically Possible Limits.\n\n"))
+
+        testN        <- 1
+        flagname_dir <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+        flagname_glo <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glo_flag")
+
+        InitVariableBBDB(flagname_dir, as.character(NA))
+        InitVariableBBDB(flagname_glo, as.character(NA))
+
+
+        QS$dir_SWdn_min <-  -4  # Minimum direct value to consider valid measurement
+        QS$dir_SWdn_dif <- 327  # Closeness to to TSI
+        QS$glo_SWdn_min <-  -4  # Minimum global value to consider valid measurement
+        QS$glo_SWdn_off <- 160  # Global departure offset above the model
+        QS$glo_SWdn_amp <- 1.3  # Global departure factor above the model
+
+        ## __ Direct --------------------------------------------------------------
+        datapart[DIR_strict < QS$dir_SWdn_min,
+             QCF_DIR_01 := "Physical possible limit min (5)"]
+        datapart[TSIextEARTH_comb - wattDIR < QS$dir_SWdn_dif,
+             QCF_DIR_01 := "Physical possible limit max (6)"]
+
+        ## . . Global --------------------------------------------------------------
+        datapart[wattGLB < QS$glo_SWdn_min,
+             QCF_GLB_01 := "Physical possible limit min (5)"]
+        datapart[, Glo_max_ref := TSIextEARTH_comb * QS$glo_SWdn_amp * cosde(SZA)^1.2 + QS$glo_SWdn_off]
+        datapart[wattGLB > Glo_max_ref,
+             QCF_GLB_01 := "Physical possible limit max (6)"]
+    }
+
+
+
+
+        stop()
+
     summary(datapart)
 
     ## store actual data
@@ -252,6 +306,14 @@ for (af in filelist$names) {
 
 BB <- opendata()
 
+
+pp <- BB |> select(Date, ends_with("strict")) |> collect()
+
+
+plot(pp$Date, pp$DIR_strict)
+plot(pp$Date, pp$GLB_strict)
+
+
 # check new variables
 # PLOTS
 
@@ -262,55 +324,6 @@ stop()
 
 
 
-
-
-## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN  -------------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
-#'
-#' Test values are within physical/logical limits.
-#'
-#' Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
-#' or need to remove data.
-#'
-#' Global upper constrain is an modeled GHI value.
-#'
-#' These limit should not be met, they are defined neat the maximum observed
-#' values of the data set.
-#'
-#+ echo=TEST_01, include=T
-if (TEST_01) {
-    cat(paste("\n1. Physically Possible Limits.\n\n"))
-
-    testN        <- 1
-    flagname_dir <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-    flagname_glo <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glo_flag")
-
-    InitVariableBBDB(flagname_dir, as.character(NA))
-    InitVariableBBDB(flagname_glo, as.character(NA))
-
-    stop()
-
-    QS$dir_SWdn_min <-  -4  # Minimum direct value to consider valid measurement
-    QS$dir_SWdn_dif <- 327  # Closeness to to TSI
-    QS$glo_SWdn_min <-  -4  # Minimum global value to consider valid measurement
-    QS$glo_SWdn_off <- 160  # Global departure offset above the model
-    QS$glo_SWdn_amp <- 1.3  # Global departure factor above the model
-
-    ## __ Direct --------------------------------------------------------------
-    DATA[wattDIR < QS$dir_SWdn_min,
-         QCF_DIR_01 := "Physical possible limit min (5)"]
-    DATA[TSIextEARTH_comb - wattDIR < QS$dir_SWdn_dif,
-         QCF_DIR_01 := "Physical possible limit max (6)"]
-
-    ## . . Global --------------------------------------------------------------
-    DATA[wattGLB < QS$glo_SWdn_min,
-         QCF_GLB_01 := "Physical possible limit min (5)"]
-    DATA[, Glo_max_ref := TSIextEARTH_comb * QS$glo_SWdn_amp * cosde(SZA)^1.2 + QS$glo_SWdn_off]
-    DATA[wattGLB > Glo_max_ref,
-         QCF_GLB_01 := "Physical possible limit max (6)"]
-}
 
 #+ echo=F, include=T, results="asis"
 if (TEST_01) {
