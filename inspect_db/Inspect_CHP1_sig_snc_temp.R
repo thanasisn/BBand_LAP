@@ -189,8 +189,8 @@ for (YYYY in sort(years_to_do)) {
         year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
 
         cat("\nRemove bad temperatrue data\n")
-        year_data[chp1_bad_temp_flag, chp1_temperature    := NA ]
-        year_data[chp1_bad_temp_flag, chp1_temperature_SD := NA ]
+        year_data[!is.na(chp1_bad_temp_flag), chp1_temperature    := NA]
+        year_data[!is.na(chp1_bad_temp_flag), chp1_temperature_SD := NA]
     }
 
     ## Missing days
