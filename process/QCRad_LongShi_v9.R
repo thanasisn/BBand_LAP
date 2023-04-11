@@ -152,6 +152,8 @@ if (TEST_DB) {
 
 ##  Create a new variable to the whole database  -------------------------------
 
+## use this columna as indicator
+InitVariableBBDB("QCv9_01_dir_flag", as.character(NA))
 
 ## list data base files
 filelist <- data.table(
@@ -169,7 +171,7 @@ filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 ## find what needs touching
 BB <- opendata()
 temp_to_do <- data.table(BB |>
-                             filter(is.na(chp1_t_cor_factor) & !is.na(chp1_temperature)) |>
+                             filter(is.na(QCv9_01_dir_flag)) |>
                              select(year, month) |>
                              unique()            |>
                              collect()
@@ -178,8 +180,31 @@ rm(BB)
 
 ## select what dataset files to touch
 filelist <- filelist[temp_to_do, on = .(flmonth = month, flyear = year)]
-rm(temp_to_do)
+rm(temp_to_do, dd)
 
+
+
+
+
+
+## process data
+## loop data base files computing black for CHP-1
+for (af in filelist$names) {
+    datapart <- data.table(read_parquet(af))
+    datapart[, month := as.integer(month(Date))]
+    datapart[, year  := as.integer(year(Date)) ]
+
+    cat("Load: ", af, "\n")
+
+
+
+
+
+
+
+
+
+    }
 
 
 
@@ -196,10 +221,6 @@ stop()
 ##  Interactive tests  ---------------------------------------------------------
 
 
-BB <- opendata()
-
-## gather Quality control settings
-QS <- list()
 
 
 ##  Create strict radiation data  ----------------------------------------------
