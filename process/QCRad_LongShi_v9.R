@@ -93,6 +93,7 @@ library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
+library(pander,     warn.conflicts = TRUE, quietly = TRUE)
 
 ## __  Variables  --------------------------------------------------------------
 sun_elev_min     <-  -2 * 0.103  ## Drop  radiation data when sun is below this point
@@ -152,7 +153,8 @@ if (TEST_DB) {
 
 ##  Create a new variable to the whole database  -------------------------------
 
-## use this columna as indicator
+## use this columns as indicator
+## make it NA to reprocess all
 InitVariableBBDB("QCv9_01_dir_flag", as.character(NA))
 
 ## list data base files
@@ -178,12 +180,12 @@ temp_to_do <- data.table(BB |>
 )
 rm(BB)
 
-## select what dataset files to touch
+## select what data set files to touch
 filelist <- filelist[temp_to_do, on = .(flmonth = month, flyear = year)]
 rm(temp_to_do, dd)
 
 
-## gather configurations
+## gather configurations for quality control
 QS <- data.table()
 
 
@@ -221,7 +223,6 @@ for (af in filelist$names) {
              GLB_strict := GLB_wpsm]
 
     ## __ Negative radiation to zero  ------------------------------------------
-
     datapart[DIR_strict < 0, DIR_strict := 0]
     datapart[HOR_strict < 0, HOR_strict := 0]
     datapart[GLB_strict < 0, GLB_strict := 0]
@@ -241,7 +242,7 @@ for (af in filelist$names) {
 
 
 
-    ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN  -------------------------------------
+    ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ---------------------------------
     #' \FloatBarrier
     #' \newpage
     #' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
@@ -262,11 +263,10 @@ for (af in filelist$names) {
 
         testN        <- 1
         flagname_dir <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-        flagname_glo <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glo_flag")
+        flagname_glb <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
 
         InitVariableBBDB(flagname_dir, as.character(NA))
-        InitVariableBBDB(flagname_glo, as.character(NA))
-
+        InitVariableBBDB(flagname_glb, as.character(NA))
 
         QS$dir_SWdn_min <-  -4  # Minimum direct value to consider valid measurement
         QS$dir_SWdn_dif <- 327  # Closeness to to TSI
@@ -282,10 +282,10 @@ for (af in filelist$names) {
 
         ## . . Global --------------------------------------------------------------
         datapart[GLB_strict < QS$glo_SWdn_min,
-                 (flagname_glo) := "Physical possible limit min (5)"]
+                 (flagname_glb) := "Physical possible limit min (5)"]
         datapart[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cosde(SZA)^1.2 + QS$glo_SWdn_off]
         datapart[GLB_strict > Glo_max_ref,
-                 (flagname_glo) := "Physical possible limit max (6)"]
+                 (flagname_glb) := "Physical possible limit max (6)"]
     }
 
 
@@ -305,45 +305,47 @@ for (af in filelist$names) {
 
 
 
+
+##  Inspect quality control data  ----------------------------------------------
+
+## open data base for plots
 BB <- opendata()
-
-pp <- BB |> select(starts_with("QCv")) |> collect()
-
-
-BB |> select(starts_with("QCv")) |> collect() |> table()
-
-
-
-# check new variables
-# PLOTS
-
-stop()
-
-
-
-
-
 
 
 #+ echo=F, include=T, results="asis"
 if (TEST_01) {
 
-    cat(pander(table(DATA$QCF_DIR_01, exclude = NULL)))
+    testN        <- 1
+    flagname_dir <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+    flagname_glb <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+
+    cat(pander(table(collect(select(BB, !!flagname_dir)), useNA = "always")))
     cat("\n\n")
-    cat(pander(table(DATA$QCF_GLB_01, exclude = NULL)))
+    cat(pander(table(collect(select(BB, !!flagname_glb)), useNA = "always")))
     cat("\n\n")
 
-    range(DATA[, TSIextEARTH_comb - wattDIR ], na.rm = T)
+    test <- BB |>
+        mutate(test = TSI_TOA - DIR_strict) |>
+        select(test) |> collect()
 
-    hist(DATA[,  TSIextEARTH_comb - wattDIR ], breaks = 100)
+    range(test$test, na.rm = T)
 
-    range(DATA[, Glo_max_ref - wattGLB ], na.rm = T)
+    hist(test$test, breaks = 100,
+         main = "TSI_TOA - DIR_strict")
 
-    hist(DATA[,  Glo_max_ref - wattGLB ], breaks = 100)
+    test <- BB |>
+        mutate(test = Glo_max_ref - GLB_strict) |>
+        select(test) |> collect()
+
+    range(test$test, na.rm = T)
+
+    hist(test$test, breaks = 100,
+         main = "Glo_max_ref - GLB_strict")
 
     if (DO_PLOTS) {
 
-        test <- DATA[!is.na(QCF_DIR_01)]
+        test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
+        ## TODO
         for (ad in sort(unique(as.Date(test$Date)))) {
             pp <- DATA[ as.Date(Date) == ad, ]
             ylim <- range(pp$TSIextEARTH_comb - QS$dir_SWdn_dif, pp$wattDIR, na.rm = T)
@@ -361,7 +363,8 @@ if (TEST_01) {
             #        col = "red", pch = 1)
         }
 
-        test <- DATA[ !is.na(QCF_GLB_01) ]
+        test <- BB |> filter(!is.na(QCv9_01_glb_flag) ) |> collect() |> as.data.table()
+        ## TODO
         for (ad in sort(unique(as.Date(c(test$Date))))) {
             pp <- DATA[ as.Date(Date) == ad, ]
             ylim <- range(pp$Glo_max_ref, pp$wattGLB, na.rm = T)
