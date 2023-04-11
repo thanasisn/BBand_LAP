@@ -197,102 +197,69 @@ for (af in filelist$names) {
     cat("Load: ", af, "\n")
 
 
+    ##  Create strict radiation data  ------------------------------------------
+
+    ## __ Daytime radiation only  ----------------------------------------------
+
+    ## Direct beam DNI
+    datapart[Elevat > sun_elev_min           &
+                 is.na(chp1_bad_data_flag)   &
+                 Async_tracker_flag == FALSE,
+             DIR_strict := DIR_wpsm]
+    ## DHI
+    datapart[Elevat > sun_elev_min           &
+                 is.na(chp1_bad_data_flag)   &
+                 Async_tracker_flag == FALSE,
+             HOR_strict := HOR_wpsm]
+    ## GHI
+    datapart[Elevat > sun_elev_min           &
+                 is.na(cm21_bad_data_flag),
+             GLB_strict := GLB_wpsm]
+
+    ## __ Negative radiation to zero  ------------------------------------------
+
+    datapart[DIR_strict < 0, DIR_strict := 0]
+    datapart[HOR_strict < 0, HOR_strict := 0]
+    datapart[GLB_strict < 0, GLB_strict := 0]
+
+    ## __ Diffuse radiation  ---------------------------------------------------
+    datapart[, DIFF_strict := GLB_strict - DIR_strict]
+
+    ## __ Clearness Index  -----------------------------------------------------
+    datapart[, ClearnessIndex_kt := GLB_strict / (cosde(SZA) * TSI_TOA)]
+
+    ## __ Diffuse fraction  ---------------------------------------------------
+    datapart[, DiffuseFraction_kd := DIFF_strict / GLB_strict]
+
+    ## replace infinite values
+    datapart[is.infinite(DiffuseFraction_kd), DiffuseFraction_kd := NA]
 
 
 
+    summary(datapart)
 
-
-
+    ## store actual data
+    datapart <- as_tibble(datapart)
+    write_parquet(x = datapart, sink = af)
+    cat("Save: ", af, "\n\n")
+    ## clean
+    rm(datapart)
 
     }
 
 
+
+
+BB <- opendata()
+
+# check new variables
+# PLOTS
 
 stop()
 
 
 
 
-
-
-
-
-
-##  Interactive tests  ---------------------------------------------------------
-
-
-
-
-##  Create strict radiation data  ----------------------------------------------
-
-
-## __ Daytime radiation only  --------------------------------------------------
-BB <- BB |>
-    mutate(DIR_strict =
-               if_else(Elevat > sun_elev_min &
-                           is.na(chp1_bad_data_flag) &
-                           Async_tracker_flag == FALSE,
-                       DIR_wpsm, NA )) |> compute()
-BB <- BB |>
-    mutate(HOR_strict =
-               if_else(Elevat > sun_elev_min &
-                           is.na(chp1_bad_data_flag) &
-                           Async_tracker_flag == FALSE,
-                       HOR_wpsm, NA )) |> compute()
-BB <- BB |>
-    mutate(GLB_strict =
-               if_else(Elevat > sun_elev_min &
-                           is.na(cm21_bad_data_flag),
-                       GLB_wpsm, NA )) |> compute()
-
-
-## __ Negative radiation to zero  ----------------------------------------------
-BB <- BB |> mutate(DIR_strict =
-                       if_else(DIR_strict < 0, 0, DIR_strict)) |> compute()
-BB <- BB |> mutate(HOR_strict =
-                       if_else(HOR_strict < 0, 0, HOR_strict)) |> compute()
-BB <- BB |> mutate(GLB_strict =
-                       if_else(GLB_strict < 0, 0, GLB_strict)) |> compute()
-
-
-## __ Diffuse radiation  -------------------------------------------------------
-BB <- BB |> mutate(DIFF_strict = GLB_strict - DIR_strict) |> compute()
-
-## __ Clearness Index  ---------------------------------------------------------
-BB <- BB |> mutate(ClearnessIndex_kt = GLB_strict / (cosde(SZA) * TSI_TOA)) |> compute()
-
-
-
-
-BB |>  filter(is.na(DIR_wpsm)) |> summarise(n()) |> collect()
-BB |>  filter(is.na(DIR_strict)) |> summarise(n()) |> collect()
-BB |>  filter(DIR_strict == 0) |> summarise(n()) |> collect()
-
-
-BB |> select(chp1_bad_data_flag) |> collect() |> table(useNA = "always")
-BB |> select(Async_tracker_flag) |> collect() |> table(useNA = "always")
-
-ss <- BB |> mutate(day = as_date(Date)) |> select(day) |> unique() |> pull() |> sample(3)
-
-for (ad in ss) {
-    pp <- BB |> filter(as_date(Date) == as_date(ad)) |> collect()
-    summary(pp)
-
-    plot(pp$Date, pp$DIR_strict)
-    plot(pp$Date, pp$HOR_strict)
-    plot(pp$Date, pp$GLB_strict)
-}
-
-
-## for chp1 and cm21
-## - drop all night data
-## - remove negative values when sun is too low
-
-names(BB)
-
-DIR_strict
-GLB_strict
-HOR_strict
 
 
 
