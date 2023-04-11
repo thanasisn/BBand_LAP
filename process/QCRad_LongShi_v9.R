@@ -202,6 +202,9 @@ for (af in filelist$names) {
 
     ## __ Daytime radiation only  ----------------------------------------------
 
+    ## use this as processing marker
+    datapart$QCv9_01_dir_flag <- "pass"
+
     ## Direct beam DNI
     datapart[Elevat > sun_elev_min           &
                  is.na(chp1_bad_data_flag)   &
