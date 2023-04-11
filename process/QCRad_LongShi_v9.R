@@ -273,22 +273,20 @@ for (af in filelist$names) {
 
         ## __ Direct --------------------------------------------------------------
         datapart[DIR_strict < QS$dir_SWdn_min,
-             QCF_DIR_01 := "Physical possible limit min (5)"]
-        datapart[TSIextEARTH_comb - wattDIR < QS$dir_SWdn_dif,
-             QCF_DIR_01 := "Physical possible limit max (6)"]
+                 (flagname_dir) := "Physical possible limit min (5)"]
+        datapart[TSI_TOA - DIR_strict < QS$dir_SWdn_dif,
+                 (flagname_dir) := "Physical possible limit max (6)"]
 
         ## . . Global --------------------------------------------------------------
-        datapart[wattGLB < QS$glo_SWdn_min,
-             QCF_GLB_01 := "Physical possible limit min (5)"]
-        datapart[, Glo_max_ref := TSIextEARTH_comb * QS$glo_SWdn_amp * cosde(SZA)^1.2 + QS$glo_SWdn_off]
-        datapart[wattGLB > Glo_max_ref,
-             QCF_GLB_01 := "Physical possible limit max (6)"]
+        datapart[GLB_strict < QS$glo_SWdn_min,
+                 (flagname_glo) := "Physical possible limit min (5)"]
+        datapart[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cosde(SZA)^1.2 + QS$glo_SWdn_off]
+        datapart[GLB_strict > Glo_max_ref,
+                 (flagname_glo) := "Physical possible limit max (6)"]
     }
 
 
 
-
-        stop()
 
     summary(datapart)
 
@@ -306,12 +304,11 @@ for (af in filelist$names) {
 
 BB <- opendata()
 
+pp <- BB |> select(starts_with("QCv")) |> collect()
 
-pp <- BB |> select(Date, ends_with("strict")) |> collect()
 
+BB |> select(starts_with("QCv")) |> collect() |> table()
 
-plot(pp$Date, pp$DIR_strict)
-plot(pp$Date, pp$GLB_strict)
 
 
 # check new variables
