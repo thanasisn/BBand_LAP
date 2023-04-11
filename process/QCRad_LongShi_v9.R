@@ -149,7 +149,45 @@ if (TEST_DB) {
 }
 
 
+
 ##  Create a new variable to the whole database  -------------------------------
+
+
+## list data base files
+filelist <- data.table(
+    names = list.files(DB_DIR,
+                       pattern = "*.parquet",
+                       recursive  = TRUE,
+                       full.names = TRUE))
+dd      <- dirname(filelist$names)
+dd      <- tstrsplit(dd, "/")
+
+filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
+filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
+
+
+## find what needs touching
+BB <- opendata()
+temp_to_do <- data.table(BB |>
+                             filter(is.na(chp1_t_cor_factor) & !is.na(chp1_temperature)) |>
+                             select(year, month) |>
+                             unique()            |>
+                             collect()
+)
+rm(BB)
+
+## select what dataset files to touch
+filelist <- filelist[temp_to_do, on = .(flmonth = month, flyear = year)]
+rm(temp_to_do)
+
+
+
+
+stop()
+
+
+
+
 
 
 
