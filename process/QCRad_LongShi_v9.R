@@ -233,7 +233,7 @@ for (af in filelist$names) {
     ## __ Clearness Index  -----------------------------------------------------
     datapart[, ClearnessIndex_kt := GLB_strict / (cosde(SZA) * TSI_TOA)]
 
-    ## __ Diffuse fraction  ---------------------------------------------------
+    ## __ Diffuse fraction  ----------------------------------------------------
     datapart[, DiffuseFraction_kd := DIFF_strict / GLB_strict]
 
     ## replace infinite values
@@ -262,11 +262,11 @@ for (af in filelist$names) {
         cat(paste("\n1. Physically Possible Limits.\n\n"))
 
         testN        <- 1
-        flagname_dir <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-        flagname_glb <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+        flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+        flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
 
-        InitVariableBBDB(flagname_dir, as.character(NA))
-        InitVariableBBDB(flagname_glb, as.character(NA))
+        InitVariableBBDB(flagname_DIR, as.character(NA))
+        InitVariableBBDB(flagname_GLB, as.character(NA))
 
         QS$dir_SWdn_min <-  -4  # Minimum direct value to consider valid measurement
         QS$dir_SWdn_dif <- 327  # Closeness to to TSI
@@ -274,19 +274,79 @@ for (af in filelist$names) {
         QS$glo_SWdn_off <- 160  # Global departure offset above the model
         QS$glo_SWdn_amp <- 1.3  # Global departure factor above the model
 
-        ## __ Direct --------------------------------------------------------------
+        ## __ Direct  ----------------------------------------------------------
         datapart[DIR_strict < QS$dir_SWdn_min,
-                 (flagname_dir) := "Physical possible limit min (5)"]
+                 (flagname_DIR) := "Physical possible limit min (5)"]
         datapart[TSI_TOA - DIR_strict < QS$dir_SWdn_dif,
-                 (flagname_dir) := "Physical possible limit max (6)"]
+                 (flagname_DIR) := "Physical possible limit max (6)"]
 
-        ## . . Global --------------------------------------------------------------
+        ## __ Global  ----------------------------------------------------------
         datapart[GLB_strict < QS$glo_SWdn_min,
-                 (flagname_glb) := "Physical possible limit min (5)"]
+                 (flagname_GLB) := "Physical possible limit min (5)"]
         datapart[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cosde(SZA)^1.2 + QS$glo_SWdn_off]
         datapart[GLB_strict > Glo_max_ref,
-                 (flagname_glb) := "Physical possible limit max (6)"]
+                 (flagname_GLB) := "Physical possible limit max (6)"]
     }
+
+
+
+    ####  2. EXTREMELY RARE LIMITS PER BSRN  -----------------------------------
+    #' \FloatBarrier
+    #' \newpage
+    #' ## 2. EXTREMELY RARE LIMITS PER BSRN
+    #'
+    #' These should be a little more restrictive than 1. in order to start
+    #' catching erroneous values.
+    #'
+    #' The choose of those settings may be optimized with an iterative process.
+    #'
+    #+ echo=TEST_02, include=T
+    if (TEST_02) {
+        cat(paste("\n2. Extremely Rare Limits.\n\n"))
+
+        testN        <- 2
+        flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+        flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+
+        InitVariableBBDB(flagname_DIR, as.character(NA))
+        InitVariableBBDB(flagname_GLB, as.character(NA))
+
+        # Upper modeled values
+        QS$Dir_SWdn_amp     <-    0.91 # Direct departure factor above the model
+        QS$Dir_SWdn_off     <- -140    # Direct departure offset above the model
+        QS$Glo_SWdn_amp     <- 1.18    # Global departure factor above the model
+        QS$Glo_SWdn_off     <- 40      # Global departure offset above the model
+        # Minimum accepted values
+        QS$dir_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
+        QS$glo_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
+        # Compute reference values
+        datapart[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off]
+        datapart[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cosde(SZA)^1.2 + QS$Glo_SWdn_off]
+        # Ignore too low values near horizon
+        datapart[Direct_max < 3, Direct_max := NA]
+        datapart[Global_max < 3, Direct_max := NA]
+
+        ## __ Direct  ----------------------------------------------------------
+        datapart[DIR_strict < QS$dir_SWdn_min_ext,
+                 (flagname_DIR) := "Extremely rare limits min (3)"]
+        datapart[DIR_strict > Direct_max,
+                 (flagname_DIR) := "Extremely rare limits max (4)"]
+
+        ## __ Global  ----------------------------------------------------------
+        datapart[GLB_strict < QS$glo_SWdn_min_ext,
+                 (flagname_GLB) := "Extremely rare limits min (3)"]
+        datapart[GLB_strict > Global_max,
+                 (flagname_GLB) := "Extremely rare limits max (4)"]
+    }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -312,16 +372,21 @@ for (af in filelist$names) {
 BB <- opendata()
 
 
+
+#' \FloatBarrier
+#' \newpage
+#' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
+#'
 #+ echo=F, include=T, results="asis"
 if (TEST_01) {
 
     testN        <- 1
-    flagname_dir <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-    flagname_glb <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+    flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+    flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
 
-    cat(pander(table(collect(select(BB, !!flagname_dir)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
     cat("\n\n")
-    cat(pander(table(collect(select(BB, !!flagname_glb)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
     cat("\n\n")
 
     test <- BB |>
@@ -385,6 +450,62 @@ if (TEST_01) {
 
 
 
+#' \FloatBarrier
+#' \newpage
+#' ## 2. EXTREMELY RARE LIMITS PER BSRN
+#'
+#+ echo=F, include=T, results="asis"
+if (TEST_02) {
+
+    cat(pander(table(DATA$QCF_DIR_02, exclude = TRUE)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_GLB_02, exclude = TRUE)))
+    cat("\n\n")
+
+    range(DATA[, Direct_max - wattDIR])
+    hist(DATA[, Direct_max - wattDIR], breaks = 100)
+
+    range(DATA[, Global_max - wattGLB])
+    hist(DATA[, Global_max - wattGLB], breaks = 100)
+
+    if (DO_PLOTS) {
+
+        test <- DATA[ !is.na(QCF_DIR_02) ]
+        # test <- DATA[ wattDIR > Direct_max -50 ]
+        for (ad in sort(unique(as.Date(test$Date)))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$Direct_max, pp$wattDIR, na.rm = T)
+            plot(pp$Date, pp$wattDIR, "l", col = "blue",
+                 ylim = ylim, xlab = "", ylab = "wattDIR")
+            title(paste("2_", as.Date(ad, origin = "1970-01-01")))
+            ## plot limits
+            lines(pp$Date, pp$Direct_max, col = "red")
+            ## mark offending data
+            points(pp[!is.na(QCF_DIR_02), Date],
+                   pp[!is.na(QCF_DIR_02), wattDIR],
+                   col = "red", pch = 1)
+        }
+
+        test <- DATA[ !is.na(QCF_GLB_02) ]
+        # test <- DATA[ wattGLB > Global_max]
+        for (ad in sort(unique(as.Date(c(test$Date))))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$Global_max, pp$wattGLB, na.rm = T)
+            plot(pp$Date, pp$wattGLB, "l", col = "green",
+                 ylim = ylim, xlab = "", ylab = "wattGLB")
+            title(paste("2_", as.Date(ad, origin = "1970-01-01")))
+            ## plot limits
+            lines(pp$Date, pp$Global_max, col = "red")
+            ## mark offending data
+            points(pp[!is.na(QCF_GLB_02), Date],
+                   pp[!is.na(QCF_GLB_02), wattGLB],
+                   col = "magenta", pch = 1)
+        }
+    }
+    # DATA$Direct_max <- NULL
+    # DATA$Global_max <- NULL
+}
+#' -----------------------------------------------------------------------------
 
 
 
@@ -408,6 +529,7 @@ if (TEST_01) {
 
 
 
-myunlock(DB_lock)
+
+# myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
