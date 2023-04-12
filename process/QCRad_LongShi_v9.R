@@ -341,6 +341,50 @@ for (af in filelist$names) {
 
 
 
+    ####  3. COMPARISON TESTS PER BSRN “non-definitive”  -----------------------
+    #' \FloatBarrier
+    #' \newpage
+    #' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
+    #'
+    #+ echo=TEST_03, include=T
+    if (TEST_03) {
+        cat(paste("\n3. Comparison tests.\n\n"))
+
+        testN        <- 3
+        flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+        flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+
+        InitVariableBBDB(flagname_DIR, as.character(NA))
+        InitVariableBBDB(flagname_GLB, as.character(NA))
+
+        QS$dif_rati_po1  <-  0.03
+        QS$dif_rati_po2  <-  0.08
+        QS$dif_sza_break <- 75
+        QS$dif_rati_pr1  <-  1.03
+        QS$dif_rati_pr2  <-  1.06
+        QS$dif_watt_lim  <-  10
+
+        ## __ Proposed filter  -------------------------------------------------
+        datapart[DiffuseFraction_kd  > QS$dif_rati_pr1  &
+                     SZA            <= QS$dif_sza_break &
+                     GLB_strict      > QS$dif_watt_lim,
+                 (flagname_DIR) := "Diffuse ratio comp max (11)"]
+        datapart[DiffuseFraction_kd  > QS$dif_rati_pr2  &
+                     SZA             > QS$dif_sza_break &
+                     GLB_strict      > QS$dif_watt_lim,
+                 (flagname_DIR) := "Diffuse ratio comp max (11)"]
+
+        ## __ Extra filters by me  ---------------------------------------------
+        datapart[DiffuseFraction_kd  < QS$dif_rati_po1  &
+                     SZA            <= QS$dif_sza_break &
+                     GLB_strict      > QS$dif_watt_lim,
+                 (flagname_GLB) := "Diffuse ratio comp min (12)"]
+        datapart[DiffuseFraction_kd  < QS$dif_rati_po1  &
+                     SZA             > QS$dif_sza_break &
+                     GLB_strict      > QS$dif_watt_lim,
+                 (flagname_GLB) := "Diffuse ratio comp min (12)"]
+    }
+
 
 
 
@@ -416,7 +460,7 @@ if (TEST_01) {
             # lines(pp$Date, pp[, 1.2 * TSIextEARTH_comb * 0.678 * cosde(SZA) ])
             # lines(pp$Date, pp[, 0.8 * TSIextEARTH_comb * cosde(SZA)  ])
             # lines(pp$Date, pp[, 1.2 * TSIextEARTH_comb ^ (0.678 * cosde(SZA)) ])
-            title(paste("1_", as.Date(ad, origin = "1970-01-01")))
+            title(paste("#1", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             lines(pp$Date, pp$TSIextEARTH_comb - QS$dir_SWdn_dif, col = "red")
             ## mark offending data
@@ -432,7 +476,7 @@ if (TEST_01) {
             ylim <- range(pp$Glo_max_ref, pp$wattGLB, na.rm = T)
             plot(pp$Date, pp$wattGLB, "l", col = "green",
                  ylim = ylim, xlab = "", ylab = "wattGLB")
-            title(paste("1_", as.Date(ad, origin = "1970-01-01")))
+            title(paste("#1", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             lines(pp$Date, pp$Glo_max_ref, col = "red")
             ## mark offending data
@@ -464,22 +508,27 @@ if (TEST_02) {
     cat("\n\n")
 
 
-    range(DATA[, Direct_max - wattDIR])
-    hist(DATA[, Direct_max - wattDIR], breaks = 100)
+    test <- BB |>
+        mutate(dir = Direct_max - DIR_strict,
+               glo = Global_max - GLB_strict) |>
+        select(dir, glo) |> collect()
 
-    range(DATA[, Global_max - wattGLB])
-    hist(DATA[, Global_max - wattGLB], breaks = 100)
+    range(test$dir, na.rm = TRUE)
+    hist(test$dir, breaks = 100)
+
+    range(test$glo, na.rm = TRUE)
+    hist(test$glo, breaks = 100)
 
     if (DO_PLOTS) {
 
-        test <- DATA[ !is.na(QCF_DIR_02) ]
-        # test <- DATA[ wattDIR > Direct_max -50 ]
+        test <- BB |> filter(!is.na(QCv9_02_dir_flag)) |> collect() |> as.data.table()
+        ## TODO
         for (ad in sort(unique(as.Date(test$Date)))) {
             pp <- DATA[ as.Date(Date) == ad, ]
             ylim <- range(pp$Direct_max, pp$wattDIR, na.rm = T)
             plot(pp$Date, pp$wattDIR, "l", col = "blue",
                  ylim = ylim, xlab = "", ylab = "wattDIR")
-            title(paste("2_", as.Date(ad, origin = "1970-01-01")))
+            title(paste("#2", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             lines(pp$Date, pp$Direct_max, col = "red")
             ## mark offending data
@@ -488,33 +537,128 @@ if (TEST_02) {
                    col = "red", pch = 1)
         }
 
-        test <- DATA[ !is.na(QCF_GLB_02) ]
-        # test <- DATA[ wattGLB > Global_max]
+
+        test <- BB |> filter(!is.na(QCv9_02_glb_flag)) |> collect() |> as.data.table()
         for (ad in sort(unique(as.Date(c(test$Date))))) {
-            pp <- DATA[ as.Date(Date) == ad, ]
-            ylim <- range(pp$Global_max, pp$wattGLB, na.rm = T)
-            plot(pp$Date, pp$wattGLB, "l", col = "green",
-                 ylim = ylim, xlab = "", ylab = "wattGLB")
-            title(paste("2_", as.Date(ad, origin = "1970-01-01")))
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            ylim <- range(pp$Global_max, pp$GLB_strict, na.rm = T)
+            plot(pp$Date, pp$GLB_strict, "l", col = "green",
+                 ylim = ylim, xlab = "", ylab = "GLB")
+            title(paste("#2", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             lines(pp$Date, pp$Global_max, col = "red")
             ## mark offending data
-            points(pp[!is.na(QCF_GLB_02), Date],
-                   pp[!is.na(QCF_GLB_02), wattGLB],
+            points(pp[!is.na(QCv9_02_glb_flag), Date],
+                   pp[!is.na(QCv9_02_glb_flag), GLB_strict],
                    col = "magenta", pch = 1)
         }
     }
-    # DATA$Direct_max <- NULL
-    # DATA$Global_max <- NULL
 }
 #' -----------------------------------------------------------------------------
 
 
 
+####  3. COMPARISON TESTS PER BSRN “non-definitive”  ---------------------------
+#' \FloatBarrier
+#' \newpage
+#' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
+#'
+#+ echo=F, include=T, results="asis"
+if (TEST_03) {
+
+    testN        <- 3
+    flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+    flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+
+    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
+    cat("\n\n")
+    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
+    cat("\n\n")
+
+    years <- (BB |> filter(!is.na(DiffuseFraction_kd)) |>
+                  select(year) |> unique() |> collect() |> pull())
+    for (ay in years) {
+        pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
+        ylim <- c(-0.5, 1.5)
+
+        par(mar = c(4, 4, 2, 1))
+        plot(pp$SZA, pp$DiffuseFraction_kd,
+             ylab = "Diffuse fraction", xlab = "SZA", #ylim = ylim,
+             cex = .1)
+        title(paste("#3", ay))
+
+        par(mar = c(4, 4, 2, 1))
+        plot(pp$Date, pp$DiffuseFraction_kd,
+             ylab = "Diffuse fraction", xlab = "SZA", #ylim = ylim,
+             cex = .1)
+        title(paste("#3", ay))
 
 
 
+        # segments(               0, QS$dif_rati_pr1, QS$dif_sza_break, QS$dif_rati_pr1, col = "red" )
+        # segments(QS$dif_sza_break, QS$dif_rati_pr2,               93, QS$dif_rati_pr2, col = "red" )
+        #
+        # segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue" )
+        # segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue" )
+        #
+        # points( pp[!is.na(QCF_BTH_03_1), SZA], pp[!is.na(QCF_BTH_03_1), DiffuseFraction_Kd],
+        #         cex = .2, col = "red")
+        # points( pp[!is.na(QCF_BTH_03_2), SZA], pp[!is.na(QCF_BTH_03_2), DiffuseFraction_Kd],
+        #         cex = .2, col = "cyan")
+        #
+        #
+        # par(mar = c(4,4,2,1))
+        # plot( pp$Azimuth, pp$DiffuseFraction_Kd,
+        #       ylim = ylim,
+        #       ylab = "Diffuse fraction", xlab = "Azimuth",
+        #       cex = .1)
+        # title(paste("3_", ay))
+        #
+        # points( pp[!is.na(QCF_BTH_03_1), Azimuth], pp[!is.na(QCF_BTH_03_1), DiffuseFraction_Kd],
+        #         cex = .2, col = "red")
+        # points( pp[!is.na(QCF_BTH_03_2), Azimuth], pp[!is.na(QCF_BTH_03_2), DiffuseFraction_Kd],
+        #         cex = .2, col = "cyan")
+    }
 
+    if (DO_PLOTS) {
+        tmp <- DATA[ !is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2) ]
+        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
+            pp   <- DATA[ as.Date(Date) == ad, ]
+            layout(matrix(c(1,2), 2, 1, byrow = TRUE))
+            par(mar = c(2,4,2,1))
+
+            plot( pp$Date, pp$DiffuseFraction_Kd, "l",
+                  col = "cyan", ylab = "Diffuse Fraction", xlab = "")
+
+            abline(h = QS$dif_rati_pr1, col = "red")
+            abline(h = QS$dif_rati_pr2, col = "red", lty = 2)
+            abline(h = QS$dif_rati_po1, col = "blue")
+            abline(h = QS$dif_rati_po2, col = "blue", lty = 2)
+
+            title(paste("3_1_2", as.Date(ad, origin = "1970-01-01")))
+
+            par(mar = c(2,4,1,1))
+            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
+            plot( pp$Date, pp$wattGLB, "l",
+                  ylim = ylim, col = "green", ylab = "", xlab = "")
+            lines(pp$Date, pp$wattDIR, col = "blue" )
+
+            points(pp[!is.na(QCF_BTH_03_1), Date],
+                   pp[!is.na(QCF_BTH_03_1), wattDIR],
+                   ylim = ylim, col = "red")
+            points(pp[!is.na(QCF_BTH_03_1), Date],
+                   pp[!is.na(QCF_BTH_03_1), wattGLB],
+                   ylim = ylim, col = "red")
+            points(pp[!is.na(QCF_BTH_03_2), Date],
+                   pp[!is.na(QCF_BTH_03_2), wattDIR],
+                   ylim = ylim, col = "magenta")
+            points(pp[!is.na(QCF_BTH_03_2), Date],
+                   pp[!is.na(QCF_BTH_03_2), wattGLB],
+                   ylim = ylim, col = "magenta")
+        }
+    }
+}
+#' -----------------------------------------------------------------------------
 
 
 
