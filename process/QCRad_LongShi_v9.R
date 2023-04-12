@@ -348,9 +348,6 @@ for (af in filelist$names) {
 
 
 
-
-
-
     summary(datapart)
 
     ## store actual data
@@ -457,10 +454,15 @@ if (TEST_01) {
 #+ echo=F, include=T, results="asis"
 if (TEST_02) {
 
-    cat(pander(table(DATA$QCF_DIR_02, exclude = TRUE)))
+    testN        <- 2
+    flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+    flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+
+    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
     cat("\n\n")
-    cat(pander(table(DATA$QCF_GLB_02, exclude = TRUE)))
+    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
     cat("\n\n")
+
 
     range(DATA[, Direct_max - wattDIR])
     hist(DATA[, Direct_max - wattDIR], breaks = 100)
