@@ -579,7 +579,7 @@ if (TEST_03) {
                   select(year) |> unique() |> collect() |> pull())
     for (ay in years) {
         pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
-        ylim <- c(-0.5, 1.5)
+        ylim <- c(-30, 1.1)
 
         par(mar = c(4, 4, 2, 1))
         plot(pp$SZA, pp$DiffuseFraction_kd,
@@ -589,10 +589,9 @@ if (TEST_03) {
 
         par(mar = c(4, 4, 2, 1))
         plot(pp$Date, pp$DiffuseFraction_kd,
-             ylab = "Diffuse fraction", xlab = "SZA", #ylim = ylim,
+             ylab = "Diffuse fraction", xlab = "SZA", ylim = ylim,
              cex = .1)
         title(paste("#3", ay))
-
 
 
         # segments(               0, QS$dif_rati_pr1, QS$dif_sza_break, QS$dif_rati_pr1, col = "red" )
@@ -621,14 +620,18 @@ if (TEST_03) {
     }
 
     if (DO_PLOTS) {
-        tmp <- DATA[ !is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2) ]
+
+        tmp <- BB |> filter(!is.na(QCv9_03_dir_flag) | !is.na(QCv9_03_glb_flag)) |> collect() |> as.data.table()
+
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
-            pp   <- DATA[ as.Date(Date) == ad, ]
+
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+
             layout(matrix(c(1,2), 2, 1, byrow = TRUE))
             par(mar = c(2,4,2,1))
 
-            plot( pp$Date, pp$DiffuseFraction_Kd, "l",
-                  col = "cyan", ylab = "Diffuse Fraction", xlab = "")
+            plot(pp$Date, pp$DiffuseFraction_kd, "l",
+                 col = "cyan", ylab = "Diffuse Fraction", xlab = "")
 
             abline(h = QS$dif_rati_pr1, col = "red")
             abline(h = QS$dif_rati_pr2, col = "red", lty = 2)
@@ -638,16 +641,16 @@ if (TEST_03) {
             title(paste("3_1_2", as.Date(ad, origin = "1970-01-01")))
 
             par(mar = c(2,4,1,1))
-            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
-            plot( pp$Date, pp$wattGLB, "l",
+            ylim <- range(pp$GLB_strict, pp$DIR_strict, na.rm = T)
+            plot( pp$Date, pp$GLB_strict, "l",
                   ylim = ylim, col = "green", ylab = "", xlab = "")
-            lines(pp$Date, pp$wattDIR, col = "blue" )
+            lines(pp$Date, pp$DIR_strict, col = "blue" )
 
-            points(pp[!is.na(QCF_BTH_03_1), Date],
-                   pp[!is.na(QCF_BTH_03_1), wattDIR],
+            points(pp[!is.na(QCv9_03_dir_flag), Date],
+                   pp[!is.na(QCv9_03_dir_flag), DIR_strict],
                    ylim = ylim, col = "red")
-            points(pp[!is.na(QCF_BTH_03_1), Date],
-                   pp[!is.na(QCF_BTH_03_1), wattGLB],
+            points(pp[!is.na(QCv9_03_glb_flag), Date],
+                   pp[!is.na(QCv9_03_glb_flag), GLB_strict],
                    ylim = ylim, col = "red")
             points(pp[!is.na(QCF_BTH_03_2), Date],
                    pp[!is.na(QCF_BTH_03_2), wattDIR],
