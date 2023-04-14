@@ -115,9 +115,9 @@ TEST_07  <- FALSE
 TEST_08  <- FALSE
 TEST_09  <- FALSE
 
-TEST_01  <- TRUE
-TEST_02  <- TRUE
-TEST_03  <- TRUE
+# TEST_01  <- TRUE
+# TEST_02  <- TRUE
+# TEST_03  <- TRUE
 TEST_04  <- TRUE
 TEST_05  <- TRUE
 TEST_06  <- TRUE
@@ -394,7 +394,7 @@ for (af in filelist$names) {
 
 
 
-    ####  4. Climatological (configurable) Limits  ---------------------------------
+    ## 4. Climatological (configurable) Limits  --------------------------------
     #' \FloatBarrier
     #' \newpage
     #' ## 4. Climatological (configurable) Limits
@@ -415,26 +415,25 @@ for (af in filelist$names) {
         QS$clim_lim_C1 <- 1.14
         QS$clim_lim_D1 <- 1.32
 
-        ## . . Direct --------------------------------------------------------------
-        DATA[, Dir_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
-        DATA[wattDIR > Dir_First_Clim_lim,
-             QCF_DIR_04_1 := "First climatological limit (17)"]
-        DATA[, Dir_Secon_Clim_lim := TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15]
-        DATA[wattDIR > Dir_Secon_Clim_lim,
-             QCF_DIR_04_2 := "Second climatological limit (16)"]
+        ## __ Direct -----------------------------------------------------------
+        datapart[, Dir_First_Clim_lim := TSI_TOA * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
+        datapart[DIR_strict > Dir_First_Clim_lim,
+                 (flagname_DIR) := "First climatological limit (17)"]
+        datapart[, Dir_Secon_Clim_lim := TSI_TOA * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15]
+        datapart[DIR_strict > Dir_Secon_Clim_lim,
+                 (flagname_DIR) := "Second climatological limit (16)"]
 
-        ## . . Global --------------------------------------------------------------
-        DATA[, Glo_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60]
-        DATA[wattGLB > Glo_First_Clim_lim,
-             QCF_GLB_04_1 := "First climatological limit (17)"]
-        DATA[, Glo_Secon_Clim_lim := TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60]
-        DATA[wattGLB > Glo_Secon_Clim_lim,
-             QCF_GLB_04_2 := "Second climatological limit (16)"]
+        ## __ Global -----------------------------------------------------------
+        datapart[, Glo_First_Clim_lim := TSI_TOA * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60]
+        datapart[GLB_strict > Glo_First_Clim_lim,
+                 (flagname_GLB) := "First climatological limit (17)"]
+        datapart[, Glo_Secon_Clim_lim := TSI_TOA * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60]
+        datapart[GLB_strict > Glo_Secon_Clim_lim,
+                 (flagname_GLB) := "Second climatological limit (16)"]
     }
 
 
 
-stop()
 
 
 
@@ -469,7 +468,7 @@ stop()
 BB <- opendata()
 
 
-
+####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ----------------------------------
 #' \FloatBarrier
 #' \newpage
 #' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
@@ -546,7 +545,7 @@ if (TEST_01) {
 #' -----------------------------------------------------------------------------
 
 
-
+####  2. EXTREMELY RARE LIMITS PER BSRN  ---------------------------------------
 #' \FloatBarrier
 #' \newpage
 #' ## 2. EXTREMELY RARE LIMITS PER BSRN
@@ -738,16 +737,27 @@ if (TEST_03) {
 #+ echo=F, include=T, results="asis"
 if (TEST_04) {
 
-    cat(pander(table(DATA$QCF_GLB_04_1, exclude = NULL)))
+    testN        <- 4
+    flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+    flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+
+    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
     cat("\n\n")
-    cat(pander(table(DATA$QCF_GLB_04_2, exclude = NULL)))
-    cat("\n\n")
-    cat(pander(table(DATA$QCF_DIR_04_1, exclude = NULL)))
-    cat("\n\n")
-    cat(pander(table(DATA$QCF_DIR_04_2, exclude = NULL)))
+    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
     cat("\n\n")
 
-    hist(DATA[, wattDIR - Dir_First_Clim_lim], breaks = 100,
+
+    test <- BB |>
+        filter(!is.na(!!flagname_DIR) | !is.na(!!flagname_GLB)) |>
+        select(Date,
+               DIR_strict,
+               GLB_strict,
+               Dir_First_Clim_lim, Dir_Secon_Clim_lim,
+               Glo_First_Clim_lim, Glo_Secon_Clim_lim) |>
+        collect()
+
+
+    hist(datapart[, DIR_stict - Dir_First_Clim_lim], breaks = 100,
          main = "Departure Direct from first climatological limti")
 
     hist(DATA[, wattDIR - Dir_Secon_Clim_lim], breaks = 100,
