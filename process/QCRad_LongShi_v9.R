@@ -441,12 +441,6 @@ for (af in filelist$names) {
 
 
 
-
-
-
-
-
-
     summary(datapart)
 
     ## store actual data
@@ -579,7 +573,7 @@ if (TEST_02) {
         test <- BB |> filter(!is.na(QCv9_02_dir_flag)) |> collect() |> as.data.table()
         ## TODO
         for (ad in sort(unique(as.Date(test$Date)))) {
-            pp <- DATA[ as.Date(Date) == ad, ]
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
             ylim <- range(pp$Direct_max, pp$wattDIR, na.rm = T)
             plot(pp$Date, pp$wattDIR, "l", col = "blue",
                  ylim = ylim, xlab = "", ylab = "wattDIR")
@@ -746,113 +740,87 @@ if (TEST_04) {
     cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
     cat("\n\n")
 
+    test <- data.table(BB |>
+                           filter(!is.na(get(flagname_DIR)) |
+                                      !is.na(get(flagname_GLB))) |>
+                           select(Date,
+                                  DIR_strict,
+                                  GLB_strict,
+                                  Dir_First_Clim_lim, Dir_Secon_Clim_lim,
+                                  Glo_First_Clim_lim, Glo_Secon_Clim_lim,
+                                  !!flagname_DIR, !!flagname_GLB) |>
+                           collect())
 
-    test <- BB |>
-        filter(!is.na(!!flagname_DIR) | !is.na(!!flagname_GLB)) |>
-        select(Date,
-               DIR_strict,
-               GLB_strict,
-               Dir_First_Clim_lim, Dir_Secon_Clim_lim,
-               Glo_First_Clim_lim, Glo_Secon_Clim_lim) |>
-        collect()
-
-
-    hist(datapart[, DIR_stict - Dir_First_Clim_lim], breaks = 100,
+    hist(test[, DIR_strict - Dir_First_Clim_lim], breaks = 100,
          main = "Departure Direct from first climatological limti")
 
-    hist(DATA[, wattDIR - Dir_Secon_Clim_lim], breaks = 100,
+    hist(test[, DIR_strict - Dir_Secon_Clim_lim], breaks = 100,
          main = "Departure Direct from second climatological limit")
 
-    hist(DATA[, wattGLB - Glo_First_Clim_lim], breaks = 100,
+    hist(test[, GLB_strict - Glo_First_Clim_lim], breaks = 100,
          main = "Departure Direct from first climatological limti")
 
-    hist(DATA[, wattGLB - Glo_Secon_Clim_lim], breaks = 100,
+    hist(test[, GLB_strict - Glo_Secon_Clim_lim], breaks = 100,
          main = "Departure Direct from second climatological limit")
 
     if (DO_PLOTS) {
 
-        ## test direct first limit
-        temp1 <- DATA[ !is.na(QCF_DIR_04_1) ]
+        ## test direct limits
+        temp1 <- data.table(BB |>
+                               filter(!is.na(get(flagname_DIR))) |>
+                               select(Date,
+                                      DIR_strict,
+                                      Dir_First_Clim_lim, Dir_Secon_Clim_lim,
+                                      !!flagname_DIR) |>
+                               collect())
+
         for (ad in sort(unique(as.Date(temp1$Date)))) {
-            pp <- DATA[ as.Date(Date) == ad, ]
-            if (any(!is.na(pp$wattDIR))) {
-                ylim <- range(pp$Dir_First_Clim_lim, pp$wattDIR, na.rm = T)
-                plot(pp$Date, pp$wattDIR, "l", col = "blue",
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            if (any(!is.na(pp$DIR_strict))) {
+                ylim <- range(pp$Dir_First_Clim_lim,
+                              pp$Dir_Secon_Clim_lim,
+                              pp$DIR_strict, na.rm = T)
+                plot(pp$Date, pp$DIR_strict, "l", col = "blue",
                      ylim = ylim, xlab = "", ylab = "wattDIR")
-                title(paste("4_1", as.Date(ad, origin = "1970-01-01")))
+                title(paste("#4", as.Date(ad, origin = "1970-01-01")))
                 ## plot limits
                 lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
                 lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
                 ## mark offending data
-                points(pp[wattDIR > Dir_First_Clim_lim, Date],
-                       pp[wattDIR > Dir_First_Clim_lim, wattDIR],
+                points(pp[!is.na(get(flagname_DIR)), DIR_strict, Date],
                        col = "red", pch = 1)
             }
         }
 
-        ## test direct second limit
-        temp2 <- DATA[ !is.na(QCF_DIR_04_2) ]
-        # extra <- sample(unique(as.Date(DATA[!is.na(wattDIR), Date])),5)
-        for (ad in sort(unique(c(as.Date(temp2$Date))))) {
-            pp <- DATA[ as.Date(Date) == ad, ]
-            if (any(!is.na(pp$wattDIR))) {
-                ylim <- range(pp$Dir_Secon_Clim_lim, pp$wattDIR, na.rm = T)
-                plot(pp$Date, pp$wattDIR, "l", col = "blue",
-                     ylim = ylim, xlab = "", ylab = "wattDIR")
-                title(paste("4_2", as.Date(ad, origin = "1970-01-01")))
-                ## plot limits
-                lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
-                lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
-                ## mark offending data
-                points(pp[wattDIR > Dir_First_Clim_lim, Date],
-                       pp[wattDIR > Dir_First_Clim_lim, wattDIR],
-                       col = "red", pch = 1)
-            }
-        }
 
         ## test global first limit
-        temp1 <- DATA[ !is.na(QCF_GLB_04_1) ]
+        temp1 <- data.table(BB |>
+                                filter(!is.na(get(flagname_GLB))) |>
+                                select(Date,
+                                       GLB_strict,
+                                       Glo_First_Clim_lim, Glo_Secon_Clim_lim,
+                                       !!flagname_GLB) |>
+                                collect())
+
         for (ad in sort(unique(as.Date(temp1$Date)))) {
-            pp <- DATA[ as.Date(Date) == ad, ]
-            if (any(!is.na(pp$wattGLB))) {
-                ylim <- range(pp$Glo_First_Clim_lim, pp$wattGLB, na.rm = T)
-                plot(pp$Date, pp$wattGLB, "l", col = "green",
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            if (any(!is.na(pp$GLB_strict))) {
+                ylim <- range(pp$Glo_First_Clim_lim,
+                              pp$Glo_Secon_Clim_lim,
+                              pp$GLB_strict, na.rm = T)
+
+                plot(pp$Date, pp$GLB_strict, "l", col = "green",
                      ylim = ylim, xlab = "", ylab = "wattGLB")
-                title(paste("4_1", as.Date(ad, origin = "1970-01-01")))
+                title(paste("#4", as.Date(ad, origin = "1970-01-01")))
                 ## plot limits
                 lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink")
                 lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
                 ## mark offending data
-                points(pp[wattGLB > Glo_First_Clim_lim, Date],
-                       pp[wattGLB > Glo_First_Clim_lim, wattGLB],
-                       col = "magenta", pch = 1)
+                points(pp[!is.na(get(flagname_GLB)), GLB_strict, Date],
+                col = "red", pch = 1)
             }
         }
-
-        ## test global second limit
-        temp2 <- DATA[ !is.na(QCF_GLB_04_2) ]
-        for (ad in sort(unique(c(as.Date(temp2$Date))))) {
-            pp <- DATA[ as.Date(Date) == ad, ]
-            if (any(!is.na(pp$wattGLB))) {
-                ylim <- range(pp$Glo_Secon_Clim_lim, pp$wattGLB, na.rm = T)
-                plot(pp$Date, pp$wattGLB, "l", col = "green",
-                     ylim = ylim, xlab = "", ylab = "wattGLB")
-                title(paste("4_2", as.Date(ad, origin = "1970-01-01")))
-                ## plot limits
-                lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink")
-                lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
-                ## mark offending data
-                points(pp[wattGLB > Glo_Secon_Clim_lim, Date],
-                       pp[wattGLB > Glo_Secon_Clim_lim, wattGLB],
-                       col = "magenta", pch = 1)
-            }
-        }
-
     }
-    # DATA$Dir_First_Clim_lim <- NULL
-    # DATA$Glo_First_Clim_lim <- NULL
-    # DATA$Dir_Secon_Clim_lim <- NULL
-    # DATA$Glo_Secon_Clim_lim <- NULL
 }
 #' -----------------------------------------------------------------------------
 
