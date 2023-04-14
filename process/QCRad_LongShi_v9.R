@@ -233,20 +233,20 @@ for (af in filelist$names) {
 
     ## __ Diffuse radiation  ---------------------------------------------------
     datapart[, DIFF_strict := GLB_strict - HOR_strict]
-    warning(" * * DIF_HOR is no Diffuse radiation !! ** ")
-    cat("\n\n * * DIF_HOR is no Diffuse radiation !! ** \n\n")
-
+    warning(" * * DIF_strict is no Diffuse radiation !! ** ")
+    cat("\n\n * * DIF_strict is no Diffuse radiation !! ** \n\n")
 
     ## __ Clearness Index  -----------------------------------------------------
     datapart[, ClearnessIndex_kt := GLB_strict / (cosde(SZA) * TSI_TOA)]
 
     ## __ Diffuse fraction  ----------------------------------------------------
     datapart[, DiffuseFraction_kd := DIFF_strict / GLB_strict]
+    warning(" * * DiffuseFraction_Kd is no Diffuse Fraction !! ** ")
+    cat("\n\n * * DiffuseFraction_Kd is no Diffuse Fraction !! ** \n\n")
+
 
     ## replace infinite values
     datapart[is.infinite(DiffuseFraction_kd), DiffuseFraction_kd := NA]
-
-
 
 
     ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ---------------------------------
@@ -297,7 +297,7 @@ for (af in filelist$names) {
 
 
 
-    ####  2. EXTREMELY RARE LIMITS PER BSRN  -----------------------------------
+    ## 2. EXTREMELY RARE LIMITS PER BSRN  --------------------------------------
     #' \FloatBarrier
     #' \newpage
     #' ## 2. EXTREMELY RARE LIMITS PER BSRN
@@ -348,7 +348,7 @@ for (af in filelist$names) {
 
 
 
-    ####  3. COMPARISON TESTS PER BSRN “non-definitive”  -----------------------
+    ## 3. COMPARISON TESTS PER BSRN “non-definitive”  --------------------------
     #' \FloatBarrier
     #' \newpage
     #' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
@@ -358,11 +358,11 @@ for (af in filelist$names) {
         cat(paste("\n3. Comparison tests.\n\n"))
 
         testN        <- 3
-        flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-        flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+        flagname_UPP <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_upp_flag")
+        flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
 
-        InitVariableBBDB(flagname_DIR, as.character(NA))
-        InitVariableBBDB(flagname_GLB, as.character(NA))
+        InitVariableBBDB(flagname_UPP, as.character(NA))
+        InitVariableBBDB(flagname_LOW, as.character(NA))
 
         QS$dif_rati_po1  <-  0.03
         QS$dif_rati_po2  <-  0.08
@@ -375,22 +375,71 @@ for (af in filelist$names) {
         datapart[DiffuseFraction_kd  > QS$dif_rati_pr1  &
                      SZA            <= QS$dif_sza_break &
                      GLB_strict      > QS$dif_watt_lim,
-                 (flagname_DIR) := "Diffuse ratio comp max (11)"]
+                 (flagname_UPP) := "Diffuse ratio comp max (11)"]
         datapart[DiffuseFraction_kd  > QS$dif_rati_pr2  &
                      SZA             > QS$dif_sza_break &
                      GLB_strict      > QS$dif_watt_lim,
-                 (flagname_DIR) := "Diffuse ratio comp max (11)"]
+                 (flagname_UPP) := "Diffuse ratio comp max (11)"]
 
         ## __ Extra filters by me  ---------------------------------------------
         datapart[DiffuseFraction_kd  < QS$dif_rati_po1  &
                      SZA            <= QS$dif_sza_break &
                      GLB_strict      > QS$dif_watt_lim,
-                 (flagname_GLB) := "Diffuse ratio comp min (12)"]
+                 (flagname_LOW) := "Diffuse ratio comp min (12)"]
         datapart[DiffuseFraction_kd  < QS$dif_rati_po1  &
                      SZA             > QS$dif_sza_break &
                      GLB_strict      > QS$dif_watt_lim,
-                 (flagname_GLB) := "Diffuse ratio comp min (12)"]
+                 (flagname_LOW) := "Diffuse ratio comp min (12)"]
     }
+
+
+
+    ####  4. Climatological (configurable) Limits  ---------------------------------
+    #' \FloatBarrier
+    #' \newpage
+    #' ## 4. Climatological (configurable) Limits
+    #'
+    #+ echo=TEST_04, include=T
+    if (TEST_04) {
+        cat("\n## 4. Climatological (configurable) Limits.\n\n")
+
+        testN        <- 4
+        flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+        flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+
+        InitVariableBBDB(flagname_DIR, as.character(NA))
+        InitVariableBBDB(flagname_GLB, as.character(NA))
+
+        QS$clim_lim_C3 <- 0.77
+        QS$clim_lim_D3 <- 0.81
+        QS$clim_lim_C1 <- 1.14
+        QS$clim_lim_D1 <- 1.32
+
+        ## . . Direct --------------------------------------------------------------
+        DATA[, Dir_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
+        DATA[wattDIR > Dir_First_Clim_lim,
+             QCF_DIR_04_1 := "First climatological limit (17)"]
+        DATA[, Dir_Secon_Clim_lim := TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15]
+        DATA[wattDIR > Dir_Secon_Clim_lim,
+             QCF_DIR_04_2 := "Second climatological limit (16)"]
+
+        ## . . Global --------------------------------------------------------------
+        DATA[, Glo_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60]
+        DATA[wattGLB > Glo_First_Clim_lim,
+             QCF_GLB_04_1 := "First climatological limit (17)"]
+        DATA[, Glo_Secon_Clim_lim := TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60]
+        DATA[wattGLB > Glo_Secon_Clim_lim,
+             QCF_GLB_04_2 := "Second climatological limit (16)"]
+    }
+
+
+
+stop()
+
+
+
+
+
 
 
 
@@ -574,61 +623,67 @@ if (TEST_02) {
 if (TEST_03) {
 
     testN        <- 3
-    flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-    flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+    flagname_UPP <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_upp_flag")
+    flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
 
-    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_UPP)), useNA = "always")))
     cat("\n\n")
-    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_LOW)), useNA = "always")))
     cat("\n\n")
+
 
     years <- (BB |> filter(!is.na(DiffuseFraction_kd)) |>
                   select(year) |> unique() |> collect() |> pull())
     for (ay in years) {
         pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
         ylim <- c(-30, 1.1)
+        ylim <- c(-0.5, 1.5)
 
         par(mar = c(4, 4, 2, 1))
+
         plot(pp$SZA, pp$DiffuseFraction_kd,
-             ylab = "Diffuse fraction", xlab = "SZA", #ylim = ylim,
+             ylab = "Not Diffuse fraction", xlab = "SZA", ylim = ylim,
              cex = .1)
         title(paste("#3", ay))
 
-        par(mar = c(4, 4, 2, 1))
+        segments(               0, QS$dif_rati_pr1, QS$dif_sza_break, QS$dif_rati_pr1, col = "red" )
+        segments(QS$dif_sza_break, QS$dif_rati_pr2,               93, QS$dif_rati_pr2, col = "red" )
+
+        segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue" )
+        segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue" )
+
+        points(pp[!is.na(get(flagname_UPP)), DiffuseFraction_kd, SZA],
+               cex = .2, col = "red")
+        points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, SZA],
+               cex = .2, col = "cyan")
+
+
         plot(pp$Date, pp$DiffuseFraction_kd,
-             ylab = "Diffuse fraction", xlab = "SZA", ylim = ylim,
+             ylab = "Not Diffuse fraction", xlab = "SZA", ylim = ylim,
              cex = .1)
         title(paste("#3", ay))
 
+        points(pp[!is.na(get(flagname_UPP)), DiffuseFraction_kd, Date],
+               cex = .2, col = "red")
+        points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, Date],
+               cex = .2, col = "cyan")
 
-        # segments(               0, QS$dif_rati_pr1, QS$dif_sza_break, QS$dif_rati_pr1, col = "red" )
-        # segments(QS$dif_sza_break, QS$dif_rati_pr2,               93, QS$dif_rati_pr2, col = "red" )
-        #
-        # segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue" )
-        # segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue" )
-        #
-        # points( pp[!is.na(QCF_BTH_03_1), SZA], pp[!is.na(QCF_BTH_03_1), DiffuseFraction_Kd],
-        #         cex = .2, col = "red")
-        # points( pp[!is.na(QCF_BTH_03_2), SZA], pp[!is.na(QCF_BTH_03_2), DiffuseFraction_Kd],
-        #         cex = .2, col = "cyan")
-        #
-        #
-        # par(mar = c(4,4,2,1))
-        # plot( pp$Azimuth, pp$DiffuseFraction_Kd,
-        #       ylim = ylim,
-        #       ylab = "Diffuse fraction", xlab = "Azimuth",
-        #       cex = .1)
-        # title(paste("3_", ay))
-        #
-        # points( pp[!is.na(QCF_BTH_03_1), Azimuth], pp[!is.na(QCF_BTH_03_1), DiffuseFraction_Kd],
-        #         cex = .2, col = "red")
-        # points( pp[!is.na(QCF_BTH_03_2), Azimuth], pp[!is.na(QCF_BTH_03_2), DiffuseFraction_Kd],
-        #         cex = .2, col = "cyan")
+
+        plot(pp$Azimuth, pp$DiffuseFraction_kd,
+             ylim = ylim,
+             ylab = "Not Diffuse fraction", xlab = "Azimuth",
+             cex = .1)
+        title(paste("#3", ay))
+
+        points(pp[!is.na(get(flagname_UPP)), DiffuseFraction_kd, Azimuth],
+               cex = .2, col = "red")
+        points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, Azimuth],
+               cex = .2, col = "cyan")
     }
 
     if (DO_PLOTS) {
 
-        tmp <- BB |> filter(!is.na(QCv9_03_dir_flag) | !is.na(QCv9_03_glb_flag)) |> collect() |> as.data.table()
+        tmp <- BB |> filter(!is.na(QCv9_03_upp_flag) | !is.na(QCv9_03_low_flag)) |> collect() |> as.data.table()
 
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
 
@@ -638,7 +693,7 @@ if (TEST_03) {
             par(mar = c(2,4,2,1))
 
             plot(pp$Date, pp$DiffuseFraction_kd, "l",
-                 col = "cyan", ylab = "Diffuse Fraction", xlab = "")
+                 col = "cyan", ylab = "Not Diffuse Fraction", xlab = "")
 
             abline(h = QS$dif_rati_pr1, col = "red")
             abline(h = QS$dif_rati_pr2, col = "red", lty = 2)
@@ -653,17 +708,17 @@ if (TEST_03) {
                   ylim = ylim, col = "green", ylab = "", xlab = "")
             lines(pp$Date, pp$DIR_strict, col = "blue" )
 
-            points(pp[!is.na(QCv9_03_dir_flag), Date],
-                   pp[!is.na(QCv9_03_dir_flag), DIR_strict],
+            points(pp[!is.na(QCv9_03_upp_flag), Date],
+                   pp[!is.na(QCv9_03_upp_flag), DIR_strict],
                    ylim = ylim, col = "red")
-            points(pp[!is.na(QCv9_03_glb_flag), Date],
-                   pp[!is.na(QCv9_03_glb_flag), GLB_strict],
+            points(pp[!is.na(QCv9_03_upp_flag), Date],
+                   pp[!is.na(QCv9_03_upp_flag), GLB_strict],
                    ylim = ylim, col = "red")
-            points(pp[!is.na(QCF_BTH_03_2), Date],
-                   pp[!is.na(QCF_BTH_03_2), wattDIR],
+            points(pp[!is.na(QCv9_03_low_flag), Date],
+                   pp[!is.na(QCv9_03_low_flag), DIR_strict],
                    ylim = ylim, col = "magenta")
-            points(pp[!is.na(QCF_BTH_03_2), Date],
-                   pp[!is.na(QCF_BTH_03_2), wattGLB],
+            points(pp[!is.na(QCv9_03_low_flag), Date],
+                   pp[!is.na(QCv9_03_low_flag), GLB_strict],
                    ylim = ylim, col = "magenta")
         }
     }
@@ -674,6 +729,122 @@ if (TEST_03) {
 
 
 
+
+####  4. Climatological (configurable) Limits  ---------------------------------
+#' \FloatBarrier
+#' \newpage
+#' ## 4. Climatological (configurable) Limits
+#'
+#+ echo=F, include=T, results="asis"
+if (TEST_04) {
+
+    cat(pander(table(DATA$QCF_GLB_04_1, exclude = NULL)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_GLB_04_2, exclude = NULL)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_DIR_04_1, exclude = NULL)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_DIR_04_2, exclude = NULL)))
+    cat("\n\n")
+
+    hist(DATA[, wattDIR - Dir_First_Clim_lim], breaks = 100,
+         main = "Departure Direct from first climatological limti")
+
+    hist(DATA[, wattDIR - Dir_Secon_Clim_lim], breaks = 100,
+         main = "Departure Direct from second climatological limit")
+
+    hist(DATA[, wattGLB - Glo_First_Clim_lim], breaks = 100,
+         main = "Departure Direct from first climatological limti")
+
+    hist(DATA[, wattGLB - Glo_Secon_Clim_lim], breaks = 100,
+         main = "Departure Direct from second climatological limit")
+
+    if (DO_PLOTS) {
+
+        ## test direct first limit
+        temp1 <- DATA[ !is.na(QCF_DIR_04_1) ]
+        for (ad in sort(unique(as.Date(temp1$Date)))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            if (any(!is.na(pp$wattDIR))) {
+                ylim <- range(pp$Dir_First_Clim_lim, pp$wattDIR, na.rm = T)
+                plot(pp$Date, pp$wattDIR, "l", col = "blue",
+                     ylim = ylim, xlab = "", ylab = "wattDIR")
+                title(paste("4_1", as.Date(ad, origin = "1970-01-01")))
+                ## plot limits
+                lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
+                lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
+                ## mark offending data
+                points(pp[wattDIR > Dir_First_Clim_lim, Date],
+                       pp[wattDIR > Dir_First_Clim_lim, wattDIR],
+                       col = "red", pch = 1)
+            }
+        }
+
+        ## test direct second limit
+        temp2 <- DATA[ !is.na(QCF_DIR_04_2) ]
+        # extra <- sample(unique(as.Date(DATA[!is.na(wattDIR), Date])),5)
+        for (ad in sort(unique(c(as.Date(temp2$Date))))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            if (any(!is.na(pp$wattDIR))) {
+                ylim <- range(pp$Dir_Secon_Clim_lim, pp$wattDIR, na.rm = T)
+                plot(pp$Date, pp$wattDIR, "l", col = "blue",
+                     ylim = ylim, xlab = "", ylab = "wattDIR")
+                title(paste("4_2", as.Date(ad, origin = "1970-01-01")))
+                ## plot limits
+                lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
+                lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
+                ## mark offending data
+                points(pp[wattDIR > Dir_First_Clim_lim, Date],
+                       pp[wattDIR > Dir_First_Clim_lim, wattDIR],
+                       col = "red", pch = 1)
+            }
+        }
+
+        ## test global first limit
+        temp1 <- DATA[ !is.na(QCF_GLB_04_1) ]
+        for (ad in sort(unique(as.Date(temp1$Date)))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            if (any(!is.na(pp$wattGLB))) {
+                ylim <- range(pp$Glo_First_Clim_lim, pp$wattGLB, na.rm = T)
+                plot(pp$Date, pp$wattGLB, "l", col = "green",
+                     ylim = ylim, xlab = "", ylab = "wattGLB")
+                title(paste("4_1", as.Date(ad, origin = "1970-01-01")))
+                ## plot limits
+                lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink")
+                lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
+                ## mark offending data
+                points(pp[wattGLB > Glo_First_Clim_lim, Date],
+                       pp[wattGLB > Glo_First_Clim_lim, wattGLB],
+                       col = "magenta", pch = 1)
+            }
+        }
+
+        ## test global second limit
+        temp2 <- DATA[ !is.na(QCF_GLB_04_2) ]
+        for (ad in sort(unique(c(as.Date(temp2$Date))))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            if (any(!is.na(pp$wattGLB))) {
+                ylim <- range(pp$Glo_Secon_Clim_lim, pp$wattGLB, na.rm = T)
+                plot(pp$Date, pp$wattGLB, "l", col = "green",
+                     ylim = ylim, xlab = "", ylab = "wattGLB")
+                title(paste("4_2", as.Date(ad, origin = "1970-01-01")))
+                ## plot limits
+                lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink")
+                lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
+                ## mark offending data
+                points(pp[wattGLB > Glo_Secon_Clim_lim, Date],
+                       pp[wattGLB > Glo_Secon_Clim_lim, wattGLB],
+                       col = "magenta", pch = 1)
+            }
+        }
+
+    }
+    # DATA$Dir_First_Clim_lim <- NULL
+    # DATA$Glo_First_Clim_lim <- NULL
+    # DATA$Dir_Secon_Clim_lim <- NULL
+    # DATA$Glo_Secon_Clim_lim <- NULL
+}
+#' -----------------------------------------------------------------------------
 
 
 
