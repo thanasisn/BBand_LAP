@@ -52,6 +52,10 @@
 #'
 #' The chosen levels and filters have to be evaluated with the available data.
 #'
+#' For now this is a copy of
+#' "~/RAD_QC/QCRad_LongShi_v8_id_CM21_CHP1.R" and
+#' "~/RAD_QC/QCRad_LongShi_v8_apply_CM21_CHP1.R"
+#'
 #'
 #' TODO:
 #'
@@ -228,7 +232,10 @@ for (af in filelist$names) {
     datapart[GLB_strict < 0, GLB_strict := 0]
 
     ## __ Diffuse radiation  ---------------------------------------------------
-    datapart[, DIFF_strict := GLB_strict - DIR_strict]
+    datapart[, DIFF_strict := GLB_strict - HOR_strict]
+    warning(" * * DIF_HOR is no Diffuse radiation !! ** ")
+    cat("\n\n * * DIF_HOR is no Diffuse radiation !! ** \n\n")
+
 
     ## __ Clearness Index  -----------------------------------------------------
     datapart[, ClearnessIndex_kt := GLB_strict / (cosde(SZA) * TSI_TOA)]
