@@ -81,9 +81,17 @@ Table of Contents
 
 # Details
 
-We use a dataset of parquet files as a database for all measurements and additional data.
-And some files with extra meta data for the database.
-It should be easy to migrate to a pure database like `duckdb` or `sqlite`.
-I use some features of the `arrow` library, but I also use `data.table` when
-I find it more suitable or clear to code.
+## Development and Design
+
+Some aspects on the implementation of this project.
+
+- We use a dataset of `parquet` files as a database for all measurements and additional data.
+- There are some files with extra meta data for the data in the database and the analysis performed.
+- It should be easy to migrate to a pure database like `duckdb` or `sqlite`.
+- We use features of the `arrow` library, and also `data.table` when it is more suitable or clear to code.
+- The analysis should be able to be performed with under 8Gb of RAM.
+- There is a trade-of with the disk usage/wearing.
+- New data should be easy to be added on daily base on all levels.
+- New process and analysis should be easy to added for all data.
+
 
