@@ -876,20 +876,33 @@ if (TEST_05) {
     cat("\n\n")
 
     test <- data.table(BB |>
+                           filter(Elevat > 0) |>
                            select(Date,
-                                  DIR_strict, GLB_strict,
+                                  DIR_strict, GLB_strict, DIFF_strict,
                                   ClrSW_ref2, !!flagname_DIR) |>
                            collect())
 
-    hist(test[, ClrSW_ref2 - DIR_strict], breaks = 100)
-    hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
-    hist(DATA[, wattDIF / wattGLB    ], breaks = 100)
+    hist(test[GLB_strict / ClrSW_ref2 < 2,
+              GLB_strict / ClrSW_ref2], breaks = 100)
+    abline(v = QS$ClrSW_lim, col = "red", lty = 3)
+
+    hist(test[DIFF_strict / GLB_strict > -0.5,
+              DIFF_strict / GLB_strict], breaks = 100)
+    abline(v = QS$ClrSW_lim, col = "red", lty = 3)
+
+    hist(test[, GLB_strict], breaks = 100)
+    abline(v = QS$glo_min, col = "red", lty = 3)
 
     if (DO_PLOTS) {
-        tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
-        # tmp <- sample(DATA[!is.na(wattDIR), unique(as.Date(Date))], 10)
-        for (ad in sort(tmp)) {
-            pp <- DATA[ as.Date(Date) == ad, ]
+        tmp <- BB |>
+            filter(!is.na(get(flagname_DIR))) |>
+            select(Date) |>
+            collect() |>
+            as.data.table()
+
+        for (ad in sort(unique(as.Date(tmp$Date)))) {
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+
             ylim <- range(pp$ClrSW_ref2, pp$wattDIR, pp$wattGLB, na.rm = T)
             plot(pp$Date, pp$wattDIR, "l", col = "blue",
                  ylim = ylim, xlab = "", ylab = "wattDIR")
