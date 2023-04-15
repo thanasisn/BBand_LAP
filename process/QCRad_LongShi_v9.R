@@ -99,11 +99,11 @@ library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(pander,     warn.conflicts = TRUE, quietly = TRUE)
 
-## __  Variables  --------------------------------------------------------------
+##  Variables  -----------------------------------------------------------------
 sun_elev_min     <-  -2 * 0.103  ## Drop  radiation data when sun is below this point
 
 
-## __  Execution control  ------------------------------------------------------
+##  Execution control  ---------------------------------------------------------
 
 TEST_01  <- FALSE
 TEST_02  <- FALSE
@@ -118,7 +118,7 @@ TEST_09  <- FALSE
 # TEST_01  <- TRUE
 # TEST_02  <- TRUE
 # TEST_03  <- TRUE
-TEST_04  <- TRUE
+# TEST_04  <- TRUE
 TEST_05  <- TRUE
 TEST_06  <- TRUE
 # TEST_07  <- TRUE
@@ -435,7 +435,42 @@ for (af in filelist$names) {
 
 
 
+    ## 5. Tracker is off test  -------------------------------------------------
+    #' \FloatBarrier
+    #' \newpage
+    #' ## 5. Tracker is off test
+    #'
+    # This test use a diffuse model will be implemented when one is produced
+    # and accepted. For now we omit it to protect from over-fitting prior to
+    # make one such model.
+    #
+    #+ echo=TEST_05, include=T
+    if (TEST_05) {
+        cat(paste("\n5. Tracking test.\n\n"))
 
+        testN        <- 5
+        flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+
+        InitVariableBBDB(flagname_DIR, as.character(NA))
+
+        ## criteria
+        QS$Tracking_min_elev <-   15
+        QS$ClrSW_lim         <-    0.85
+        QS$glo_min           <-   25
+        ## Global Clear SW model
+        QS$ClrSW_a           <- 1050.5
+        QS$ClrSW_b           <-    1.095
+
+        ## Clear Sky Sort-Wave model
+        datapart[, ClrSW_ref2 := (QS$ClrSW_a / Sun_Dist_Astropy^2) * cosde(SZA)^QS$ClrSW_b]
+
+        ## __ Direct -----------------------------------------------------------
+        datapart[GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim &
+                 DIFF_strict / GLB_strict > QS$ClrSW_lim &
+                 GLB_strict               > QS$glo_min   &
+                 Elevat                   > QS$Tracking_min_elev,
+             (flagname_DIR) := "Possible no tracking (24)"]
+    }
 
 
 
@@ -537,6 +572,7 @@ if (TEST_01) {
     # DATA$Glo_max_ref <- NULL
 }
 #' -----------------------------------------------------------------------------
+
 
 
 ####  2. EXTREMELY RARE LIMITS PER BSRN  ---------------------------------------
@@ -720,9 +756,6 @@ if (TEST_03) {
 
 
 
-
-
-
 ####  4. Climatological (configurable) Limits  ---------------------------------
 #' \FloatBarrier
 #' \newpage
@@ -828,7 +861,52 @@ if (TEST_04) {
 
 
 
+####  5. Tracker is off test  --------------------------------------------------
+#' \FloatBarrier
+#' \newpage
+#' ## 5. Tracker is off test
+#'
+#+ echo=F, include=T, results="asis"
+if (TEST_05) {
 
+    testN        <- 5
+    flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+
+    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
+    cat("\n\n")
+
+    test <- data.table(BB |>
+                           select(Date,
+                                  DIR_strict, GLB_strict,
+                                  ClrSW_ref2, !!flagname_DIR) |>
+                           collect())
+
+    hist(test[, ClrSW_ref2 - DIR_strict], breaks = 100)
+    hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
+    hist(DATA[, wattDIF / wattGLB    ], breaks = 100)
+
+    if (DO_PLOTS) {
+        tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
+        # tmp <- sample(DATA[!is.na(wattDIR), unique(as.Date(Date))], 10)
+        for (ad in sort(tmp)) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$ClrSW_ref2, pp$wattDIR, pp$wattGLB, na.rm = T)
+            plot(pp$Date, pp$wattDIR, "l", col = "blue",
+                 ylim = ylim, xlab = "", ylab = "wattDIR")
+            lines(pp$Date, pp$wattGLB, col = "green")
+            title(paste("5_", as.Date(ad, origin = "1970-01-01")))
+            ## plot limits
+            # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
+            lines(pp$Date, pp$ClrSW_ref2, col = "cyan")
+            ## mark offending data
+            points(pp[!is.na(QCF_DIR_05), Date],
+                   pp[!is.na(QCF_DIR_05), wattDIR],
+                   col = "red", pch = 1)
+        }
+    }
+    # DATA$ClrSW_ref2 <- NULL
+}
+#' -----------------------------------------------------------------------------
 
 
 
