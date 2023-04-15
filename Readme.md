@@ -13,15 +13,21 @@ Plots and reports can be found here: [thanasisn.netlify.app/3-data_display](http
 Table of Contents
 =================
 
+<!--ts-->
 * [Broad Band LAP](#broad-band-lap)
+* [Table of Contents](#table-of-contents)
    * [What it does](#what-it-does)
       * [For CHP-1](#for-chp-1)
       * [For CM-21](#for-cm-21)
       * [Other processes](#other-processes)
    * [TODO](#todo)
 * [Details](#details)
+   * [Development and Design](#development-and-design)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+<!-- Added by: athan, at: 2023-04-15T21:14:39 EEST -->
+
+<!--te-->
 
 
 ## What it does
