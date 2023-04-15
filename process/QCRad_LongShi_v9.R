@@ -120,7 +120,7 @@ TEST_09  <- FALSE
 # TEST_03  <- TRUE
 # TEST_04  <- TRUE
 # TEST_05  <- TRUE
-TEST_06  <- TRUE
+# TEST_06  <- TRUE
 # TEST_07  <- TRUE
 TEST_08  <- TRUE
 TEST_09  <- TRUE
@@ -533,6 +533,97 @@ for (af in filelist$names) {
         datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
                  (flagname_BTH) := "Rayleigh diffuse limit (18)"]
     }
+
+
+
+
+
+
+
+    ##    7. Test for obstacles  -----------------------------------------------
+    #'
+    #' \newpage
+    #' ## 7. Test for obstacles
+    #'
+    #' This is deactivated
+    #'
+    #+ echo=TEST_07, include=T
+    if (TEST_07) {
+        cat(paste("\n7. Obstacles test.\n\n"))
+
+        ## . . Direct ----------------------------------------------------------
+
+        source("./QCRad_Obstacles_definition_v2.R")
+
+        ## get biology building tag
+        # biol     <- biolog_build(DATA$Azimuth, DATA$Elevat )
+        # ## apply filter for biology building
+        # ## this is not pretty we are using the indexes to mark data
+        # ## have to parse all the original data although the filter is applicable
+        # ## for a specific range of Azimuth angles
+        # building <- which(biol$type == "bellow")
+        # existing <- which(is.na(DATA_year$QCF_DIR))
+        # exclude  <- building %in% existing
+        #
+        # DATA_year$QCF_DIR[    building[exclude] ] <- "Biology Building (22)"
+        # DATA_year$QCF_DIR_07[ building[exclude] ] <- "Biology Building (22)"
+        #
+        # ## Pole abstraction is a possibility, should combine with Direct to decide
+        # suspects <- DATA_year$Azimuth > Pole_az_lim[1] & DATA_year$Azimuth < Pole_az_lim[2]
+        # DATA_year$QCF_DIR[    suspects ]          <- "Possible Direct Obstruction (23)"
+        # DATA_year$QCF_DIR_07[ suspects ]          <- "Possible Direct Obstruction (23)"
+
+
+
+    }
+
+
+
+    ##    8. Test for inverted values  -----------------------------------------
+    #' \FloatBarrier
+    #' \newpage
+    #' ## 8. Test for inverted values
+    #'
+    #' Test the ratio of Diffuse / Global radiation.
+    #' When the Diffuse is too lower than Global, (less than a % limit).
+    #'
+    #' This denotes obstacles on the mornings mostly, or very low
+    #' signals when Sun is near the horizon.
+    #' Due to the time difference of sun shine, due to geometry, location and
+    #' obstacles.
+    #'
+    #' And possible cases of Instrument windows cleaning shadowing.
+    #'
+    #' Probably these value should be removed for CS when occurring on low
+    #' elevation angles, as the measurements can not be considered to reflect
+    #' the same condition of Sun visibility.
+    #'
+    #' Additional criteria is needed for any data drop.
+    #'
+    #+ echo=TEST_08, include=T
+    if (TEST_08) {
+        cat(paste("\n8. Inversion test.\n\n"))
+
+        testN        <- 8
+        flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
+
+        InitVariableBBDB(flagname_BTH, as.character(NA))
+
+        QS$dir_glo_invert  <- 5  # Diffuse Inversion test: DIRhor - GLBhor > lim[%]
+        QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
+
+        ## __ Both  ------------------------------------------------------------
+        datapart[, Relative_diffuse := 100 * (HOR_strict  - GLB_strict) / GLB_strict ]
+        datapart[ is.infinite(Relative_diffuse), Relative_diffuse := NA]
+
+        datapart[Relative_diffuse > QS$dir_glo_invert  &
+                 GLB_strict       > QS$dir_glo_glo_off,
+                 (flagname_BTH) := "Direct > global soft (14)"]
+        datapart[Relative_diffuse > QS$dir_glo_invert,
+                 (flagname_BTH) := "Direct > global hard (15)" ]
+    }
+
+
 
 
 
@@ -1021,65 +1112,128 @@ if (TEST_06) {
             lines(pp$Date, pp$RaylDIFF, col = "magenta" )
             lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_upper_lim, col = "red" )
 
-            title(paste("6_1", as.Date(ad, origin = "1970-01-01")))
+            title(paste("#6", as.Date(ad, origin = "1970-01-01")))
 
             par(mar = c(2,4,1,1))
-            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
-            plot( pp$Date, pp$wattGLB, "l",
+            ylim <- range(pp$GLB_strict, pp$DIR_strict, na.rm = T)
+            plot( pp$Date, pp$GLB_strict, "l",
                   ylim = ylim, col = "green", ylab = "", xlab = "")
-            lines(pp$Date, pp$wattDIR, col = "blue" )
+            lines(pp$Date, pp$DIR_strict, col = "blue" )
 
-            points(pp[!is.na(QCF_BTH_06_1), Date],
-                   pp[!is.na(QCF_BTH_06_1), wattDIR],
-                   ylim = ylim, col = "red")
-            points(pp[!is.na(QCF_BTH_06_1), Date],
-                   pp[!is.na(QCF_BTH_06_1), wattGLB],
-                   ylim = ylim, col = "red")
-        }
-
-        ## plot on lower limit
-        DATA[ !is.na(QCF_BTH_06_2) , .N]
-        DATA[ !is.na(QCF_BTH_06_2) &
-                  (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) , .N]
-        DATA[ !is.na(QCF_BTH_06_2) &
-                  (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) &
-                  wattGLB > QS$Rayleigh_glo_min , .N]
-
-        tmp <- DATA[!is.na(QCF_BTH_06_2) &
-                        (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) &
-                        wattGLB > QS$Rayleigh_glo_min ]
-
-        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
-
-            pp   <- DATA[ as.Date(Date) == ad, ]
-
-            layout(matrix(c(1,2), 2, 1, byrow = TRUE))
-            par(mar = c(2,4,2,1))
-
-            ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
-            plot( pp$Date, pp$wattDIF, "l",
-                  ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
-            lines(pp$Date, pp$RaylDIFF, col = "magenta" )
-            lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_lower_lim, col = "red" )
-
-            title(paste("6_2", as.Date(ad, origin = "1970-01-01")))
-
-            par(mar = c(2,4,1,1))
-            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
-            plot( pp$Date, pp$wattGLB, "l",
-                  ylim = ylim, col = "green", ylab = "", xlab = "")
-            lines(pp$Date, pp$wattDIR, col = "blue" )
-
-            points(pp[!is.na(QCF_BTH_06_2), Date],
-                   pp[!is.na(QCF_BTH_06_2), wattDIR],
-                   ylim = ylim, col = "red")
-            points(pp[!is.na(QCF_BTH_06_2), Date],
-                   pp[!is.na(QCF_BTH_06_2), wattGLB],
-                   ylim = ylim, col = "red")
+            points(pp[!is.na(get(flagname_BTH)), DIR_strict, Date],
+                   ylim = ylim, col = "pink")
+            points(pp[!is.na(get(flagname_BTH)), GLB_strict, Date],
+                   ylim = ylim, col = "magenta")
         }
     }
 }
 #' -----------------------------------------------------------------------------
+
+
+
+####  7. Test for obstacles  ---------------------------------------------------
+#'
+#' \newpage
+#' ## 7. Test for obstacles
+#'
+#+ echo=F, include=T, results="asis"
+if (TEST_07) {
+
+}
+#' -----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+####  8. Test for inverted values  ---------------------------------------------
+#' \FloatBarrier
+#' \newpage
+#' ## 8. Test for inverted values
+#'
+#+ echo=F, include=T, results="asis"
+if (TEST_08) {
+
+    testN        <- 8
+    flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
+
+    cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always")))
+
+
+
+    hist(DATA[ !is.na(QCF_BTH_08_1), Relative_diffuse], breaks = 100)
+    hist(DATA[ !is.na(QCF_BTH_08_2), Relative_diffuse], breaks = 100)
+
+    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  Elevat])
+    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  wattHOR - wattGLB])
+    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & wattGLB > QS$dir_glo_glo_off, Elevat])
+    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & wattGLB > QS$dir_glo_glo_off, wattHOR - wattGLB])
+
+    if (DO_PLOTS) {
+
+        ## plot softer limit
+        test <- DATA[ !is.na(QCF_BTH_08_1) ]
+        xlim <- range( DATA[ Elevat > 0, Azimuth ] )
+        for (ad in unique(as.Date(test$Date))) {
+            pp   <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
+            plot( pp$Azimuth, pp$wattHOR, "l",
+                  xlim = xlim, ylim = ylim, col = "blue", ylab = "", xlab = "")
+            lines(pp$Azimuth, pp$wattGLB, col = "green" )
+            title(paste("8_1", as.Date(ad, origin = "1970-01-01")))
+            points(pp[!is.na(QCF_BTH_08_1), Azimuth],
+                   pp[!is.na(QCF_BTH_08_1), wattHOR],
+                   ylim = ylim, col = "red")
+            points(pp[!is.na(QCF_BTH_08_1), Azimuth],
+                   pp[!is.na(QCF_BTH_08_1), wattGLB],
+                   ylim = ylim, col = "magenta")
+        }
+
+        ## plot harder limit
+        test <- DATA[ !is.na(QCF_BTH_08_2) ]
+        xlim <- range( DATA[ Elevat > 0, Azimuth ] )
+        for (ad in unique(as.Date(test$Date))) {
+            pp   <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
+            plot( pp$Azimuth, pp$wattHOR, "l",
+                  xlim = xlim, ylim = ylim, col = "blue", ylab = "", xlab = "")
+            lines(pp$Azimuth, pp$wattGLB, col = "green" )
+            title(paste("8_2", as.Date(ad, origin = "1970-01-01")))
+            points(pp[!is.na(QCF_BTH_08_2), Azimuth],
+                   pp[!is.na(QCF_BTH_08_2), wattHOR],
+                   ylim = ylim, col = "red")
+            points(pp[!is.na(QCF_BTH_08_2), Azimuth],
+                   pp[!is.na(QCF_BTH_08_2), wattGLB],
+                   ylim = ylim, col = "magenta")
+        }
+
+        # test <- DATA[ , Relative_diffuse < -200 ]
+        # for (ad in unique(as.Date(DATA[test,Date]))) {
+        #     pp   <- DATA[ as.Date(Date) == ad, ]
+        #     tt   <- pp[, Relative_diffuse < -200 ]
+        #     ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
+        #     plot( pp$Date, pp$wattHOR, "l",
+        #           ylim = ylim, col = "blue", ylab = "", xlab = "")
+        #     lines(pp$Date, pp$wattGLB, col = "green" )
+        #     title(as.Date(ad, origin = "1970-01-01"))
+        #     points(pp[tt, Date],
+        #            pp[tt, wattHOR],
+        #            ylim = ylim, col = "blue")
+        #     points(pp[tt, Date],
+        #            pp[tt, wattGLB],
+        #            ylim = ylim, col = "green")
+        # }
+
+    }
+    DATA$Relative_diffuse <- NULL
+}
+#' -----------------------------------------------------------------------------
+
+
+
 
 
 
