@@ -1162,7 +1162,12 @@ if (TEST_08) {
 
     cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always")))
 
+    test <- BB |>
+        filter(Elevat > 0) |>
+        select(!!flagname_BTH, Relative_diffuse, Elevat, GLB_strict) |>
+        collect() |> data.table()
 
+    hist(test$Relative_diffuse, breaks = 100)
 
     hist(DATA[ !is.na(QCF_BTH_08_1), Relative_diffuse], breaks = 100)
     hist(DATA[ !is.na(QCF_BTH_08_2), Relative_diffuse], breaks = 100)
