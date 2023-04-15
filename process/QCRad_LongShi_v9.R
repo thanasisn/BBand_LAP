@@ -1164,18 +1164,17 @@ if (TEST_08) {
 
     test <- BB |>
         filter(Elevat > 0) |>
-        select(!!flagname_BTH, Relative_diffuse, Elevat, GLB_strict) |>
+        select(!!flagname_BTH, Relative_diffuse, Elevat, GLB_strict, HOR_strict) |>
         collect() |> data.table()
 
-    hist(test$Relative_diffuse, breaks = 100)
+    hist(test[Relative_diffuse < 10, Relative_diffuse], breaks = 100)
+    abline(v = QS$dir_glo_invert, lty = 3, col = "red")
 
-    hist(DATA[ !is.na(QCF_BTH_08_1), Relative_diffuse], breaks = 100)
-    hist(DATA[ !is.na(QCF_BTH_08_2), Relative_diffuse], breaks = 100)
+    hist(test[Relative_diffuse > QS$dir_glo_invert & Elevat  > 3, Elevat], breaks = 100)
+    hist(test[Relative_diffuse > QS$dir_glo_invert & Elevat  > 3, HOR_strict - GLB_strict], breaks = 100)
+    hist(test[Relative_diffuse > QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, Elevat], breaks = 100)
+    hist(test[Relative_diffuse > QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, HOR_strict - GLB_strict], breaks = 100)
 
-    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  Elevat])
-    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  wattHOR - wattGLB])
-    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & wattGLB > QS$dir_glo_glo_off, Elevat])
-    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & wattGLB > QS$dir_glo_glo_off, wattHOR - wattGLB])
 
     if (DO_PLOTS) {
 
