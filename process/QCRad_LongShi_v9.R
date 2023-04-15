@@ -122,7 +122,7 @@ TEST_09  <- FALSE
 # TEST_05  <- TRUE
 # TEST_06  <- TRUE
 # TEST_07  <- TRUE
-TEST_08  <- TRUE
+# TEST_08  <- TRUE
 TEST_09  <- TRUE
 
 ## mostly for daily plots
@@ -481,7 +481,7 @@ for (af in filelist$names) {
 
 
 
-    ##    6. Rayleigh Limit Diffuse Comparison  --------------------------------
+    ## 6. Rayleigh Limit Diffuse Comparison  -----------------------------------
     #' \FloatBarrier
     #' \newpage
     #' ## 6. Rayleigh Limit Diffuse Comparison
@@ -540,7 +540,7 @@ for (af in filelist$names) {
 
 
 
-    ##    7. Test for obstacles  -----------------------------------------------
+    ## 7. Test for obstacles  --------------------------------------------------
     #'
     #' \newpage
     #' ## 7. Test for obstacles
@@ -579,7 +579,7 @@ for (af in filelist$names) {
 
 
 
-    ##    8. Test for inverted values  -----------------------------------------
+    ## 8. Test for inverted values  --------------------------------------------
     #' \FloatBarrier
     #' \newpage
     #' ## 8. Test for inverted values
@@ -622,6 +622,127 @@ for (af in filelist$names) {
         datapart[Relative_diffuse > QS$dir_glo_invert,
                  (flagname_BTH) := "Direct > global hard (15)" ]
     }
+
+
+
+
+
+
+
+
+
+
+
+
+    ## 9. Clearness index test  ------------------------------------------------
+    #' \FloatBarrier
+    #' \newpage
+    #' ## 9. Clearness index test
+    #'
+    #' This filter is mine, and is applied on GHI data.
+    #'
+    #' Data near elevation 0 are caused by the cos(SZA) while calculating
+    #' kt = GLB / (cos(sza) * TSI).
+    #'
+    #' For larger elevation angles manual inspection is needed.
+    #'
+    #+ echo=TEST_09, include=T
+    if (TEST_09) {
+        cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))0
+
+        testN        <- 9
+        flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+
+        InitVariableBBDB(flagname_GLB, as.character(NA))
+
+        QS$CL_idx_max <-  1.13  # Upper Clearness index accepted level
+        QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
+        QS$CL_idx_ele <-  8     # Apply for elevations above this angle
+
+        ## . . Global --------------------------------------------------------------
+        DATA[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
+             QCF_GLB_09 := "Clearness index limit max (19)" ]
+        DATA[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele,
+             QCF_GLB_09 := "Clearness index limit min (20)" ]
+
+
+    }
+
+    #+ echo=F, include=T, results="asis"
+    if (TEST_09) {
+
+        cat(pander(table(DATA$QCF_GLB_09, exclude = TRUE)))
+        cat("\n\n")
+
+        range(DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], na.rm = T)
+        hist( DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], breaks = 100 )
+
+        if (any(!is.na(DATA$QCF_GLB_09))) {
+            hist(DATA[!is.na(QCF_GLB_09), wattGLB],      breaks = 100)
+            hist(DATA[!is.na(QCF_GLB_09), Elevat ],      breaks = 100)
+            hist(DATA[!is.na(QCF_GLB_09), Clearness_Kt], breaks = 100)
+        }
+
+
+        if (DO_PLOTS) {
+
+            tmp <- DATA[ !is.na(QCF_GLB_09) ]
+
+            ## plot offending years
+            for (ay in unique(year(tmp$Date))) {
+                pp <- DATA[year(Date) == ay]
+
+                ylim = c(-0.5, 2)
+                plot(pp$Elevat, pp$Clearness_Kt,
+                     main = ay, pch = 19, cex = 0.1,
+                     ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
+
+                abline(v = QS$CL_idx_ele, col = "yellow")
+
+                points(pp[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Elevat],
+                       pp[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Clearness_Kt],
+                       pch = 19, cex = 0.3, col = "red")
+                abline(h = QS$CL_idx_max, col = "magenta", lwd = 0.5)
+
+                points(pp[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Elevat],
+                       pp[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Clearness_Kt],
+                       pch = 19, cex = 0.3, col = "blue")
+                abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+            }
+
+            ## plot offending days
+            for (ad in sort(unique(c(as.Date(tmp$Date))))) {
+                pp   <- DATA[ as.Date(Date) == ad, ]
+                ylim <- range(pp$wattDIR, pp$wattGLB, na.rm = T)
+                plot(pp$Date, pp$wattGLB, "l", col = "green",
+                     ylim = ylim, xlab = "", ylab = "wattGLB")
+                lines(pp$Date, pp$wattDIR, col = "blue")
+                title(paste("9_", as.Date(ad, origin = "1970-01-01")))
+                ## mark offending data
+                points(pp[!is.na(QCF_GLB_09), Date],
+                       pp[!is.na(QCF_GLB_09), wattGLB],
+                       col = "red", pch = 1)
+                ## no applicable to direct!!
+                # points(pp[!is.na(QCF_GLB_09), Date],
+                #        pp[!is.na(QCF_GLB_09), wattDIR],
+                #        col = "red", pch = 1)
+            }
+        }
+    }
+    #' -----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1010,8 +1131,6 @@ if (TEST_04) {
 
 
 
-
-
 ####  5. Tracker is off test  --------------------------------------------------
 #' \FloatBarrier
 #' \newpage
@@ -1144,11 +1263,6 @@ if (TEST_07) {
 
 
 
-
-
-
-
-
 ####  8. Test for inverted values  ---------------------------------------------
 #' \FloatBarrier
 #' \newpage
@@ -1178,61 +1292,27 @@ if (TEST_08) {
 
     if (DO_PLOTS) {
 
-        ## plot softer limit
-        test <- DATA[ !is.na(QCF_BTH_08_1) ]
-        xlim <- range( DATA[ Elevat > 0, Azimuth ] )
-        for (ad in unique(as.Date(test$Date))) {
-            pp   <- DATA[ as.Date(Date) == ad, ]
-            ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
-            plot( pp$Azimuth, pp$wattHOR, "l",
-                  xlim = xlim, ylim = ylim, col = "blue", ylab = "", xlab = "")
-            lines(pp$Azimuth, pp$wattGLB, col = "green" )
-            title(paste("8_1", as.Date(ad, origin = "1970-01-01")))
-            points(pp[!is.na(QCF_BTH_08_1), Azimuth],
-                   pp[!is.na(QCF_BTH_08_1), wattHOR],
-                   ylim = ylim, col = "red")
-            points(pp[!is.na(QCF_BTH_08_1), Azimuth],
-                   pp[!is.na(QCF_BTH_08_1), wattGLB],
+        tmp <- BB |>
+            filter(!is.na(get(flagname_BTH))) |>
+            select(Date) |>
+            collect()    |>
+            as.data.table()
+
+        for (ad in unique(as.Date(tmp$Date))) {
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            ylim <- range(pp$GLB_strict, pp$HOR_strict, na.rm = T)
+
+            plot( pp$Azimuth, pp$HOR_strict, "l",
+                  ylim = ylim, col = "blue", ylab = "", xlab = "")
+            lines(pp$Azimuth, pp$GLB_strict, col = "green")
+            title(paste("#8", as.Date(ad, origin = "1970-01-01")))
+
+            points(pp[!is.na(get(flagname_BTH)), HOR_strict, Azimuth],
+                   col = "red")
+            points(pp[!is.na(get(flagname_BTH)), GLB_strict, Azimuth],
                    ylim = ylim, col = "magenta")
         }
-
-        ## plot harder limit
-        test <- DATA[ !is.na(QCF_BTH_08_2) ]
-        xlim <- range( DATA[ Elevat > 0, Azimuth ] )
-        for (ad in unique(as.Date(test$Date))) {
-            pp   <- DATA[ as.Date(Date) == ad, ]
-            ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
-            plot( pp$Azimuth, pp$wattHOR, "l",
-                  xlim = xlim, ylim = ylim, col = "blue", ylab = "", xlab = "")
-            lines(pp$Azimuth, pp$wattGLB, col = "green" )
-            title(paste("8_2", as.Date(ad, origin = "1970-01-01")))
-            points(pp[!is.na(QCF_BTH_08_2), Azimuth],
-                   pp[!is.na(QCF_BTH_08_2), wattHOR],
-                   ylim = ylim, col = "red")
-            points(pp[!is.na(QCF_BTH_08_2), Azimuth],
-                   pp[!is.na(QCF_BTH_08_2), wattGLB],
-                   ylim = ylim, col = "magenta")
-        }
-
-        # test <- DATA[ , Relative_diffuse < -200 ]
-        # for (ad in unique(as.Date(DATA[test,Date]))) {
-        #     pp   <- DATA[ as.Date(Date) == ad, ]
-        #     tt   <- pp[, Relative_diffuse < -200 ]
-        #     ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
-        #     plot( pp$Date, pp$wattHOR, "l",
-        #           ylim = ylim, col = "blue", ylab = "", xlab = "")
-        #     lines(pp$Date, pp$wattGLB, col = "green" )
-        #     title(as.Date(ad, origin = "1970-01-01"))
-        #     points(pp[tt, Date],
-        #            pp[tt, wattHOR],
-        #            ylim = ylim, col = "blue")
-        #     points(pp[tt, Date],
-        #            pp[tt, wattGLB],
-        #            ylim = ylim, col = "green")
-        # }
-
     }
-    DATA$Relative_diffuse <- NULL
 }
 #' -----------------------------------------------------------------------------
 
