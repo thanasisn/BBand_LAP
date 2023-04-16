@@ -37,10 +37,10 @@ writedata <- function(.) {
 
 #' Create and init a new column/variable in the Broad Band dataset.
 #'
-#' @param varname  The name of the new column to create
+#' @param varname  The name of the new column to create.
 #' @param vartype  The data type use to fill the new column.
 #'
-#' @return         Nothing. It edit the dataset in place
+#' @return         Nothing. It edit the dataset in place and writes to disk.
 #' @export
 #'
 #' @examples       InitVariableBBDB("new_varile_name", as.character(NA))
@@ -61,7 +61,14 @@ InitVariableBBDB <- function(varname, vartype) {
 
 
 
-
+#' Overwrite an existing variable in the dataset.
+#'
+#' @param varname  The name of the column, have to exist already
+#' @param vartype  The data type of the column
+#'
+#' @return         Nothing. It edit the dataset in place and writes to disk.
+#' @export
+#'
 OVERWRITEVariableBBDB <- function(varname, vartype) {
     BB <- opendata()
     if (!is.character(varname)) stop()
@@ -76,3 +83,4 @@ OVERWRITEVariableBBDB <- function(varname, vartype) {
     }
     BB <- opendata()
 }
+
