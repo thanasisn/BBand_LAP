@@ -162,6 +162,7 @@ DO_PLOTS <- TRUE
 ## make it NA to reprocess all
 InitVariableBBDB("QCv9_01_dir_flag", as.character(NA))
 
+# OVERWRITEVariableBBDB("QCv9_01_dir_flag", as.character(NA))
 
 ## list data base files
 filelist <- data.table(
@@ -408,7 +409,7 @@ for (af in filelist$names) {
     #'
     #+ echo=TEST_04, include=T
     if (TEST_04) {
-        cat("\n## 4. Climatological (configurable) Limits.\n\n")
+        cat("\n4. Climatological (configurable) Limits.\n\n")
 
         testN        <- 4
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
