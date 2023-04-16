@@ -162,6 +162,7 @@ DO_PLOTS <- TRUE
 ## make it NA to reprocess all
 InitVariableBBDB("QCv9_01_dir_flag", as.character(NA))
 
+
 ## list data base files
 filelist <- data.table(
     names = list.files(DB_DIR,
