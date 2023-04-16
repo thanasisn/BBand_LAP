@@ -10,12 +10,11 @@ This is partial used as operational procedures.
 Plots and reports can be found here: [thanasisn.netlify.app/3-data_display](https://thanasisn.netlify.app/3-data_display)
 
 
-Table of Contents
-=================
+## Table of Contents
 
 <!--ts-->
 * [Broad Band LAP](#broad-band-lap)
-* [Table of Contents](#table-of-contents)
+   * [Table of Contents](#table-of-contents)
    * [What it does](#what-it-does)
       * [For CHP-1](#for-chp-1)
       * [For CM-21](#for-cm-21)
@@ -25,13 +24,12 @@ Table of Contents
    * [Development and Design](#development-and-design)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-04-15T21:14:39 EEST -->
+<!-- Added by: athan, at: 2023-04-16T11:45:41 EEST -->
 
 <!--te-->
 
 
 ## What it does
-
 
 ### For CHP-1
 
@@ -66,11 +64,16 @@ Table of Contents
 
 ### Other processes
 
-- Import data from [github.com/thanasisn/TSI](https://github.com/thanasisn/TSI)
+- Quality Check of radiation data   
+  - Flags data using mainly the algorithm of C. N. Long and Y. Shi (2006)
+- Imports data from [github.com/thanasisn/TSI](https://github.com/thanasisn/TSI)
   - `Sun_Dist_Astropy` Sun - LAP distance
   - `TSI_TOA`          TSI at TOA at LAP
   - `TSI_1au`          TSI 
   - `TSI_source`       TSI data source
+- Imports atmospheric pressure data from proxies
+  - `Pressure`         Atmospheric pressure at LAP
+  - `Pressure_source`  Data source
 - Keeps an `md5sum` of all input files to check for bit rot and other data corruption.
 
 
@@ -80,8 +83,7 @@ Table of Contents
 - Process more instruments
 - Interactive plot of db variables
 - Import libRadtran data
-- Import pressure
-- May import QCrad and CSid
+- May import CSid
 
 ----------------------
 
