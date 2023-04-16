@@ -115,14 +115,14 @@ TEST_07  <- FALSE
 TEST_08  <- FALSE
 TEST_09  <- FALSE
 
-# TEST_01  <- TRUE
-# TEST_02  <- TRUE
-# TEST_03  <- TRUE
-# TEST_04  <- TRUE
-# TEST_05  <- TRUE
-# TEST_06  <- TRUE
-# TEST_07  <- TRUE
-# TEST_08  <- TRUE
+TEST_01  <- TRUE
+TEST_02  <- TRUE
+TEST_03  <- TRUE
+TEST_04  <- TRUE
+TEST_05  <- TRUE
+TEST_06  <- TRUE
+TEST_07  <- TRUE
+TEST_08  <- TRUE
 TEST_09  <- TRUE
 
 ## mostly for daily plots
@@ -294,7 +294,7 @@ for (af in filelist$names) {
         datapart[GLB_strict > Glo_max_ref,
                  (flagname_GLB) := "Physical possible limit max (6)"]
 
-        rm(flagname_DIR, flagname_GLB)
+        rm(list = ls(pattern = "flagname_.*"))
     }
 
 
@@ -347,7 +347,7 @@ for (af in filelist$names) {
         datapart[GLB_strict > Global_max,
                  (flagname_GLB) := "Extremely rare limits max (4)"]
 
-        rm(flagname_DIR, flagname_GLB)
+        rm(list = ls(pattern = "flagname_.*"))
     }
 
 
@@ -395,7 +395,7 @@ for (af in filelist$names) {
                      GLB_strict      > QS$dif_watt_lim,
                  (flagname_LOW) := "Diffuse ratio comp min (12)"]
 
-        rm(flagname_LOW, flagname_UPP)
+        rm(list = ls(pattern = "flagname_.*"))
     }
 
 
@@ -437,7 +437,7 @@ for (af in filelist$names) {
         datapart[GLB_strict > Glo_Secon_Clim_lim,
                  (flagname_GLB) := "Second climatological limit (16)"]
 
-        rm(flagname_GLB, flagname_DIR)
+        rm(list = ls(pattern = "flagname_.*"))
     }
 
 
@@ -478,7 +478,7 @@ for (af in filelist$names) {
                  Elevat                   > QS$Tracking_min_elev,
              (flagname_DIR) := "Possible no tracking (24)"]
 
-        rm(flagname_DIR)
+        rm(list = ls(pattern = "flagname_.*"))
     }
 
 
@@ -535,7 +535,7 @@ for (af in filelist$names) {
         datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
                  (flagname_BTH) := "Rayleigh diffuse limit (18)"]
 
-        rm(flagname_BTH)
+        rm(list = ls(pattern = "flagname_.*"))
     }
 
 
@@ -553,7 +553,7 @@ for (af in filelist$names) {
 
         ## . . . Direct --------------------------------------------------------
 
-        source("./QCRad_Obstacles_definition_v2.R")
+        # source("./QCRad_Obstacles_definition_v2.R")
 
         ## get biology building tag
         # biol     <- biolog_build(DATA$Azimuth, DATA$Elevat )
@@ -572,9 +572,6 @@ for (af in filelist$names) {
         # suspects <- DATA_year$Azimuth > Pole_az_lim[1] & DATA_year$Azimuth < Pole_az_lim[2]
         # DATA_year$QCF_DIR[    suspects ]          <- "Possible Direct Obstruction (23)"
         # DATA_year$QCF_DIR_07[ suspects ]          <- "Possible Direct Obstruction (23)"
-
-
-
     }
 
 
@@ -622,7 +619,7 @@ for (af in filelist$names) {
         datapart[Relative_diffuse > QS$dir_glo_invert,
                  (flagname_BTH) := "Direct > global hard (15)" ]
 
-        rm(flagname_BTH)
+        rm(list = ls(pattern = "flagname_.*"))
     }
 
 
@@ -658,7 +655,7 @@ for (af in filelist$names) {
         datapart[ClearnessIndex_kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele,
              (flagname_GLB) := "Clearness index limit min (20)" ]
 
-        rm(flagname_GLB)
+        rm(list = ls(pattern = "flagname_.*"))
     }
 
 
@@ -756,7 +753,7 @@ if (TEST_01) {
             #        col = "red", pch = 1)
         }
     }
-    # DATA$Glo_max_ref <- NULL
+    rm(list = ls(pattern = "flagname_.*"))
 }
 #' -----------------------------------------------------------------------------
 
@@ -825,6 +822,7 @@ if (TEST_02) {
                    col = "magenta", pch = 1)
         }
     }
+    rm(list = ls(pattern = "flagname_.*"))
 }
 #' -----------------------------------------------------------------------------
 
@@ -938,6 +936,7 @@ if (TEST_03) {
                    ylim = ylim, col = "magenta")
         }
     }
+    rm(list = ls(pattern = "flagname_.*"))
 }
 #' -----------------------------------------------------------------------------
 
@@ -1041,6 +1040,7 @@ if (TEST_04) {
             }
         }
     }
+    rm(list = ls(pattern = "flagname_.*"))
 }
 #' -----------------------------------------------------------------------------
 
@@ -1100,6 +1100,7 @@ if (TEST_05) {
                    col = "red", pch = 1)
         }
     }
+    rm(list = ls(pattern = "flagname_.*"))
 }
 #' -----------------------------------------------------------------------------
 
@@ -1160,6 +1161,7 @@ if (TEST_06) {
                    ylim = ylim, col = "magenta")
         }
     }
+    rm(list = ls(pattern = "flagname_.*"))
 }
 #' -----------------------------------------------------------------------------
 
@@ -1228,6 +1230,7 @@ if (TEST_08) {
                    ylim = ylim, col = "magenta")
         }
     }
+    rm(list = ls(pattern = "flagname_.*"))
 }
 #' -----------------------------------------------------------------------------
 
@@ -1247,22 +1250,33 @@ if (TEST_09) {
     cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
     cat("\n\n")
 
+    test <- BB |>
+        filter(Elevat > 0 & !is.na(ClearnessIndex_kt) & ClearnessIndex_kt > 0) |>
+        select(!!flagname_GLB, ClearnessIndex_kt, Elevat,
+               GLB_strict) |>
+        collect() |> data.table()
 
-    range(DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], na.rm = T)
-    hist( DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], breaks = 100 )
+    range(test[Elevat > QS$CL_idx_ele, ClearnessIndex_kt], na.rm = T)
+    hist( test[Elevat > QS$CL_idx_ele, ClearnessIndex_kt], breaks = 100)
+    abline(v = QS$CL_idx_max, lty = 3, col = "red")
+    abline(v = QS$CL_idx_min, lty = 3, col = "red")
 
-    if (any(!is.na(DATA$QCF_GLB_09))) {
-        hist(DATA[!is.na(QCF_GLB_09), wattGLB],      breaks = 100)
-        hist(DATA[!is.na(QCF_GLB_09), Elevat ],      breaks = 100)
-        hist(DATA[!is.na(QCF_GLB_09), Clearness_Kt], breaks = 100)
+    if (any(!is.na(test$QCv9_09_glb_flag))) {
+        hist(test[!is.na(QCv9_09_glb_flag), GLB_strict],        breaks = 100)
+        hist(test[!is.na(QCv9_09_glb_flag), Elevat ],           breaks = 100)
+        hist(test[!is.na(QCv9_09_glb_flag), ClearnessIndex_kt], breaks = 100)
     }
 
 
     if (DO_PLOTS) {
 
-        tmp <- DATA[ !is.na(QCF_GLB_09) ]
+        tmp <- BB |>
+            filter(!is.na(get(flagname_GLB))) |>
+            select(Date) |>
+            collect()    |>
+            as.data.table()
 
-        ## plot offending years
+        ## TODO plot offending years
         for (ay in unique(year(tmp$Date))) {
             pp <- DATA[year(Date) == ay]
 
@@ -1284,7 +1298,7 @@ if (TEST_09) {
             abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
         }
 
-        ## plot offending days
+        ## TODO plot offending days
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
             pp   <- DATA[ as.Date(Date) == ad, ]
             ylim <- range(pp$wattDIR, pp$wattGLB, na.rm = T)
@@ -1302,6 +1316,7 @@ if (TEST_09) {
             #        col = "red", pch = 1)
         }
     }
+    rm(list = ls(pattern = "flagname_.*"))
 }
 #' -----------------------------------------------------------------------------
 
