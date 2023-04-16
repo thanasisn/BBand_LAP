@@ -22,9 +22,10 @@ Plots and reports can be found here: [thanasisn.netlify.app/3-data_display](http
    * [TODO](#todo)
 * [Details](#details)
    * [Development and Design](#development-and-design)
+   * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-04-16T11:45:41 EEST -->
+<!-- Added by: athan, at: 2023-04-16T12:54:09 EEST -->
 
 <!--te-->
 
@@ -102,4 +103,12 @@ Some aspects on the implementation of this project.
 - New data should be easy to be added on daily base on all levels.
 - New process and analysis should be easy to added for all data.
 
+## Documentation and usage
+
+There is no centralized documentation for the project. Although you can refer to:
+
+- `Readme.md` or other markdown files for a relevant overview   
+- Summary notes on the start of each script
+- Comments inside each script
+- Compiled reports from each script
 
