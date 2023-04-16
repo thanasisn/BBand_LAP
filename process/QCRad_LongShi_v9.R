@@ -297,6 +297,7 @@ for (af in filelist$names) {
                  (flagname_GLB) := "Physical possible limit max (6)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -350,6 +351,7 @@ for (af in filelist$names) {
                  (flagname_GLB) := "Extremely rare limits max (4)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -398,6 +400,7 @@ for (af in filelist$names) {
                  (flagname_LOW) := "Diffuse ratio comp min (12)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -440,6 +443,7 @@ for (af in filelist$names) {
                  (flagname_GLB) := "Second climatological limit (16)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -481,6 +485,7 @@ for (af in filelist$names) {
              (flagname_DIR) := "Possible no tracking (24)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -538,6 +543,7 @@ for (af in filelist$names) {
                  (flagname_BTH) := "Rayleigh diffuse limit (18)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -622,6 +628,7 @@ for (af in filelist$names) {
                  (flagname_BTH) := "Direct > global hard (15)" ]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -658,6 +665,7 @@ for (af in filelist$names) {
              (flagname_GLB) := "Clearness index limit min (20)" ]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -670,6 +678,7 @@ for (af in filelist$names) {
     cat("Save: ", af, "\n\n")
     ## clean
     rm(datapart)
+    gc()
 
     }
 
@@ -755,6 +764,7 @@ if (TEST_01) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -824,6 +834,7 @@ if (TEST_02) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -938,6 +949,7 @@ if (TEST_03) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1042,6 +1054,7 @@ if (TEST_04) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1102,6 +1115,7 @@ if (TEST_05) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1165,6 +1179,7 @@ if (TEST_06) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1234,6 +1249,7 @@ if (TEST_08) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1320,6 +1336,7 @@ if (TEST_09) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
