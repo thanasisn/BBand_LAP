@@ -1159,6 +1159,8 @@ if (TEST_06) {
                    ylim = ylim, col = "pink")
             points(pp[!is.na(get(flagname_BTH)), GLB_strict, Date],
                    ylim = ylim, col = "magenta")
+
+            layout(1,1)
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
