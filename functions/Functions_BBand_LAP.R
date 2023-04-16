@@ -58,3 +58,21 @@ InitVariableBBDB <- function(varname, vartype) {
     BB <- opendata()
 }
 
+
+
+
+
+OVERWRITEVariableBBDB <- function(varname, vartype) {
+    BB <- opendata()
+    if (!is.character(varname)) stop()
+    if (is.null(vartype)) stop()
+
+    if (any(names(BB) == varname)) {
+        cat("Overwrite column: ", varname, "\n")
+        BB <- BB |> mutate( !!varname := vartype) |> compute()
+        writedata(BB)
+    } else {
+        stop("The column not exist to overwrite")
+    }
+    BB <- opendata()
+}
