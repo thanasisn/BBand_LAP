@@ -739,20 +739,19 @@ if (TEST_01) {
             #        col = "red", pch = 1)
         }
 
+        ## Plot Global radiation
         test <- BB |> filter(!is.na(QCv9_01_glb_flag) ) |> collect() |> as.data.table()
-        ## TODO
         for (ad in sort(unique(as.Date(c(test$Date))))) {
-            pp <- DATA[ as.Date(Date) == ad, ]
-            ylim <- range(pp$Glo_max_ref, pp$wattGLB, na.rm = T)
-            plot(pp$Date, pp$wattGLB, "l", col = "green",
-                 ylim = ylim, xlab = "", ylab = "wattGLB")
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            ylim <- range(pp$Glo_max_ref, pp$GLB_strict, na.rm = T)
+            plot(pp$Date, pp$GLB_strict, "l", col = "green",
+                 ylim = ylim, xlab = "", ylab = "GLB")
             title(paste("#1", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             lines(pp$Date, pp$Glo_max_ref, col = "red")
             ## mark offending data
-            # points(pp[!is.na(QCF_DIR_01), Date],
-            #        pp[!is.na(QCF_DIR_01), wattDIR],
-            #        col = "red", pch = 1)
+            points(pp[!is.na(get(flagname_GLB)), GLB_strict, Date],
+                   col = "red", pch = 1)
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
