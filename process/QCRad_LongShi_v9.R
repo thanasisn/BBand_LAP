@@ -204,7 +204,6 @@ for (af in filelist$names) {
 
     cat("Load: ", af, "\n")
 
-
     ##  Create strict radiation data  ------------------------------------------
 
     ## __ Daytime radiation only  ----------------------------------------------
@@ -245,9 +244,9 @@ for (af in filelist$names) {
     warning(" * * DiffuseFraction_Kd is no Diffuse Fraction !! ** ")
     cat("\n\n * * DiffuseFraction_Kd is no Diffuse Fraction !! ** \n\n")
 
-
     ## replace infinite values
     datapart[is.infinite(DiffuseFraction_kd), DiffuseFraction_kd := NA]
+
 
 
     ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ---------------------------------
@@ -294,6 +293,8 @@ for (af in filelist$names) {
         datapart[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cosde(SZA)^1.2 + QS$glo_SWdn_off]
         datapart[GLB_strict > Glo_max_ref,
                  (flagname_GLB) := "Physical possible limit max (6)"]
+
+        rm(flagname_DIR, flagname_GLB)
     }
 
 
@@ -345,6 +346,8 @@ for (af in filelist$names) {
                  (flagname_GLB) := "Extremely rare limits min (3)"]
         datapart[GLB_strict > Global_max,
                  (flagname_GLB) := "Extremely rare limits max (4)"]
+
+        rm(flagname_DIR, flagname_GLB)
     }
 
 
@@ -391,6 +394,8 @@ for (af in filelist$names) {
                      SZA             > QS$dif_sza_break &
                      GLB_strict      > QS$dif_watt_lim,
                  (flagname_LOW) := "Diffuse ratio comp min (12)"]
+
+        rm(flagname_LOW, flagname_UPP)
     }
 
 
@@ -431,8 +436,9 @@ for (af in filelist$names) {
         datapart[, Glo_Secon_Clim_lim := TSI_TOA * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60]
         datapart[GLB_strict > Glo_Secon_Clim_lim,
                  (flagname_GLB) := "Second climatological limit (16)"]
-    }
 
+        rm(flagname_GLB, flagname_DIR)
+    }
 
 
 
@@ -471,13 +477,9 @@ for (af in filelist$names) {
                  GLB_strict               > QS$glo_min   &
                  Elevat                   > QS$Tracking_min_elev,
              (flagname_DIR) := "Possible no tracking (24)"]
+
+        rm(flagname_DIR)
     }
-
-
-
-
-
-
 
 
 
@@ -532,11 +534,9 @@ for (af in filelist$names) {
                  (flagname_BTH) := "Rayleigh diffuse limit (18)"]
         datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
                  (flagname_BTH) := "Rayleigh diffuse limit (18)"]
+
+        rm(flagname_BTH)
     }
-
-
-
-
 
 
 
@@ -551,7 +551,7 @@ for (af in filelist$names) {
     if (TEST_07) {
         cat(paste("\n7. Obstacles test.\n\n"))
 
-        ## . . Direct ----------------------------------------------------------
+        ## . . . Direct --------------------------------------------------------
 
         source("./QCRad_Obstacles_definition_v2.R")
 
@@ -621,16 +621,9 @@ for (af in filelist$names) {
                  (flagname_BTH) := "Direct > global soft (14)"]
         datapart[Relative_diffuse > QS$dir_glo_invert,
                  (flagname_BTH) := "Direct > global hard (15)" ]
+
+        rm(flagname_BTH)
     }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -648,7 +641,7 @@ for (af in filelist$names) {
     #'
     #+ echo=TEST_09, include=T
     if (TEST_09) {
-        cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))0
+        cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
 
         testN        <- 9
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
@@ -659,92 +652,14 @@ for (af in filelist$names) {
         QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
         QS$CL_idx_ele <-  8     # Apply for elevations above this angle
 
-        ## . . Global --------------------------------------------------------------
-        DATA[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
-             QCF_GLB_09 := "Clearness index limit max (19)" ]
-        DATA[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele,
-             QCF_GLB_09 := "Clearness index limit min (20)" ]
+        ## __ Global  ----------------------------------------------------------
+        datapart[ClearnessIndex_kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
+             (flagname_GLB) := "Clearness index limit max (19)" ]
+        datapart[ClearnessIndex_kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele,
+             (flagname_GLB) := "Clearness index limit min (20)" ]
 
-
+        rm(flagname_GLB)
     }
-
-    #+ echo=F, include=T, results="asis"
-    if (TEST_09) {
-
-        cat(pander(table(DATA$QCF_GLB_09, exclude = TRUE)))
-        cat("\n\n")
-
-        range(DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], na.rm = T)
-        hist( DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], breaks = 100 )
-
-        if (any(!is.na(DATA$QCF_GLB_09))) {
-            hist(DATA[!is.na(QCF_GLB_09), wattGLB],      breaks = 100)
-            hist(DATA[!is.na(QCF_GLB_09), Elevat ],      breaks = 100)
-            hist(DATA[!is.na(QCF_GLB_09), Clearness_Kt], breaks = 100)
-        }
-
-
-        if (DO_PLOTS) {
-
-            tmp <- DATA[ !is.na(QCF_GLB_09) ]
-
-            ## plot offending years
-            for (ay in unique(year(tmp$Date))) {
-                pp <- DATA[year(Date) == ay]
-
-                ylim = c(-0.5, 2)
-                plot(pp$Elevat, pp$Clearness_Kt,
-                     main = ay, pch = 19, cex = 0.1,
-                     ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
-
-                abline(v = QS$CL_idx_ele, col = "yellow")
-
-                points(pp[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Elevat],
-                       pp[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Clearness_Kt],
-                       pch = 19, cex = 0.3, col = "red")
-                abline(h = QS$CL_idx_max, col = "magenta", lwd = 0.5)
-
-                points(pp[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Elevat],
-                       pp[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Clearness_Kt],
-                       pch = 19, cex = 0.3, col = "blue")
-                abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
-            }
-
-            ## plot offending days
-            for (ad in sort(unique(c(as.Date(tmp$Date))))) {
-                pp   <- DATA[ as.Date(Date) == ad, ]
-                ylim <- range(pp$wattDIR, pp$wattGLB, na.rm = T)
-                plot(pp$Date, pp$wattGLB, "l", col = "green",
-                     ylim = ylim, xlab = "", ylab = "wattGLB")
-                lines(pp$Date, pp$wattDIR, col = "blue")
-                title(paste("9_", as.Date(ad, origin = "1970-01-01")))
-                ## mark offending data
-                points(pp[!is.na(QCF_GLB_09), Date],
-                       pp[!is.na(QCF_GLB_09), wattGLB],
-                       col = "red", pch = 1)
-                ## no applicable to direct!!
-                # points(pp[!is.na(QCF_GLB_09), Date],
-                #        pp[!is.na(QCF_GLB_09), wattDIR],
-                #        col = "red", pch = 1)
-            }
-        }
-    }
-    #' -----------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1318,6 +1233,77 @@ if (TEST_08) {
 
 
 
+####  9. Clearness index test  -------------------------------------------------
+#' \FloatBarrier
+#' \newpage
+#' ## 9. Clearness index test
+#'
+#+ echo=F, include=T, results="asis"
+if (TEST_09) {
+
+    testN        <- 9
+    flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+
+    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
+    cat("\n\n")
+
+
+    range(DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], na.rm = T)
+    hist( DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], breaks = 100 )
+
+    if (any(!is.na(DATA$QCF_GLB_09))) {
+        hist(DATA[!is.na(QCF_GLB_09), wattGLB],      breaks = 100)
+        hist(DATA[!is.na(QCF_GLB_09), Elevat ],      breaks = 100)
+        hist(DATA[!is.na(QCF_GLB_09), Clearness_Kt], breaks = 100)
+    }
+
+
+    if (DO_PLOTS) {
+
+        tmp <- DATA[ !is.na(QCF_GLB_09) ]
+
+        ## plot offending years
+        for (ay in unique(year(tmp$Date))) {
+            pp <- DATA[year(Date) == ay]
+
+            ylim = c(-0.5, 2)
+            plot(pp$Elevat, pp$Clearness_Kt,
+                 main = ay, pch = 19, cex = 0.1,
+                 ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
+
+            abline(v = QS$CL_idx_ele, col = "yellow")
+
+            points(pp[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Elevat],
+                   pp[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Clearness_Kt],
+                   pch = 19, cex = 0.3, col = "red")
+            abline(h = QS$CL_idx_max, col = "magenta", lwd = 0.5)
+
+            points(pp[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Elevat],
+                   pp[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Clearness_Kt],
+                   pch = 19, cex = 0.3, col = "blue")
+            abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+        }
+
+        ## plot offending days
+        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
+            pp   <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$wattDIR, pp$wattGLB, na.rm = T)
+            plot(pp$Date, pp$wattGLB, "l", col = "green",
+                 ylim = ylim, xlab = "", ylab = "wattGLB")
+            lines(pp$Date, pp$wattDIR, col = "blue")
+            title(paste("9_", as.Date(ad, origin = "1970-01-01")))
+            ## mark offending data
+            points(pp[!is.na(QCF_GLB_09), Date],
+                   pp[!is.na(QCF_GLB_09), wattGLB],
+                   col = "red", pch = 1)
+            ## no applicable to direct!!
+            # points(pp[!is.na(QCF_GLB_09), Date],
+            #        pp[!is.na(QCF_GLB_09), wattDIR],
+            #        col = "red", pch = 1)
+        }
+    }
+}
+#' -----------------------------------------------------------------------------
 
 
 
