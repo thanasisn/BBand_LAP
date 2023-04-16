@@ -85,7 +85,7 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -136,23 +136,23 @@ DO_PLOTS <- TRUE
 
 
 
-##  Create a test database  ----------------------------------------------------
-TEST_DB <- TRUE
-if (TEST_DB) {
-    source("~/BBand_LAP/DEFINITIONS.R")
-    cat("\n * * * Using a temp DB * * * \n\n")
-    ## copy data to temp
-    tyear <- 2017
-    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
-    system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-    system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
-    ## replace paths with test paths
-    DB_DIR     <- test_DB_DIR
-    DB_lock    <- test_DB_lock
-    DB_META_fl <- test_DB_META_fl
-    DB_HASH_fl <- test_DB_HASH_fl
-}
+# ##  Create a test database  ----------------------------------------------------
+# TEST_DB <- TRUE
+# if (TEST_DB) {
+#     source("~/BBand_LAP/DEFINITIONS.R")
+#     cat("\n * * * Using a temp DB * * * \n\n")
+#     ## copy data to temp
+#     tyear <- 2017
+#     dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
+#     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
+#     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
+#     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
+#     ## replace paths with test paths
+#     DB_DIR     <- test_DB_DIR
+#     DB_lock    <- test_DB_lock
+#     DB_META_fl <- test_DB_META_fl
+#     DB_HASH_fl <- test_DB_HASH_fl
+# }
 
 
 
@@ -1142,8 +1142,8 @@ if (TEST_06) {
 
             ylim <- range(pp$DIFF_strict, pp$RaylDIFF, na.rm = T)
             if (ylim[1] < -10) ylim[1] <- -10
-            plot( pp$Date, pp$DIFF_strict, "l",
-                  ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
+            plot(pp$Date, pp$DIFF_strict, "l",
+                 ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
             lines(pp$Date, pp$RaylDIFF, col = "magenta" )
             lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_upper_lim, col = "red" )
 
@@ -1151,8 +1151,8 @@ if (TEST_06) {
 
             par(mar = c(2,4,1,1))
             ylim <- range(pp$GLB_strict, pp$DIR_strict, na.rm = T)
-            plot( pp$Date, pp$GLB_strict, "l",
-                  ylim = ylim, col = "green", ylab = "", xlab = "")
+            plot(pp$Date, pp$GLB_strict, "l",
+                 ylim = ylim, col = "green", ylab = "", xlab = "")
             lines(pp$Date, pp$DIR_strict, col = "blue" )
 
             points(pp[!is.na(get(flagname_BTH)), DIR_strict, Date],
@@ -1326,6 +1326,6 @@ if (TEST_09) {
 
 
 
-# myunlock(DB_lock)
+myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
