@@ -128,7 +128,7 @@ for (af in filelist$names) {
                          !is.na(chp1_temperature) &
                          is.na(chp1_t_cor_factor)]
 
-    cat("Load: ", af, "\n")
+    cat("44 Load: ", af, "\n")
 
     ## Ignore bad and missing data
     if (nrow(data_use) == 0) {
@@ -164,7 +164,7 @@ for (af in filelist$names) {
     ## store actual data
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
-    cat("Save: ", af, "\n\n")
+    cat("44 Save: ", af, "\n\n")
     ## clean
     rm(datapart, meta_day)
 }

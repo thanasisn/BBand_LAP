@@ -140,7 +140,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         partfile <- paste0(filedir, "/part-0.parquet")
         ## init data collector
         if (file.exists(partfile)) {
-            cat(" Load: ", partfile, "\n")
+            cat("05 Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## add columns for this set
             var <- "year"
@@ -199,6 +199,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
             # gather <- rows_patch(gather, day_data, by = "Date")
             gather     <- rows_upsert(gather, day_data, by = "Date")
             gathermeta <- rbind(gathermeta, file_meta)
+            cat("05 Save: ", partfile, "\n")
             rm(day_data, file_meta, ss)
             rm(temp_temp)
         }

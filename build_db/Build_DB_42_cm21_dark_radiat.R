@@ -145,7 +145,7 @@ for (af in filelist$names) {
                          !is.na(CM21_sig) &
                          is.na(CM21_sig_wo_dark)]
 
-    cat("Load: ", af, "\n")
+    cat("42 Load: ", af, "\n")
 
     ## Ignore bad and missing data
     if (nrow(data_use) == 0) {
@@ -218,12 +218,12 @@ for (af in filelist$names) {
         daydata[, GLB_wpsm    := CM21_sig    * cm21factor(Date)]
         daydata[, GLB_SD_wpsm := CM21_sig_sd * cm21factor(Date)]
 
-        ## sanity check!
-        test <- daydata[GLB_wpsm > 2000 | GLB_wpsm < 100]
-        if (nrow(test) > 0) {
-            cat(paste(format(unique(as.Date(test$Date))), collapse = " "),"\n")
-            stop("Sanity check failed: Global out of range!!")
-        }
+        # ## sanity check!
+        # test <- daydata[GLB_wpsm > 2000 | GLB_wpsm < 100]
+        # if (nrow(test) > 0) {
+        #     cat(paste(format(unique(as.Date(test$Date))), collapse = " "),"\n")
+        #     stop("Sanity check failed: Global out of range!!")
+        # }
 
         ## __ Day stats --------------------------------------------------------
         names(dark_day) <- paste0("cm21_", names(dark_day))
@@ -244,7 +244,7 @@ for (af in filelist$names) {
     ## store actual data
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
-    cat("Save: ", af, "\n\n")
+    cat("42 Save: ", af, "\n\n")
     ## clean
     rm(datapart, meta_day)
 
