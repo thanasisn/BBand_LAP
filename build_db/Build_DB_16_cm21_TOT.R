@@ -17,11 +17,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(comment    = ""      )
+knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(out.width  = "100%"  )
+knitr::opts_chunk$set(fig.align  = "center")
+knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -152,21 +152,21 @@ for (YYYY in unique(year(inp_filelist$day))) {
             gather <- read_parquet(partfile)
 
             ## add columns for this set
-            var <- "tot_glb"
-            if (!any(names(gather) == var)) {
-                gather[[var]] <- NA
-                gather[[var]] <- as.numeric(gather[[var]])
-            }
-            var <- "tot_glb_sd"
-            if (!any(names(gather) == var)) {
-                gather[[var]] <- NA
-                gather[[var]] <- as.numeric(gather[[var]])
-            }
-            var <- "lap_sza"
-            if (!any(names(gather) == var)) {
-                gather[[var]] <- NA
-                gather[[var]] <- as.numeric(gather[[var]])
-            }
+            # var <- "tot_glb"
+            # if (!any(names(gather) == var)) {
+            #     gather[[var]] <- NA
+            #     gather[[var]] <- as.numeric(gather[[var]])
+            # }
+            # var <- "tot_glb_sd"
+            # if (!any(names(gather) == var)) {
+            #     gather[[var]] <- NA
+            #     gather[[var]] <- as.numeric(gather[[var]])
+            # }
+            # var <- "lap_sza"
+            # if (!any(names(gather) == var)) {
+            #     gather[[var]] <- NA
+            #     gather[[var]] <- as.numeric(gather[[var]])
+            # }
             var <- "year"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
@@ -214,8 +214,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
             stopifnot(is.numeric(temp$tot_glb_sd))
             stopifnot(dim(temp)[1] == 1440)
 
-            temp[, year  := year(Date)]
-            temp[, month := month(Date)]
+            temp[, year  := as.integer(year(Date))]
+            temp[, month := as.integer(month(Date))]
 
             ## get metadata
             file_meta <- data.table(day                 = as_date(ad),
