@@ -162,6 +162,8 @@ DO_PLOTS <- TRUE
 ## make it NA to reprocess all
 InitVariableBBDB("QCv9_01_dir_flag", as.character(NA))
 
+# OVERWRITEVariableBBDB("QCv9_01_dir_flag", as.character(NA))
+
 ## list data base files
 filelist <- data.table(
     names = list.files(DB_DIR,
@@ -295,6 +297,7 @@ for (af in filelist$names) {
                  (flagname_GLB) := "Physical possible limit max (6)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -348,6 +351,7 @@ for (af in filelist$names) {
                  (flagname_GLB) := "Extremely rare limits max (4)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -396,6 +400,7 @@ for (af in filelist$names) {
                  (flagname_LOW) := "Diffuse ratio comp min (12)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -407,7 +412,7 @@ for (af in filelist$names) {
     #'
     #+ echo=TEST_04, include=T
     if (TEST_04) {
-        cat("\n## 4. Climatological (configurable) Limits.\n\n")
+        cat("\n4. Climatological (configurable) Limits.\n\n")
 
         testN        <- 4
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
@@ -438,6 +443,7 @@ for (af in filelist$names) {
                  (flagname_GLB) := "Second climatological limit (16)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -479,6 +485,7 @@ for (af in filelist$names) {
              (flagname_DIR) := "Possible no tracking (24)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -536,6 +543,7 @@ for (af in filelist$names) {
                  (flagname_BTH) := "Rayleigh diffuse limit (18)"]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -620,6 +628,7 @@ for (af in filelist$names) {
                  (flagname_BTH) := "Direct > global hard (15)" ]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -656,6 +665,7 @@ for (af in filelist$names) {
              (flagname_GLB) := "Clearness index limit min (20)" ]
 
         rm(list = ls(pattern = "flagname_.*"))
+        gc()
     }
 
 
@@ -668,6 +678,7 @@ for (af in filelist$names) {
     cat("Save: ", af, "\n\n")
     ## clean
     rm(datapart)
+    gc()
 
     }
 
@@ -737,23 +748,23 @@ if (TEST_01) {
             #        col = "red", pch = 1)
         }
 
+        ## Plot Global radiation
         test <- BB |> filter(!is.na(QCv9_01_glb_flag) ) |> collect() |> as.data.table()
-        ## TODO
         for (ad in sort(unique(as.Date(c(test$Date))))) {
-            pp <- DATA[ as.Date(Date) == ad, ]
-            ylim <- range(pp$Glo_max_ref, pp$wattGLB, na.rm = T)
-            plot(pp$Date, pp$wattGLB, "l", col = "green",
-                 ylim = ylim, xlab = "", ylab = "wattGLB")
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            ylim <- range(pp$Glo_max_ref, pp$GLB_strict, na.rm = T)
+            plot(pp$Date, pp$GLB_strict, "l", col = "green",
+                 ylim = ylim, xlab = "", ylab = "GLB")
             title(paste("#1", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             lines(pp$Date, pp$Glo_max_ref, col = "red")
             ## mark offending data
-            # points(pp[!is.na(QCF_DIR_01), Date],
-            #        pp[!is.na(QCF_DIR_01), wattDIR],
-            #        col = "red", pch = 1)
+            points(pp[!is.na(get(flagname_GLB)), GLB_strict, Date],
+                   col = "red", pch = 1)
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -790,23 +801,22 @@ if (TEST_02) {
 
     if (DO_PLOTS) {
 
+        ## Direct
         test <- BB |> filter(!is.na(QCv9_02_dir_flag)) |> collect() |> as.data.table()
-        ## TODO
         for (ad in sort(unique(as.Date(test$Date)))) {
             pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
-            ylim <- range(pp$Direct_max, pp$wattDIR, na.rm = T)
-            plot(pp$Date, pp$wattDIR, "l", col = "blue",
+            ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
+            plot(pp$Date, pp$DIR_strict, "l", col = "blue",
                  ylim = ylim, xlab = "", ylab = "wattDIR")
             title(paste("#2", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             lines(pp$Date, pp$Direct_max, col = "red")
             ## mark offending data
-            points(pp[!is.na(QCF_DIR_02), Date],
-                   pp[!is.na(QCF_DIR_02), wattDIR],
+            points(pp[!is.na(QCv9_02_dir_flag), DIR_strict, Date],
                    col = "red", pch = 1)
         }
 
-
+        ## Global
         test <- BB |> filter(!is.na(QCv9_02_glb_flag)) |> collect() |> as.data.table()
         for (ad in sort(unique(as.Date(c(test$Date))))) {
             pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
@@ -817,12 +827,12 @@ if (TEST_02) {
             ## plot limits
             lines(pp$Date, pp$Global_max, col = "red")
             ## mark offending data
-            points(pp[!is.na(QCv9_02_glb_flag), Date],
-                   pp[!is.na(QCv9_02_glb_flag), GLB_strict],
+            points(pp[!is.na(QCv9_02_glb_flag), GLB_strict, Date],
                    col = "magenta", pch = 1)
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -937,6 +947,7 @@ if (TEST_03) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1041,6 +1052,7 @@ if (TEST_04) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1101,6 +1113,7 @@ if (TEST_05) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1164,6 +1177,7 @@ if (TEST_06) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1233,6 +1247,7 @@ if (TEST_08) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1319,10 +1334,9 @@ if (TEST_09) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
+    gc()
 }
 #' -----------------------------------------------------------------------------
-
-
 
 
 
