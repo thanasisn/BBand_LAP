@@ -801,23 +801,22 @@ if (TEST_02) {
 
     if (DO_PLOTS) {
 
+        ## Direct
         test <- BB |> filter(!is.na(QCv9_02_dir_flag)) |> collect() |> as.data.table()
-        ## TODO
         for (ad in sort(unique(as.Date(test$Date)))) {
             pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
-            ylim <- range(pp$Direct_max, pp$wattDIR, na.rm = T)
-            plot(pp$Date, pp$wattDIR, "l", col = "blue",
+            ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
+            plot(pp$Date, pp$DIR_strict, "l", col = "blue",
                  ylim = ylim, xlab = "", ylab = "wattDIR")
             title(paste("#2", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             lines(pp$Date, pp$Direct_max, col = "red")
             ## mark offending data
-            points(pp[!is.na(QCF_DIR_02), Date],
-                   pp[!is.na(QCF_DIR_02), wattDIR],
+            points(pp[!is.na(QCv9_02_dir_flag), DIR_strict, Date],
                    col = "red", pch = 1)
         }
 
-
+        ## Global
         test <- BB |> filter(!is.na(QCv9_02_glb_flag)) |> collect() |> as.data.table()
         for (ad in sort(unique(as.Date(c(test$Date))))) {
             pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
@@ -828,8 +827,7 @@ if (TEST_02) {
             ## plot limits
             lines(pp$Date, pp$Global_max, col = "red")
             ## mark offending data
-            points(pp[!is.na(QCv9_02_glb_flag), Date],
-                   pp[!is.na(QCv9_02_glb_flag), GLB_strict],
+            points(pp[!is.na(QCv9_02_glb_flag), GLB_strict, Date],
                    col = "magenta", pch = 1)
         }
     }
@@ -1339,8 +1337,6 @@ if (TEST_09) {
     gc()
 }
 #' -----------------------------------------------------------------------------
-
-
 
 
 
