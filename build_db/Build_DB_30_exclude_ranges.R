@@ -23,11 +23,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(comment    = ""      )
+knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(out.width  = "100%"  )
+knitr::opts_chunk$set(fig.align  = "center")
+knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -148,11 +148,11 @@ cat('\n\n\\normalsize\n\n')
 ## Load CM-21 exclusions -------------------------------------------------------
 cm21_exclude_mtime <- file.mtime(CM21_EXCLUDE)
 ranges_CM21        <- read.table(CM21_EXCLUDE,
-                                sep          = ";",
-                                colClasses   = "character",
-                                strip.white  = TRUE,
-                                header       = TRUE,
-                                comment.char = "#" )
+                                 sep          = ";",
+                                 colClasses   = "character",
+                                 strip.white  = TRUE,
+                                 header       = TRUE,
+                                 comment.char = "#" )
 ranges_CM21$From  <- as.POSIXct(strptime(ranges_CM21$From,  format = "%F %H:%M", tz = "UTC"))
 ranges_CM21$Until <- as.POSIXct(strptime(ranges_CM21$Until, format = "%F %H:%M", tz = "UTC"))
 
@@ -192,9 +192,6 @@ cat('\n\n\\normalsize\n\n')
 ##  Load data just to check the columns
 BB <- opendata()
 
-# BB |> select(chp1_bad_data) %>% filter(!is.na(chp1_bad_data)) %>%  collect()
-# BB |> select(cm21_bad_data_flag) %>% filter(!is.na(cm21_bad_data_flag)) %>%  collect()
-# BB |> select(chp1_temp_bad_data) %>% filter(!is.na(chp1_temp_bad_data)) %>%  collect()
 
 
 
@@ -209,11 +206,6 @@ if (file.exists(DB_META_fl)) {
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
     ## new columns
-    # var <- "cm21_bad_data_flagged"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.POSIXct(BB_meta[[var]])
-    # }
 } else {
     stop("HAVE TO STAR A NEW DB!!")
 }

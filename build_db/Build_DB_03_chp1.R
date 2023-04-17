@@ -19,11 +19,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(comment    = ""      )
+knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(out.width  = "100%"  )
+knitr::opts_chunk$set(fig.align  = "center")
+knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -60,11 +60,6 @@ if (file.exists(DB_META_fl)) {
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
     ## new columns
-    # var <- "chp1_basename"
-    # if (!any(names(BB_meta) == var)) {
-    #     BB_meta[[var]] <- NA
-    #     BB_meta[[var]] <- as.character(BB_meta[[var]])
-    # }
 } else {
     stop("STAR A NEW DB!!")
 }

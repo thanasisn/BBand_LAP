@@ -17,11 +17,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(comment    = ""      )
+knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(out.width  = "100%"  )
+knitr::opts_chunk$set(fig.align  = "center")
+knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -143,11 +143,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
             cat(" Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## add columns for this set
-            # var <- "chp1_R_therm"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
             var <- "year"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
@@ -175,7 +170,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
             temp_temp$V1 <- as.POSIXct( temp_temp$V1 )
             temp_temp$V1 <- as.POSIXct( format( temp_temp$V1, format = "%F %R" ) )
             temp_temp$V1 <- temp_temp$V1 + 30
-            temp_temp$V3[ temp_temp$V3 == 0 ] <- NA
+            temp_temp$V3[temp_temp$V3 == 0] <- NA
 
             temp_temp    <- data.table(temp_temp)
             temp_temp    <- temp_temp[, .( V2 = mean(V2, na.rm = T),
@@ -221,8 +216,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
     rm(subyear)
 }
 rm(inp_filelist)
-
-
 
 
 
