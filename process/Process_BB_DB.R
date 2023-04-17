@@ -26,10 +26,15 @@ cat("\n\nCheck legacy export\n")
 #        params     = list(CLEAN = TRUE),
 #        output_dir = "~/BBand_LAP/REPORTS/REPORTS")
 
+try({
 render(input      = "~/BBand_LAP/process/Legacy_CHP1_L1_export.R",
-       params     = list(CLEAN = TRUE),
        output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+})
 
+try({
+render(input      = "~/BBand_LAP/process/QCRad_LongShi_v9.R",
+       output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+})
 
 system("$HOME/BBand_LAP/process/Upload_reports.sh")
 
