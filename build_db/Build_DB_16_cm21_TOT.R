@@ -148,25 +148,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
         partfile <- paste0(filedir, "/part-0.parquet")
         ## init data collector
         if (file.exists(partfile)) {
-            cat(" Load: ", partfile, "\n")
+            cat("16 Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
-
-            ## add columns for this set
-            # var <- "tot_glb"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
-            # var <- "tot_glb_sd"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
-            # var <- "lap_sza"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
             var <- "year"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
@@ -246,6 +229,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         ## store this month / set data
         write_parquet(gather,  partfile)
         write_parquet(BB_meta, DB_META_fl)
+        cat("16 Save: ", partfile, "\n")
         rm(gather, gathermeta, submonth)
     }
     rm(subyear)
