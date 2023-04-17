@@ -5,9 +5,9 @@ Developed in the Laboratory of Atmospheric Physics of Thessaloniki, Greece.
 
 To process the data from broadband instruments of LAP.
 
-This is partial used as operational procedures.
+This is partial used as operational procedures ([github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB) and [github.com/thanasisn/CS_id](https://github.com/thanasisn/CS_id) are still in use).
 
-Plots and reports can be found here: [thanasisn.netlify.app/3-data_display](https://thanasisn.netlify.app/3-data_display)
+Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](https://thanasisn.netlify.app/3-data_display)
 
 
 ## Table of Contents
@@ -65,7 +65,7 @@ Plots and reports can be found here: [thanasisn.netlify.app/3-data_display](http
 
 ### Other processes
 
-- Quality Check of radiation data   
+- Quality Check of radiation data (QCRad)   
   - Flags data using mainly the algorithm of C. N. Long and Y. Shi (2006)
 - Imports data from [github.com/thanasisn/TSI](https://github.com/thanasisn/TSI)
   - `Sun_Dist_Astropy` Sun - LAP distance
@@ -98,7 +98,8 @@ Some aspects on the implementation of this project.
 - There are some files with extra meta data for the data in the database and the analysis performed.
 - It should be easy to migrate to a pure database like `duckdb` or `sqlite`.
 - We use features of the `arrow` library, and also `data.table` when it is more suitable or clear to code.
-- The analysis should be able to be performed with under 8Gb of RAM.
+- The analysis should be able to be performed with under 8Gb of RAM, but is not assured.
+  - Currently the data set use 3.1 GB of disk space, with 16e6 rows and 71 columns.
 - There is a trade-of with the disk usage/wearing.
 - New data should be easy to be added on daily base on all levels.
 - New process and analysis should be easy to added for all data.
