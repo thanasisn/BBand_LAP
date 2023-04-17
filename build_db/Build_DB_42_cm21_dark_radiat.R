@@ -23,11 +23,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(comment    = ""      )
+knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(out.width  = "100%"  )
+knitr::opts_chunk$set(fig.align  = "center")
+knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -63,7 +63,7 @@ if (file.exists(DB_META_fl)) {
                      by  = "day",
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
-    ## new columns
+    ## avoid creating new columns
     # var <- "cm21_dark_flag"
     # if (!any(names(BB_meta) == var)) {
     #     BB_meta[[var]] <- as.character(NA)
@@ -217,6 +217,13 @@ for (af in filelist$names) {
         ## __ Convert signal to radiation --------------------------------------
         daydata[, GLB_wpsm    := CM21_sig    * cm21factor(Date)]
         daydata[, GLB_SD_wpsm := CM21_sig_sd * cm21factor(Date)]
+
+        ## sanity check!
+        test <- daydata[GLB_wpsm > 2000 | GLB_wpsm < 100]
+        if (nrow(test) > 0) {
+            cat(paste(format(unique(as.Date(test$Date))), collapse = " "),"\n")
+            stop("Sanity check failed: Global out of range!!")
+        }
 
         ## __ Day stats --------------------------------------------------------
         names(dark_day) <- paste0("cm21_", names(dark_day))
