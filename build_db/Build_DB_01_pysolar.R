@@ -166,13 +166,13 @@ for (YYYY in unique(year(inp_filelist$day))) {
         partfile <- paste0(filedir, "/part-0.parquet")
         ## init data collector
         if (file.exists(partfile)) {
-            cat(" Load: ", partfile, "\n")
+            cat("01 Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## columns may be missing while repacking dataset
             gather$year  <- year(gather$Date)
             gather$month <- month(gather$Date)
         } else {
-            cat("* NEW: ", partfile, "\n")
+            cat("01  NEW: ", partfile, "\n")
             gather <- data.table()
         }
 

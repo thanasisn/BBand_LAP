@@ -251,7 +251,7 @@ for (af in filelist$names) {
     datapart[["year"]]  <- as.integer(year( datapart$Date))
     datapart[["month"]] <- as.integer(month(datapart$Date))
 
-    cat("Load: ", af, "\n")
+    cat("30 Load: ", af, "\n")
 
     ## CHP-1 flag bad data -----------------------------------------------------
     for (i in 1:nrow(ranges_CHP1)) {
@@ -333,8 +333,7 @@ for (af in filelist$names) {
     ## store actual data
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
-    cat("Save: ", af, "\n\n")
-
+    cat("30 Save: ", af, "\n\n")
     rm(datapart)
 }
 

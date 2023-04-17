@@ -109,14 +109,14 @@ for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
     datapart[, month := as.integer(month(Date))]
     datapart[, year  := as.integer(year(Date)) ]
-    cat("Load: ", af, "\n")
+    cat("51 Load: ", af, "\n")
 
     ## update the whole data part on one go
     datapart <- rows_update(datapart, PRESSURE, by = "Date", unmatched = "ignore")
 
     ## store actual data
     write_parquet(x = datapart, sink = af)
-    cat("Save: ", af, "\n\n")
+    cat("51 Save: ", af, "\n\n")
     ## clean
     rm(datapart)
 }

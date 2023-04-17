@@ -12,10 +12,10 @@ Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
 source("~/BBand_LAP//DEFINITIONS.R")
 
 
-if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
-}
+# if (!interactive()) {
+#     pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+#     sink(file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+# }
 
 ## Import raw data
 source("~/BBand_LAP/build_db/Build_DB_01_pysolar.R"         )
