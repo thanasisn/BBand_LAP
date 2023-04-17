@@ -189,8 +189,8 @@ cat('\n\n\\normalsize\n\n')
 
 
 
-##  Load data just to check the columns
-BB <- opendata()
+# ##  Load data just to check the columns
+# BB <- opendata()
 
 
 
@@ -247,6 +247,18 @@ rm(todosets, dd)
 
 for (af in filelist$names) {
     datapart <- read_parquet(af)
+    ## add columns for this set
+    var <- "year"
+    if (!any(names(datapart) == var)) {
+        datapart[[var]] <- NA
+        datapart[[var]] <- as.integer(year(datapart$Date))
+    }
+    var <- "month"
+    if (!any(names(datapart) == var)) {
+        datapart[[var]] <- NA
+        datapart[[var]] <- as.integer(month(datapart$Date))
+    }
+
     cat("Load: ", af, "\n")
 
     ## CHP-1 flag bad data -----------------------------------------------------
