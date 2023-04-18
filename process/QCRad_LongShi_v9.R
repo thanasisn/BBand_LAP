@@ -267,6 +267,13 @@ for (af in filelist$names) {
     #' values of the data set.
     #'
     #+ echo=TEST_01, include=T
+
+    QS$dir_SWdn_min <-  -4  # Minimum direct value to consider valid measurement
+    QS$dir_SWdn_dif <- 327  # Closeness to to TSI
+    QS$glo_SWdn_min <-  -4  # Minimum global value to consider valid measurement
+    QS$glo_SWdn_off <- 160  # Global departure offset above the model
+    QS$glo_SWdn_amp <- 1.3  # Global departure factor above the model
+
     if (TEST_01) {
         cat(paste("\n1. Physically Possible Limits.\n\n"))
 
@@ -276,12 +283,6 @@ for (af in filelist$names) {
 
         InitVariableBBDB(flagname_DIR, as.character(NA))
         InitVariableBBDB(flagname_GLB, as.character(NA))
-
-        QS$dir_SWdn_min <-  -4  # Minimum direct value to consider valid measurement
-        QS$dir_SWdn_dif <- 327  # Closeness to to TSI
-        QS$glo_SWdn_min <-  -4  # Minimum global value to consider valid measurement
-        QS$glo_SWdn_off <- 160  # Global departure offset above the model
-        QS$glo_SWdn_amp <- 1.3  # Global departure factor above the model
 
         ## __ Direct  ----------------------------------------------------------
         datapart[DIR_strict < QS$dir_SWdn_min,
@@ -313,6 +314,16 @@ for (af in filelist$names) {
     #' The choose of those settings may be optimized with an iterative process.
     #'
     #+ echo=TEST_02, include=T
+
+    # Upper modeled values
+    QS$Dir_SWdn_amp     <-    0.91 # Direct departure factor above the model
+    QS$Dir_SWdn_off     <- -140    # Direct departure offset above the model
+    QS$Glo_SWdn_amp     <- 1.18    # Global departure factor above the model
+    QS$Glo_SWdn_off     <- 40      # Global departure offset above the model
+    # Minimum accepted values
+    QS$dir_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
+    QS$glo_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
+
     if (TEST_02) {
         cat(paste("\n2. Extremely Rare Limits.\n\n"))
 
@@ -323,14 +334,6 @@ for (af in filelist$names) {
         InitVariableBBDB(flagname_DIR, as.character(NA))
         InitVariableBBDB(flagname_GLB, as.character(NA))
 
-        # Upper modeled values
-        QS$Dir_SWdn_amp     <-    0.91 # Direct departure factor above the model
-        QS$Dir_SWdn_off     <- -140    # Direct departure offset above the model
-        QS$Glo_SWdn_amp     <- 1.18    # Global departure factor above the model
-        QS$Glo_SWdn_off     <- 40      # Global departure offset above the model
-        # Minimum accepted values
-        QS$dir_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
-        QS$glo_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
         # Compute reference values
         datapart[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off]
         datapart[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cosde(SZA)^1.2 + QS$Glo_SWdn_off]
@@ -362,6 +365,14 @@ for (af in filelist$names) {
     #' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
     #'
     #+ echo=TEST_03, include=T
+
+    QS$dif_rati_po0  <-  0.03
+    QS$dif_rati_po2  <-  0.08
+    QS$dif_sza_break <- 75
+    QS$dif_rati_pr1  <-  1.03
+    QS$dif_rati_pr2  <-  1.06
+    QS$dif_watt_lim  <-  10
+
     if (TEST_03) {
         cat(paste("\n3. Comparison tests.\n\n"))
 
@@ -371,13 +382,6 @@ for (af in filelist$names) {
 
         InitVariableBBDB(flagname_UPP, as.character(NA))
         InitVariableBBDB(flagname_LOW, as.character(NA))
-
-        QS$dif_rati_po1  <-  0.03
-        QS$dif_rati_po2  <-  0.08
-        QS$dif_sza_break <- 75
-        QS$dif_rati_pr1  <-  1.03
-        QS$dif_rati_pr2  <-  1.06
-        QS$dif_watt_lim  <-  10
 
         ## __ Proposed filter  -------------------------------------------------
         datapart[DiffuseFraction_kd  > QS$dif_rati_pr1  &
@@ -411,6 +415,12 @@ for (af in filelist$names) {
     #' ## 4. Climatological (configurable) Limits
     #'
     #+ echo=TEST_04, include=T
+
+    QS$clim_lim_C3 <- 0.77
+    QS$clim_lim_D3 <- 0.81
+    QS$clim_lim_C1 <- 1.14
+    QS$clim_lim_D1 <- 1.32
+
     if (TEST_04) {
         cat("\n4. Climatological (configurable) Limits.\n\n")
 
@@ -420,11 +430,6 @@ for (af in filelist$names) {
 
         InitVariableBBDB(flagname_DIR, as.character(NA))
         InitVariableBBDB(flagname_GLB, as.character(NA))
-
-        QS$clim_lim_C3 <- 0.77
-        QS$clim_lim_D3 <- 0.81
-        QS$clim_lim_C1 <- 1.14
-        QS$clim_lim_D1 <- 1.32
 
         ## __ Direct -----------------------------------------------------------
         datapart[, Dir_First_Clim_lim := TSI_TOA * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
@@ -458,6 +463,15 @@ for (af in filelist$names) {
     # make one such model.
     #
     #+ echo=TEST_05, include=T
+
+    ## criteria
+    QS$Tracking_min_elev <-   15
+    QS$ClrSW_lim         <-    0.85
+    QS$glo_min           <-   25
+    ## Global Clear SW model
+    QS$ClrSW_a           <- 1050.5
+    QS$ClrSW_b           <-    1.095
+
     if (TEST_05) {
         cat(paste("\n5. Tracking test.\n\n"))
 
@@ -465,14 +479,6 @@ for (af in filelist$names) {
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
 
         InitVariableBBDB(flagname_DIR, as.character(NA))
-
-        ## criteria
-        QS$Tracking_min_elev <-   15
-        QS$ClrSW_lim         <-    0.85
-        QS$glo_min           <-   25
-        ## Global Clear SW model
-        QS$ClrSW_a           <- 1050.5
-        QS$ClrSW_b           <-    1.095
 
         ## Clear Sky Sort-Wave model
         datapart[, ClrSW_ref2 := (QS$ClrSW_a / Sun_Dist_Astropy^2) * cosde(SZA)^QS$ClrSW_b]
@@ -505,6 +511,29 @@ for (af in filelist$names) {
     #' - Cases of instrument windows cleaning
     #'
     #+ echo=TEST_06, include=T
+
+    # criteria
+    QS$Rayleigh_upper_lim <- 500   # Upper departure diffuse limit
+    QS$Rayleigh_lower_lim <-  -3   # Lower departure diffuse limit
+    QS$Rayleigh_dif_glo_r <-   0.8 # Low limit diffuse/global < threshold
+    QS$Rayleigh_glo_min   <-  50   # Low limit minimum global
+    # model
+    Rayleigh_diff <- function(SZA, Pressure) {
+        a    <-   209.3
+        b    <-  -708.3
+        c    <-  1128.7
+        d    <-  -911.2
+        e    <-   287.85
+        f    <-     0.046725
+        mu_0 <- cosde(SZA)
+        return( a * mu_0     +
+                    b * mu_0 ^ 2 +
+                    c * mu_0 ^ 3 +
+                    d * mu_0 ^ 4 +
+                    e * mu_0 ^ 5 +
+                    f * mu_0 * Pressure)
+    }
+
     if (TEST_06) {
         cat(paste("\n6. Rayleigh Limit Diffuse Comparison.\n\n"))
 
@@ -513,27 +542,7 @@ for (af in filelist$names) {
 
         InitVariableBBDB(flagname_BTH, as.character(NA))
 
-        # criteria
-        QS$Rayleigh_upper_lim <- 500   # Upper departure diffuse limit
-        QS$Rayleigh_lower_lim <-  -3   # Lower departure diffuse limit
-        QS$Rayleigh_dif_glo_r <-   0.8 # Low limit diffuse/global < threshold
-        QS$Rayleigh_glo_min   <-  50   # Low limit minimum global
-        # model
-        Rayleigh_diff <- function(SZA, Pressure) {
-            a    <-   209.3
-            b    <-  -708.3
-            c    <-  1128.7
-            d    <-  -911.2
-            e    <-   287.85
-            f    <-     0.046725
-            mu_0 <- cosde(SZA)
-            return( a * mu_0     +
-                        b * mu_0 ^ 2 +
-                        c * mu_0 ^ 3 +
-                        d * mu_0 ^ 4 +
-                        e * mu_0 ^ 5 +
-                        f * mu_0 * Pressure )
-        }
+
         datapart[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = Pressure)]
 
         ## __ Both  ------------------------------------------------------------
@@ -606,6 +615,10 @@ for (af in filelist$names) {
     #' Additional criteria is needed for any data drop.
     #'
     #+ echo=TEST_08, include=T
+
+    QS$dir_glo_invert  <- 5  # Diffuse Inversion test: DIRhor - GLBhor > lim[%]
+    QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
+
     if (TEST_08) {
         cat(paste("\n8. Inversion test.\n\n"))
 
@@ -613,10 +626,6 @@ for (af in filelist$names) {
         flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
 
         InitVariableBBDB(flagname_BTH, as.character(NA))
-
-        QS$dir_glo_invert  <- 5  # Diffuse Inversion test: DIRhor - GLBhor > lim[%]
-        QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
-
         ## __ Both  ------------------------------------------------------------
         datapart[, Relative_diffuse := 100 * (HOR_strict  - GLB_strict) / GLB_strict ]
         datapart[ is.infinite(Relative_diffuse), Relative_diffuse := NA]
@@ -646,6 +655,11 @@ for (af in filelist$names) {
     #' For larger elevation angles manual inspection is needed.
     #'
     #+ echo=TEST_09, include=T
+
+    QS$CL_idx_max <-  1.13  # Upper Clearness index accepted level
+    QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
+    QS$CL_idx_ele <-  8     # Apply for elevations above this angle
+
     if (TEST_09) {
         cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
 
@@ -653,10 +667,6 @@ for (af in filelist$names) {
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
 
         InitVariableBBDB(flagname_GLB, as.character(NA))
-
-        QS$CL_idx_max <-  1.13  # Upper Clearness index accepted level
-        QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
-        QS$CL_idx_ele <-  8     # Apply for elevations above this angle
 
         ## __ Global  ----------------------------------------------------------
         datapart[ClearnessIndex_kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
