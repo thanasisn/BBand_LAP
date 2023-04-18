@@ -84,7 +84,10 @@ try({
     cat("\nPlot daily radiation\n\n")
     source("~/BBand_LAP/inspect_db/Plot_daily_CHP1_L1.R")
 })
-# source("~/BBand_LAP/inspect_db/Plot_daily_CM21_sig.R")
+try({
+    cat("\nPlot daily radiation\n\n")
+    source("~/BBand_LAP/inspect_db/Plot_daily_CM21_L1.R")
+})
 
 
 
