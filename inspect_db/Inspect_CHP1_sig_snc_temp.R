@@ -109,11 +109,13 @@ if (length(args) > 0) {
 
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 
-
-
-
-## years in the data base
-datayears <- opendata() |> select(year) |> unique() |> collect() |> pull()
+## years in the data base with CHP-1 data
+datayears <- opendata() |>
+    filter(!is.na(CHP1_sig)) |>
+    select(year) |>
+    unique()     |>
+    collect()    |>
+    pull()
 
 BB_meta   <- read_parquet(DB_META_fl)
 
