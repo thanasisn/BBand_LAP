@@ -17,6 +17,8 @@ source("~/BBand_LAP//DEFINITIONS.R")
 #     sink(file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 # }
 
+system("~/BBand_LAP/build_db/Get_data_from_sirena.sh"       )
+
 ## Import raw data
 source("~/BBand_LAP/build_db/Build_DB_01_pysolar.R"         )
 source("~/BBand_LAP/build_db/Build_DB_02_cm21.R"            )
