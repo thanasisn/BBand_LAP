@@ -40,7 +40,7 @@ QS$glo_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
 #' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
 #'
 
-QS$dif_rati_po0  <-  0.03
+QS$dif_rati_po1  <-  0.03
 QS$dif_rati_po2  <-  0.08
 QS$dif_sza_break <- 75
 QS$dif_rati_pr1  <-  1.03
