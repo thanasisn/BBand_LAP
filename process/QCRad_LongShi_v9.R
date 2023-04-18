@@ -370,7 +370,7 @@ for (af in filelist$names) {
                      SZA            <= QS$dif_sza_break &
                      GLB_strict      > QS$dif_watt_lim,
                  (flagname_LOW) := "Diffuse ratio comp min (12)"]
-        datapart[DiffuseFraction_kd  < QS$dif_rati_po1  &
+        datapart[DiffuseFraction_kd  < QS$dif_rati_po2  &
                      SZA             > QS$dif_sza_break &
                      GLB_strict      > QS$dif_watt_lim,
                  (flagname_LOW) := "Diffuse ratio comp min (12)"]
@@ -645,7 +645,7 @@ for (af in filelist$names) {
 
     }
 
-
+myunlock(DB_lock)
 
 
 
@@ -1303,6 +1303,6 @@ if (TEST_09) {
 
 
 
-myunlock(DB_lock)
+
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
