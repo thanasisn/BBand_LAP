@@ -110,8 +110,12 @@ if (length(args) > 0) {
 
 
 ## years in the data base
-datayears <- opendata() |> select(year) |> unique() |> collect() |> pull()
-
+datayears <- opendata() |>
+    filter(!is.na(DIR_wpsm)) |>
+    select(year) |>
+    unique()     |>
+    collect()    |>
+    pull()
 
 
 ## TODO compare output files with parsed dates from meta

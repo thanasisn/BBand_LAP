@@ -46,7 +46,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 - Plots
   - Overview of Clean/Dirty signal
   - Daily signal with and without dark
-  - Overview or Direct radiation measurements
+  - Overview of Direct radiation measurements
   - Daily Direct radiation measurements
 
 
@@ -96,7 +96,7 @@ Some aspects on the implementation of this project.
 
 - We use a dataset of `parquet` files as a database for all measurements and additional data.
 - The `parquet` dataset use one file for each month, this facilitates:
-  - Syncing of the data amongst different computers.
+  - Syncing of the data between different computers.
   - Partial processing when needed without using the dataset function.
 - It should be easy to migrate to a pure database like `duckdb` or `sqlite`.
 - There are some files with extra meta data for the data in the database and the analysis performed.

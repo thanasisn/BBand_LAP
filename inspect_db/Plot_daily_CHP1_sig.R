@@ -116,8 +116,6 @@ for (YYYY in sort(years_to_do)) {
     ## days with data
     daystodo <- year_data[!is.na(CHP1_sig), unique(as.Date(Date))]
     daystodo <- sort(daystodo)
-    ## signal limit for year
-    # ylim <- range(year_data[, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE)
 
     if (!interactive()) {
         pdffile <- paste0(OUT_FOLDER, "/", OUT_PREFIX, YYYY, ".pdf")
@@ -179,7 +177,7 @@ for (YYYY in sort(years_to_do)) {
 
         ## Decorations
         text(dd$Date[1], max(dd$CHP1_sig, dd$CHP1_sig_wo_dark, na.rm = TRUE),
-             labels = tag, pos = 4, cex =.9)
+             labels = tag, pos = 4, cex = 0.9)
 
         legend("topright", pch = 19, bty = "n",
                legend = c(
@@ -194,7 +192,6 @@ for (YYYY in sort(years_to_do)) {
                        "magenta",
                        "black")
                )
-
     }
     dev.off()
 }
