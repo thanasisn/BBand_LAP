@@ -219,10 +219,10 @@ for (af in filelist$names) {
         daydata[, CHP1_sig_wo_dark := CHP1_sig - todays_dark_correction]
 
         ## __ Convert signal to radiation --------------------------------------
-        daydata[, DIR_wpsm    := CHP1_sig    * chp1factor(Date)]
-        daydata[, DIR_SD_wpsm := CHP1_sig_sd * chp1factor(Date)]
-        daydata[, HOR_wpsm    := DIR_wpsm    * cosde(SZA)      ]
-        daydata[, HOR_SD_wpsm := DIR_SD_wpsm * cosde(SZA)      ]
+        daydata[, DIR_wpsm    := CHP1_sig_wo_dark * chp1factor(Date)]
+        daydata[, DIR_SD_wpsm := CHP1_sig_sd      * chp1factor(Date)]
+        daydata[, HOR_wpsm    := DIR_wpsm         * cosde(SZA)      ]
+        daydata[, HOR_SD_wpsm := DIR_SD_wpsm      * cosde(SZA)      ]
 
         ## __ Day stats --------------------------------------------------------
         names(dark_day) <- paste0("chp1_", names(dark_day))

@@ -215,8 +215,8 @@ for (af in filelist$names) {
         daydata[, CM21_sig_wo_dark := CM21_sig - todays_dark_correction ]
 
         ## __ Convert signal to radiation --------------------------------------
-        daydata[, GLB_wpsm    := CM21_sig    * cm21factor(Date)]
-        daydata[, GLB_SD_wpsm := CM21_sig_sd * cm21factor(Date)]
+        daydata[, GLB_wpsm    := CM21_sig_wo_dark * cm21factor(Date)]
+        daydata[, GLB_SD_wpsm := CM21_sig_sd      * cm21factor(Date)]
 
         # ## sanity check!
         # test <- daydata[GLB_wpsm > 2000 | GLB_wpsm < 100]
