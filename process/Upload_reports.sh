@@ -7,7 +7,7 @@ info() { echo ; echo "$(date +'%F %T') ::${SCRIPT}::${ID}:: $* ::" ; echo ; }
 info "Upload results start"
 
 ## rclone options
-bwlim=500  # if not set to 110
+bwlim=1000  # if not set to 110
 rclone="$HOME/PROGRAMS/rclone"
 config="$HOME/Documents/rclone.conf"
 otheropt=" --checkers=20 --delete-before --stats=300s "

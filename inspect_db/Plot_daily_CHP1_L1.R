@@ -107,8 +107,6 @@ selected    <- merge(metalist, plotfiles, all = TRUE)
 years_to_do <- selected[is.na(path) | updated > mtime, year ]
 
 
-
-
 # TEST
 # years_to_do <- 2016
 
