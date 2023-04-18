@@ -1,56 +1,55 @@
-# /* !/usr/bin/env Rscript */
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
-#' ---
-#' title:         "Inspect raw CHP-1 data **SIG** "
-#' author:        "Natsis Athanasios"
-#' institute:     "AUTH"
-#' affiliation:   "Laboratory of Atmospheric Physics"
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      10pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
-#' link-citations:  yes
-#' colorlinks:      yes
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections:  no
-#'     fig_caption:      no
-#'     keep_tex:         no
-#'     latex_engine:     xelatex
-#'     toc:              yes
-#'     fig_width:        8
-#'     fig_height:       5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  7.5
-#'     fig_height: 5
-#'
-#' date: "`r format(Sys.time(), '%F')`"
-#'
-#' params:
-#'   CLEAN: TRUE
-#'
-#' ---
+---
+title:         "Inspect raw CHP-1 data **SIG** "
+author:        "Natsis Athanasios"
+institute:     "AUTH"
+affiliation:   "Laboratory of Atmospheric Physics"
+documentclass: article
+classoption:   a4paper,oneside
+fontsize:      10pt
+geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 
-#'
-#'  **SIG**
-#'
-#' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
-#'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
-#'
-#'
-#+ echo=F, include=T
+link-citations:  yes
+colorlinks:      yes
+
+header-includes:
+- \usepackage{caption}
+- \usepackage{placeins}
+- \captionsetup{font=small}
+
+output:
+  bookdown::pdf_document2:
+    number_sections:  no
+    fig_caption:      no
+    keep_tex:         no
+    latex_engine:     xelatex
+    toc:              yes
+    fig_width:        8
+    fig_height:       5
+  html_document:
+    toc:        true
+    fig_width:  7.5
+    fig_height: 5
+
+date: "`r format(Sys.time(), '%F')`"
+
+params:
+  CLEAN: TRUE
+
+---
+
+ **SIG**
+
+**Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
+
+**Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
 
 
-#+ echo=F, include=F
+
+```{r echo=F, include=T}
+
+
+```
+```{r echo=F, include=F}
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment    = ""       )
 knitr::opts_chunk$set(dev        = "png"    )
@@ -125,31 +124,32 @@ years_to_do <- datayears
 
 # TEST
 # years_to_do <- 2016
+```
 
-#'
-#' ## Intro
-#'
-#' Produce yearly plots for **CHP-1**.
-#'
-#' Shows only **raw data** aspects.
-#'
-#' It can use flags to show 'CLEAN'/'DIRTY' data.
-#'
-#' For 'CLEAN' data, it removes from view:
-#'
-#' - Bad recordings ranges `chp1_bad_data_flag`
-#' - Tracker async cases `Async_tracker_flag`
-#' - Physical recording limits `chp1_signal_lower_limit()` and `chp1_signal_upper_limit()`
-#'
-#' Mark outliers for signal and SD with:
-#'
-#' **mean(variable) -/+ `r OutliersPlot` * sd(variable)**
-#'
-#' This is just a report it doesn't alter the data.
-#'
-#'
 
-#+ include=TRUE, echo=FALSE, results="asis"
+## Intro
+
+Produce yearly plots for **CHP-1**.
+
+Shows only **raw data** aspects.
+
+It can use flags to show 'CLEAN'/'DIRTY' data.
+
+For 'CLEAN' data, it removes from view:
+
+- Bad recordings ranges `chp1_bad_data_flag`
+- Tracker async cases `Async_tracker_flag`
+- Physical recording limits `chp1_signal_lower_limit()` and `chp1_signal_upper_limit()`
+
+Mark outliers for signal and SD with:
+
+**mean(variable) -/+ `r OutliersPlot` * sd(variable)**
+
+This is just a report it doesn't alter the data.
+
+
+
+```{r include=TRUE, echo=FALSE, results="asis"}
 for (YYYY in sort(years_to_do)) {
     days_of_year <- seq.Date(as.Date(paste0(YYYY, "-01-01")),
                              as.Date(paste0(YYYY, "-12-31")), by = "day")
@@ -398,13 +398,13 @@ for (YYYY in sort(years_to_do)) {
     }
 
 }
+```
 
+**END**
 
-
-
-
-#' **END**
-#+ include=T, echo=F
+```{r include=T, echo=F}
 # myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+```
+
