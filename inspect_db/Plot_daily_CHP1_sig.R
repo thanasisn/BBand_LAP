@@ -101,7 +101,7 @@ plotfiles <- data.table(path = list.files(path    = OUT_FOLDER,
                                           ignore.case = TRUE))
 plotfiles$mtime <- file.mtime(plotfiles$path)
 plotfiles$year  <- as.numeric(
-    sub("CHP1_signal_", "", sub("\\.pdf", "", basename(plotfiles$path))))
+    sub(OUT_PREFIX, "", sub("\\.pdf", "", basename(plotfiles$path))))
 
 selected    <- merge(metalist, plotfiles, all = TRUE)
 years_to_do <- selected[is.na(path) | updated > mtime, year ]
