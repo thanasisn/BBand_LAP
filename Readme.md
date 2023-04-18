@@ -95,12 +95,15 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 Some aspects on the implementation of this project.
 
 - We use a dataset of `parquet` files as a database for all measurements and additional data.
-- There are some files with extra meta data for the data in the database and the analysis performed.
+- The `parquet` dataset use one file for each month, this facilitates:
+  - Syncing of the data amongst different computers.
+  - Partial processing when needed without using the dataset function.
 - It should be easy to migrate to a pure database like `duckdb` or `sqlite`.
+- There are some files with extra meta data for the data in the database and the analysis performed.
 - We use features of the `arrow` library, and also `data.table` when it is more suitable or clear to code.
 - The analysis should be able to be performed with under 8Gb of RAM, but is not assured.
-  - Currently the data set use 3.1 GB of disk space, with 16e6 rows and 71 columns.
-- There is a trade-of with the disk usage/wearing.
+  - Currently the data set use $3.1$ GB of disk space, with $16e6$ rows and $71$ columns.
+- There is a trade-of with the disk usage/wearing, especially when starting from scratch.
 - New data should be easy to be added on daily base on all levels.
 - New process and analysis should be easy to added for all data.
 
