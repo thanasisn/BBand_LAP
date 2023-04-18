@@ -72,3 +72,34 @@ QS$glo_min           <-   25
 QS$ClrSW_a           <- 1050.5
 QS$ClrSW_b           <-    1.095
 
+
+
+#'
+#' ## 6. Rayleigh Limit Diffuse Comparison
+#'
+
+# criteria
+QS$Rayleigh_upper_lim <- 500   # Upper departure diffuse limit
+QS$Rayleigh_lower_lim <-  -3   # Lower departure diffuse limit
+QS$Rayleigh_dif_glo_r <-   0.8 # Low limit diffuse/global < threshold
+QS$Rayleigh_glo_min   <-  50   # Low limit minimum global
+
+
+
+#'
+#' ## 8. Test for inverted values
+#'
+
+QS$dir_glo_invert  <- 5  # Diffuse Inversion test: DIRhor - GLBhor > lim[%]
+QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
+
+
+
+#'
+#' ## 9. Clearness index test
+#'
+
+QS$CL_idx_max <-  1.13  # Upper Clearness index accepted level
+QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
+QS$CL_idx_ele <-  8     # Apply for elevations above this angle
+
