@@ -477,11 +477,6 @@ for (af in filelist$names) {
     #'
     #+ echo=TEST_06, include=T
 
-    # criteria
-    QS$Rayleigh_upper_lim <- 500   # Upper departure diffuse limit
-    QS$Rayleigh_lower_lim <-  -3   # Lower departure diffuse limit
-    QS$Rayleigh_dif_glo_r <-   0.8 # Low limit diffuse/global < threshold
-    QS$Rayleigh_glo_min   <-  50   # Low limit minimum global
     # model
     Rayleigh_diff <- function(SZA, Pressure) {
         a    <-   209.3
@@ -581,9 +576,6 @@ for (af in filelist$names) {
     #'
     #+ echo=TEST_08, include=T
 
-    QS$dir_glo_invert  <- 5  # Diffuse Inversion test: DIRhor - GLBhor > lim[%]
-    QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
-
     if (TEST_08) {
         cat(paste("\n8. Inversion test.\n\n"))
 
@@ -620,10 +612,6 @@ for (af in filelist$names) {
     #' For larger elevation angles manual inspection is needed.
     #'
     #+ echo=TEST_09, include=T
-
-    QS$CL_idx_max <-  1.13  # Upper Clearness index accepted level
-    QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
-    QS$CL_idx_ele <-  8     # Apply for elevations above this angle
 
     if (TEST_09) {
         cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
