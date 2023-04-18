@@ -149,7 +149,7 @@ for (YYYY in sort(years_to_do)) {
              ylim = range(dd[, .(DIR_wpsm, HOR_wpsm, DIR_wpsm_temp_cor)], na.rm = TRUE),
              lwd  = 1.5,
              pch  = 19,  cex = 0.5, col = "cyan",
-             xlab = "", ylab = "Signal [Watt/m^2]")
+             xlab = "", ylab = "Radiation Flux [Watt/m^2]")
         lines(dd$Date, dd$DIR_wpsm,
               col = "blue",)
         abline(h = 0, col = "grey", lty = 2)
