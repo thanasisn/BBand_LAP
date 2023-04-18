@@ -68,11 +68,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(comment    = ""      )
+knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(out.width  = "100%"  )
+knitr::opts_chunk$set(fig.align  = "center")
+knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -83,6 +83,7 @@ qc_ver      <- 9
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
+source("~/BBand_LAP/process/DEFINITIONS_QCRad_LongShi_v9.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
 mylock(DB_lock)
@@ -192,10 +193,6 @@ filelist <- filelist[temp_to_do, on = .(flmonth = month, flyear = year)]
 rm(temp_to_do, dd)
 
 
-## gather configurations for quality control
-QS <- data.table()
-
-
 
 ## process data
 ## loop data base files computing black for CHP-1
@@ -267,13 +264,6 @@ for (af in filelist$names) {
     #' values of the data set.
     #'
     #+ echo=TEST_01, include=T
-
-    QS$dir_SWdn_min <-  -4  # Minimum direct value to consider valid measurement
-    QS$dir_SWdn_dif <- 327  # Closeness to to TSI
-    QS$glo_SWdn_min <-  -4  # Minimum global value to consider valid measurement
-    QS$glo_SWdn_off <- 160  # Global departure offset above the model
-    QS$glo_SWdn_amp <- 1.3  # Global departure factor above the model
-
     if (TEST_01) {
         cat(paste("\n1. Physically Possible Limits.\n\n"))
 
@@ -314,16 +304,6 @@ for (af in filelist$names) {
     #' The choose of those settings may be optimized with an iterative process.
     #'
     #+ echo=TEST_02, include=T
-
-    # Upper modeled values
-    QS$Dir_SWdn_amp     <-    0.91 # Direct departure factor above the model
-    QS$Dir_SWdn_off     <- -140    # Direct departure offset above the model
-    QS$Glo_SWdn_amp     <- 1.18    # Global departure factor above the model
-    QS$Glo_SWdn_off     <- 40      # Global departure offset above the model
-    # Minimum accepted values
-    QS$dir_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
-    QS$glo_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
-
     if (TEST_02) {
         cat(paste("\n2. Extremely Rare Limits.\n\n"))
 
@@ -365,14 +345,6 @@ for (af in filelist$names) {
     #' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
     #'
     #+ echo=TEST_03, include=T
-
-    QS$dif_rati_po0  <-  0.03
-    QS$dif_rati_po2  <-  0.08
-    QS$dif_sza_break <- 75
-    QS$dif_rati_pr1  <-  1.03
-    QS$dif_rati_pr2  <-  1.06
-    QS$dif_watt_lim  <-  10
-
     if (TEST_03) {
         cat(paste("\n3. Comparison tests.\n\n"))
 
@@ -415,12 +387,6 @@ for (af in filelist$names) {
     #' ## 4. Climatological (configurable) Limits
     #'
     #+ echo=TEST_04, include=T
-
-    QS$clim_lim_C3 <- 0.77
-    QS$clim_lim_D3 <- 0.81
-    QS$clim_lim_C1 <- 1.14
-    QS$clim_lim_D1 <- 1.32
-
     if (TEST_04) {
         cat("\n4. Climatological (configurable) Limits.\n\n")
 
@@ -463,7 +429,6 @@ for (af in filelist$names) {
     # make one such model.
     #
     #+ echo=TEST_05, include=T
-
     ## criteria
     QS$Tracking_min_elev <-   15
     QS$ClrSW_lim         <-    0.85
