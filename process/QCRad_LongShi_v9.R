@@ -695,20 +695,18 @@ if (TEST_01) {
         test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
         ## TODO
         for (ad in sort(unique(as.Date(test$Date)))) {
-            pp <- DATA[ as.Date(Date) == ad, ]
-            ylim <- range(pp$TSIextEARTH_comb - QS$dir_SWdn_dif, pp$wattDIR, na.rm = T)
-            plot(pp$Date, pp$wattDIR, "l", col = "blue",
-                 ylim = ylim, xlab = "", ylab = "wattDIR")
-            # lines(pp$Date, pp[, 1.2 * TSIextEARTH_comb * 0.678 * cosde(SZA) ])
-            # lines(pp$Date, pp[, 0.8 * TSIextEARTH_comb * cosde(SZA)  ])
-            # lines(pp$Date, pp[, 1.2 * TSIextEARTH_comb ^ (0.678 * cosde(SZA)) ])
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            ylim <- range(pp$TSI_TOA - QS$dir_SWdn_dif, pp$DIR_strict, na.rm = T)
+            plot(pp$Date, pp$DIR_strict, "l", col = "blue",
+                 ylim = ylim, xlab = "", ylab = "DIR_strict")
+
             title(paste("#1", as.Date(ad, origin = "1970-01-01")))
+
             ## plot limits
-            lines(pp$Date, pp$TSIextEARTH_comb - QS$dir_SWdn_dif, col = "red")
+            lines(pp$Date, pp$TSI_TOA - QS$dir_SWdn_dif, col = "red")
             ## mark offending data
-            # points(pp[!is.na(QCF_DIR_01), Date],
-            #        pp[!is.na(QCF_DIR_01), wattDIR],
-            #        col = "red", pch = 1)
+            points(pp[!is.na(get(flagname_DIR)), DIR_strict, Date],
+                   col = "red", pch = 1)
         }
 
         ## Plot Global radiation
