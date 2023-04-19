@@ -1277,6 +1277,20 @@ Tracker program was restarted manual.
 
 
 
+## 2023-04-19 09:19
+
+[//]: # (Keywords: #tracker, #chp1, #data_loss)
+
+The tracker didn't start normally today.
+
+I restart it manual at
+
+~ 09:10 LT
+
+
+
+
+
 :::
 
 
@@ -1331,14 +1345,14 @@ At least you need `pandoc` installed.
 List of tags
 ============
       5 #async
-     48 #chp1
+     49 #chp1
       1 #cleaned
      15 #cleaning
      11 #cm21
       2 #codding
       3 #data_corruption_certain
       1 #data_format_change
-     32 #data_loss
+     33 #data_loss
       3 #down_time
       5 #error
       2 #inclined
@@ -1356,5 +1370,5 @@ List of tags
       1 #sync
       1 #temp
       1 #test
-      7 #tracker
+      8 #tracker
      20 #tracker2
