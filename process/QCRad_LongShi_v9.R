@@ -1256,37 +1256,38 @@ if (TEST_09) {
 
         ## TODO plot offending years
         for (ay in unique(year(tmp$Date))) {
-            pp <- DATA[year(Date) == ay]
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
 
             ylim = c(-0.5, 2)
-            plot(pp$Elevat, pp$Clearness_Kt,
+            plot(pp$Elevat, pp$ClearnessIndex_kt,
                  main = ay, pch = 19, cex = 0.1,
                  ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
 
             abline(v = QS$CL_idx_ele, col = "yellow")
+            title(paste("#9", as.Date(ad, origin = "1970-01-01")))
 
-            points(pp[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Elevat],
-                   pp[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Clearness_Kt],
+            points(pp[ClearnessIndex_kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Elevat],
+                   pp[ClearnessIndex_kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, ClearnessIndex_kt],
                    pch = 19, cex = 0.3, col = "red")
             abline(h = QS$CL_idx_max, col = "magenta", lwd = 0.5)
 
-            points(pp[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Elevat],
-                   pp[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Clearness_Kt],
+            points(pp[ClearnessIndex_kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Elevat],
+                   pp[ClearnessIndex_kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, ClearnessIndex_kt],
                    pch = 19, cex = 0.3, col = "blue")
             abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
         }
 
         ## TODO plot offending days
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
-            pp   <- DATA[ as.Date(Date) == ad, ]
-            ylim <- range(pp$wattDIR, pp$wattGLB, na.rm = T)
-            plot(pp$Date, pp$wattGLB, "l", col = "green",
+            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+
+            ylim <- range(pp$DIR_strict, pp$GLB_strict, na.rm = T)
+            plot(pp$Date, pp$GLB_strict, "l", col = "green",
                  ylim = ylim, xlab = "", ylab = "wattGLB")
-            lines(pp$Date, pp$wattDIR, col = "blue")
-            title(paste("9_", as.Date(ad, origin = "1970-01-01")))
+            lines(pp$Date, pp$DIR_strict, col = "blue")
+            title(paste("#9", as.Date(ad, origin = "1970-01-01")))
             ## mark offending data
-            points(pp[!is.na(QCF_GLB_09), Date],
-                   pp[!is.na(QCF_GLB_09), wattGLB],
+            points(pp[!is.na(get(flagname_GLB)), GLB_strict, Date],
                    col = "red", pch = 1)
             ## no applicable to direct!!
             # points(pp[!is.na(QCF_GLB_09), Date],
