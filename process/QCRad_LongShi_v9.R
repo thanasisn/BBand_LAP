@@ -1287,7 +1287,7 @@ if (TEST_09) {
             lines(pp$Date, pp$DIR_strict, col = "blue")
             title(paste("#9", as.Date(ad, origin = "1970-01-01")))
             ## mark offending data
-            points(pp[!is.na(get(flagname_GLB)), GLB_strict, Date],
+            points(pp[!is.na(get(flagname_DIR)), GLB_strict, Date],
                    col = "red", pch = 1)
             ## no applicable to direct!!
             # points(pp[!is.na(QCF_GLB_09), Date],
