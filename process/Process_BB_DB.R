@@ -31,8 +31,9 @@ try({
 })
 
 try({
-    render(input      = "~/BBand_LAP/process/QCRad_LongShi_v9.R",
-           output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+    render(input         = "~/BBand_LAP/process/QCRad_LongShi_v9.R",
+           output_format = " bookdown::pdf_document2",
+           output_dir    = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
 system("$HOME/BBand_LAP/process/Upload_reports.sh")
