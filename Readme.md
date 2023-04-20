@@ -81,6 +81,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 
 ## TODO
 
+- Replace and compare processes from "CM_21_GLB"
 - Process more instruments
 - Interactive plot of db variables
 - Import libRadtran data
