@@ -1260,7 +1260,7 @@ if (TEST_09) {
 
             ylim = c(-0.5, 2)
             plot(pp$Elevat, pp$ClearnessIndex_kt,
-                 main = ay, pch = 19, cex = 0.1,
+                 pch = 19, cex = 0.1,
                  ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
 
             abline(v = QS$CL_idx_ele, col = "yellow")
