@@ -5,7 +5,7 @@
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Inspect raw data from CHP1."
+#' abstract:      "Inspect raw data from CM21."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -137,7 +137,7 @@ for (YYYY in datayears) {
     year_data <- data.table(year_data)
 
     if (!file.exists(legacyout) |
-        file.mtime(legacyout) < max(BB_meta$chp1_bad_data_flagged, na.rm = T) |
+        file.mtime(legacyout) < max(BB_meta$cm21_bad_data_flagged, na.rm = T) |
         YYYY %in% editedyears) {
         cat("Will export ", legacyout, "\n")
     } else {
@@ -145,47 +145,25 @@ for (YYYY in datayears) {
         next()
     }
 
-    stop()
-    wecare <- grep("TSI|Astropy|tot_|GLB_|cm21|CM21_|_R_",
-                   names(year_data), value = TRUE, ignore.case = TRUE, invert = TRUE)
-    year_data <- year_data[, ..wecare]
-
 
     # ## Apply some filtering ----------------------------------------------------
     # cat("\nRemove bad data regions\n")
-    # cat(year_data[!is.na(chp1_bad_data_flag), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-    # year_data$CHP1_sig   [!is.na(year_data$chp1_bad_data_flag)] <- NA
-    # year_data$CHP1_sig_sd[!is.na(year_data$chp1_bad_data_flag)] <- NA
+    # cat(year_data[!is.na(cm21_bad_data_flag), .N], year_data[!is.na(CM21_sig), .N], "\n\n")
+    # year_data$CM21_sig   [!is.na(year_data$cm21_bad_data_flag)] <- NA
+    # year_data$CM21_sig_sd[!is.na(year_data$cm21_bad_data_flag)] <- NA
 
     setorder(year_data, Date)
 
     ## Use the old names for output --------------------------------------------
-    names(year_data)[names(year_data) == "Date"]                <- "Date30"
-    names(year_data)[names(year_data) == "CHP1_sig"]            <- "CHP1value"
-    names(year_data)[names(year_data) == "CHP1_sig_sd"]         <- "CHP1sd"
-    names(year_data)[names(year_data) == "Async_step_count"]    <- "AsynStep"
-    names(year_data)[names(year_data) == "Async_tracker_flag"]  <- "Async"
-    names(year_data)[names(year_data) == "chp1_temperature"]    <- "CHP1temp"
-    names(year_data)[names(year_data) == "chp1_temperature_SD"] <- "CHP1tempSD"
-    names(year_data)[names(year_data) == "chp1_temp_UNC"]       <- "CHP1tempUNC"
-    names(year_data)[names(year_data) == "DIR_wpsm_temp_cor"]   <- "wattDIR_tmp_cr"
-    names(year_data)[names(year_data) == "HOR_wpsm_temp_cor"]   <- "wattHOR_tmp_cr"
-    names(year_data)[names(year_data) == "chp1_t_cor_factor"]   <- "chp1TempCF"
-    names(year_data)[names(year_data) == "DIR_SD_wpsm"]         <- "wattDIR_sds"
-    names(year_data)[names(year_data) == "DIR_wpsm"]            <- "wattDIR"
-    names(year_data)[names(year_data) == "HOR_wpsm"]            <- "wattHOR"
-    names(year_data)[names(year_data) == "HOR_SD_wpsm"]         <- "wattHOR_sds"
-    year_data$DumDarkCHP1 <- year_data$CHP1value - year_data$CHP1_sig_wo_dark
-    year_data$Date <- year_data$Date30 - 30
+    names(year_data)[names(year_data) == "CM21_sig"]            <- "CM21value"
+    names(year_data)[names(year_data) == "CM21_sig_sd"]         <- "CM21sd"
+    # year_data$DumDarkCM21 <- year_data$CM21value - year_data$CM21_sig_wo_dark
 
-    year_data$CHP1_sig_wo_dark   <- NULL
-    year_data$chp1_bad_data_flag <- NULL
-    year_data$chp1_bad_temp_flag <- NULL
-    year_data$month              <- NULL
-    year_data$year               <- NULL
-    year_data$doy                <- NULL
-    year_data$lap_sza            <- NULL
+    # year_data$CM21_sig_wo_dark   <- NULL
+    year_data$cm21_bad_data_flag <- NULL
 
+    year_data[, sig_lowlim := cm21_signal_lower_limit(Date)]
+    year_data[, sig_upplim := cm21_signal_upper_limit(Date)]
 
     year_data |> glimpse()
     ## Write data to old file format  ------------------------------------------
@@ -194,7 +172,6 @@ for (YYYY in datayears) {
               file   = legacyout)
 
 }
-
 
 ## Old format of CM21_H_SIG
 # $ Date      : POSIXct, format: "2005-01-01 00:00:30" "2005-01-01 00:01:30" ...
@@ -205,7 +182,7 @@ for (YYYY in datayears) {
 # $ sig_lowlim: num  -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 ...
 # $ sig_upplim: num  0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 ...
 
-
+stop()
 
 
 
@@ -217,7 +194,7 @@ for (YYYY in datayears) {
 #+ echo=F, include=T, results="asis"
 if (COMPARE) {
     listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
-                             pattern = "Legacy_L1_CHP1_[0-9]{4}\\.Rds",
+                             pattern = "Legacy_L1_CM21_[0-9]{4}\\.Rds",
                              full.names = TRUE, ignore.case = TRUE)
 
     ## gather remaiining
@@ -228,11 +205,11 @@ if (COMPARE) {
         ## load new files
         legacy <- readRDS(alf)
         yyyy   <- unique(year(legacy$Date30))[1]
-        legacy <- legacy[!is.na(CHP1value),]
+        legacy <- legacy[!is.na(CM21value),]
         legacy$Azimuth        <- NULL
         legacy$preNoon        <- NULL
         legacy$SZA            <- NULL
-        legacy$DumDarkCHP1    <- NULL
+        legacy$DumDarkCM21    <- NULL
         legacy$wattHOR        <- NULL
         legacy$wattDIR        <- NULL
         legacy$wattHOR_sds    <- NULL
@@ -240,11 +217,11 @@ if (COMPARE) {
         legacy$Elevat         <- NULL
         legacy$Date           <- NULL
         legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
-        legacy[is.na(CHP1value), Async    := NA]
-        legacy[is.na(CHP1value), AsynStep := NA]
+        legacy[is.na(CM21value), Async    := NA]
+        legacy[is.na(CM21value), AsynStep := NA]
 
         ## load old files
-        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CHP1_L1_",yyyy,".Rds")))
+        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CM21_L1_",yyyy,".Rds")))
         baseDT$Azimuth        <- NULL
         baseDT$preNoon        <- NULL
         baseDT$Elevat         <- NULL
@@ -258,12 +235,12 @@ if (COMPARE) {
         baseDT$wattHOR_unc_WT <- NULL
         baseDT$wattDIR_unc_NT <- NULL
         baseDT$wattHOR_unc_NT <- NULL
-        baseDT$DumDarkCHP1    <- NULL
+        baseDT$DumDarkCM21    <- NULL
         baseDT$rel_Time       <- NULL
         baseDT$rel_Elev       <- NULL
         baseDT$Times          <- NULL
-        baseDT[is.na(CHP1value), Async    := NA]
-        baseDT[is.na(CHP1value), AsynStep := NA]
+        baseDT[is.na(CM21value), Async    := NA]
+        baseDT[is.na(CM21value), AsynStep := NA]
 
 
         setequal(names(baseDT), names(legacy))
