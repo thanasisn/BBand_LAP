@@ -25,6 +25,7 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
+#'     toc_depth:        4
 #'     fig_width:        8
 #'     fig_height:       5
 #'   html_document:
