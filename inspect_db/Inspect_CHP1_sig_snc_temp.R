@@ -162,6 +162,8 @@ for (YYYY in sort(years_to_do)) {
 
     ## load data for year
     year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
+    setorder(year_data, Date)
+
 
     ## Recording limits
     year_data[, sig_lowlim := chp1_signal_lower_limit(Date)]
@@ -172,8 +174,8 @@ for (YYYY in sort(years_to_do)) {
         year_data[!is.na(CHP1_sig), .N]
         cat("\nRemove bad data regions\n")
         cat(year_data[!is.na(chp1_bad_data_flag), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CM21_sig   [!is.na(year_data$chp1_bad_data_flag)] <- NA
-        year_data$CM21_sig_sd[!is.na(year_data$chp1_bad_data_flag)] <- NA
+        year_data$CHP1_sig   [!is.na(year_data$chp1_bad_data_flag)] <- NA
+        year_data$CHP1_sig_sd[!is.na(year_data$chp1_bad_data_flag)] <- NA
 
         cat("\nRemove tracker async cases\n")
         cat(year_data[Async_tracker_flag == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
@@ -252,6 +254,7 @@ for (YYYY in sort(years_to_do)) {
     cat(pander(summary(year_data[, .(Date, SZA, CHP1_sig, CHP1_sig_sd, Async_tracker_flag)])))
     cat('\n\n\\normalsize\n\n')
 
+
     hist(year_data$CHP1_sig,
          breaks = 50,
          main   = paste("CHP1 signal ",  YYYY))
@@ -259,12 +262,14 @@ for (YYYY in sort(years_to_do)) {
     abline(v = yearlims[ an == "CHP1_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
+
     hist(year_data$CHP1_sig_sd,
          breaks = 50,
          main   = paste("CHP1 signal SD", YYYY))
     abline(v = yearlims[ an == "CHP1_sig_sd", low], lty = 3, col = "red")
     abline(v = yearlims[ an == "CHP1_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
+
 
     plot(year_data$Elevat, year_data$CHP1_sig,
          pch  = 19,
@@ -275,6 +280,7 @@ for (YYYY in sort(years_to_do)) {
     points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
     cat('\n\n')
+
 
     plot(year_data$Date, year_data$CHP1_sig,
          pch  = 19,
@@ -288,6 +294,7 @@ for (YYYY in sort(years_to_do)) {
     abline(h = yearlims[ an == "CHP1_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
+
     plot(year_data$Elevat, year_data$CHP1_sig_sd,
          pch  = 19,
          cex  = .1,
@@ -298,7 +305,67 @@ for (YYYY in sort(years_to_do)) {
     abline(h = yearlims[ an == "CHP1_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
 
-    # par(mar = c(2,4,2,1))
+
+    all    <- cumsum(tidyr::replace_na(year_data$CHP1_sig, 0))
+    pos    <- year_data[ CHP1_sig > 0 ]
+    pos$V1 <- cumsum(tidyr::replace_na(pos$CHP1_sig, 0))
+    neg    <- year_data[ CHP1_sig < 0 ]
+    neg$V1 <- cumsum(tidyr::replace_na(neg$CHP1_sig, 0))
+    xlim   <- range(year_data$Date)
+    plot(year_data$Date, all,
+         type = "l",
+         xlim = xlim,
+         ylab = "",
+         yaxt = "n", xlab = "",
+         main = paste("Cum Sum of CHP-1 signal ",  YYYY) )
+    par(new = TRUE)
+    plot(pos$Date, pos$V1,
+         xlim = xlim,
+         col = "blue", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    par(new = TRUE)
+    plot(neg$Date, neg$V1,
+         xlim = xlim,
+         col = "red", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    legend("left", legend = c("Positive signal",
+                              "Negative signal",
+                              "All signal"),
+           lty = 1, bty = "n", cex = 0.8,
+           col = c("red", "blue", "black"))
+    cat('\n\n')
+
+
+    all    <- cumsum(tidyr::replace_na(year_data$CHP1_sig_sd, 0))
+    pos    <- year_data[ CHP1_sig > 0 ]
+    pos$V1 <- cumsum(tidyr::replace_na(pos$CHP1_sig_sd, 0))
+    neg    <- year_data[ CHP1_sig < 0 ]
+    neg$V1 <- cumsum(tidyr::replace_na(neg$CHP1_sig_sd, 0))
+    xlim   <- range(year_data$Date)
+    plot(year_data$Date, all,
+         type = "l",
+         xlim = xlim,
+         ylab = "",
+         yaxt = "n", xlab = "",
+         main = paste("Cum Sum of CHP-1 sd ",  YYYY) )
+    par(new = TRUE)
+    plot(pos$Date, pos$V1,
+         xlim = xlim,
+         col = "blue", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    par(new = TRUE)
+    plot(neg$Date, neg$V1,
+         xlim = xlim,
+         col = "red", type = "l",
+         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+    legend("left", legend = c("Positive signal",
+                              "Negative signal",
+                              "All signal"),
+           lty = 1, bty = "n", cex = 0.8,
+           col = c("red", "blue", "black"))
+    cat('\n\n')
+
+
     month_vec <- strftime(  year_data$Date, format = "%m")
     dd        <- aggregate( year_data[, .(CHP1_sig, CHP1_sig_sd, Elevat, Azimuth)],
                             list(month_vec), FUN = summary, digits = 6 )
