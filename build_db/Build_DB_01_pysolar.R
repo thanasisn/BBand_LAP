@@ -190,12 +190,14 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, year  := year( Date)]
             sun_temp[, month := month(Date)]
             sun_temp[, doy   := yday( Date)]
+
             ## Get metadata for each sun file ----------------------------------
             sun_meta <- data.table(day              = as_date(ad),
                                    pysolar_basename = basename(ss$fullname),
                                    pysolar_mtime    = file.mtime(ss$fullname),
                                    pysolar_parsed   = Sys.time())
-            ## Here we can init more variables of the database!! ---------------
+
+            ## Here we can init more variables of the database -----------------
             sun_temp[Azimuth <= 180, preNoon := TRUE ]
             sun_temp[Azimuth >  180, preNoon := FALSE]
 
@@ -226,16 +228,20 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, lap_sza                 := as.numeric(NA)  ]
             ## Radiation
             sun_temp[, DIR_SD_wpsm             := as.numeric(NA)  ]
-            sun_temp[, DIR_wpsm                := as.numeric(NA)  ]
             sun_temp[, DIR_strict              := as.numeric(NA)  ]
+            sun_temp[, DIR_wpsm                := as.numeric(NA)  ]
             sun_temp[, DIR_wpsm_temp_cor       := as.numeric(NA)  ]
             sun_temp[, GLB_SD_wpsm             := as.numeric(NA)  ]
-            sun_temp[, GLB_wpsm                := as.numeric(NA)  ]
             sun_temp[, GLB_strict              := as.numeric(NA)  ]
+            sun_temp[, GLB_wpsm                := as.numeric(NA)  ]
             sun_temp[, HOR_SD_wpsm             := as.numeric(NA)  ]
-            sun_temp[, HOR_wpsm                := as.numeric(NA)  ]
             sun_temp[, HOR_strict              := as.numeric(NA)  ]
+            sun_temp[, HOR_wpsm                := as.numeric(NA)  ]
             sun_temp[, HOR_wpsm_temp_cor       := as.numeric(NA)  ]
+            ## Computed
+            sun_temp[, DIFF_strict             := as.numeric(NA)  ]
+            sun_temp[, DiffuseFraction_kd      := as.numeric(NA)  ]
+            sun_temp[, ClearnessIndex_kt       := as.numeric(NA)  ]
             ## Sun
             sun_temp[, Sun_Dist_Astropy        := as.numeric(NA)  ]
             sun_temp[, TSI_TOA                 := as.numeric(NA)  ]
