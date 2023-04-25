@@ -231,17 +231,14 @@ for (af in filelist$names) {
     datapart[GLB_strict < 0, GLB_strict := 0]
 
     ## __ Diffuse radiation  ---------------------------------------------------
+    ## DHI = GHI – DNI cos(z)
     datapart[, DIFF_strict := GLB_strict - HOR_strict]
-    warning(" * * DIF_strict is no Diffuse radiation !! ** ")
-    cat("\n\n * * DIF_strict is no Diffuse radiation !! ** \n\n")
 
     ## __ Clearness Index  -----------------------------------------------------
     datapart[, ClearnessIndex_kt := GLB_strict / (cosde(SZA) * TSI_TOA)]
 
     ## __ Diffuse fraction  ----------------------------------------------------
     datapart[, DiffuseFraction_kd := DIFF_strict / GLB_strict]
-    warning(" * * DiffuseFraction_Kd is no Diffuse Fraction !! ** ")
-    cat("\n\n * * DiffuseFraction_Kd is no Diffuse Fraction !! ** \n\n")
 
     ## replace infinite values
     datapart[is.infinite(DiffuseFraction_kd), DiffuseFraction_kd := NA]
