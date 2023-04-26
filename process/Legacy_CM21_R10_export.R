@@ -95,7 +95,7 @@ panderOptions("table.split.table",        120   )
 
 ## __ Execution control  -------------------------------------------------------
 COMPARE <- TRUE
-COMPARE <- FALSE
+# COMPARE <- FALSE
 
 
 ## years in the data base
@@ -112,14 +112,8 @@ editedyears <- as.vector(na.omit(unique(
 )))
 
 
-
-
 ## test
 # datayears <- NULL
-
-
-
-
 
 
 ## export legacy files
@@ -182,9 +176,6 @@ for (YYYY in datayears) {
 # $ sig_lowlim: num  -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 ...
 # $ sig_upplim: num  0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 ...
 
-stop()
-
-
 
 ## Do a data comparison --------------------------------------------------------
 
@@ -193,13 +184,14 @@ stop()
 
 #+ echo=F, include=T, results="asis"
 if (COMPARE) {
-    listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
-                             pattern = "Legacy_L1_CM21_[0-9]{4}\\.Rds",
+    listlegacy <- list.files(path   = "~/DATA/Broad_Band/CM21_H_signal",
+                             pattern = "Legacy_LAP_CM21_H_SIG_[0-9]{4}\\.Rds",
                              full.names = TRUE, ignore.case = TRUE)
 
     ## gather remaiining
     gather <- data.table()
 
+stop()
     for (alf in listlegacy) {
 
         ## load new files
