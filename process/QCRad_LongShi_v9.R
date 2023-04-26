@@ -653,12 +653,17 @@ BB <- opendata()
 
 
 ## inspect a part of data
-PLOT_FIRST <- as_date("2020-01-01")
-PLOT_LAST  <- as_date("2023-03-31")
+PLOT_FIRST <- as_date("2022-01-01")
+PLOT_LAST  <- as_date("2024-03-31")
 
 BB <- BB |> filter(as_date(Date) >= PLOT_FIRST &
                    as_date(Date) <= PLOT_LAST) |>
     compute()
+
+yearstodo <- BB |> select(year) |> unique() |> pull(as_vector = TRUE)
+
+
+
 
 
 ####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ----------------------------------
@@ -697,6 +702,8 @@ if (TEST_01) {
          main = "Glo_max_ref - GLB_strict")
 
     if (DO_PLOTS) {
+
+        pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf")
 
         test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
         ## TODO
