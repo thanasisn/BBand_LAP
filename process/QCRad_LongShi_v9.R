@@ -580,6 +580,7 @@ for (af in filelist$names) {
         flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
 
         InitVariableBBDB(flagname_BTH, as.character(NA))
+
         ## __ Both  ------------------------------------------------------------
         datapart[, Relative_diffuse := 100 * (HOR_strict  - GLB_strict) / GLB_strict ]
         datapart[ is.infinite(Relative_diffuse), Relative_diffuse := NA]
@@ -629,7 +630,6 @@ for (af in filelist$names) {
     }
 
 
-
     summary(datapart)
 
     ## store actual data
@@ -650,6 +650,15 @@ myunlock(DB_lock)
 
 ## open data base for plots
 BB <- opendata()
+
+
+## inspect a part of data
+PLOT_FIRST <- as_date("2020-01-01")
+PLOT_LAST  <- as_date("2023-03-31")
+
+BB <- BB |> filter(as_date(Date) >= PLOT_FIRST &
+                   as_date(Date) <= PLOT_LAST) |>
+    compute()
 
 
 ####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ----------------------------------
