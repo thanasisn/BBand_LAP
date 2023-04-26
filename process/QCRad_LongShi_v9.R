@@ -656,11 +656,11 @@ BB <- opendata()
 PLOT_FIRST <- as_date("2022-01-01")
 PLOT_LAST  <- as_date("2024-03-31")
 
-BB <- BB |> filter(as_date(Date) >= PLOT_FIRST &
-                   as_date(Date) <= PLOT_LAST) |>
-    compute()
-
-yearstodo <- BB |> select(year) |> unique() |> pull(as_vector = TRUE)
+# BB <- BB |> filter(as_date(Date) >= PLOT_FIRST &
+#                    as_date(Date) <= PLOT_LAST) |>
+#     compute()
+#
+# yearstodo <- BB |> select(year) |> unique() |> pull(as_vector = TRUE)
 
 
 
@@ -703,7 +703,9 @@ if (TEST_01) {
 
     if (DO_PLOTS) {
 
-        pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf")
+        if (!interactive()) {
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+        }
 
         test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
         ## TODO
@@ -739,6 +741,7 @@ if (TEST_01) {
     }
     rm(list = ls(pattern = "flagname_.*"))
     gc()
+    if (!interactive()) dev.off()
 }
 #' -----------------------------------------------------------------------------
 
@@ -775,6 +778,10 @@ if (TEST_02) {
 
     if (DO_PLOTS) {
 
+        if (!interactive()) {
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+        }
+
         ## Direct
         test <- BB |> filter(!is.na(QCv9_02_dir_flag)) |> collect() |> as.data.table()
         for (ad in sort(unique(as.Date(test$Date)))) {
@@ -807,6 +814,7 @@ if (TEST_02) {
     }
     rm(list = ls(pattern = "flagname_.*"))
     gc()
+    if (!interactive()) dev.off()
 }
 #' -----------------------------------------------------------------------------
 
@@ -881,6 +889,10 @@ if (TEST_03) {
 
     if (DO_PLOTS) {
 
+        if (!interactive()) {
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+        }
+
         tmp <- BB |> filter(!is.na(QCv9_03_upp_flag) | !is.na(QCv9_03_low_flag)) |> collect() |> as.data.table()
 
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
@@ -922,6 +934,7 @@ if (TEST_03) {
     }
     rm(list = ls(pattern = "flagname_.*"))
     gc()
+    if (!interactive()) dev.off()
 }
 #' -----------------------------------------------------------------------------
 
@@ -968,6 +981,10 @@ if (TEST_04) {
          main = "Departure Direct from second climatological limit")
 
     if (DO_PLOTS) {
+
+        if (!interactive()) {
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+        }
 
         ## test direct limits
         temp1 <- data.table(BB |>
@@ -1027,6 +1044,7 @@ if (TEST_04) {
     }
     rm(list = ls(pattern = "flagname_.*"))
     gc()
+    if (!interactive()) dev.off()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1065,6 +1083,11 @@ if (TEST_05) {
     abline(v = QS$glo_min, col = "red", lty = 3)
 
     if (DO_PLOTS) {
+
+        if (!interactive()) {
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+        }
+
         tmp <- BB |>
             filter(!is.na(get(flagname_DIR))) |>
             select(Date) |>
@@ -1088,6 +1111,7 @@ if (TEST_05) {
     }
     rm(list = ls(pattern = "flagname_.*"))
     gc()
+    if (!interactive()) dev.off()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1112,6 +1136,10 @@ if (TEST_06) {
     abline(v = QS$Rayleigh_upper_lim, lty = 3, col = "red")
 
     if (DO_PLOTS) {
+
+        if (!interactive()) {
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+        }
 
         ## plot on upper limit
 
@@ -1152,6 +1180,7 @@ if (TEST_06) {
     }
     rm(list = ls(pattern = "flagname_.*"))
     gc()
+    if (!interactive()) dev.off()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1199,6 +1228,10 @@ if (TEST_08) {
 
     if (DO_PLOTS) {
 
+        if (!interactive()) {
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+        }
+
         tmp <- BB |>
             filter(!is.na(get(flagname_BTH))) |>
             select(Date) |>
@@ -1222,6 +1255,7 @@ if (TEST_08) {
     }
     rm(list = ls(pattern = "flagname_.*"))
     gc()
+    if (!interactive()) dev.off()
 }
 #' -----------------------------------------------------------------------------
 
@@ -1260,6 +1294,10 @@ if (TEST_09) {
 
 
     if (DO_PLOTS) {
+
+        if (!interactive()) {
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+        }
 
         tmp <- BB |>
             filter(!is.na(get(flagname_GLB))) |>
@@ -1310,6 +1348,7 @@ if (TEST_09) {
     }
     rm(list = ls(pattern = "flagname_.*"))
     gc()
+    if (!interactive()) dev.off()
 }
 #' -----------------------------------------------------------------------------
 
