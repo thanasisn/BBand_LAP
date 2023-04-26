@@ -191,63 +191,35 @@ if (COMPARE) {
     ## gather remaiining
     gather <- data.table()
 
-stop()
     for (alf in listlegacy) {
 
         ## load new files
         legacy <- readRDS(alf)
-        yyyy   <- unique(year(legacy$Date30))[1]
+        yyyy   <- unique(year(legacy$Date))[1]
         legacy <- legacy[!is.na(CM21value),]
         legacy$Azimuth        <- NULL
-        legacy$preNoon        <- NULL
-        legacy$SZA            <- NULL
-        legacy$DumDarkCM21    <- NULL
-        legacy$wattHOR        <- NULL
-        legacy$wattDIR        <- NULL
-        legacy$wattHOR_sds    <- NULL
-        legacy$wattHOR_tmp_cr <- NULL
         legacy$Elevat         <- NULL
-        legacy$Date           <- NULL
-        legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
-        legacy[is.na(CM21value), Async    := NA]
-        legacy[is.na(CM21value), AsynStep := NA]
+        # legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
 
         ## load old files
-        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CM21_L1_",yyyy,".Rds")))
+        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_signal/LAP_CM21_H_SIG_",yyyy,".Rds")))
         baseDT$Azimuth        <- NULL
-        baseDT$preNoon        <- NULL
         baseDT$Elevat         <- NULL
-        baseDT$SZA            <- NULL
-        baseDT$wattHOR        <- NULL
-        baseDT$wattDIR        <- NULL
-        baseDT$wattHOR_sds    <- NULL
-        baseDT$wattHOR_tmp_cr <- NULL
-        baseDT$Date           <- NULL
-        baseDT$wattDIR_unc_WT <- NULL
-        baseDT$wattHOR_unc_WT <- NULL
-        baseDT$wattDIR_unc_NT <- NULL
-        baseDT$wattHOR_unc_NT <- NULL
-        baseDT$DumDarkCM21    <- NULL
-        baseDT$rel_Time       <- NULL
-        baseDT$rel_Elev       <- NULL
-        baseDT$Times          <- NULL
-        baseDT[is.na(CM21value), Async    := NA]
-        baseDT[is.na(CM21value), AsynStep := NA]
 
 
         setequal(names(baseDT), names(legacy))
 
         cat(paste("\n\n##", yyyy, "\n\n"))
 
-        setorder(baseDT, Date30)
-        setorder(legacy, Date30)
+        setorder(baseDT, Date)
+        setorder(legacy, Date)
 
         wecare <- names(legacy)
         wecare <- grep("Date", wecare, invert = TRUE, value = TRUE )
 
         ## merge two streams
         sss <- merge(baseDT, legacy,
-                     by = "Date30", all = T, suffixes = c(".old", ".new"))
+                     by = "Date", all = T, suffixes = c(".old", ".new"))
 
         for (av in wecare) {
             vold <- paste0(av,".old")
