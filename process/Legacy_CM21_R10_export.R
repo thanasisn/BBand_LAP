@@ -95,7 +95,7 @@ panderOptions("table.split.table",        120   )
 
 ## __ Execution control  -------------------------------------------------------
 COMPARE <- TRUE
-# COMPARE <- FALSE
+COMPARE <- FALSE
 
 
 ## years in the data base
@@ -112,8 +112,14 @@ editedyears <- as.vector(na.omit(unique(
 )))
 
 
+
+
 ## test
 # datayears <- NULL
+
+
+
+
 
 
 ## export legacy files
@@ -176,6 +182,9 @@ for (YYYY in datayears) {
 # $ sig_lowlim: num  -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 ...
 # $ sig_upplim: num  0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 ...
 
+stop()
+
+
 
 ## Do a data comparison --------------------------------------------------------
 
@@ -184,8 +193,8 @@ for (YYYY in datayears) {
 
 #+ echo=F, include=T, results="asis"
 if (COMPARE) {
-    listlegacy <- list.files(path   = "~/DATA/Broad_Band/CM21_H_signal",
-                             pattern = "Legacy_LAP_CM21_H_SIG_[0-9]{4}\\.Rds",
+    listlegacy <- list.files(path   = "~/DATA/Broad_Band/",
+                             pattern = "Legacy_L1_CM21_[0-9]{4}\\.Rds",
                              full.names = TRUE, ignore.case = TRUE)
 
     ## gather remaiining
@@ -195,31 +204,58 @@ if (COMPARE) {
 
         ## load new files
         legacy <- readRDS(alf)
-        yyyy   <- unique(year(legacy$Date))[1]
+        yyyy   <- unique(year(legacy$Date30))[1]
         legacy <- legacy[!is.na(CM21value),]
         legacy$Azimuth        <- NULL
+        legacy$preNoon        <- NULL
+        legacy$SZA            <- NULL
+        legacy$DumDarkCM21    <- NULL
+        legacy$wattHOR        <- NULL
+        legacy$wattDIR        <- NULL
+        legacy$wattHOR_sds    <- NULL
+        legacy$wattHOR_tmp_cr <- NULL
         legacy$Elevat         <- NULL
-        # legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
+        legacy$Date           <- NULL
+        legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
+        legacy[is.na(CM21value), Async    := NA]
+        legacy[is.na(CM21value), AsynStep := NA]
 
         ## load old files
-        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_signal/LAP_CM21_H_SIG_",yyyy,".Rds")))
+        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/LAP_CM21_L1_",yyyy,".Rds")))
         baseDT$Azimuth        <- NULL
+        baseDT$preNoon        <- NULL
         baseDT$Elevat         <- NULL
+        baseDT$SZA            <- NULL
+        baseDT$wattHOR        <- NULL
+        baseDT$wattDIR        <- NULL
+        baseDT$wattHOR_sds    <- NULL
+        baseDT$wattHOR_tmp_cr <- NULL
+        baseDT$Date           <- NULL
+        baseDT$wattDIR_unc_WT <- NULL
+        baseDT$wattHOR_unc_WT <- NULL
+        baseDT$wattDIR_unc_NT <- NULL
+        baseDT$wattHOR_unc_NT <- NULL
+        baseDT$DumDarkCM21    <- NULL
+        baseDT$rel_Time       <- NULL
+        baseDT$rel_Elev       <- NULL
+        baseDT$Times          <- NULL
+        baseDT[is.na(CM21value), Async    := NA]
+        baseDT[is.na(CM21value), AsynStep := NA]
 
 
         setequal(names(baseDT), names(legacy))
 
         cat(paste("\n\n##", yyyy, "\n\n"))
 
-        setorder(baseDT, Date)
-        setorder(legacy, Date)
+        setorder(baseDT, Date30)
+        setorder(legacy, Date30)
 
         wecare <- names(legacy)
         wecare <- grep("Date", wecare, invert = TRUE, value = TRUE )
 
         ## merge two streams
         sss <- merge(baseDT, legacy,
-                     by = "Date", all = T, suffixes = c(".old", ".new"))
+                     by = "Date30", all = T, suffixes = c(".old", ".new"))
 
         for (av in wecare) {
             vold <- paste0(av,".old")
