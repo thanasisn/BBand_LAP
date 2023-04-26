@@ -1202,6 +1202,13 @@ The horizontal Global CM-21 was
 
 
 
+## 2022-06-16 00:00 [BA]
+
+Τελικά έβαλα το σπασμένο shield (το κόλλησα πρόχειρα) σήμερα στις 7.00 UTC.
+
+
+
+
 ## 2022-06-27 11:40 [ThanasisN]
 
 [//]: # (Keywords: #cm21, #inclined)
