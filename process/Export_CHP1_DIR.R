@@ -1,5 +1,5 @@
-#!/usr/bin/env Rscript
-#' Copyright (C) 2018 Athanasios Natsis <natsisphysicist@gmail.com>
+# /* #!/opt/R/4.2.3/bin/Rscript */
+# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 
 #'
@@ -14,9 +14,9 @@ tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
                             return("Undefined R script name!!") })
-if(!interactive()) {
-    pdf(file=sub("\\.R$",".pdf",Script.Name))
-    sink(file=sub("\\.R$",".out",Script.Name,),split=TRUE)
+if (!interactive()) {
+    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 options(max.print = 1500)
