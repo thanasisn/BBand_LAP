@@ -31,14 +31,16 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB_02_cm21.R"
 
+if (!interactive()) {
+    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+}
+
+
+## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
-
-if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
-}
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
@@ -90,7 +92,6 @@ inp_filelist <- inp_filelist[!inp_filelist$cm21_basename %in% BB_meta$cm21_basen
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 
 cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
-
 
 
 
@@ -175,7 +176,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
         }
 
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
-        # BBdaily <- rows_patch(BBdaily, gathermeta, by = "day", unmatched = "ignore")
 
         setorder(gather, Date)
 
@@ -187,7 +187,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
     rm(subyear)
 }
 rm(inp_filelist)
-
 
 
 
