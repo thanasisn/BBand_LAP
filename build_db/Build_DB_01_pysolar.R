@@ -37,8 +37,8 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB_01_pysolar.R"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 
@@ -150,7 +150,6 @@ inp_filelist <- inp_filelist[!inp_filelist$basename %in% BB_meta$pysolar_basenam
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 
 cat("\n**Parse:",paste(nrow(inp_filelist), "PySolar files**\n\n"))
-
 
 
 
