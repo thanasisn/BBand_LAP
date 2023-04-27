@@ -911,7 +911,7 @@ if (TEST_03) {
             abline(h = QS$dif_rati_po1, col = "blue")
             abline(h = QS$dif_rati_po2, col = "blue", lty = 2)
 
-            title(paste("3_1_2", as.Date(ad, origin = "1970-01-01")))
+            title(paste("#3", as.Date(ad, origin = "1970-01-01")))
 
             par(mar = c(2,4,1,1))
             ylim <- range(pp$GLB_strict, pp$DIR_strict, na.rm = T)
