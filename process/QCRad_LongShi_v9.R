@@ -1129,14 +1129,15 @@ if (TEST_05) {
                                  Elevat > sun_elev_min)   |>
                     collect()
             )
-            ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, na.rm = T)
+            ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = T)
             plot(pp$Date, pp$DIR_strict, "l", col = "blue",
                  ylim = ylim, xlab = "", ylab = "wattDIR")
             lines(pp$Date, pp$GLB_strict, col = "green")
+            lines(pp$Date, pp$HOR_strict, col = "cyan")
             title(paste("#5", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
-            lines(pp$Date, pp$ClrSW_ref2, col = "cyan")
+            lines(pp$Date, pp$ClrSW_ref2, col = "magenta")
             ## mark offending data
             points(pp[!is.na(get(flagname_DIR)), DIR_strict, Date],
                    col = "red", pch = 1)
