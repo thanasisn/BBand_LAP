@@ -102,7 +102,7 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(pander,     warn.conflicts = TRUE, quietly = TRUE)
 
 ##  Variables  -----------------------------------------------------------------
-sun_elev_min     <-  -2 * 0.103  ## Drop  radiation data when sun is below this point
+sun_elev_min     <-  -2 * 0.103  ## Drop ALL radiation data when sun is below this point
 
 
 ##  Execution control  ---------------------------------------------------------
@@ -123,7 +123,7 @@ TEST_03  <- TRUE
 TEST_04  <- TRUE
 TEST_05  <- TRUE
 TEST_06  <- TRUE
-TEST_07  <- TRUE
+TEST_07  <- TRUE  ## TODO
 TEST_08  <- TRUE
 TEST_09  <- TRUE
 
@@ -711,7 +711,11 @@ if (TEST_01) {
         test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
         ## TODO
         for (ad in sort(unique(as.Date(test$Date)))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
             ylim <- range(pp$TSI_TOA - QS$dir_SWdn_dif, pp$DIR_strict, na.rm = T)
             plot(pp$Date, pp$DIR_strict, "l", col = "blue",
                  ylim = ylim, xlab = "", ylab = "DIR_strict")
@@ -728,7 +732,11 @@ if (TEST_01) {
         ## Plot Global radiation
         test <- BB |> filter(!is.na(QCv9_01_glb_flag) ) |> collect() |> as.data.table()
         for (ad in sort(unique(as.Date(c(test$Date))))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
             ylim <- range(pp$Glo_max_ref, pp$GLB_strict, na.rm = T)
             plot(pp$Date, pp$GLB_strict, "l", col = "green",
                  ylim = ylim, xlab = "", ylab = "GLB")
@@ -786,7 +794,11 @@ if (TEST_02) {
         ## Direct
         test <- BB |> filter(!is.na(QCv9_02_dir_flag)) |> collect() |> as.data.table()
         for (ad in sort(unique(as.Date(test$Date)))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
             ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
             plot(pp$Date, pp$DIR_strict, "l", col = "blue",
                  ylim = ylim, xlab = "", ylab = "wattDIR")
@@ -801,7 +813,11 @@ if (TEST_02) {
         ## Global
         test <- BB |> filter(!is.na(QCv9_02_glb_flag)) |> collect() |> as.data.table()
         for (ad in sort(unique(as.Date(c(test$Date))))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
             ylim <- range(pp$Global_max, pp$GLB_strict, na.rm = T)
             plot(pp$Date, pp$GLB_strict, "l", col = "green",
                  ylim = ylim, xlab = "", ylab = "GLB")
@@ -898,7 +914,11 @@ if (TEST_03) {
 
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
 
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
 
             layout(matrix(c(1,2), 2, 1, byrow = TRUE))
             par(mar = c(2,4,2,1))
@@ -997,7 +1017,11 @@ if (TEST_04) {
                                collect())
 
         for (ad in sort(unique(as.Date(temp1$Date)))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
             if (any(!is.na(pp$DIR_strict))) {
                 ylim <- range(pp$Dir_First_Clim_lim,
                               pp$Dir_Secon_Clim_lim,
@@ -1025,7 +1049,11 @@ if (TEST_04) {
                                 collect())
 
         for (ad in sort(unique(as.Date(temp1$Date)))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
             if (any(!is.na(pp$GLB_strict))) {
                 ylim <- range(pp$Glo_First_Clim_lim,
                               pp$Glo_Secon_Clim_lim,
@@ -1096,7 +1124,11 @@ if (TEST_05) {
             as.data.table()
 
         for (ad in sort(unique(as.Date(tmp$Date)))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
             ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, na.rm = T)
             plot(pp$Date, pp$DIR_strict, "l", col = "blue",
                  ylim = ylim, xlab = "", ylab = "wattDIR")
@@ -1151,7 +1183,12 @@ if (TEST_06) {
             as.data.table()
 
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
 
             layout(matrix(c(1, 2), 2, 1, byrow = TRUE))
             par(mar = c(2, 4, 2, 1))
@@ -1240,7 +1277,11 @@ if (TEST_08) {
             as.data.table()
 
         for (ad in unique(as.Date(tmp$Date))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
             ylim <- range(pp$GLB_strict, pp$HOR_strict, na.rm = T)
 
             plot( pp$Azimuth, pp$HOR_strict, "l",
@@ -1308,7 +1349,11 @@ if (TEST_09) {
 
         ## TODO plot offending years
         for (ay in unique(year(tmp$Date))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
 
             ylim = c(-0.5, 2)
             plot(pp$Elevat, pp$ClearnessIndex_kt,
@@ -1331,7 +1376,11 @@ if (TEST_09) {
 
         ## TODO plot offending days
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
-            pp <- data.table(BB |> filter(as.Date(Date) == as.Date(ad)) |> collect())
+            pp <- data.table(
+                BB |> filter(as.Date(Date) == as.Date(ad) &
+                                 Elevat > sun_elev_min)   |>
+                    collect()
+            )
 
             ylim <- range(pp$DIR_strict, pp$GLB_strict, na.rm = T)
             plot(pp$Date, pp$GLB_strict, "l", col = "green",
