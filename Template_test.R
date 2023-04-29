@@ -12,7 +12,6 @@ Script.Name <- "~/BBand_LAP/Plot_test.R"
 
 
 source("~/BBand_LAP/DEFINITIONS.R")
-source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 # mylock(DB_lock)
@@ -34,7 +33,9 @@ library(plotly)
 
 ##  Create a test database  ----------------------------------------------------
 
-TEST_DB <- TRUE
+TEST_DB <- FALSE
+
+# TEST_DB <- TRUE
 
 if (TEST_DB) {
     source("~/BBand_LAP/DEFINITIONS.R")
@@ -59,6 +60,25 @@ if (TEST_DB) {
 # InitVariableBBDB("somevar", as.numeric(NA))
 
 
+## Find duration of day ligth
+
+## Tracker start at -5
+min_elevation <- -5
+
+BB <- opendata()
+
+Duration <- BB |> filter(Elevat >= min_elevation) |> select(Date, Elevat) |> group_by(as_date(Date)) |> count() |> collect()
+
+Duration <- data.table(Duration)
+
+Duration[ n == max(n) ]
+
+Duration[, max(n)] / 60
+
+## max day duration is 960 minutes or 16 hours
+
+stop()
+
 ##  Interactive tests  ---------------------------------------------------------
 
 
@@ -67,7 +87,6 @@ vars <- grep("Date|Azimuth|doy|year|month", names(BB), invert = TRUE, value = TR
 
 ttd <- BB |> filter(is.na(CHP1_sig_wo_dark)) |> collect()
 ttg <- BB |> filter(is.na(CM21_sig_wo_dark)) |> collect()
-
 
 
 stop()
