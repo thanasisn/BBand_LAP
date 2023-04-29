@@ -53,11 +53,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(comment    = ""      )
+knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(out.width  = "100%"  )
+knitr::opts_chunk$set(fig.align  = "center")
+knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -65,17 +65,19 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "Check_input_files.R"
 
-source("~/BBand_LAP/DEFINITIONS.R")
-
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-library(data.table)
-library(arrow)
-library(dplyr)
-library(pander)
+
+## __ Load libraries  ----------------------------------------------------------
+source("~/BBand_LAP/DEFINITIONS.R")
+
+library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
+library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
+library(data.table, warn.conflicts = TRUE, quietly = TRUE)
+library(pander,     warn.conflicts = TRUE, quietly = TRUE)
 
 
 ##  CHP-1 raw data check  ------------------------------------------------------

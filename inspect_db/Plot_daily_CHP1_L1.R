@@ -25,6 +25,7 @@
 #'     keep_tex:         no
 #'     latex_engine:     xelatex
 #'     toc:              yes
+#'     toc_depth:        4
 #'     fig_width:        8
 #'     fig_height:       5
 #'   html_document:
@@ -49,11 +50,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(comment    = ""      )
+knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(out.width  = "100%"  )
+knitr::opts_chunk$set(fig.align  = "center")
+knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -61,20 +62,21 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_db/Plot_daily_CHP1_L1.R"
 
+if (!interactive()) {
+    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+}
+
+
+## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 # mylock(DB_lock)
 
-
-if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
-}
-
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
-library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
+library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 
 
