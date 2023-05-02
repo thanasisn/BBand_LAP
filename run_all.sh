@@ -3,6 +3,7 @@
 
 #### Build the Broad Band database from scratch.
 
+
 info() { echo ; echo "$(date +%F_%T) :: $* " >&1; }
 mkdir -p "$(dirname "$0")/LOGs/"
 LOG_FILE="$(dirname "$0")/LOGs/$(basename "$0")_$(date +%F_%T).log"
@@ -11,24 +12,6 @@ exec  > >(tee -i "${LOG_FILE}")
 exec 2> >(tee -i "${ERR_FILE}" >&2)
 info "START :: $0 :: $* ::"
 
-echo ""
-echo "ARE YOU SURE?"
-echo ""
-
-read -p "Do you want to NUKE the database and rebuild everything? " conf
-
-if   [[ $conf == "yes" ]]; then
-    echo "Start form scratch"
-else
-    echo "Exit"
-    exit 99
-fi
-
-
-info "Remove data and metadata"
-rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB"
-rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
-rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB.stopfile"
 
 info "Get data from Sirena"
 "$HOME/BBand_LAP/build_db/Get_data_from_sirena.sh"
