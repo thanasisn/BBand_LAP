@@ -1284,7 +1284,7 @@ Tracker program was restarted manual.
 
 
 
-## 2023-04-19 09:19
+## 2023-04-19 09:19 [ThanasisN]
 
 [//]: # (Keywords: #tracker, #chp1, #data_loss)
 
