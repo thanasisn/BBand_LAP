@@ -244,9 +244,9 @@ todosets <- unique(rbind(
 filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 rm(todosets, dd)
 
-# filelist <- filelist[10,]
 
-for (af in filelist$names) {
+
+for (af in na.omit(filelist$names)) {
     datapart <- read_parquet(af)
     ## add columns for this set
     datapart[["year"]]  <- as.integer(year( datapart$Date))
@@ -351,7 +351,7 @@ BB <- opendata()
 wecare <- c("cm21_bad_data_flag", "chp1_bad_data_flag", "chp1_bad_temp_flag")
 
 for (acol in wecare) {
-    stats <- BB |> select(acol) |> collect() |> table(useNA = "always")
+    stats <- BB |> select(all_of(acol)) |> collect() |> table(useNA = "always")
     pander(data.frame(stats))
 }
 
@@ -360,3 +360,5 @@ for (acol in wecare) {
 myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
+    file = "~/BBand_LAP/LOGs/Run.log", append = TRUE)
