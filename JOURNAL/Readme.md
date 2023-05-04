@@ -1160,6 +1160,24 @@ Domes cleaned
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
 
+## 2022-02-17 00:00 [ThanasisN]
+
+[//]: # (Keywords: #chp1, #works, #broadband, #ccd)
+
+Broadband instruments were installed? after they have been removed from the instruments tables.
+
+Work on instruments table was performed.
+
+
+New instrument table was installed for CCD spectrometers.
+
+CHP-1 was between brewers and the new CCD table, may be affected.
+
+There are photos.
+
+
+
+
 ## 2022-02-21 13:50 [ThanasisN]
 
 [//]: # (Keywords: #cm21, #inclined)
@@ -1352,7 +1370,9 @@ At least you need `pandoc` installed.
 List of tags
 ============
       5 #async
-     49 #chp1
+      1 #broadband
+      1 #ccd
+     50 #chp1
       1 #cleaned
      15 #cleaning
      11 #cm21
@@ -1379,3 +1399,4 @@ List of tags
       1 #test
       8 #tracker
      20 #tracker2
+      1 #works
