@@ -1180,9 +1180,7 @@ There are photos.
 
 ## 2022-02-21 13:50 [ThanasisN]
 
-[//]: # (Keywords: #cm21, #inclined)
-
-The inclined CM-21 was leveled, for comparison to the horizontal one, before calibration of the horizontal.
+[//]: # (Keywords: #cm21, #inclined, #chp1)
 
 We consider after 
 
@@ -1191,6 +1189,8 @@ We consider after
 the inclined CM-21 to have been set to horizontal position.
 
 This is reflected on the measurements.
+
+There are photos.
 
 
 
@@ -1203,6 +1203,7 @@ Installation of horizontal CM-21
 
  ~ 07:55 - 08:17 UTC
 
+There are photos.
 
 
 
@@ -1372,7 +1373,7 @@ List of tags
       5 #async
       1 #broadband
       1 #ccd
-     50 #chp1
+     51 #chp1
       1 #cleaned
      15 #cleaning
      11 #cm21
