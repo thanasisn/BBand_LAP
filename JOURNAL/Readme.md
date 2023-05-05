@@ -1178,6 +1178,21 @@ There are photos.
 
 
 
+## 2022-02-21 00:00 [ThanasisN]
+
+[//]: # (Keywords: #chp1)
+
+The CHP-1 was moved!
+
+It was west of the brewers and moved east of the brewers.
+
+The inclined CM-21 was leveled, for comparison to the horizontal one, before calibration of the horizontal.
+
+There are photos
+
+
+
+
 ## 2022-02-21 13:50 [ThanasisN]
 
 [//]: # (Keywords: #cm21, #inclined, #chp1)
@@ -1217,6 +1232,8 @@ The horizontal Global CM-21 was
 - installed 
 - leveled 
 - start measuring **without sun shield**
+
+Photos exist.
 
 
 
@@ -1373,7 +1390,7 @@ List of tags
       5 #async
       1 #broadband
       1 #ccd
-     51 #chp1
+     52 #chp1
       1 #cleaned
      15 #cleaning
      11 #cm21
