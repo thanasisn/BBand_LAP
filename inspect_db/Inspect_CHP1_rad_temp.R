@@ -153,8 +153,8 @@ for (YYYY in sort(years_to_do)) {
 
 
     ## do some cleaning for displaying
-    year_data[ !is.na(chp1_bad_temp_flag), chp1_temperature    := NA]
-    year_data[ !is.na(chp1_bad_temp_flag), chp1_temperature_SD := NA]
+    year_data[!is.na(chp1_bad_temp_flag), chp1_temperature    := NA]
+    year_data[!is.na(chp1_bad_temp_flag), chp1_temperature_SD := NA]
 
 
     wattlimit <- 50
