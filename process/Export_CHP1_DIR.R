@@ -80,7 +80,7 @@ BB <- opendata()
 
 
 
-BB |> filter(!is.na(DIR_wpsm)) |> select(year) |> unique()
+BB |> filter(!is.na(DIR_wpsm)) |> select(Date) |> as_date(Date)
 
 names(BB)
 
