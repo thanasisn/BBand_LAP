@@ -7,25 +7,43 @@
 #' and output DIR files with direct beam irradiance for sirena repository
 #'
 
-closeAllConnections()
-rm(list = (ls()[ls() != ""]))
+
+
+
+
+#+ echo=F, include=F
+## __ Document options ---------------------------------------------------------
+knitr::opts_chunk$set(comment    = ""      )
+knitr::opts_chunk$set(dev        = "png"   )
+knitr::opts_chunk$set(out.width  = "100%"  )
+knitr::opts_chunk$set(fig.align  = "center")
+knitr::opts_chunk$set(fig.pos    = '!h'    )
+
+
+## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({ funr::sys.script() },
-                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n")
-                            return("Undefined R script name!!") })
+Script.Name <- "./BBand_LAP/process/Export_CHP1_DIR.R"
+
+source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
+
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
     sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
+
+library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
+library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
+library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
+library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 
 options(max.print = 1500)
 
 
 ## data export folder
 DATOUT = "/home/athan/DATA/CHP1_LAP.DIR/"
-## data input folder
-DATIN  = "/home/athan/DATA/Broad_Band"
+
 
 YEARS  <- c(2016,2017,2018,2019,2020,2021,2022)
 
@@ -58,6 +76,38 @@ pzen <- function(YYYY, min = 1:1440, doy) {
 
 
 
+BB <- opendata()
+
+
+
+BB |> filter(!is.na(DIR_wpsm)) |> select(year) |> unique()
+
+names(BB)
+
+cat("\nRemove bad data regions\n")
+cat(year_data[!is.na(chp1_bad_data_flag), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+year_data$CHP1_sig   [!is.na(year_data$chp1_bad_data_flag)] <- NA
+year_data$CHP1_sig_sd[!is.na(year_data$chp1_bad_data_flag)] <- NA
+
+cat("\nRemove tracker async cases\n")
+cat(year_data[Async_tracker_flag == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+year_data$CHP1_sig   [year_data$Async_tracker_flag == TRUE] <- NA
+year_data$CHP1_sig_sd[year_data$Async_tracker_flag == TRUE] <- NA
+
+cat("\nRemove data above physical limits\n")
+cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+
+cat("\nRemove data below physical limits\n")
+cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+
+
+
+
+stop()
 
 
 for (ayear in YEARS) {
@@ -222,6 +272,11 @@ cat(paste("Before upload to sirena check line endings"))
 cat(paste("Run unix2dos"))
 
 
-## info of script run
-tac = Sys.time()
-write(sprintf("%s %-10s %-10s %-50s %f",Sys.time(),Sys.info()["nodename"],Sys.info()["login"],Script.Name,difftime(tac,tic,units="mins")),"~/Aerosols/CM21datavalidation/run.log",append=T)
+#' **END**
+#+ include=T, echo=F
+# myunlock(DB_lock)
+tac <- Sys.time()
+cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
+    file = "~/BBand_LAP/LOGs/Run.log", append = TRUE)
+
