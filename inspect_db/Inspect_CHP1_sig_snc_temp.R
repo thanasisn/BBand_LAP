@@ -186,13 +186,13 @@ for (YYYY in sort(years_to_do)) {
 
         cat("\nRemove data above physical limits\n")
         cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
-        year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+        year_data$CHP1_sig   [year_data$CHP1_sig > year_data$sig_upplim] <- NA
+        year_data$CHP1_sig_sd[year_data$CHP1_sig > year_data$sig_upplim] <- NA
 
         cat("\nRemove data below physical limits\n")
         cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
-        year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+        year_data$CHP1_sig   [year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+        year_data$CHP1_sig_sd[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
 
         cat("\nRemove bad temperatrue data\n")
         year_data[!is.na(chp1_bad_temp_flag), chp1_temperature    := NA]

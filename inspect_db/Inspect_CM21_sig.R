@@ -178,13 +178,13 @@ for (YYYY in sort(years_to_do)) {
 
         cat("\nRemove data above physical limits\n")
         cat(year_data[CM21_sig > sig_upplim, .N], year_data[!is.na(CM21_sig), .N], "\n\n")
-        year_data$CM21_sig[year_data$CM21_sig > year_data$sig_upplim] <- NA
-        year_data$CM21_sig[year_data$CM21_sig > year_data$sig_upplim] <- NA
+        year_data$CM21_sig   [year_data$CM21_sig > year_data$sig_upplim] <- NA
+        year_data$CM21_sig_sd[year_data$CM21_sig > year_data$sig_upplim] <- NA
 
         cat("\nRemove data below physical limits\n")
         cat(year_data[CM21_sig < sig_lowlim, .N], year_data[!is.na(CM21_sig), .N], "\n\n")
-        year_data$CM21_sig[year_data$CM21_sig < year_data$sig_lowlim] <- NA
-        year_data$CM21_sig[year_data$CM21_sig < year_data$sig_lowlim] <- NA
+        year_data$CM21_sig   [year_data$CM21_sig < year_data$sig_lowlim] <- NA
+        year_data$CM21_sig_sd[year_data$CM21_sig < year_data$sig_lowlim] <- NA
     }
 
     ## Missing days

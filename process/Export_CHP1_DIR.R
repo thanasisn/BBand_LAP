@@ -27,6 +27,7 @@ Script.Name <- "./BBand_LAP/process/Export_CHP1_DIR.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
+source("~/BBand_LAP/functions/Functions_CHP1.R")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -79,30 +80,58 @@ pzen <- function(YYYY, min = 1:1440, doy) {
 BB <- opendata()
 
 
+yearstodo <- as.vector(BB |> filter(!is.na(DIR_wpsm)) |> select(year) |> unique() |> collect())
 
-BB |> filter(!is.na(DIR_wpsm)) |> select(Date) |> as_date(Date)
+yearstodo <- 2022
 
-names(BB)
+for (YYYY in yearstodo) {
+    year_data <- data.table(
+        BB |>
+            filter(year == YYYY) |>
+            select(Date,
+                   CHP1_sig,
+                   DIR_wpsm,
+                   DIR_SD_wpsm,
+                   SZA,
+                   lap_sza,
+                   chp1_bad_data_flag,
+                   Async_tracker_flag,
+                   ) |>
+            collect()
+    )
 
-cat("\nRemove bad data regions\n")
-cat(year_data[!is.na(chp1_bad_data_flag), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-year_data$CHP1_sig   [!is.na(year_data$chp1_bad_data_flag)] <- NA
-year_data$CHP1_sig_sd[!is.na(year_data$chp1_bad_data_flag)] <- NA
+    ## Recording limits
+    year_data[, sig_lowlim := chp1_signal_lower_limit(Date)]
+    year_data[, sig_upplim := chp1_signal_upper_limit(Date)]
 
-cat("\nRemove tracker async cases\n")
-cat(year_data[Async_tracker_flag == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-year_data$CHP1_sig   [year_data$Async_tracker_flag == TRUE] <- NA
-year_data$CHP1_sig_sd[year_data$Async_tracker_flag == TRUE] <- NA
+    ## Make sure we have used the proper flags
+    ## This should not be needed
+    year_data$DIR_wpsm   [!is.na(year_data$chp1_bad_data_flag)] <- NA
+    year_data$DIR_SD_wpsm[!is.na(year_data$chp1_bad_data_flag)] <- NA
+    year_data$DIR_wpsm   [year_data$Async_tracker_flag == TRUE] <- NA
+    year_data$DIR_SD_wpsm[year_data$Async_tracker_flag == TRUE] <- NA
+    year_data$DIR_wpsm   [year_data$CHP1_sig > year_data$sig_upplim] <- NA
+    year_data$DIR_SD_wpsm[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+    year_data$DIR_wpsm   [year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+    year_data$DIR_SD_wpsm[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
 
-cat("\nRemove data above physical limits\n")
-cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
-year_data$CHP1_sig[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+    year_data$chp1_bad_data_flag <- NULL
+    year_data$Async_tracker_flag <- NULL
+    year_data$sig_lowlim         <- NULL
+    year_data$sig_upplim         <- NULL
+    year_data$CHP1_sig           <- NULL
 
-cat("\nRemove data below physical limits\n")
-cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
-year_data$CHP1_sig[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+    ## drop empty
+    year_data <- year_data[!is.na(DIR_wpsm)]
+
+
+
+
+
+    stop()
+}
+
+
 
 
 
