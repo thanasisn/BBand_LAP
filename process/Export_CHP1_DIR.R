@@ -9,17 +9,6 @@
 
 
 
-
-
-#+ echo=F, include=F
-## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
-
-
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
@@ -77,6 +66,7 @@ pzen <- function(YYYY, min = 1:1440, doy) {
 BB <- opendata()
 
 yearstodo <- as.vector(BB |> filter(!is.na(DIR_wpsm)) |> select(year) |> unique() |> collect())
+yearstodo <- yearstodo$year
 
 # yearstodo <- 2022
 
@@ -164,7 +154,7 @@ for (YYYY in yearstodo) {
         doy      <- yday(dateD)
 
         ## calculate zenith angle as other instruments
-        oneday$lapzen <- pzen(YYYY, 1:1440, doy )
+        oneday$lapzen <- pzen(YYYY, 1:1440, doy)
 
         output <- data.frame(TIME_UT = round(TIME_UT,            digits = 4),
                              SZA     = round(oneday$lapzen,      digits = 2),
@@ -180,7 +170,7 @@ for (YYYY in yearstodo) {
                            width     = 8,
                            row.names = FALSE,
                            scietific = FALSE,
-                           nsmall    = 2 ),
+                           nsmall    = 2),
                     file      = filename,
                     append    = TRUE,
                     quote     = FALSE,
@@ -188,9 +178,9 @@ for (YYYY in yearstodo) {
                     row.names = FALSE,
                     eol = "\r\n")
         ## make sure has consistent line endings
-        system(paste("unix2dos ", filename))
+        system(paste("unix2dos ", filename),
+               ignore.stdout = TRUE)
 
-stop()
         ## create a plot of the output data
         par(mar = c(3,3,1,1))
         par(mgp = c(1.5,.5,0))
@@ -200,13 +190,13 @@ stop()
         if (!all(is.na(output$Wm2))) {
 
             ## test SZAs
-            # plot(oneday$SZA, lapzen)
+            # plot(oneday$SZA, oneday$lapzen)
 
-            plot( output$TIME_UT, output$Wm2, "l",
-                  lwd  = 1.5 , col = "green",
-                  ylab = expression( Watt/m^2 ),
-                  xlab = "Hour (UTC)")
-            title(main = paste(dateD), cex.main = .8 )
+            plot(output$TIME_UT, output$Wm2, "l",
+                 lwd  = 1.5, col = "green",
+                 ylab = expression(Watt/m^2),
+                 xlab = "Hour (UTC)")
+            title(main = paste(dateD), cex.main = .8)
 
             points( output$TIME_UT, output$st.dev,
                     pch = 18, cex = .4, col = "blue")
@@ -217,17 +207,17 @@ stop()
                    lty = c( 1, NA),
                    pch = c(NA, 18),
                    col = c("green", "blue"),  cex = 0.8)
-            legend("topleft", tag, bty = "n", cex = 0.8 )
+            legend("topleft", tag, bty = "n", cex = 0.8)
 
             ## by sza
-            plot( output$SZA, output$Wm2, "l",
-                  lwd  = 1.5, col = "green",
-                  ylab = expression(Watt/m^2),
-                  xlab = "SZA")
-            title(main = paste(dateD), cex.main = .8 )
+            plot(output$SZA, output$Wm2, "l",
+                 lwd  = 1.5, col = "green",
+                 ylab = expression(Watt/m^2),
+                 xlab = "SZA")
+            title(main = paste(dateD), cex.main = .8)
 
-            points( output$SZA, output$st.dev,
-                    pch = 18, cex = .4 , col = "blue")
+            points(output$SZA, output$st.dev,
+                   pch = 18, cex = .4 , col = "blue")
 
             legend("topright", bty = "n",
                    legend = c("Direct Normal Irradiance",
@@ -237,13 +227,10 @@ stop()
                    col = c("green", "blue"),  cex = 0.8)
             legend("topleft", tag, bty = "n", cex = 0.8)
 
-
         }## if data
         rm(output)
     }## alldays
     dev.off()
-
-    stop()
 }
 
 
@@ -255,4 +242,3 @@ tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/LOGs/Run.log", append = TRUE)
-
