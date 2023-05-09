@@ -200,11 +200,15 @@ if (COMPARE) {
         legacy <- legacy[!is.na(CM21value),]
         legacy$Azimuth        <- NULL
         legacy$Elevat         <- NULL
+        legacy$sig_lowlim     <- NULL
+        legacy$sig_upplim     <- NULL
         # legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
 
         ## load old files
         baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_signal/LAP_CM21_H_SIG_",yyyy,".Rds")))
         baseDT$Azimuth        <- NULL
+        baseDT$sig_lowlim     <- NULL
+        baseDT$sig_upplim     <- NULL
         baseDT$Elevat         <- NULL
 
 
