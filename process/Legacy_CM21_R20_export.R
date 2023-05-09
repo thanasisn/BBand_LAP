@@ -67,7 +67,7 @@ knitr::opts_chunk$set(fig.pos    = '!h'    )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/process/Legacy_CM21_R10_export.R"
+Script.Name <- "~/BBand_LAP/process/Legacy_CM21_R20_export.R"
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
@@ -106,7 +106,7 @@ BB_meta  <- read_parquet(DB_META_fl)
 BB       <- opendata()
 
 
-# datayears <- 2023
+datayears <- 2022
 
 editedyears <- as.vector(na.omit(unique(
     year(BB_meta$day)[year(BB_meta$day) >= year(BB_meta$cm21_parsed)]
@@ -120,7 +120,7 @@ editedyears <- as.vector(na.omit(unique(
 ## export legacy files
 for (YYYY in datayears) {
     ## legacy filename
-    legacyout <- paste0("~/DATA/Broad_Band/CM21_H_signal/Legacy_LAP_CM21_H_SIG_", YYYY, ".Rds")
+    legacyout <- paste0("~/DATA/Broad_Band/CM21_H_signal/Legacy_LAP_CM21_H_S0_", YYYY, ".Rds")
 
     ## get data from DB
     year_data <- BB |>
@@ -141,11 +141,11 @@ for (YYYY in datayears) {
     }
 
 
-    # ## Apply some filtering ----------------------------------------------------
-    # cat("\nRemove bad data regions\n")
-    # cat(year_data[!is.na(cm21_bad_data_flag), .N], year_data[!is.na(CM21_sig), .N], "\n\n")
-    # year_data$CM21_sig   [!is.na(year_data$cm21_bad_data_flag)] <- NA
-    # year_data$CM21_sig_sd[!is.na(year_data$cm21_bad_data_flag)] <- NA
+    ## Apply some filtering ----------------------------------------------------
+    cat("\nRemove bad data regions\n")
+    cat(year_data[!is.na(cm21_bad_data_flag), .N], year_data[!is.na(CM21_sig), .N], "\n\n")
+    year_data$CM21_sig   [!is.na(year_data$cm21_bad_data_flag)] <- NA
+    year_data$CM21_sig_sd[!is.na(year_data$cm21_bad_data_flag)] <- NA
 
     setorder(year_data, Date)
 
@@ -168,15 +168,14 @@ for (YYYY in datayears) {
 
 }
 
-## Old format of CM21_H_SIG
-# $ Date      : POSIXct, format: "2005-01-01 00:00:30" "2005-01-01 00:01:30" ...
-# $ CM21value : num  -0.00215 -0.00213 -0.002 -0.002 -0.00194 ...
-# $ CM21sd    : num  2.29e-05 2.74e-05 6.47e-05 2.86e-05 5.72e-05 ...
-# $ Azimuth   : num  53.4 53.8 54.2 54.6 55 ...
-# $ Elevat    : num  -64.3 -64.2 -64 -63.9 -63.7 ...
-# $ sig_lowlim: num  -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 -0.2 ...
-# $ sig_upplim: num  0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 0.6 ...
-
+## Old format of CM21_H_S0
+# $ Date      : POSIXct, format: "1993-04-12 00:00:30" "1993-04-12 00:01:30" ...
+# $ CM21value : num  NA NA NA NA NA NA NA NA NA NA ...
+# $ CM21sd    : num  NA NA NA NA NA NA NA NA NA NA ...
+# $ Azimuth   : num  28.5 28.8 29.1 29.4 29.6 ...
+# $ Elevat    : num  -36.5 -36.4 -36.3 -36.2 -36.1 ...
+# $ sig_lowlim: num  -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 ...
+# $ sig_upplim: num  5 5 5 5 5 5 5 5 5 5 ...
 
 ## Do a data comparison --------------------------------------------------------
 
@@ -186,7 +185,7 @@ for (YYYY in datayears) {
 #+ echo=F, include=T, results="asis"
 if (COMPARE) {
     listlegacy <- list.files(path   = "~/DATA/Broad_Band/CM21_H_signal",
-                             pattern = "Legacy_LAP_CM21_H_SIG_[0-9]{4}\\.Rds",
+                             pattern = "Legacy_LAP_CM21_H_S0_[0-9]{4}\\.Rds",
                              full.names = TRUE, ignore.case = TRUE)
 
     ## gather remaiining
@@ -200,12 +199,16 @@ if (COMPARE) {
         legacy <- legacy[!is.na(CM21value),]
         legacy$Azimuth        <- NULL
         legacy$Elevat         <- NULL
+        legacy$sig_lowlim     <- NULL
+        legacy$sig_upplim     <- NULL
         # legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
 
         ## load old files
-        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_signal/LAP_CM21_H_SIG_",yyyy,".Rds")))
+        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_signal/LAP_CM21_H_S0_",yyyy,".Rds")))
         baseDT$Azimuth        <- NULL
         baseDT$Elevat         <- NULL
+        baseDT$sig_lowlim     <- NULL
+        baseDT$sig_upplim     <- NULL
 
 
         setequal(names(baseDT), names(legacy))
@@ -244,7 +247,6 @@ if (COMPARE) {
             #          ylab = nodl)
             # }
         }
-        ## keep non empty
         sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
 
         wecare <- wecare[paste0(wecare,".old") %in% names(sss)]
