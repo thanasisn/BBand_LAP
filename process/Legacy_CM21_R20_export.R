@@ -106,7 +106,7 @@ BB_meta  <- read_parquet(DB_META_fl)
 BB       <- opendata()
 
 
-datayears <- 2022
+# datayears <- 2022
 
 editedyears <- as.vector(na.omit(unique(
     year(BB_meta$day)[year(BB_meta$day) >= year(BB_meta$cm21_parsed)]
