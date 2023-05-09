@@ -53,7 +53,7 @@
 
 
 
-
+stop("run R20 only")
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
