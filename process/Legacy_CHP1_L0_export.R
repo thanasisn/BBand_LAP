@@ -154,15 +154,15 @@ for (YYYY in datayears) {
 
 
     ## Clean temperature data --------------------------------------------------
-    year_data$chp1_temperature_SD[year_data$chp1_temperature    > CHP_TEMP_MAX]     <- NA
-    year_data$chp1_temp_UNC      [year_data$chp1_temperature    > CHP_TEMP_MAX]     <- NA
-    year_data$chp1_temperature   [year_data$chp1_temperature    > CHP_TEMP_MAX]     <- NA
-    year_data$chp1_temperature_SD[year_data$chp1_temperature    < CHP_TEMP_MIN]     <- NA
-    year_data$chp1_temp_UNC      [year_data$chp1_temperature    < CHP_TEMP_MIN]     <- NA
-    year_data$chp1_temperature   [year_data$chp1_temperature    < CHP_TEMP_MIN]     <- NA
-    year_data$chp1_temperature   [year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
-    year_data$chp1_temp_UNC      [year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
-    year_data$chp1_temperature_SD[year_data$chp1_temperature_SD > CHP_TEMP_STD_LIM] <- NA
+    year_data$chp1_temperature_SD[year_data$chp1_temperature    > CHP1_TEMP_MAX]     <- NA
+    year_data$chp1_temp_UNC      [year_data$chp1_temperature    > CHP1_TEMP_MAX]     <- NA
+    year_data$chp1_temperature   [year_data$chp1_temperature    > CHP1_TEMP_MAX]     <- NA
+    year_data$chp1_temperature_SD[year_data$chp1_temperature    < CHP1_TEMP_MIN]     <- NA
+    year_data$chp1_temp_UNC      [year_data$chp1_temperature    < CHP1_TEMP_MIN]     <- NA
+    year_data$chp1_temperature   [year_data$chp1_temperature    < CHP1_TEMP_MIN]     <- NA
+    year_data$chp1_temperature   [year_data$chp1_temperature_SD > CHP1_TEMP_STD_LIM] <- NA
+    year_data$chp1_temp_UNC      [year_data$chp1_temperature_SD > CHP1_TEMP_STD_LIM] <- NA
+    year_data$chp1_temperature_SD[year_data$chp1_temperature_SD > CHP1_TEMP_STD_LIM] <- NA
 
     setorder(year_data, Date)
 
