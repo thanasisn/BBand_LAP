@@ -290,11 +290,11 @@ for (af in na.omit(filelist$names)) {
 
     ## CHP-1 flag temperature physical limits ----------------------------------
     datapart <- data.table(datapart)
-    datapart[chp1_temperature > CHP_TEMP_MAX        & !is.na(chp1_bad_temp_flag),
+    datapart[chp1_temperature > CHP1_TEMP_MAX        & !is.na(chp1_bad_temp_flag),
              chp1_bad_temp_flag := "Abnormal HIGH temperature"]
-    datapart[chp1_temperature < CHP_TEMP_MIN        & !is.na(chp1_bad_temp_flag),
+    datapart[chp1_temperature < CHP1_TEMP_MIN        & !is.na(chp1_bad_temp_flag),
              chp1_bad_temp_flag := "Abnormal LOW temperature"]
-    datapart[chp1_temperature_SD > CHP_TEMP_STD_LIM & !is.na(chp1_bad_temp_flag),
+    datapart[chp1_temperature_SD > CHP1_TEMP_STD_LIM & !is.na(chp1_bad_temp_flag),
              chp1_bad_temp_flag := "Abnormal temperature SD"]
     datapart <- as_tibble(datapart)
 
