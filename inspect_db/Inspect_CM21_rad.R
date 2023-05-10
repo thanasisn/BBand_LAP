@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Inspect CHP-1 radiation data **L1** "
+#' title:         "Inspect CM-21 radiation data **L1** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -50,6 +50,9 @@
 #'
 #+ echo=F, include=T
 
+## TODO
+## - apply changes
+## - make similar to CM_21_GLB
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
@@ -63,7 +66,7 @@ knitr::opts_chunk$set(fig.pos    = '!h'    )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_db/Inspect_CHP1_sig_snc_temp.R"
+Script.Name <- "~/BBand_LAP/inspect_db/Inspect_CM21_rad.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -112,7 +115,7 @@ if (length(args) > 0) {
 
 ## years in the data base
 datayears <- opendata() |>
-    filter(!is.na(DIR_wpsm)) |>
+    filter(!is.na(GLB_wpsm)) |>
     select(year) |>
     unique()     |>
     collect()    |>
@@ -123,12 +126,12 @@ datayears <- opendata() |>
 years_to_do <- datayears
 
 # TEST
-# years_to_do <- 2016
+years_to_do <- 2016
 
 #'
 #' ## Intro
 #'
-#' Produce yearly plots for **CHP-1**.
+#' Produce yearly plots for **CM-21**.
 #'
 #'
 
@@ -153,8 +156,8 @@ for (YYYY in sort(years_to_do)) {
 
 
     ## do some cleaning for displaying
-    year_data[!is.na(chp1_bad_temp_flag), chp1_temperature    := NA]
-    year_data[!is.na(chp1_bad_temp_flag), chp1_temperature_SD := NA]
+    year_data[!is.na(cm21_bad_temp_flag), cm21_temperature    := NA]
+    year_data[!is.na(cm21_bad_temp_flag), cm21_temperature_SD := NA]
 
 
     ## Check for night time extreme values -------------------------------------
@@ -262,25 +265,25 @@ for (YYYY in sort(years_to_do)) {
 
 
     cat('\n\n\\footnotesize\n\n')
-    cat(pander(summary(year_data[, .(Date, SZA, DIR_wpsm, DIR_SD_wpsm, HOR_wpsm, HOR_SD_wpsm, chp1_temperature)])))
+    cat(pander(summary(year_data[, .(Date, SZA, DIR_wpsm, DIR_SD_wpsm, HOR_wpsm, HOR_SD_wpsm, cm21_temperature)])))
     cat('\n\n\\normalsize\n\n')
 
     ## Temperature data --------------------------------------------------------
-    if (year_data[!is.na(chp1_temperature), .N] > 0) {
+    if (year_data[!is.na(cm21_temperature), .N] > 0) {
         cat("\n\n\\FloatBarrier\n\n")
         cat("\n## Temperature data:", YYYY, "\n\n")
 
-        hist(year_data$chp1_temperature,
+        hist(year_data$cm21_temperature,
              breaks = 50,
              main   = paste("CHP1 temperature ",  YYYY))
         cat('\n\n')
 
-        hist(year_data$chp1_temperature_SD,
+        hist(year_data$cm21_temperature_SD,
              breaks = 50,
              main   = paste("CHP1 temperature SD", YYYY))
         cat('\n\n')
 
-        plot(year_data$Date, year_data$chp1_temperature,
+        plot(year_data$Date, year_data$cm21_temperature,
              pch  = 19,
              cex  = .5,
              main = paste("CHP1 temperature ", YYYY ),
@@ -288,7 +291,7 @@ for (YYYY in sort(years_to_do)) {
              ylab = "CHP1 temperature [C]" )
         cat('\n\n')
 
-        plot(year_data$Elevat, year_data$chp1_temperature_SD,
+        plot(year_data$Elevat, year_data$cm21_temperature_SD,
              pch  = 19,
              cex  = .5,
              main = paste("CHP1 temperature SD", YYYY ),
