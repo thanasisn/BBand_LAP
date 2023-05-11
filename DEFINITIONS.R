@@ -53,13 +53,13 @@ CHP1_TEMP_MIN     <- -20    ## Drop temperatures below this value
 CHP1_TEMP_MAX     <-  60    ## Drop temperatures above this value
 CHP1_TEMP_STD_LIM <-   5    ## Drop temperatures with standard deviation above this value
 CHP1_TEMP_UNC_LIM <-   0.8  ## Drop temperatures with uncertainty above this value
-CHP1_MINnightLIM  <- -15    ## Lower  radiation limit when dark   (R20) -> ToolowDark
-CHP1_MAXnightLIM  <- +15    ## Higher radiation limit when dark   (R20) -> ToohigDark
+CHP1_MINnightLIM  <- -14    ## Lower  radiation limit when dark (R20) -> ToolowDark
+CHP1_MAXnightLIM  <- +14    ## Higher radiation limit when dark (R20) -> ToohigDark
 
 
 ##  CM-21 variables  -----------------------------------------------------------
-CM21_MINnightLIM  <- -15    ## Lower  radiation limit when dark   (R20) -> ToolowDark
-CM21_MAXnightLIM  <- +15    ## Higher radiation limit when dark   (R20) -> ToohigDark
+CM21_MINnightLIM  <- -14    ## Lower  radiation limit when dark (R20) -> ToolowDark
+CM21_MAXnightLIM  <- +14    ## Higher radiation limit when dark (R20) -> ToohigDark
 
 
 
