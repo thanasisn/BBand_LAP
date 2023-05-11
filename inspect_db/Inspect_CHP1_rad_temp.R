@@ -123,7 +123,7 @@ datayears <- opendata() |>
 years_to_do <- datayears
 
 # TEST
-years_to_do <- 2016
+# years_to_do <- 2016
 
 #'
 #' ## Intro
@@ -163,10 +163,14 @@ for (YYYY in sort(years_to_do)) {
 
     if (nrow(dark_test) > 0) {
         cat("\n### Night radiation outlier days\n\n")
-        pander(
-            dark_test[, .(Min = min(DIR_wpsm), Max = max(DIR_wpsm)),
-                      by = as.Date(Date)]
+        cat(
+            pander(
+                dark_test[, .(Min = min(DIR_wpsm, na.rm = TRUE),
+                              Max = max(DIR_wpsm, na.rm = TRUE)),
+                          by = as.Date(Date)]
+            )
         )
+        cat('\n\n')
     }
 
 
