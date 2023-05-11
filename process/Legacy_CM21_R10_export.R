@@ -52,8 +52,7 @@
 #+ echo=F, include=T
 
 
-
-stop("run R20 only")
+stop("Run Legacy R20 directly. This step is not needed!")
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
