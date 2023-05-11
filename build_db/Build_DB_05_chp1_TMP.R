@@ -199,7 +199,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
             # gather <- rows_patch(gather, day_data, by = "Date")
             gather     <- rows_upsert(gather, day_data, by = "Date")
             gathermeta <- rbind(gathermeta, file_meta)
-            cat("05 Save: ", partfile, "\n")
             rm(day_data, file_meta, ss)
             rm(temp_temp)
         }
@@ -211,6 +210,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
 
         ## store this month / set data
         write_parquet(gather,  partfile)
+        cat("05 Save: ", partfile, "\n")
         write_parquet(BB_meta, DB_META_fl)
         rm(gather, gathermeta, submonth)
     }
