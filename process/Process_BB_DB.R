@@ -11,8 +11,6 @@ Script.Name <- "~/BBand_LAP/process/Process_BB_DB.R"
 
 library(rmarkdown)
 
-source("~/BBand_LAP/DEFINITIONS.R")
-
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
