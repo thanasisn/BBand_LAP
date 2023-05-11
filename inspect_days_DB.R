@@ -1,4 +1,4 @@
-#!/opt/R/4.2.3/bin/R
+#!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #### Tool to visual inspect the measurements of the instruments.
@@ -24,8 +24,8 @@ library(optparse,   quietly = T, warn.conflicts = F)
 library(plotly,     quietly = T, warn.conflicts = F)
 
 
-# source("~/CM_21_GLB/Functions_CM21_factor.R")
-# source("~/BBand_LAP/functions/Functions_CHP1.R")
+source("~/CM_21_GLB/Functions_CM21_factor.R")
+source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/BBand_LAP/DEFINITIONS.R")
 
@@ -68,9 +68,8 @@ if (!all((ranges_CM21$Until - ranges_CM21$From) >= 1)) {
 ## --
 
 ## For Brave ----
-BROWSER_CMD <- "brave-browser --window-size=1240,720 --incognito -app=file://"
-cat(paste("Will always do a killall",gsub(" .*", "", BROWSER_CMD), "!!"), "\n")
-system(paste( "killall", gsub(" .*", "", BROWSER_CMD)))
+## use a user-data-dir to avoid load my custom colors
+BROWSER_CMD <- "brave-browser --window-size=1240,720 --user-data-dir=/tmp/bravetmp --incognito -app=file://"
 ## --
 
 
@@ -118,6 +117,7 @@ if (!(MINSTEP <= STEP & STEP <= MAXSTEP)) {
 }
 
 
+
 ####    Init    ################################################################
 
 BB <- opendata()
@@ -135,23 +135,31 @@ daystodo <- seq(STARTDAY, MAXDATE, by = MOVE)
 for (ap in daystodo) {
     toplot <- seq.Date( as.Date(ap, origin = "1970-01-01"), length.out = STEP, by = "day")
     ## get all days from data base
-    gather <- data.table(BB |> filter(as.Date(Date) %in% toplot ) |> collect())
+    # gather <- data.table(BB |> filter(as.Date(Date) %in% toplot ) |> collect())
+
+    ## faster query
+    yearsq <- unique(year(toplot))
+    monthq <- unique(month(toplot))
+    gather <- data.table(open_dataset(sources       = DB_DIR,
+                                      hive_style    = FALSE,
+                                      partitioning  = c("year", "month")) |>
+                             filter(year %in% yearsq & month %in% monthq) |>
+                             filter(as.Date(Date) %in% toplot ) |>
+                             collect())
 
     cat("\n - - - - - - - - - - - - - - - - - - - \n")
     cat("Load:", format(toplot, "%F"), "\n")
 
 
-    stop()
-
 
     ## keep signal for debugging
-    gather$GLBraw <- gather$GLBsig
+    gather$GLBraw <- gather$CM21_sig_wo_dark
 
     ## convert to radiation
-    gather$GLBsig <- as.numeric(gather$GLBsig) * cm21factor(gather$Date)
-    gather$GLBsd  <- gather$GLBsd  * cm21factor(gather$Date)
-    gather$DIRsig <- gather$DIRsig * chp1factor(gather$Date)
-    gather$DIRsd  <- gather$DIRsd  * chp1factor(gather$Date)
+    gather$GLBsig <- as.numeric(gather$CM21_sig_wo_dark) * cm21factor(gather$Date)
+    gather$GLBsd  <- gather$CM21_sig_sd      * cm21factor(gather$Date)
+    gather$DIRsig <- gather$CHP1_sig_wo_dark * chp1factor(gather$Date)
+    gather$DIRsd  <- gather$CHP1_sig_sd      * chp1factor(gather$Date)
 
     ## find bad data marks
     bad_chp1 <- data.table()
@@ -208,7 +216,7 @@ for (ap in daystodo) {
     fig <- plot_ly()
     ## plot lines of radiation
     fig <- add_trace(fig, x = gather$Date, y = gather$DIRsig,
-                     name = "Direct beam",
+                     name = "Direct beam on-the-fly",
                      line = list(color = "blue"),
                      text = paste(format(gather$Date, "%F %R"),"\n","DBI:",round(gather$DIRsig,1)),
                      hoverinfo = 'text',
@@ -219,6 +227,27 @@ for (ap in daystodo) {
                      text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$GLBsig,1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
+
+    fig <- add_trace(fig, x = gather$Date, y = gather$DIR_wpsm,
+                     name = "Direct beam Clean",
+                     line = list(color = "darkblue"),
+                     text = paste(format(gather$Date, "%F %R"),"\n","DBI:",round(gather$DIRsig,1)),
+                     hoverinfo = 'text',
+                     mode = "lines", type = "scatter")
+    fig <- add_trace(fig, x = gather$Date, y = gather$GLB_wpsm,
+                     name = "Global on-the-fly",
+                     line = list(color = "darkgreen"),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$GLBsig,1)),
+                     hoverinfo = 'text',
+                     mode = "lines", type = "scatter")
+
+    fig <- add_trace(fig, x = gather$Date, y = gather$tot_glb,
+                     name = "Global Sirena",
+                     line = list(color = "forestgreen"),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$GLBsig,1)),
+                     hoverinfo = 'text',
+                     mode = "lines", type = "scatter")
+
     ## plot standard deviation points
     fig <- add_trace(fig, x = gather$Date, y = gather$DIRsd,
                      name = "Direct beam SD",

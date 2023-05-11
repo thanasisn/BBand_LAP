@@ -86,7 +86,6 @@ MAXSTEP <- 400
 INITDAY <- paste0(year(Sys.Date()), "-01-01")
 INISTEP <- 3
 
-
 ## TEST override start day
 INITDAY <- "2023-03-15"
 INISTEP <- 1
