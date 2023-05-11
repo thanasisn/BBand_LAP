@@ -163,8 +163,8 @@ for (YYYY in sort(years_to_do)) {
         cat("\n### Night radiation outlier days\n\n")
         cat(
             pander(
-                dark_test[, .(Min = min(GLB_wpsm, na.rm = TRUE),
-                              Max = max(GLB_wpsm, na.rm = TRUE)),
+                dark_test[, .(Min_GLB = min(GLB_wpsm, na.rm = TRUE),
+                              Max_GLB = max(GLB_wpsm, na.rm = TRUE)),
                           by = as.Date(Date)]
             )
         )
