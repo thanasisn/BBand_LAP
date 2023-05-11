@@ -173,8 +173,8 @@ for (YYYY in sort(years_to_do)) {
 
 
     hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
-         main = paste(YYYY, "Elevat  >", DARK_ELEV, "[Watt/m^2]"),
-         breaks = 100 , las = 1, probability = T, xlab = "watt/m^2")
+         main = paste(YYYY, "Elevat  >", DARK_ELEV, "[°]"),
+         breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
     abline(v = CHP1_MAXnightLIM, col = "red", lty = 3)
     abline(v = CHP1_MINnightLIM, col = "red", lty = 3)
     cat('\n\n')
@@ -195,7 +195,7 @@ for (YYYY in sort(years_to_do)) {
     wattlimit <- 50
     hist(year_data[GLB_wpsm > wattlimit, GLB_wpsm],
          main = paste(YYYY, "Global  >", wattlimit, "[Watt/m^2]"),
-         breaks = 100 , las = 1, probability = T, xlab = "watt/m^2")
+         breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
     lines(density(year_data$GLB_wpsm, na.rm = T), col = "orange", lwd = 3)
     cat('\n\n')
 
