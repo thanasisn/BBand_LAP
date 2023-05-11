@@ -1409,5 +1409,5 @@ if (TEST_09) {
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/LOGs/Run.log", append = TRUE)
+    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
 
