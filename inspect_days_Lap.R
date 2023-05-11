@@ -9,7 +9,7 @@ tic <- Sys.time()
 Script.Name <- tryCatch({ funr::sys.script() },
                         error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
                             return("inspect_days_") })
-sink(file   = paste0("~/BBand_LAP/LOGs/", basename(sub("\\.R$", ".log", Script.Name))),
+sink(file   = paste0("~/BBand_LAP/REPORTS/LOGs/", basename(sub("\\.R$", ".log", Script.Name))),
      split  = TRUE,
      append = TRUE)
 
