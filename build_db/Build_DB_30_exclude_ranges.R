@@ -23,11 +23,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -211,7 +211,7 @@ if (file.exists(DB_META_fl)) {
     stop("HAVE TO STAR A NEW DB!!")
 }
 
-
+names(BB_meta)
 
 
 
@@ -232,18 +232,27 @@ dd      <- tstrsplit(dd, "/")
 filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
+
 ## list data set to be touched
+## This will update the whole database when any of the param files changed.
+## A better approach will be to check if the values in the param files have been
+## excluded, but this is infrequent so this works well enough.
 todosets <- unique(rbind(
-    BB_meta[is.na(chp1_bad_data_flagged),
+    BB_meta[is.na(chp1_bad_data_flagged)                   |
+                chp1_bad_data_flagged < chp1_exclude_mtime |
+                chp1_bad_data_flagged < chp1_temp_exclude_mtime,
             .(month = month(day), year = year(day))],
-    BB_meta[is.na(cm21_bad_data_flagged),
+    BB_meta[is.na(cm21_bad_data_flagged) |
+                cm21_bad_data_flagged < cm21_exclude_mtime,
             .(month = month(day), year = year(day))]
 ))
+
+
+
 
 ## select what to touch
 filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 rm(todosets, dd)
-
 
 
 for (af in na.omit(filelist$names)) {
