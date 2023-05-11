@@ -126,7 +126,7 @@ datayears <- opendata() |>
 years_to_do <- datayears
 
 # TEST
-years_to_do <- 2016
+# years_to_do <- 2016
 
 #'
 #' ## Intro
@@ -155,26 +155,31 @@ for (YYYY in sort(years_to_do)) {
     )
 
 
-
     ## Check for night time extreme values -------------------------------------
     dark_test <- year_data[Elevat < DARK_ELEV &
                                (GLB_wpsm < CM21_MINnightLIM | GLB_wpsm > CM21_MAXnightLIM)]
 
-    if (nrow(dark_test) > 0) stop("Something to do")
+    if (nrow(dark_test) > 0) {
+        cat("\n### Night radiation outlier days\n\n")
+        pander(
+            dark_test[, .(Min = min(GLB_wpsm), Max = max(GLB_wpsm)),
+                      by = as.Date(Date)]
+        )
+    }
 
 
     hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
          main = paste(YYYY, "Elevat  >", DARK_ELEV, "[Watt/m^2]"),
          breaks = 100 , las = 1, probability = T, xlab = "watt/m^2")
-    abline(v = CHP1_MAXnightLIM)
-    abline(v = CHP1_MINnightLIM)
+    abline(v = CHP1_MAXnightLIM, col = "red", lty = 3)
+    abline(v = CHP1_MINnightLIM, col = "red", lty = 3)
     cat('\n\n')
 
 
     plot(year_data[Elevat < DARK_ELEV, GLB_wpsm, Date],
          pch  = 19,
          cex  = .1,
-         main = paste("Night time measurements ", YYYY),
+         main = paste("GHI Night time measurements ", YYYY),
          xlab = "",
          ylab = "[Watt/m^2]" )
     abline(h = CHP1_MAXnightLIM, col = "red", lty = 3)
@@ -182,21 +187,19 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
 
-
-
-
-    ## Distribution of direct and SD -------------------------------------------
+    ## Distribution of Global and SD -------------------------------------------
     wattlimit <- 50
     hist(year_data[GLB_wpsm > wattlimit, GLB_wpsm],
-         main = paste(YYYY, "Direct  >", wattlimit, "[Watt/m^2]"),
+         main = paste(YYYY, "Global  >", wattlimit, "[Watt/m^2]"),
          breaks = 100 , las = 1, probability = T, xlab = "watt/m^2")
     lines(density(year_data$GLB_wpsm, na.rm = T), col = "orange", lwd = 3)
+    cat('\n\n')
 
     hist(year_data$GLB_SD_wpsm,
-         main = paste(YYYY, "Direct SD"),
+         main = paste(YYYY, "Global SD"),
          breaks = 100 , las = 1, probability = T, xlab = "[Watt/m^2]")
     lines(density(year_data$GLB_SD_wpsm, na.rm = T), col = "orange", lwd = 3)
-
+    cat('\n\n')
 
 
     ## Scatter points by sun position ------------------------------------------
@@ -216,6 +219,7 @@ for (YYYY in sort(years_to_do)) {
          ylab = "[Watt/m^2]" )
     cat('\n\n')
 
+    ## Scatter points by date --------------------------------------------------
     plot(year_data$Date, year_data$GLB_wpsm,
          pch  = 19,
          cex  = .1,
@@ -225,8 +229,7 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
 
-
-
+    ## Scatter points by time of day -------------------------------------------
     plot(year_data[preNoon == TRUE, Elevat],
          year_data[preNoon == TRUE, GLB_wpsm],
          pch  = 19,
@@ -245,6 +248,34 @@ for (YYYY in sort(years_to_do)) {
            col    = c("blue",        "green"),
            pch    = 19, bty = "n")
     cat('\n\n')
+
+
+    minelevet <- -1
+    xlim <- range(year_data$Elevat)
+    gap  <- 1
+    xlim[2] <- xlim[2] + abs(diff(range(year_data[Elevat > minelevet ,Elevat]))) + gap
+    xlim[1] <- minelevet
+
+    plot(year_data[preNoon == TRUE & Elevat > minelevet, Elevat],
+         year_data[preNoon == TRUE & Elevat > minelevet, GLB_wpsm],
+         xlim = xlim,
+         pch  = 19,
+         cex  = .05,
+         col  = "blue",
+         main = paste("GHI morning evening balance", YYYY),
+         xaxt = "n",
+         xlab = "Sun Elevation",
+         ylab = "[Watt/m^2]" )
+
+    points(-year_data[preNoon == FALSE & Elevat > minelevet, Elevat] + gap + abs(diff(range(year_data$Elevat))),
+           year_data[preNoon == FALSE & Elevat > minelevet, GLB_wpsm],
+           pch = 19,
+           cex = 0.05,
+           col = "green")
+    cat('\n\n')
+
+
+
 
 
     ## Box plots by week -------------------------------------------------------
@@ -269,8 +300,6 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n\\footnotesize\n\n')
     cat(pander(summary(year_data[, .(Date, SZA, GLB_wpsm, GLB_SD_wpsm)])))
     cat('\n\n\\normalsize\n\n')
-
-
 
 }
 
