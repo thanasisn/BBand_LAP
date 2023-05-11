@@ -1,5 +1,4 @@
 
-- inspect/add check for toolowdark and toohighdark
 - remove _SIG_ rds
 - replace _S0_ rds
 - remove old plots
