@@ -123,7 +123,7 @@ datayears <- opendata() |>
 years_to_do <- datayears
 
 # TEST
-# years_to_do <- 2016
+# years_to_do <- 2021
 
 #'
 #' ## Intro
@@ -158,15 +158,15 @@ for (YYYY in sort(years_to_do)) {
 
 
     ## Check for night time extreme values -------------------------------------
-    dark_test <- year_data[Elevat < DARK_ELEV &
-                               (DIR_wpsm < CHP1_MINnightLIM | DIR_wpsm > CHP1_MAXnightLIM)]
+    dark_test <- year_data[(Elevat < DARK_ELEV & DIR_wpsm < CHP1_MINnightLIM) |
+                           (Elevat < DARK_ELEV & DIR_wpsm > CHP1_MAXnightLIM) ]
 
     if (nrow(dark_test) > 0) {
         cat("\n### Night radiation outlier days\n\n")
         cat(
             pander(
-                dark_test[, .(Min = min(DIR_wpsm, na.rm = TRUE),
-                              Max = max(DIR_wpsm, na.rm = TRUE)),
+                dark_test[, .(Min_DIR = min(DIR_wpsm, na.rm = TRUE),
+                              Max_DIR = max(DIR_wpsm, na.rm = TRUE)),
                           by = as.Date(Date)]
             )
         )
