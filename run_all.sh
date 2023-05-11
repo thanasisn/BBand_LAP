@@ -1,7 +1,7 @@
 #!/bin/bash
 ## created on 2023-04-03
 
-#### Build the Broad Band database from scratch.
+#### Run everything for this project
 
 
 info() { echo ; echo "$(date +%F_%T) :: $* " >&1; }
