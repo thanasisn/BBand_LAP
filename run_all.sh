@@ -3,11 +3,10 @@
 
 #### Run everything for this project
 
-
 info() { echo ; echo "$(date +%F_%T) :: $* " >&1; }
-mkdir -p "$(dirname "$0")/LOGs/"
-LOG_FILE="$(dirname "$0")/LOGs/$(basename "$0")_$(date +%F_%T).log"
-ERR_FILE="$(dirname "$0")/LOGs/$(basename "$0")_$(date +%F_%T).err"
+mkdir -p "$(dirname "$0")/REPORTS/LOGs/"
+LOG_FILE="$(dirname "$0")/REPORTS/LOGs/$(basename "$0")_$(date +%F_%T).log"
+ERR_FILE="$(dirname "$0")/REPORTS/LOGs/$(basename "$0")_$(date +%F_%T).err"
 exec  > >(tee -i "${LOG_FILE}")
 exec 2> >(tee -i "${ERR_FILE}" >&2)
 info "START :: $0 :: $* ::"
