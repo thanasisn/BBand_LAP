@@ -123,7 +123,7 @@ datayears <- opendata() |>
 years_to_do <- datayears
 
 # TEST
-# years_to_do <- 2016
+years_to_do <- 2016
 
 #'
 #' ## Intro
@@ -147,7 +147,7 @@ for (YYYY in sort(years_to_do)) {
     year_data <- data.table(
         opendata()           |>
         filter(year == YYYY) |>
-        filter(Elevat > -5)  |>
+        # filter(Elevat > -5)  |>
         collect()
     )
 
@@ -161,7 +161,33 @@ for (YYYY in sort(years_to_do)) {
     dark_test <- year_data[Elevat < DARK_ELEV &
                                (DIR_wpsm < CHP1_MINnightLIM | DIR_wpsm > CHP1_MAXnightLIM)]
 
-    if (nrow(dark_test) > 0) stop("Something to do")
+    if (nrow(dark_test) > 0) {
+        cat("\n### Night radiation outlier days\n\n")
+        pander(
+            dark_test[, .(Min = min(DIR_wpsm), Max = max(DIR_wpsm)),
+                      by = as.Date(Date)]
+        )
+    }
+
+
+    hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
+         main = paste(YYYY, "Elevat  >", DARK_ELEV, "[Watt/m^2]"),
+         breaks = 100 , las = 1, probability = T, xlab = "watt/m^2")
+    abline(v = CHP1_MAXnightLIM, col = "red", lty = 3)
+    abline(v = CHP1_MINnightLIM, col = "red", lty = 3)
+    cat('\n\n')
+
+
+    plot(year_data[Elevat < DARK_ELEV, GLB_wpsm, Date],
+         pch  = 19,
+         cex  = .1,
+         main = paste("GHI Night time measurements ", YYYY),
+         xlab = "",
+         ylab = "[Watt/m^2]" )
+    abline(h = CHP1_MAXnightLIM, col = "red", lty = 3)
+    abline(h = CHP1_MINnightLIM, col = "red", lty = 3)
+    cat('\n\n')
+
 
 
     ## Distribution of direct and SD -------------------------------------------
@@ -212,6 +238,7 @@ for (YYYY in sort(years_to_do)) {
          ylab = "[Watt/m^2]" )
     cat('\n\n')
 
+    ## Scatter points by date --------------------------------------------------
     plot(year_data$Date, year_data$HOR_wpsm,
          pch  = 19,
          cex  = .1,
@@ -221,7 +248,7 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
 
-
+    ## Scatter points by time of day -------------------------------------------
     plot(year_data[preNoon == TRUE, Elevat],
          year_data[preNoon == TRUE, HOR_wpsm],
          pch  = 19,
@@ -240,6 +267,33 @@ for (YYYY in sort(years_to_do)) {
            col    = c("blue",        "green"),
            pch    = 19, bty = "n")
     cat('\n\n')
+
+
+    minelevet <- -1
+    xlim <- range(year_data$Elevat)
+    gap  <- 1
+    xlim[2] <- xlim[2] + abs(diff(range(year_data[Elevat > minelevet ,Elevat]))) + gap
+    xlim[1] <- minelevet
+
+    plot(year_data[preNoon == TRUE & Elevat > minelevet, Elevat],
+         year_data[preNoon == TRUE & Elevat > minelevet, HOR_wpsm],
+         xlim = xlim,
+         pch  = 19,
+         cex  = .05,
+         col  = "blue",
+         main = paste("DHI morning/evening balance", YYYY),
+         xaxt = "n",
+         xlab = "Sun Elevation",
+         ylab = "[Watt/m^2]" )
+
+    points(-year_data[preNoon == FALSE & Elevat > minelevet, Elevat] + gap + abs(diff(range(year_data$Elevat))),
+           year_data[preNoon == FALSE & Elevat > minelevet, HOR_wpsm],
+           pch = 19,
+           cex = 0.05,
+           col = "green")
+    cat('\n\n')
+
+
 
 
     ## Box plots by week -------------------------------------------------------
