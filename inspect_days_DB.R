@@ -1,4 +1,4 @@
-#!/
+#!/opt/R/4.2.3/bin/R
 # /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #### Tool to visual inspect the measurements of the instruments.
@@ -6,9 +6,7 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({ funr::sys.script() },
-                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("inspect_days_") })
+Script.Name <- "~/BBand_LAP/inspect_days_DB.R"
 sink(file   = paste0("~/BBand_LAP/REPORTS/LOGs/", basename(sub("\\.R$", ".log", Script.Name))),
      split  = TRUE,
      append = TRUE)
@@ -19,12 +17,17 @@ sink(file   = paste0("~/BBand_LAP/REPORTS/LOGs/", basename(sub("\\.R$", ".log", 
 ## plot sun
 
 
+library(arrow,      quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
+library(dplyr,      quietly = T, warn.conflicts = F)
 library(optparse,   quietly = T, warn.conflicts = F)
 library(plotly,     quietly = T, warn.conflicts = F)
 
-source("~/CM_21_GLB/Functions_CM21_factor.R")
-source("~/BBand_LAP/functions/Functions_CHP1.R")
+
+# source("~/CM_21_GLB/Functions_CM21_factor.R")
+# source("~/BBand_LAP/functions/Functions_CHP1.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
+source("~/BBand_LAP/DEFINITIONS.R")
 
 ## excluded data mark
 ## if can not read skip files there me be formatting error!!
@@ -70,9 +73,6 @@ cat(paste("Will always do a killall",gsub(" .*", "", BROWSER_CMD), "!!"), "\n")
 system(paste( "killall", gsub(" .*", "", BROWSER_CMD)))
 ## --
 
-## Data folder
-# FOLDER <- "~/DATA_RAW/Raddata"
-FOLDER <- "~/DATA_RAW/Bband"
 
 
 ####   Get input    ############################################################
@@ -83,10 +83,9 @@ MAXSTEP <- 400
 INITDAY <- paste0(year(Sys.Date()), "-01-01")
 INISTEP <- 3
 
-
 ## TEST override start day
 INITDAY <- "2023-03-15"
-INISTEP <- 1
+INISTEP <- 2
 
 option_list <-  list(
     make_option(c("-d", "--day"),
@@ -119,21 +118,9 @@ if (!(MINSTEP <= STEP & STEP <= MAXSTEP)) {
 }
 
 
-
 ####    Init    ################################################################
 
-## global sigbal files
-globalfiles <- list.files(path        = FOLDER,
-                          recursive   = TRUE,
-                          pattern     = "[0-9]*06.LAP$",
-                          ignore.case = TRUE,
-                          full.names  = TRUE)
-## direct signal files
-directfiles <- list.files(path        = FOLDER,
-                          recursive   = TRUE,
-                          pattern     = "[0-9]*03.LAP$",
-                          ignore.case = TRUE,
-                          full.names  = TRUE)
+BB <- opendata()
 
 if (STEP == 1) {
     MOVE <- 1
@@ -143,70 +130,19 @@ if (STEP == 1) {
 
 daystodo <- seq(STARTDAY, MAXDATE, by = MOVE)
 
-# daystodo <- daystodo[1:3]
 
 ## loop plots
 for (ap in daystodo) {
     toplot <- seq.Date( as.Date(ap, origin = "1970-01-01"), length.out = STEP, by = "day")
-    gather <- data.table()
+    ## get all days from data base
+    gather <- data.table(BB |> filter(as.Date(Date) %in% toplot ) |> collect())
 
-    ## loop days to plot with step
-    for (ad in toplot) {
-        theday    <- as.Date(ad, origin = "1970-01-01")
-        strday    <- format(theday, "%d%m%y")
-        cat("\n - - - - - - - - - - - - - - - - - - - \n")
-        cat("Load:", format(theday, "%F"), "\n")
+    cat("\n - - - - - - - - - - - - - - - - - - - \n")
+    cat("Load:", format(toplot, "%F"), "\n")
 
-        ## get file names
-        glbfile   <- grep( paste0(strday,"06.lap"), globalfiles, value = T, ignore.case = T )
-        dirfile   <- grep( strday, directfiles, value = T )
 
-        ## test file names
-        stopifnot(length(glbfile) <= 1)
-        stopifnot(length(dirfile) <= 1)
+    stop()
 
-        ## create time
-        D_minutes <- seq(from       = as.POSIXct(paste(theday,"00:00:00 UTC")),
-                         length.out = 1440,
-                         by         = "min" )
-
-        ## read global signal file
-        if (length(glbfile) == 1) {
-            glb <- fread(glbfile)
-            names(glb) <- c("GLBsig", "GLBsd")
-            ## clean missing
-            glb[GLBsig < -8, GLBsig := as.numeric(NA)]
-            glb[GLBsd  < -8, GLBsd  := as.numeric(NA)]
-            ## burn extreme
-            glb[GLBsig > 10, GLBsig := 10 ]
-            glb[GLBsd  > 10, GLBsd  := 10 ]
-
-        } else {
-            cat(paste0("Missing global   : ", strday,"06.lap"),"\n")
-            glb        <- data.table()
-            glb$GLBsig <- rep(as.numeric(NA), 1440)
-            glb$GLBsd  <- rep(as.numeric(NA), 1440)
-        }
-        ## read direct signal file
-        if (length(dirfile) == 1) {
-            dir <- fread(dirfile)
-            names(dir) <- c("DIRsig", "DIRsd")
-            ## clean missing
-            dir[DIRsig < -8, DIRsig := as.numeric(NA)]
-            dir[DIRsd  < -8, DIRsd  := as.numeric(NA)]
-            ## burn extreme
-            dir[DIRsig > 10, DIRsig := 10]
-            dir[DIRsd  > 10, DIRsd  := 10]
-        } else {
-            cat(paste0("Missing direct   : ", strday,"03.lap"),"\n")
-            dir        <- data.table()
-            dir$DIRsig <- rep(as.numeric(NA), 1440)
-            dir$DIRsd  <- rep(as.numeric(NA), 1440)
-        }
-
-        daydt  <- cbind(Date = D_minutes, glb, dir)
-        gather <- rbind(gather, daydt)
-    }
 
     ## keep signal for debugging
     gather$GLBraw <- gather$GLBsig
