@@ -231,20 +231,20 @@ for (ap in daystodo) {
     fig <- add_trace(fig, x = gather$Date, y = gather$DIR_wpsm,
                      name = "Direct beam Clean",
                      line = list(color = "darkblue"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","DBI:",round(gather$DIRsig,1)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","DBI:",round(gather$DIR_wpsm,1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
     fig <- add_trace(fig, x = gather$Date, y = gather$GLB_wpsm,
                      name = "Global on-the-fly",
                      line = list(color = "darkgreen"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$GLBsig,1)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$GLB_wpsm,1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
     fig <- add_trace(fig, x = gather$Date, y = gather$tot_glb,
                      name = "Global Sirena",
-                     line = list(color = "forestgreen"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$GLBsig,1)),
+                     line = list(color = "lightgreen"),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$tot_glb,1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
