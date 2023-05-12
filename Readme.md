@@ -19,13 +19,14 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
       * [For CHP-1](#for-chp-1)
       * [For CM-21](#for-cm-21)
       * [Other processes](#other-processes)
+      * [Tools](#tools)
    * [TODO](#todo)
 * [Details](#details)
    * [Development and Design](#development-and-design)
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-04-16T12:54:09 EEST -->
+<!-- Added by: athan, at: 2023-05-12T20:04:43 EEST -->
 
 <!--te-->
 
@@ -78,10 +79,17 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 - Keeps an `md5sum` of all input files to check for bit rot and other data corruption.
 
 
+### Tools
+
+- `inspect_days_DB.R`  interactive plot of some data in the DB
+- `inspect_days_Lap.R` interactive plot of some data from source files 
+- `inspect_days_Lap_sirena.R` interactive plot of some data from source files 
+
 
 ## TODO
 
 - Replace and compare processes from "CM_21_GLB"
+  - Some of the first stages have been replaced
 - Process more instruments
 - Interactive plot of db variables
 - Import libRadtran data
