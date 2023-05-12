@@ -123,7 +123,7 @@ datayears <- opendata() |>
 years_to_do <- datayears
 
 # TEST
-# years_to_do <- 2021
+years_to_do <- 2021
 
 #'
 #' ## Intro
@@ -173,25 +173,41 @@ for (YYYY in sort(years_to_do)) {
         cat('\n\n')
     }
 
-
+    ## Plot of 'Dark' data -----------------------------------------------------
     hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
-         main = paste(YYYY, "Elevat  >", DARK_ELEV, "[°]"),
+         main = paste(YYYY, "GHI Elevat <", DARK_ELEV, "°"),
          breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
     abline(v = CHP1_MAXnightLIM, col = "red", lty = 3)
     abline(v = CHP1_MINnightLIM, col = "red", lty = 3)
     cat('\n\n')
 
-
     plot(year_data[Elevat < DARK_ELEV, GLB_wpsm, Date],
          pch  = 19,
          cex  = .1,
-         main = paste("GHI Night time measurements ", YYYY),
+         main = paste(YYYY, "GHI, Elevat <", DARK_ELEV, "°"),
          xlab = "",
          ylab = "[Watt/m^2]" )
     abline(h = CHP1_MAXnightLIM, col = "red", lty = 3)
     abline(h = CHP1_MINnightLIM, col = "red", lty = 3)
     cat('\n\n')
 
+
+    ## Plots of SD -------------------------------------------------------------
+    plot(year_data[Elevat > 0, GLB_SD_wpsm, Date],
+         pch  = 19,
+         cex  = .1,
+         main = paste(YYYY, "GHI SD, Elevat >", 0, "°"),
+         xlab = "",
+         ylab = "[Watt/m^2]" )
+    cat('\n\n')
+
+    plot(year_data[Elevat < 0, GLB_SD_wpsm, Date],
+         pch  = 19,
+         cex  = .1,
+         main = paste(YYYY, "GHI SD, Elevat <", 0, "°"),
+         xlab = "",
+         ylab = "[Watt/m^2]" )
+    cat('\n\n')
 
 
     ## Distribution of direct and SD -------------------------------------------
