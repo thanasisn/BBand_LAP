@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Inspect CHP-1 radiation data **L1** "
+#' title:         "Inspect CHP-1 radiation data **DNI/DHI L1** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -123,7 +123,7 @@ datayears <- opendata() |>
 years_to_do <- datayears
 
 # TEST
-years_to_do <- 2021
+# years_to_do <- 2021
 
 #'
 #' ## Intro
@@ -174,17 +174,17 @@ for (YYYY in sort(years_to_do)) {
     }
 
     ## Plot of 'Dark' data -----------------------------------------------------
-    hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
-         main = paste(YYYY, "GHI Elevat <", DARK_ELEV, "°"),
+    hist(year_data[Elevat < DARK_ELEV, DIR_wpsm],
+         main = paste(YYYY, "DNI Elevat <", DARK_ELEV, "°"),
          breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
     abline(v = CHP1_MAXnightLIM, col = "red", lty = 3)
     abline(v = CHP1_MINnightLIM, col = "red", lty = 3)
     cat('\n\n')
 
-    plot(year_data[Elevat < DARK_ELEV, GLB_wpsm, Date],
+    plot(year_data[Elevat < DARK_ELEV, DIR_wpsm, Date],
          pch  = 19,
          cex  = .1,
-         main = paste(YYYY, "GHI, Elevat <", DARK_ELEV, "°"),
+         main = paste(YYYY, "DNI, Elevat <", DARK_ELEV, "°"),
          xlab = "",
          ylab = "[Watt/m^2]" )
     abline(h = CHP1_MAXnightLIM, col = "red", lty = 3)
@@ -193,18 +193,18 @@ for (YYYY in sort(years_to_do)) {
 
 
     ## Plots of SD -------------------------------------------------------------
-    plot(year_data[Elevat > 0, GLB_SD_wpsm, Date],
+    plot(year_data[Elevat > 0, DIR_SD_wpsm, Date],
          pch  = 19,
          cex  = .1,
-         main = paste(YYYY, "GHI SD, Elevat >", 0, "°"),
+         main = paste(YYYY, "DNI SD, Elevat >", 0, "°"),
          xlab = "",
          ylab = "[Watt/m^2]" )
     cat('\n\n')
 
-    plot(year_data[Elevat < 0, GLB_SD_wpsm, Date],
+    plot(year_data[Elevat < 0, DIR_SD_wpsm, Date],
          pch  = 19,
          cex  = .1,
-         main = paste(YYYY, "GHI SD, Elevat <", 0, "°"),
+         main = paste(YYYY, "DNI SD, Elevat <", 0, "°"),
          xlab = "",
          ylab = "[Watt/m^2]" )
     cat('\n\n')
@@ -212,16 +212,17 @@ for (YYYY in sort(years_to_do)) {
 
     ## Distribution of direct and SD -------------------------------------------
     wattlimit <- 50
-    hist(year_data[ DIR_wpsm > wattlimit, DIR_wpsm ],
+    hist(year_data[ DIR_wpsm > wattlimit, DIR_wpsm],
          main = paste(YYYY, "Direct  >", wattlimit, "[Watt/m^2]"),
-         breaks = 100 , las = 1, probability = T, xlab = "watt/m^2")
+         breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
     lines(density(year_data$DIR_wpsm, na.rm = T), col = "orange", lwd = 3)
+    cat('\n\n')
 
     hist(year_data$DIR_SD_wpsm,
          main = paste(YYYY, "Direct SD"),
          breaks = 100 , las = 1, probability = T, xlab = "[Watt/m^2]")
     lines(density(year_data$DIR_SD_wpsm, na.rm = T), col = "orange", lwd = 3)
-
+    cat('\n\n')
 
 
     ## Scatter points by sun position ------------------------------------------
@@ -241,6 +242,7 @@ for (YYYY in sort(years_to_do)) {
          ylab = "[Watt/m^2]" )
     cat('\n\n')
 
+    ## Scatter points by date --------------------------------------------------
     plot(year_data$Date, year_data$DIR_wpsm,
          pch  = 19,
          cex  = .1,

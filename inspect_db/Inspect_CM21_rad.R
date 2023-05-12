@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Inspect CM-21 radiation data **L1** "
+#' title:         "Inspect CM-21 radiation data **GHI L1** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -157,7 +157,8 @@ for (YYYY in sort(years_to_do)) {
 
     ## Check for night time extreme values -------------------------------------
     dark_test <- year_data[Elevat < DARK_ELEV &
-                               (GLB_wpsm < CM21_MINnightLIM | GLB_wpsm > CM21_MAXnightLIM)]
+                               (GLB_wpsm < CM21_MINnightLIM |
+                                    GLB_wpsm > CM21_MAXnightLIM)]
 
     if (nrow(dark_test) > 0) {
         cat("\n### Night radiation outlier days\n\n")
@@ -171,19 +172,18 @@ for (YYYY in sort(years_to_do)) {
         cat('\n\n')
     }
 
-
+    ## Plot of 'Dark' data -----------------------------------------------------
     hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
-         main = paste(YYYY, "Elevat  >", DARK_ELEV, "[°]"),
+         main = paste(YYYY, "GHI Elevat <", DARK_ELEV, "°"),
          breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
     abline(v = CHP1_MAXnightLIM, col = "red", lty = 3)
     abline(v = CHP1_MINnightLIM, col = "red", lty = 3)
     cat('\n\n')
 
-
     plot(year_data[Elevat < DARK_ELEV, GLB_wpsm, Date],
          pch  = 19,
          cex  = .1,
-         main = paste("GHI Night time measurements ", YYYY),
+         main = paste(YYYY, "GHI, Elevat <", DARK_ELEV, "°"),
          xlab = "",
          ylab = "[Watt/m^2]" )
     abline(h = CHP1_MAXnightLIM, col = "red", lty = 3)
@@ -191,16 +191,34 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
 
+    ## Plots of SD -------------------------------------------------------------
+    plot(year_data[Elevat > 0, GLB_SD_wpsm, Date],
+         pch  = 19,
+         cex  = .1,
+         main = paste(YYYY, "GHI SD, Elevat >", 0, "°"),
+         xlab = "",
+         ylab = "[Watt/m^2]" )
+    cat('\n\n')
+
+    plot(year_data[Elevat < 0, GLB_SD_wpsm, Date],
+         pch  = 19,
+         cex  = .1,
+         main = paste(YYYY, "GHI SD, Elevat <", 0, "°"),
+         xlab = "",
+         ylab = "[Watt/m^2]" )
+    cat('\n\n')
+
+
     ## Distribution of Global and SD -------------------------------------------
     wattlimit <- 50
     hist(year_data[GLB_wpsm > wattlimit, GLB_wpsm],
-         main = paste(YYYY, "Global  >", wattlimit, "[Watt/m^2]"),
+         main = paste(YYYY, "GHI >", wattlimit, "[Watt/m^2]"),
          breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
     lines(density(year_data$GLB_wpsm, na.rm = T), col = "orange", lwd = 3)
     cat('\n\n')
 
     hist(year_data$GLB_SD_wpsm,
-         main = paste(YYYY, "Global SD"),
+         main = paste(YYYY, "GHI SD"),
          breaks = 100 , las = 1, probability = T, xlab = "[Watt/m^2]")
     lines(density(year_data$GLB_SD_wpsm, na.rm = T), col = "orange", lwd = 3)
     cat('\n\n')
@@ -266,7 +284,7 @@ for (YYYY in sort(years_to_do)) {
          pch  = 19,
          cex  = .05,
          col  = "blue",
-         main = paste("GHI morning evening balance", YYYY),
+         main = paste("GHI morning/evening balance", YYYY),
          xaxt = "n",
          xlab = "Sun Elevation",
          ylab = "[Watt/m^2]" )
@@ -277,7 +295,6 @@ for (YYYY in sort(years_to_do)) {
            cex = 0.05,
            col = "green")
     cat('\n\n')
-
 
 
 
