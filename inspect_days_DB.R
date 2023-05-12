@@ -150,17 +150,48 @@ for (ap in daystodo) {
     cat("\n - - - - - - - - - - - - - - - - - - - \n")
     cat("Load:", format(toplot, "%F"), "\n")
 
+    # plot(gather$Date, gather$CM21_sig, type = "l", col = 2)
+    # lines(gather$Date, gather$CM21_sig_wo_dark, type = "l", col = 3)
+    #
+    # plot(gather$Date, gather$CM21_sig * cm21factor(gather$Date), type = "l", col = 2)
+    # lines(gather$Date, gather$CM21_sig_wo_dark * cm21factor(gather$Date), type = "l", col = 3)
+
 
 
     ## keep signal for debugging
     gather$GLBraw <- gather$CM21_sig_wo_dark
 
     ## convert to radiation
-    gather$GLBsig <- as.numeric(gather$CM21_sig_wo_dark) * cm21factor(gather$Date)
-    gather$GLBsd  <- gather$CM21_sig_sd      * cm21factor(gather$Date)
-    gather$DIRsig <- gather$CHP1_sig_wo_dark * chp1factor(gather$Date)
-    gather$DIRsd  <- gather$CHP1_sig_sd      * chp1factor(gather$Date)
+    gather$GLB_otf    <- gather$CM21_sig_wo_dark * cm21factor(gather$Date)
+    gather$GLB_sd_otf <- gather$CM21_sig_sd      * cm21factor(gather$Date)
 
+    gather$DIR_otf    <- gather$CHP1_sig_wo_dark * chp1factor(gather$Date)
+    gather$DIR_sd_otf <- gather$CHP1_sig_sd      * chp1factor(gather$Date)
+
+
+
+    plot(gather[, CM21_sig, CM21_sig_wo_dark])
+    plot(gather[, CHP1_sig, CHP1_sig_wo_dark])
+
+    plot(gather[, CM21_sig / CM21_sig_wo_dark])
+    plot(gather[, CHP1_sig / CHP1_sig_wo_dark])
+
+    plot(gather[, CM21_sig - CM21_sig_wo_dark])
+    plot(gather[, CHP1_sig - CHP1_sig_wo_dark])
+
+
+    plot(gather[, GLB_wpsm / CM21_sig_wo_dark])
+    plot(gather[, DIR_wpsm / CHP1_sig_wo_dark])
+
+    plot(gather[, GLB_wpsm / (CM21_sig * cm21factor(Date) )])
+    plot(gather[, DIR_wpsm / (CHP1_sig * chp1factor(Date) )])
+
+
+    plot(gather[, (GLB_wpsm / CM21_sig_wo_dark) - (GLB_wpsm / CM21_sig)])
+    plot(gather[, (DIR_wpsm / CHP1_sig_wo_dark) - (DIR_wpsm / CHP1_sig)])
+
+
+    stop()
     ## find bad data marks
     bad_chp1 <- data.table()
     for (i in 1:nrow(ranges_CHP1)) {
@@ -168,7 +199,7 @@ for (ap in daystodo) {
         upper <- ranges_CHP1$Until[  i]
         comme <- ranges_CHP1$Comment[i]
         ## mark bad regions of data
-        tmp <- gather[Date >= lower & Date < upper & !is.na(DIRsig) ]
+        tmp <- gather[Date >= lower & Date < upper & !is.na(DIR_otf) ]
         tmp$comment <- comme
         bad_chp1 <- rbind(bad_chp1, tmp)
     }
@@ -179,7 +210,7 @@ for (ap in daystodo) {
         upper <- ranges_CM21$Until[  i]
         comme <- ranges_CM21$Comment[i]
         ## mark bad regions of data
-        tmp <- gather[Date >= lower & Date < upper & !is.na(GLBsig) ]
+        tmp <- gather[Date >= lower & Date < upper & !is.na(GLB_otf) ]
         tmp$comment <- comme
         bad_cm21 <- rbind(bad_cm21, tmp)
     }
@@ -187,26 +218,25 @@ for (ap in daystodo) {
 
     ## Base Plot
     # xlim <- range(gather$Date)
-    # ylim <- range(0, 300, gather$GLBsig, gather$DIRsig, gather$GLBsd, gather$DIRsd, na.rm = T)
+    # ylim <- range(0, 300, gather$GLB_otf, gather$DIR_otf, gather$GLB_sd_otf, gather$DIR_sd_otf, na.rm = T)
     #
     # plot(NULL, xlab="", ylab="", xlim = xlim, ylim = ylim, xaxt = "n")
     # axis.POSIXct(1, gather$Date, format = "%F")
     # axis.POSIXct(1, at = seq(min(gather$Date), max(gather$Date), "2 hours"),
     #           labels = FALSE, tcl = -0.2)
     #
-    # lines(gather$Date, gather$GLBsig, col = "green")
-    # lines(gather$Date, gather$DIRsig, col = "blue")
+    # lines(gather$Date, gather$GLB_otf, col = "green")
+    # lines(gather$Date, gather$DIR_otf, col = "blue")
     #
-    # points(gather$Date, gather$GLBsd, col = "green", pch = 8, cex = 0.3)
-    # points(gather$Date, gather$DIRsd, col = "blue" , pch = 8, cex = 0.3)
+    # points(gather$Date, gather$GLB_sd_otf, col = "green", pch = 8, cex = 0.3)
+    # points(gather$Date, gather$DIR_sd_otf, col = "blue" , pch = 8, cex = 0.3)
     #
     # if (nrow(bad_chp1) > 1 ) {
-    #     points(bad_chp1$Date, bad_chp1$DIRsig, col = "red" )
+    #     points(bad_chp1$Date, bad_chp1$DIR_otf, col = "red" )
     # }
     # if (nrow(bad_cm21) > 1 ) {
-    #     points(bad_cm21$Date, bad_cm21$GLBsig, col = "red" )
+    #     points(bad_cm21$Date, bad_cm21$GLB_otf, col = "red" )
     # }
-
 
 
 
@@ -215,25 +245,25 @@ for (ap in daystodo) {
 
     fig <- plot_ly()
     ## Direct with out dark on the fly
-    fig <- add_trace(fig, x = gather$Date, y = gather$DIRsig,
+    fig <- add_trace(fig, x = gather$Date, y = gather$DIR_otf,
                      name = "Direct beam on-the-fly",
                      line = list(color = "blue"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","DBI F:",round(gather$DIRsig,2)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","DBI F:",round(gather$DIR_otf,4)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
     ## Direct final product
     fig <- add_trace(fig, x = gather$Date, y = gather$DIR_wpsm,
                      name = "Direct beam Clean",
                      line = list(color = "darkblue"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","DBI C:",round(gather$DIR_wpsm,2)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","DBI C:",round(gather$DIR_wpsm,4)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
     ## Global with out dark on the fly
-    fig <- add_trace(fig, x = gather$Date, y = gather$GLBsig,
+    fig <- add_trace(fig, x = gather$Date, y = gather$GLB_otf,
                      name = "Global on-the-fly",
                      line = list(color = "green"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI F:",round(gather$GLBsig,2)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI F:",round(gather$GLB_otf,4)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
@@ -241,7 +271,7 @@ for (ap in daystodo) {
     fig <- add_trace(fig, x = gather$Date, y = gather$GLB_wpsm,
                      name = "Global clean",
                      line = list(color = "darkgreen"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI C:",round(gather$GLB_wpsm,2)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI C:",round(gather$GLB_wpsm,4)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
@@ -249,37 +279,37 @@ for (ap in daystodo) {
     fig <- add_trace(fig, x = gather$Date, y = gather$tot_glb,
                      name = "Global Sirena",
                      line = list(color = "lightgreen"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI S:",round(gather$tot_glb,2)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI S:",round(gather$tot_glb,4)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
     ## plot standard deviation points
-    fig <- add_trace(fig, x = gather$Date, y = gather$DIRsd,
+    fig <- add_trace(fig, x = gather$Date, y = gather$DIR_sd_otf,
                      name = "Direct beam SD",
                      marker = list(color = "blue", symbol = "asterisk-open", size = 2),
-                     text = paste("DBI SD:", round(gather$DIRsd,2)),
+                     text = paste("DBI SD:", round(gather$DIR_sd_otf,4)),
                      hoverinfo = 'text',
                      # showlegend = FALSE,
                      mode = 'markers', type = "scatter")
-    fig <- add_trace(fig, x = gather$Date, y = gather$GLBsd,
+    fig <- add_trace(fig, x = gather$Date, y = gather$GLB_sd_otf,
                      name = "Global SD",
                      marker = list(color = "green", symbol = "asterisk-open", size = 2),
-                     # text = paste(format(gather$Date, "%F %R"),"\n",round(gather$GLBsd,1)),
-                     text = paste("GHI SD:",round(gather$GLBsd,2)),
+                     # text = paste(format(gather$Date, "%F %R"),"\n",round(gather$GLB_sd_otf,1)),
+                     text = paste("GHI SD:",round(gather$GLB_sd_otf,4)),
                      hoverinfo = 'text',
                      # showlegend = FALSE,
                      mode = 'markers', type = "scatter")
 
     ## plot excluded ranges
     if (nrow(bad_chp1) > 0 ) {
-        fig <- add_trace(fig, x = bad_chp1$Date, y = bad_chp1$DIRsig,
+        fig <- add_trace(fig, x = bad_chp1$Date, y = bad_chp1$DIR_otf,
                          name = "Excluded CHP1",
                          text   = bad_chp1$comment,
                          marker = list(color = "red", symbol = "square-open", size = 10),
                          mode = 'markers', type = "scatter")
     }
     if (nrow(bad_cm21) > 0 ) {
-        fig <- add_trace(fig, x = bad_cm21$Date, y = bad_cm21$GLBsig,
+        fig <- add_trace(fig, x = bad_cm21$Date, y = bad_cm21$GLB_otf,
                          name   = "Excluded CM21",
                          text   = bad_cm21$comment,
                          marker = list(color = "red", symbol = "square-open", size = 10),
