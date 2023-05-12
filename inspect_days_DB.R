@@ -162,11 +162,11 @@ for (ap in daystodo) {
     gather$GLBraw <- gather$CM21_sig_wo_dark
 
     ## convert to radiation
-    gather$GLB_otf    <- gather$CM21_sig_wo_dark * cm21factor(gather$Date)
-    gather$GLB_sd_otf <- gather$CM21_sig_sd      * cm21factor(gather$Date)
+    gather$GLB_otf    <- gather$CM21_sig    * cm21factor(gather$Date)
+    gather$GLB_sd_otf <- gather$CM21_sig_sd * cm21factor(gather$Date)
 
-    gather$DIR_otf    <- gather$CHP1_sig_wo_dark * chp1factor(gather$Date)
-    gather$DIR_sd_otf <- gather$CHP1_sig_sd      * chp1factor(gather$Date)
+    gather$DIR_otf    <- gather$CHP1_sig    * chp1factor(gather$Date)
+    gather$DIR_sd_otf <- gather$CHP1_sig_sd * chp1factor(gather$Date)
 
 
 
@@ -191,7 +191,7 @@ for (ap in daystodo) {
     plot(gather[, (DIR_wpsm / CHP1_sig_wo_dark) - (DIR_wpsm / CHP1_sig)])
 
 
-    stop()
+
     ## find bad data marks
     bad_chp1 <- data.table()
     for (i in 1:nrow(ranges_CHP1)) {
@@ -214,6 +214,9 @@ for (ap in daystodo) {
         tmp$comment <- comme
         bad_cm21 <- rbind(bad_cm21, tmp)
     }
+
+
+
 
 
     ## Base Plot
@@ -303,18 +306,51 @@ for (ap in daystodo) {
     ## plot excluded ranges
     if (nrow(bad_chp1) > 0 ) {
         fig <- add_trace(fig, x = bad_chp1$Date, y = bad_chp1$DIR_otf,
-                         name = "Excluded CHP1",
-                         text   = bad_chp1$comment,
-                         marker = list(color = "red", symbol = "square-open", size = 10),
+                         name = "Excluded CHP1 otf",
+                         text   = paste(bad_chp1$comment),
+                         hoverinfo = 'text',
+                         marker = list(color = "red", symbol = "square-open-dot", size = 10),
                          mode = 'markers', type = "scatter")
     }
     if (nrow(bad_cm21) > 0 ) {
         fig <- add_trace(fig, x = bad_cm21$Date, y = bad_cm21$GLB_otf,
-                         name   = "Excluded CM21",
-                         text   = bad_cm21$comment,
-                         marker = list(color = "red", symbol = "square-open", size = 10),
+                         name   = "Excluded CM21 otf",
+                         text   = paste(bad_cm21$comment),
+                         hoverinfo = 'text',
+                         marker = list(color = "red", symbol = "square-open-dot", size = 10),
                          mode   = 'markers', type = "scatter")
     }
+
+    fig <- add_trace(fig,
+                     x = gather[Async_tracker_flag == TRUE, Date],
+                     y = gather[Async_tracker_flag == TRUE, DIR_otf],
+                     name   = "Tracker Async",
+                     text   = paste("Async Steps: ",gather[Async_tracker_flag == TRUE, Async_step_count]),
+                     hoverinfo = 'text',
+                     marker = list(color = "magenta", symbol = "star-triangle-up-open-dot", size = 10),
+                     mode   = 'markers', type = "scatter")
+
+    fig <- add_trace(fig,
+                     x = gather[!is.na(cm21_bad_data_flag), Date],
+                     y = gather[!is.na(cm21_bad_data_flag), GLB_otf],
+                     name   = "Excluded CM21 in DB",
+                     text   = paste(gather[!is.na(cm21_bad_data_flag), cm21_bad_data_flag]),
+                     hoverinfo = 'text',
+                     marker = list(color = "red", symbol = "circle-x-opem", size = 10),
+                     mode   = 'markers', type = "scatter")
+
+    fig <- add_trace(fig,
+                     x = gather[!is.na(chp1_bad_data_flag), Date],
+                     y = gather[!is.na(chp1_bad_data_flag), DIR_otf],
+                     name   = "Excluded CM21 in DB",
+                     text   = paste(gather[!is.na(chp1_bad_data_flag), chp1_bad_data_flag]),
+                     hoverinfo = 'text',
+                     marker = list(color = "red", symbol = "circle-x-opem", size = 10),
+                     mode   = 'markers', type = "scatter")
+
+
+grep("flag",names(gather),value = T)
+
 
     ## Asynv
     ## *_bad_data_flag....
