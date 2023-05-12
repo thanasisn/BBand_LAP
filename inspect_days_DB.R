@@ -169,30 +169,7 @@ for (ap in daystodo) {
     gather$DIR_sd_otf <- gather$CHP1_sig_sd * chp1factor(gather$Date)
 
 
-
-    plot(gather[, CM21_sig, CM21_sig_wo_dark])
-    plot(gather[, CHP1_sig, CHP1_sig_wo_dark])
-
-    plot(gather[, CM21_sig / CM21_sig_wo_dark])
-    plot(gather[, CHP1_sig / CHP1_sig_wo_dark])
-
-    plot(gather[, CM21_sig - CM21_sig_wo_dark])
-    plot(gather[, CHP1_sig - CHP1_sig_wo_dark])
-
-
-    plot(gather[, GLB_wpsm / CM21_sig_wo_dark])
-    plot(gather[, DIR_wpsm / CHP1_sig_wo_dark])
-
-    plot(gather[, GLB_wpsm / (CM21_sig * cm21factor(Date) )])
-    plot(gather[, DIR_wpsm / (CHP1_sig * chp1factor(Date) )])
-
-
-    plot(gather[, (GLB_wpsm / CM21_sig_wo_dark) - (GLB_wpsm / CM21_sig)])
-    plot(gather[, (DIR_wpsm / CHP1_sig_wo_dark) - (DIR_wpsm / CHP1_sig)])
-
-
-
-    ## find bad data marks
+    ## find bad data marks from parametric files
     bad_chp1 <- data.table()
     for (i in 1:nrow(ranges_CHP1)) {
         lower <- ranges_CHP1$From[   i]
@@ -214,32 +191,6 @@ for (ap in daystodo) {
         tmp$comment <- comme
         bad_cm21 <- rbind(bad_cm21, tmp)
     }
-
-
-
-
-
-    ## Base Plot
-    # xlim <- range(gather$Date)
-    # ylim <- range(0, 300, gather$GLB_otf, gather$DIR_otf, gather$GLB_sd_otf, gather$DIR_sd_otf, na.rm = T)
-    #
-    # plot(NULL, xlab="", ylab="", xlim = xlim, ylim = ylim, xaxt = "n")
-    # axis.POSIXct(1, gather$Date, format = "%F")
-    # axis.POSIXct(1, at = seq(min(gather$Date), max(gather$Date), "2 hours"),
-    #           labels = FALSE, tcl = -0.2)
-    #
-    # lines(gather$Date, gather$GLB_otf, col = "green")
-    # lines(gather$Date, gather$DIR_otf, col = "blue")
-    #
-    # points(gather$Date, gather$GLB_sd_otf, col = "green", pch = 8, cex = 0.3)
-    # points(gather$Date, gather$DIR_sd_otf, col = "blue" , pch = 8, cex = 0.3)
-    #
-    # if (nrow(bad_chp1) > 1 ) {
-    #     points(bad_chp1$Date, bad_chp1$DIR_otf, col = "red" )
-    # }
-    # if (nrow(bad_cm21) > 1 ) {
-    #     points(bad_cm21$Date, bad_cm21$GLB_otf, col = "red" )
-    # }
 
 
 
@@ -345,21 +296,15 @@ for (ap in daystodo) {
                      name   = "Excluded CM21 in DB",
                      text   = paste(gather[!is.na(chp1_bad_data_flag), chp1_bad_data_flag]),
                      hoverinfo = 'text',
-                     marker = list(color = "red", symbol = "circle-x-opem", size = 10),
+                     marker = list(color = "red", symbol = "circle-x-open", size = 10),
                      mode   = 'markers', type = "scatter")
 
 
-grep("flag",names(gather),value = T)
-
-
-    ## Asynv
-    ## *_bad_data_flag....
 
     fig <- layout(fig, legend = list(x = 0.85, y = 0.95, bgcolor = 'rgba(75,75,75,0.3)'))
     # fig <- layout(fig, xaxis  = list(showcrossline = T))
     # fig <- layout(fig, hovermode = "x unified")
     fig <- layout(fig, hovermode = "x")
-
 
 
     # fig
