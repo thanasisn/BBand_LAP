@@ -8,13 +8,16 @@ BASED      <- "~/BBand_LAP/"
 
 ##  Input paths  ---------------------------------------------------------------
 SUN_FOLDER   <- "~/DATA_RAW/SUN/PySolar_LAP/"
-SIRENA_GLB   <- "~/DATA_RAW/Bband/AC21_LAP.GLB/"
 SIRENA_DIR   <- "~/DATA_RAW/Bband/CHP1_lap.DIR/"
+SIRENA_GLB   <- "~/DATA_RAW/Bband/AC21_LAP.GLB/"
+SIRENA_INC   <- "~/DATA_RAW/Bband/CM21_LAP.INC/"
 trSYNC_DIR   <- "~/DATA_RAW/tracker_chp1/tracker_SYNC"
 CHPTMP_DIR   <- "~/DATA_RAW/tracker_chp1/Tracker_THERM"
 SIRENA_TOT   <- "~/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
 RADMON_DIR   <- "~/DATA_RAW/Raddata/3"
 RADMON_GLB   <- "~/DATA_RAW/Raddata/6"
+RADMON_INC   <- "~/DATA_RAW/Raddata/6"
+
 
 ##  Other data input  ----------------------------------------------------------
 COMP_TSI     <- "~/DATA/SUN/TSI_COMPOSITE.Rds"

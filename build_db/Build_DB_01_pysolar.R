@@ -72,59 +72,80 @@ if (file.exists(DB_META_fl)) {
     warning("STARTING NEW DB!!")
     BB_meta <- data.table(day = seq(as_date(DB_start_date), Sys.Date(), by = "day"))
     ## add general columns
-    BB_meta$pysolar_basename      <- as.character(NA)
-    BB_meta$pysolar_mtime         <- as.POSIXct(NA)
-    BB_meta$pysolar_parsed        <- as.POSIXct(NA)
-    BB_meta$pysolar_basename      <- as.character(BB_meta$pysolar_basename)
-    BB_meta$pysolar_mtime         <- as.POSIXct(BB_meta$pysolar_mtime)
-    BB_meta$pysolar_parsed        <- as.POSIXct(BB_meta$pysolar_parsed)
+    BB_meta$pysolar_basename         <- as.character(NA)
+    BB_meta$pysolar_mtime            <- as.POSIXct(NA)
+    BB_meta$pysolar_parsed           <- as.POSIXct(NA)
+    BB_meta$pysolar_basename         <- as.character(BB_meta$pysolar_basename)
+    BB_meta$pysolar_mtime            <- as.POSIXct(BB_meta$pysolar_mtime)
+    BB_meta$pysolar_parsed           <- as.POSIXct(BB_meta$pysolar_parsed)
     ## For CM-21 meta data
-    BB_meta$cm21_Daily_dark       <- as.numeric(NA)
-    BB_meta$cm21_bad_data_flagged <- as.POSIXct(NA)
-    BB_meta$cm21_basename         <- as.character(NA)
-    BB_meta$cm21_dark_Eve_avg     <- as.numeric(NA)
-    BB_meta$cm21_dark_Eve_cnt     <- as.integer(NA)
-    BB_meta$cm21_dark_Eve_end     <- as.POSIXct(NA)
-    BB_meta$cm21_dark_Eve_med     <- as.numeric(NA)
-    BB_meta$cm21_dark_Eve_sta     <- as.POSIXct(NA)
-    BB_meta$cm21_dark_Mor_avg     <- as.numeric(NA)
-    BB_meta$cm21_dark_Mor_cnt     <- as.integer(NA)
-    BB_meta$cm21_dark_Mor_end     <- as.POSIXct(NA)
-    BB_meta$cm21_dark_Mor_med     <- as.numeric(NA)
-    BB_meta$cm21_dark_Mor_sta     <- as.POSIXct(NA)
-    BB_meta$cm21_dark_computed    <- as.POSIXct(NA)
-    BB_meta$cm21_dark_flag        <- as.character(NA)
-    BB_meta$cm21_md5sum           <- as.character(NA)
-    BB_meta$cm21_mtime            <- as.POSIXct(NA)
-    BB_meta$cm21_parsed           <- as.POSIXct(NA)
-    BB_meta$cm21_sig_NAs          <- as.integer(NA)
-    BB_meta$cm21_sig_sd_NAs       <- as.integer(NA)
+    BB_meta$cm21_Daily_dark          <- as.numeric(NA)
+    BB_meta$cm21_bad_data_flagged    <- as.POSIXct(NA)
+    BB_meta$cm21_basename            <- as.character(NA)
+    BB_meta$cm21_dark_Eve_avg        <- as.numeric(NA)
+    BB_meta$cm21_dark_Eve_cnt        <- as.integer(NA)
+    BB_meta$cm21_dark_Eve_end        <- as.POSIXct(NA)
+    BB_meta$cm21_dark_Eve_med        <- as.numeric(NA)
+    BB_meta$cm21_dark_Eve_sta        <- as.POSIXct(NA)
+    BB_meta$cm21_dark_Mor_avg        <- as.numeric(NA)
+    BB_meta$cm21_dark_Mor_cnt        <- as.integer(NA)
+    BB_meta$cm21_dark_Mor_end        <- as.POSIXct(NA)
+    BB_meta$cm21_dark_Mor_med        <- as.numeric(NA)
+    BB_meta$cm21_dark_Mor_sta        <- as.POSIXct(NA)
+    BB_meta$cm21_dark_computed       <- as.POSIXct(NA)
+    BB_meta$cm21_dark_flag           <- as.character(NA)
+    BB_meta$cm21_md5sum              <- as.character(NA)
+    BB_meta$cm21_mtime               <- as.POSIXct(NA)
+    BB_meta$cm21_parsed              <- as.POSIXct(NA)
+    BB_meta$cm21_sig_NAs             <- as.integer(NA)
+    BB_meta$cm21_sig_sd_NAs          <- as.integer(NA)
+    ## For INCLINED CM-21 meta data
+    BB_meta$cm21inc_Daily_dark       <- as.numeric(NA)
+    BB_meta$cm21inc_bad_data_flagged <- as.POSIXct(NA)
+    BB_meta$cm21inc_basename         <- as.character(NA)
+    BB_meta$cm21inc_dark_Eve_avg     <- as.numeric(NA)
+    BB_meta$cm21inc_dark_Eve_cnt     <- as.integer(NA)
+    BB_meta$cm21inc_dark_Eve_end     <- as.POSIXct(NA)
+    BB_meta$cm21inc_dark_Eve_med     <- as.numeric(NA)
+    BB_meta$cm21inc_dark_Eve_sta     <- as.POSIXct(NA)
+    BB_meta$cm21inc_dark_Mor_avg     <- as.numeric(NA)
+    BB_meta$cm21inc_dark_Mor_cnt     <- as.integer(NA)
+    BB_meta$cm21inc_dark_Mor_end     <- as.POSIXct(NA)
+    BB_meta$cm21inc_dark_Mor_med     <- as.numeric(NA)
+    BB_meta$cm21inc_dark_Mor_sta     <- as.POSIXct(NA)
+    BB_meta$cm21inc_dark_computed    <- as.POSIXct(NA)
+    BB_meta$cm21inc_dark_flag        <- as.character(NA)
+    BB_meta$cm21inc_md5sum           <- as.character(NA)
+    BB_meta$cm21inc_mtime            <- as.POSIXct(NA)
+    BB_meta$cm21inc_parsed           <- as.POSIXct(NA)
+    BB_meta$cm21inc_sig_NAs          <- as.integer(NA)
+    BB_meta$cm21inc_sig_sd_NAs       <- as.integer(NA)
     ## Fro CHP-1 meta data
-    BB_meta$chp1_Daily_dark       <- as.numeric(NA)
-    BB_meta$chp1_bad_data_flagged <- as.POSIXct(NA)
-    BB_meta$chp1_bad_temp_flagged <- as.POSIXct(NA)
-    BB_meta$chp1_basename         <- as.character(NA)
-    BB_meta$chp1_dark_Eve_avg     <- as.numeric(NA)
-    BB_meta$chp1_dark_Eve_cnt     <- as.integer(NA)
-    BB_meta$chp1_dark_Eve_end     <- as.POSIXct(NA)
-    BB_meta$chp1_dark_Eve_med     <- as.numeric(NA)
-    BB_meta$chp1_dark_Eve_sta     <- as.POSIXct(NA)
-    BB_meta$chp1_dark_Mor_avg     <- as.numeric(NA)
-    BB_meta$chp1_dark_Mor_cnt     <- as.integer(NA)
-    BB_meta$chp1_dark_Mor_end     <- as.POSIXct(NA)
-    BB_meta$chp1_dark_Mor_med     <- as.numeric(NA)
-    BB_meta$chp1_dark_Mor_sta     <- as.POSIXct(NA)
-    BB_meta$chp1_dark_computed    <- as.POSIXct(NA)
-    BB_meta$chp1_dark_flag        <- as.character(NA)
-    BB_meta$chp1_md5sum           <- as.character(NA)
-    BB_meta$chp1_mtime            <- as.POSIXct(NA)
-    BB_meta$chp1_parsed           <- as.POSIXct(NA)
-    BB_meta$chp1_sig_NAs          <- as.integer(NA)
-    BB_meta$chp1_sig_sd_NAs       <- as.integer(NA)
-    BB_meta$chp1_temp_basename    <- as.character(NA)
-    BB_meta$chp1_temp_md5sum      <- as.character(NA)
-    BB_meta$chp1_temp_mtime       <- as.POSIXct(NA)
-    BB_meta$chp1_temp_parsed      <- as.POSIXct(NA)
+    BB_meta$chp1_Daily_dark          <- as.numeric(NA)
+    BB_meta$chp1_bad_data_flagged    <- as.POSIXct(NA)
+    BB_meta$chp1_bad_temp_flagged    <- as.POSIXct(NA)
+    BB_meta$chp1_basename            <- as.character(NA)
+    BB_meta$chp1_dark_Eve_avg        <- as.numeric(NA)
+    BB_meta$chp1_dark_Eve_cnt        <- as.integer(NA)
+    BB_meta$chp1_dark_Eve_end        <- as.POSIXct(NA)
+    BB_meta$chp1_dark_Eve_med        <- as.numeric(NA)
+    BB_meta$chp1_dark_Eve_sta        <- as.POSIXct(NA)
+    BB_meta$chp1_dark_Mor_avg        <- as.numeric(NA)
+    BB_meta$chp1_dark_Mor_cnt        <- as.integer(NA)
+    BB_meta$chp1_dark_Mor_end        <- as.POSIXct(NA)
+    BB_meta$chp1_dark_Mor_med        <- as.numeric(NA)
+    BB_meta$chp1_dark_Mor_sta        <- as.POSIXct(NA)
+    BB_meta$chp1_dark_computed       <- as.POSIXct(NA)
+    BB_meta$chp1_dark_flag           <- as.character(NA)
+    BB_meta$chp1_md5sum              <- as.character(NA)
+    BB_meta$chp1_mtime               <- as.POSIXct(NA)
+    BB_meta$chp1_parsed              <- as.POSIXct(NA)
+    BB_meta$chp1_sig_NAs             <- as.integer(NA)
+    BB_meta$chp1_sig_sd_NAs          <- as.integer(NA)
+    BB_meta$chp1_temp_basename       <- as.character(NA)
+    BB_meta$chp1_temp_md5sum         <- as.character(NA)
+    BB_meta$chp1_temp_mtime          <- as.POSIXct(NA)
+    BB_meta$chp1_temp_parsed         <- as.POSIXct(NA)
 }
 
 
@@ -206,6 +227,11 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, CM21_sig_sd             := as.numeric(NA)  ]
             sun_temp[, CM21_sig_wo_dark        := as.numeric(NA)  ]
             sun_temp[, cm21_bad_data_flag      := as.character(NA)]
+            ## For INCLINED CM-21
+            sun_temp[, CM21INC_sig             := as.numeric(NA)  ]
+            sun_temp[, CM21INC_sig_sd          := as.numeric(NA)  ]
+            sun_temp[, CM21INC_sig_wo_dark     := as.numeric(NA)  ]
+            sun_temp[, cm21INC_bad_data_flag   := as.character(NA)]
             ## For CHP-1
             sun_temp[, Async_step_count        := as.integer(NA)  ]
             sun_temp[, Async_tracker_flag      := TRUE            ]
@@ -233,6 +259,9 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, GLB_SD_wpsm             := as.numeric(NA)  ]
             sun_temp[, GLB_strict              := as.numeric(NA)  ]
             sun_temp[, GLB_wpsm                := as.numeric(NA)  ]
+            sun_temp[, GLBINC_SD_wpsm          := as.numeric(NA)  ]
+            sun_temp[, GLBINC_strict           := as.numeric(NA)  ]
+            sun_temp[, GLBINC_wpsm             := as.numeric(NA)  ]
             sun_temp[, HOR_SD_wpsm             := as.numeric(NA)  ]
             sun_temp[, HOR_strict              := as.numeric(NA)  ]
             sun_temp[, HOR_wpsm                := as.numeric(NA)  ]
