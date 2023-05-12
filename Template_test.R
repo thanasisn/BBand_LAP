@@ -35,8 +35,8 @@ library(plotly)
 
 TEST_DB <- FALSE
 
+#### ~ ~ ~ ~ USE A TEST DB ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ####
 # TEST_DB <- TRUE
-
 if (TEST_DB) {
     source("~/BBand_LAP/DEFINITIONS.R")
     cat("\n * * * Using a temp DB * * * \n\n")
@@ -52,7 +52,7 @@ if (TEST_DB) {
     DB_META_fl <- test_DB_META_fl
     DB_HASH_fl <- test_DB_HASH_fl
 }
-
+#### ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ####
 
 
 ##  Create a new variable to the whole database  -------------------------------
