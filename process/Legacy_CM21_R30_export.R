@@ -57,11 +57,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -105,7 +105,6 @@ datayears <- opendata() |>  select(year) |> unique() |> collect() |> pull() |> s
 BB_meta  <- read_parquet(DB_META_fl)
 BB       <- opendata()
 
-names(BB)
 datayears <- 2022
 
 editedyears <- as.vector(na.omit(unique(
@@ -162,11 +161,11 @@ for (YYYY in datayears) {
     year_data <- data.table(year_data)
     write_RDS(object = year_data,
               file   = legacyout)
+    rm(year_data)
 }
+gc()
 
-    stop()
 ## Old format of CM21_H_S1
-
 # $ Date          : POSIXct, format: "2007-01-08 00:00:30" "2007-01-08 00:01:30" ...
 # $ CM21value     : num  NA NA NA NA NA NA NA NA NA NA ...
 # $ CM21sd        : num  NA NA NA NA NA NA NA NA NA NA ...
@@ -185,10 +184,10 @@ for (YYYY in datayears) {
 #+ echo=F, include=T, results="asis"
 if (COMPARE) {
     listlegacy <- list.files(path   = "~/DATA/Broad_Band/CM21_H_signal",
-                             pattern = "Legacy_LAP_CM21_H_S0_[0-9]{4}\\.Rds",
+                             pattern = "Legacy_LAP_CM21_H_S1_[0-9]{4}\\.Rds",
                              full.names = TRUE, ignore.case = TRUE)
 
-    ## gather remaiining
+    ## gather remaining data
     gather <- data.table()
 
     for (alf in listlegacy) {
@@ -199,16 +198,13 @@ if (COMPARE) {
         legacy <- legacy[!is.na(CM21value),]
         legacy$Azimuth        <- NULL
         legacy$Elevat         <- NULL
-        legacy$sig_lowlim     <- NULL
-        legacy$sig_upplim     <- NULL
         # legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
 
         ## load old files
-        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_signal/LAP_CM21_H_S0_",yyyy,".Rds")))
-        baseDT$Azimuth        <- NULL
-        baseDT$Elevat         <- NULL
-        baseDT$sig_lowlim     <- NULL
-        baseDT$sig_upplim     <- NULL
+        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_signal/LAP_CM21_H_S1_",yyyy,".Rds")))
+        baseDT$Azimuth  <- NULL
+        baseDT$Elevat   <- NULL
+        baseDT$QFlag_1  <- NULL
 
 
         setequal(names(baseDT), names(legacy))
@@ -398,4 +394,3 @@ tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
-
