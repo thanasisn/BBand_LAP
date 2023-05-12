@@ -83,8 +83,8 @@ INITDAY <- paste0(year(Sys.Date()), "-01-01")
 INISTEP <- 3
 
 ## TEST override start day
-INITDAY <- "2023-03-15"
-INISTEP <- 2
+INITDAY <- "2023-04-15"
+INISTEP <- 1
 
 option_list <-  list(
     make_option(c("-d", "--day"),
@@ -214,37 +214,42 @@ for (ap in daystodo) {
     ## Plotly
 
     fig <- plot_ly()
-    ## plot lines of radiation
+    ## Direct with out dark on the fly
     fig <- add_trace(fig, x = gather$Date, y = gather$DIRsig,
                      name = "Direct beam on-the-fly",
                      line = list(color = "blue"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","DBI:",round(gather$DIRsig,1)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","DBI F:",round(gather$DIRsig,2)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
-    fig <- add_trace(fig, x = gather$Date, y = gather$GLBsig,
-                     name = "Global on-the-fly",
-                     line = list(color = "green"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$GLBsig,1)),
-                     hoverinfo = 'text',
-                     mode = "lines", type = "scatter")
-
+    ## Direct final product
     fig <- add_trace(fig, x = gather$Date, y = gather$DIR_wpsm,
                      name = "Direct beam Clean",
                      line = list(color = "darkblue"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","DBI:",round(gather$DIR_wpsm,1)),
-                     hoverinfo = 'text',
-                     mode = "lines", type = "scatter")
-    fig <- add_trace(fig, x = gather$Date, y = gather$GLB_wpsm,
-                     name = "Global on-the-fly",
-                     line = list(color = "darkgreen"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$GLB_wpsm,1)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","DBI C:",round(gather$DIR_wpsm,2)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
+    ## Global with out dark on the fly
+    fig <- add_trace(fig, x = gather$Date, y = gather$GLBsig,
+                     name = "Global on-the-fly",
+                     line = list(color = "green"),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI F:",round(gather$GLBsig,2)),
+                     hoverinfo = 'text',
+                     mode = "lines", type = "scatter")
+
+    ## Global final product
+    fig <- add_trace(fig, x = gather$Date, y = gather$GLB_wpsm,
+                     name = "Global clean",
+                     line = list(color = "darkgreen"),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI C:",round(gather$GLB_wpsm,2)),
+                     hoverinfo = 'text',
+                     mode = "lines", type = "scatter")
+
+    ## Global from sirena
     fig <- add_trace(fig, x = gather$Date, y = gather$tot_glb,
                      name = "Global Sirena",
                      line = list(color = "lightgreen"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI:",round(gather$tot_glb,1)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI S:",round(gather$tot_glb,2)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
@@ -252,7 +257,7 @@ for (ap in daystodo) {
     fig <- add_trace(fig, x = gather$Date, y = gather$DIRsd,
                      name = "Direct beam SD",
                      marker = list(color = "blue", symbol = "asterisk-open", size = 2),
-                     text = paste("DBI SD:",round(gather$DIRsd,1)),
+                     text = paste("DBI SD:", round(gather$DIRsd,2)),
                      hoverinfo = 'text',
                      # showlegend = FALSE,
                      mode = 'markers', type = "scatter")
@@ -260,7 +265,7 @@ for (ap in daystodo) {
                      name = "Global SD",
                      marker = list(color = "green", symbol = "asterisk-open", size = 2),
                      # text = paste(format(gather$Date, "%F %R"),"\n",round(gather$GLBsd,1)),
-                     text = paste("GHI SD:",round(gather$GLBsd,1)),
+                     text = paste("GHI SD:",round(gather$GLBsd,2)),
                      hoverinfo = 'text',
                      # showlegend = FALSE,
                      mode = 'markers', type = "scatter")
@@ -281,11 +286,15 @@ for (ap in daystodo) {
                          mode   = 'markers', type = "scatter")
     }
 
+    ## Asynv
+    ## *_bad_data_flag....
 
     fig <- layout(fig, legend = list(x = 0.85, y = 0.95, bgcolor = 'rgba(75,75,75,0.3)'))
     # fig <- layout(fig, xaxis  = list(showcrossline = T))
     # fig <- layout(fig, hovermode = "x unified")
     fig <- layout(fig, hovermode = "x")
+
+
 
     # fig
     # print(fig)
