@@ -189,7 +189,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
 
         setorder(gather, Date)
-stop("wait")
+
         ## store this month / set data
         write_parquet(gather,  partfile)
         write_parquet(BB_meta, DB_META_fl)
