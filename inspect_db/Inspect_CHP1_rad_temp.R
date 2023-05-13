@@ -53,11 +53,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -158,9 +158,12 @@ for (YYYY in sort(years_to_do)) {
 
 
     ## Check for night time extreme values -------------------------------------
-    dark_test <- year_data[(Elevat < DARK_ELEV & DIR_wpsm < CHP1_MINnightLIM) |
-                           (Elevat < DARK_ELEV & DIR_wpsm > CHP1_MAXnightLIM) ]
-
+    #'
+    #' Problems in the night signal especially bellow DARK_ELEV can be spotted
+    #' and corrected with exclusions to protect the dark signal calculation.
+    #'
+    dark_test <- year_data[(Elevat < 0 & DIR_wpsm < CHP1_MINnightLIM) |
+                           (Elevat < 0 & DIR_wpsm > CHP1_MAXnightLIM) ]
     if (nrow(dark_test) > 0) {
         cat("\n### Night radiation outlier days\n\n")
         cat(
@@ -172,6 +175,20 @@ for (YYYY in sort(years_to_do)) {
         )
         cat('\n\n')
     }
+
+    dark_test <- year_data[Elevat < 0 & DIR_SD_wpsm > CHP1_MAXSDnightLIM ]
+    if (nrow(dark_test) > 0) {
+        cat("\n### Night radiation SD outlier days\n\n")
+        cat(
+            pander(
+                dark_test[, .(Min_DIR_SD = min(DIR_SD_wpsm, na.rm = TRUE),
+                              Max_DIR_SD = max(DIR_SD_wpsm, na.rm = TRUE)),
+                          by = as.Date(Date)]
+            )
+        )
+        cat('\n\n')
+    }
+
 
     ## Plot of 'Dark' data -----------------------------------------------------
     hist(year_data[Elevat < DARK_ELEV, DIR_wpsm],
@@ -207,6 +224,7 @@ for (YYYY in sort(years_to_do)) {
          main = paste(YYYY, "DNI SD, Elevat <", 0, "°"),
          xlab = "",
          ylab = "[Watt/m^2]" )
+    abline(h = CHP1_MAXSDnightLIM, col = "red", lty = 3)
     cat('\n\n')
 
 
@@ -242,6 +260,7 @@ for (YYYY in sort(years_to_do)) {
          ylab = "[Watt/m^2]" )
     cat('\n\n')
 
+
     ## Scatter points by date --------------------------------------------------
     plot(year_data$Date, year_data$DIR_wpsm,
          pch  = 19,
@@ -251,7 +270,6 @@ for (YYYY in sort(years_to_do)) {
          ylab = "[Watt/m^2]" )
     cat('\n\n')
 
-
     plot(year_data$Azimuth, year_data$HOR_wpsm,
          pch  = 19,
          cex  = .1,
@@ -259,6 +277,7 @@ for (YYYY in sort(years_to_do)) {
          xlab = "Azimuth [°]",
          ylab = "[Watt/m^2]" )
     cat('\n\n')
+
 
     ## Scatter points by date --------------------------------------------------
     plot(year_data$Date, year_data$HOR_wpsm,
@@ -341,6 +360,7 @@ for (YYYY in sort(years_to_do)) {
     cat(pander(summary(year_data[, .(Date, SZA, DIR_wpsm, DIR_SD_wpsm, HOR_wpsm, HOR_SD_wpsm, chp1_temperature)])))
     cat('\n\n\\normalsize\n\n')
 
+
     ## Temperature data --------------------------------------------------------
     if (year_data[!is.na(chp1_temperature), .N] > 0) {
         cat("\n\n\\FloatBarrier\n\n")
@@ -371,9 +391,7 @@ for (YYYY in sort(years_to_do)) {
              xlab = "Elevation [°]",
              ylab = "CHP1 temperature SD [C]")
         cat('\n\n')
-
     }
-
 }
 
 
