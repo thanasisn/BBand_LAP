@@ -31,7 +31,7 @@ rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
 rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB.stopfile"
 
 info "Get data from Sirena"
-"$HOME/BBand_LAP/build_db/Get_data_from_sirena.sh"
+"$HOME/BBand_LAP/tools/Get_data_from_sirena.sh"
 
 info "Build the main database"
 "$HOME/BBand_LAP/build_db/Build_BB_DB.R"
