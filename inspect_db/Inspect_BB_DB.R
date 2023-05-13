@@ -16,6 +16,7 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 library(rmarkdown, warn.conflicts = TRUE, quietly = TRUE)
 
+cat("\n\nwrite it in sheel to parallelize\n\n")
 
 
 try({
