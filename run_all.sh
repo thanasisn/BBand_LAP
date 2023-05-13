@@ -13,7 +13,7 @@ info "START :: $0 :: $* ::"
 
 
 info "Get data from Sirena"
-"$HOME/BBand_LAP/build_db/Get_data_from_sirena.sh"
+"$HOME/BBand_LAP/tools/Get_data_from_sirena.sh"
 
 info "Build the main database"
 "$HOME/BBand_LAP/build_db/Build_BB_DB.R"
