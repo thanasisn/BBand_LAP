@@ -40,17 +40,17 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
+library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
-library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
 
 #### ~ ~ ~ ~ USE A TEST DB ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ####
-TEST_DB <- TRUE
+TEST_DB <- FALSE
 if (TEST_DB) {
     source("~/BBand_LAP/DEFINITIONS.R")
     cat("\n * * * Using a temp DB * * * \n\n")
@@ -125,7 +125,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         partfile <- paste0(filedir, "/part-0.parquet")
         ## init data collector
         if (file.exists(partfile)) {
-            cat("06 Load: ", partfile, "\n")
+            # cat("06 Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## add columns for this set
             var <- "year"
@@ -155,7 +155,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
                              by         = "min")
 
             ## __  Read LAP file  --------------------------------------------------
-            lap   <- fread(ss$fullname, na.strings = "-9")
+            lap    <- fread(ss$fullname, na.strings = "-9")
             lap$V1 <- as.numeric(lap$V1)
             lap$V2 <- as.numeric(lap$V2)
             stopifnot(is.numeric(lap$V1))
@@ -191,6 +191,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         setorder(gather, Date)
 
         ## store this month / set data
+        cat("06 Save: ", partfile, "\n")
         write_parquet(gather,  partfile)
         write_parquet(BB_meta, DB_META_fl)
         rm(gather, gathermeta, submonth)
