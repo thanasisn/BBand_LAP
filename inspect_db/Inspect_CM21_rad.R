@@ -56,11 +56,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -172,12 +172,26 @@ for (YYYY in sort(years_to_do)) {
         cat('\n\n')
     }
 
+    dark_test <- year_data[Elevat < 0 & GLB_SD_wpsm > CM21_MAXSDnightLIM ]
+    if (nrow(dark_test) > 0) {
+        cat("\n### Night radiation SD outlier days\n\n")
+        cat(
+            pander(
+                dark_test[, .(Min_GLB_SD = min(GLB_SD_wpsm, na.rm = TRUE),
+                              Max_GLB_SD = max(GLB_SD_wpsm, na.rm = TRUE)),
+                          by = as.Date(Date)]
+            )
+        )
+        cat('\n\n')
+    }
+
+
     ## Plot of 'Dark' data -----------------------------------------------------
     hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
          main = paste(YYYY, "GHI Elevat <", DARK_ELEV, "°"),
          breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
-    abline(v = CHP1_MAXnightLIM, col = "red", lty = 3)
-    abline(v = CHP1_MINnightLIM, col = "red", lty = 3)
+    abline(v = CM21_MAXnightLIM, col = "red", lty = 3)
+    abline(v = CM21_MINnightLIM, col = "red", lty = 3)
     cat('\n\n')
 
     plot(year_data[Elevat < DARK_ELEV, GLB_wpsm, Date],
@@ -186,8 +200,8 @@ for (YYYY in sort(years_to_do)) {
          main = paste(YYYY, "GHI, Elevat <", DARK_ELEV, "°"),
          xlab = "",
          ylab = "[Watt/m^2]" )
-    abline(h = CHP1_MAXnightLIM, col = "red", lty = 3)
-    abline(h = CHP1_MINnightLIM, col = "red", lty = 3)
+    abline(h = CM21_MAXnightLIM, col = "red", lty = 3)
+    abline(h = CM21_MINnightLIM, col = "red", lty = 3)
     cat('\n\n')
 
 
@@ -206,6 +220,7 @@ for (YYYY in sort(years_to_do)) {
          main = paste(YYYY, "GHI SD, Elevat <", 0, "°"),
          xlab = "",
          ylab = "[Watt/m^2]" )
+    abline(h = CM21_MAXSDnightLIM, col = "red", lty = 3)
     cat('\n\n')
 
 
@@ -240,6 +255,7 @@ for (YYYY in sort(years_to_do)) {
          xlab = "Azimuth [°]",
          ylab = "[Watt/m^2]" )
     cat('\n\n')
+
 
     ## Scatter points by date --------------------------------------------------
     plot(year_data$Date, year_data$GLB_wpsm,
