@@ -47,7 +47,7 @@ source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
@@ -240,14 +240,16 @@ filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 todosets <- unique(rbind(
     BB_meta[is.na(chp1_bad_data_flagged)                   |
                 chp1_bad_data_flagged < chp1_exclude_mtime |
-                chp1_bad_data_flagged < chp1_temp_exclude_mtime,
+                chp1_bad_temp_flagged < chp1_temp_exclude_mtime,
             .(month = month(day), year = year(day))],
     BB_meta[is.na(cm21_bad_data_flagged) |
                 cm21_bad_data_flagged < cm21_exclude_mtime,
             .(month = month(day), year = year(day))]
 ))
 
-
+range(BB_meta$cm21_bad_data_flagged)
+range(BB_meta$chp1_bad_data_flagged)
+range(BB_meta$chp1_bad_temp_flagged)
 
 
 ## select what to touch
@@ -340,6 +342,8 @@ for (af in na.omit(filelist$names)) {
     BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime     ]
     BB_meta[day %in% chg_days, chp1_bad_temp_flagged := chp1_temp_exclude_mtime]
     BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime     ]
+
+    stop()
     ## store actual data
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
@@ -366,7 +370,7 @@ for (acol in wecare) {
 
 
 
-myunlock(DB_lock)
+# myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
