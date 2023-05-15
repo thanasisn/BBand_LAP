@@ -134,25 +134,36 @@ for (YYYY in unique(year(inp_filelist$day))) {
         step_temp <- fread(ss$fullname, na.strings = "None")
         names(step_temp)[names(step_temp) == "V1"] <- "Date"
         names(step_temp)[names(step_temp) == "V2"] <- "Axis"
-        names(step_temp)[names(step_temp) == "V3"] <- "AxisNum"
-        names(step_temp)[names(step_temp) == "V4"] <- "AxisStep"
-        names(step_temp)[names(step_temp) == "V5"] <- "SunAngle"
+        names(step_temp)[names(step_temp) == "V3"] <- "Num"
+        names(step_temp)[names(step_temp) == "V4"] <- "Step"
+        names(step_temp)[names(step_temp) == "V5"] <- "Sun"
         names(step_temp)[names(step_temp) == "V6"] <- "StepsTaken"
-        names(step_temp)[names(step_temp) == "V7"] <- "TrackerAngle"
+        names(step_temp)[names(step_temp) == "V7"] <- "Tracker"
+
+        ## reshape data
+        step_temp$Num <- NULL
+        step_temp[Axis == "a", Axis := "Azim"]
+        step_temp[Axis == "z", Axis := "Elev"]
+
+        dt_azim      <- step_temp[Axis == "Azim"]
+        dt_elev      <- step_temp[Axis == "Elev"]
+        dt_azim$Axis <- NULL
+        dt_elev$Axis <- NULL
+
+
+        wecare <- grep("Date|Taken", names(dt_azim), value = TRUE, ignore.case = TRUE, invert = TRUE)
+
+        for (av in wecare) {
+            names(dt_azim)[names(dt_azim) == av] <- paste0(av, "_Azim")
+            names(dt_elev)[names(dt_elev) == av] <- paste0(av, "_Elev")
+        }
+
+        step_temp <- merge(dt_azim, dt_elev, all = TRUE)
         step_temp[, year  := year( Date)]
         step_temp[, month := month(Date)]
         step_temp[, doy   := yday( Date)]
 
-        ## reshape data
-        ##
-        step_temp
 
-        reshape(step_temp, idvar = "Date", direction = "wide")
-        melt(step_temp, id.vars = "Date", measure.vars = "Axis")
-        melt(step_temp, id = "Date")
-        mel t(step_temp, id.vars = c("Date","SunAngle"), measure.vars = c("Axis"))
-
-        stop()
         ## Get metadata for steps file  ----------------------------------------
         step_meta <- data.table(day            = as_date(ad),
                                 Steps_basename = basename(ss$fullname),
@@ -160,9 +171,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
                                 Steps_parsed   = Sys.time())
 
         ## Init DB variables for next processes --------------------------------
-        step_temp[, Async_basename := as.character(NA)]
-        step_temp[, Async_mtime    := as.POSIXct(NA)  ]
-        step_temp[, Async_parsed   := as.POSIXct(NA)  ]
+        step_temp[, Async_step_count   := as.integer(NA)]
+        step_temp[, Async_tracker_flag := TRUE          ]
 
         ## gather data
         if (nrow(gather) == 0) {
@@ -174,6 +184,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
         gathermeta <- rbind(gathermeta, step_meta)
         rm(step_temp, step_meta, ss)
     }
+
+    step_temp[step_temp$Date %in% gather$Date ]
 
 
     BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
