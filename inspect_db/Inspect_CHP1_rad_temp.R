@@ -194,7 +194,7 @@ for (YYYY in sort(years_to_do)) {
     if (nrow(offend) > 0) {
         cat("\n### outlier days\n\n")
         cat(pander(
-            offend[, .(Max = max(V1), Min = min(V1)), by = as.Date(Date) ]
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
         ))
         cat('\n\n')
     }
@@ -224,7 +224,7 @@ for (YYYY in sort(years_to_do)) {
     if (nrow(offend) > 0) {
         cat("\n### outlier days\n\n")
         cat(pander(
-            offend[, .(Max = max(V1), Min = min(V1)), by = as.Date(Date) ]
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
         ))
         cat('\n\n')
     }
@@ -254,7 +254,7 @@ for (YYYY in sort(years_to_do)) {
     if (nrow(offend) > 0) {
         cat("\n### outlier days\n\n")
         cat(pander(
-            offend[, .(Max = max(V1), Min = min(V1)), by = as.Date(Date) ]
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
         ))
         cat('\n\n')
     }
@@ -285,7 +285,7 @@ for (YYYY in sort(years_to_do)) {
     if (nrow(offend) > 0) {
         cat("\n### outlier days\n\n")
         cat(pander(
-            offend[, .(Max = max(V1), Min = min(V1)), by = as.Date(Date) ]
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
         ))
         cat('\n\n')
     }
