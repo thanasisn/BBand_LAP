@@ -133,8 +133,9 @@ for (YYYY in unique(year(inp_filelist$day))) {
         step_temp <- fread(ss$fullname, na.strings = "None")
     stop()
         names(step_temp)[names(step_temp) == "V1"] <- "Date"
-        names(step_temp)[names(step_temp) == "AZIM"] <- "Azimuth"
-        names(step_temp)[names(step_temp) == "ELEV"] <- "Elevat"
+        names(step_temp)[names(step_temp) == "V2"] <- "Axis"
+        names(step_temp)[names(step_temp) == "V3"] <- "AxisNum"
+        names(step_temp)[names(step_temp) == "V3"] <- "AxisNum"
         step_temp[, DIST  := NULL]
         step_temp[, SZA   := 90 - Elevat]
         step_temp[, year  := year( Date)]
@@ -210,6 +211,37 @@ for (YYYY in unique(year(inp_filelist$day))) {
 rm(subyear)
 
 rm(inp_filelist)
+
+
+
+
+
+
+
+
+# ## Sycfile deffinition
+#
+# str(now)
+# str(step)
+# str(response)
+# str(az_count)
+# str(freq_az)
+# str(freq_main)
+# with open(SYNCFILE, "a+") as myfile:
+#     myfile.write(text)
+#
+#
+#
+# ## Step file definition
+#
+# if response == step:
+# str(now)
+#  \ta
+#  \t1\t" + \
+# str(step) + "\t" + \
+# str(sun_azimuth) + "\t" + \
+# str(az_count) + "\t" + \
+# str(tracker_azi_ang) + "\n"
 
 
 
