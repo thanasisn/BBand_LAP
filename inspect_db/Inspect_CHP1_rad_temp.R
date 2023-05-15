@@ -190,6 +190,15 @@ for (YYYY in sort(years_to_do)) {
     }
 
 
+    ## Dynamic outliers ----
+    names(year_data)
+
+    vars <- c("CM21_sig", "CM21_sig_sd")
+
+
+
+    stop()
+
     ## Plot of 'Dark' data -----------------------------------------------------
     hist(year_data[Elevat < DARK_ELEV, DIR_wpsm],
          main = paste(YYYY, "DNI Elevat <", DARK_ELEV, "°"),
