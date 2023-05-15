@@ -140,6 +140,18 @@ missingTOT <- missingTOT[, .(Min_date = min(Date),
 #'
 #+ include=TRUE, echo=FALSE
 
+
+plot(missingGLB$Day, missingGLB$N,
+     pch = 19,
+     cex = 0.3)
+
+plot(missingTOT$Day, missingTOT$N,
+     pch = 19,
+     cex = 0.3)
+
+
+
+
 #' ### Missing GLB by date
 #+ include=TRUE, echo=FALSE
 pander(
@@ -171,13 +183,61 @@ pander(
     caption = "Days with missing TOT but not Global"
 )
 
-plot(missingGLB$Day, missingGLB$N,
-     pch = 19,
-     cex = 0.3)
 
-plot(missingTOT$Day, missingTOT$N,
-     pch = 19,
-     cex = 0.3)
+
+datayears <- BB |>
+    filter(!is.na(GLB_wpsm) | !is.na(tot_glb) ) |>
+    select(year) |>
+    unique()     |>
+    collect()    |>
+    pull()
+
+
+#+ include=TRUE, echo=FALSE, results="asis"
+for (YYYY in sort(datayears)) {
+    days_of_year <- seq.Date(as.Date(paste0(YYYY, "-01-01")),
+                             as.Date(paste0(YYYY, "-12-31")), by = "day")
+    ## don't go to the future
+    days_of_year <- days_of_year[days_of_year <= Sys.Date()]
+
+    cat("\n\n\\FloatBarrier\n\n")
+    cat("\\newpage\n\n")
+    cat("\n## Year:", YYYY, "\n\n")
+
+    ## load data for year
+    year_data <- data.table(
+        BB |>
+            filter(year == YYYY) |>
+            select(GLB_wpsm, tot_glb, Elevat, Date, SZA) |>
+        collect()
+    )
+
+    sun_up   <- year_data[Elevat > 0]
+    sun_down <- year_data[Elevat < 0]
+
+    plot(sun_up[, tot_glb - GLB_wpsm, Date],
+         main = "tot_glb - GLB_wpsm  Elevation>0")
+
+    plot(sun_up[, tot_glb / GLB_wpsm, Date],
+         main = "tot_glb / GLB_wpsm  Elevation>0")
+
+    plot(sun_up[, (GLB_wpsm - tot_glb) / tot_glb, Date],
+         main = "(GLB_wpsm - tot_glb) / tot_glb  Elevation>0")
+
+    plot(sun_down[, tot_glb - GLB_wpsm, Date],
+         main = "tot_glb - GLB_wpsm  Elevation<0")
+
+    plot(sun_down[, tot_glb / GLB_wpsm, Date],
+         main = "tot_glb / GLB_wpsm  Elevation<0")
+
+    plot(sun_down[, (GLB_wpsm - tot_glb) / tot_glb, Date],
+         main = "(GLB_wpsm - tot_glb) / tot_glb  Elevation<0")
+
+
+
+}
+
+
 
 
 
