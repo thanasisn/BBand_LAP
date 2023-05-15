@@ -119,36 +119,65 @@ missingTOT <- data.table(
         select(Date) |> collect())
 
 
+missingGLB <- missingGLB[, .(Min_date = min(Date),
+                             Max_date = max(Date),
+                             N = .N),
+                         by = .(Day = as.Date(Date))]
 
 
-
+missingTOT <- missingTOT[, .(Min_date = min(Date),
+                             Max_date = max(Date),
+                             N = .N),
+                         by = .(Day = as.Date(Date))]
 
 
 #'
 #' ## Tables of omitted data
 #'
+#' There are `r sum(missingGLB$N)` missing GLB values but not TOT.
+#'
+#' There are `r sum(missingTOT$N)` missing TOT values but not GLB.
+#'
 #+ include=TRUE, echo=FALSE
 
-#' ### Missing GL
+#' ### Missing GLB by date
+#+ include=TRUE, echo=FALSE
 pander(
-    missingGLB[, .(Min_date = min(Date),
-                   Max_date = max(Date),
-                   N = .N), by = as.Date(Date)],
+    missingGLB,
+    caption = "Days with missing Global but not TOT"
+)
+
+setorder(missingGLB, -N)
+#' ### Missing GLB by N
+#+ include=TRUE, echo=FALSE
+pander(
+    missingGLB,
     caption = "Days with missing Global but not TOT"
 )
 
 
-#' ### Missing TOT
+#' ### Missing TOT by date
+#+ include=TRUE, echo=FALSE
 pander(
-    missingTOT[, .(Min_date = min(Date),
-                   Max_date = max(Date),
-                   N = .N), by = as.Date(Date)],
+    missingTOT,
     caption = "Days with missing TOT but not Global"
 )
 
+setorder(missingTOT, -N)
+#' ### Missing TOT by N
+#+ include=TRUE, echo=FALSE
+pander(
+    missingTOT,
+    caption = "Days with missing TOT but not Global"
+)
 
+plot(missingGLB$Day, missingGLB$N,
+     pch = 19,
+     cex = 0.3)
 
-
+plot(missingTOT$Day, missingTOT$N,
+     pch = 19,
+     cex = 0.3)
 
 
 
