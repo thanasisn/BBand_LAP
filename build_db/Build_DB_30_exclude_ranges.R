@@ -47,7 +47,7 @@ source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
@@ -187,11 +187,6 @@ cat('\n\n\\footnotesize\n\n')
 pander(data.table(table(ranges_CM21$Comment)))
 cat('\n\n')
 cat('\n\n\\normalsize\n\n')
-
-
-
-# ##  Load data just to check the columns
-# BB <- opendata()
 
 
 
@@ -343,7 +338,6 @@ for (af in na.omit(filelist$names)) {
     BB_meta[day %in% chg_days, chp1_bad_temp_flagged := chp1_temp_exclude_mtime]
     BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime     ]
 
-    stop()
     ## store actual data
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
@@ -370,7 +364,7 @@ for (acol in wecare) {
 
 
 
-# myunlock(DB_lock)
+myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
