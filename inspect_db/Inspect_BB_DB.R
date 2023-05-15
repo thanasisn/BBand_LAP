@@ -103,5 +103,15 @@ try({
 
 
 
+try({
+    cat("\n\n 9. Inspect CM-21 radiation\n")
+    render(input       = "~/BBand_LAP/inspect_db/Inspect_TOT_GLB.R",
+                output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+})
+
+
+
+
+
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
