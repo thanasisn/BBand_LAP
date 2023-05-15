@@ -150,7 +150,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         reshape(step_temp, idvar = "Date", direction = "wide")
         melt(step_temp, id.vars = "Date", measure.vars = "Axis")
         melt(step_temp, id = "Date")
-        melt(step_temp, id.vars = c("Date","SunAngle"), measure.vars = c("Axis"))
+        mel t(step_temp, id.vars = c("Date","SunAngle"), measure.vars = c("Axis"))
 
         stop()
         ## Get metadata for steps file  ----------------------------------------
