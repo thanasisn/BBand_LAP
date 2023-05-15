@@ -21,11 +21,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -50,9 +50,9 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
-DB_Steps_META_fl <- "~/DATA/Broad_Band/CHP1_Tracker_steps.parquet"
+DB_Steps_META_fl <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB_metadata.parquet"
 trSTP_DIR        <- "~/DATA_RAW/tracker_chp1/Tracker_STEP/"
-DB_Steps_DIR     <- "~/DATA/Broad_Band/CHP1_Tracker_steps/"
+DB_Steps_DIR     <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB/"
 
 cat("\n Initialize DB and import  Tracker steps files\n\n")
 
@@ -129,62 +129,38 @@ for (YYYY in unique(year(inp_filelist$day))) {
     gathermeta <- data.table()
     for (ad in subyear$day) {
         ss <- subyear[day == ad]
-        ## Read sun data file  ---------------------------------------------
+
+        ## Read sun data file  -------------------------------------------------
         step_temp <- fread(ss$fullname, na.strings = "None")
-    stop()
         names(step_temp)[names(step_temp) == "V1"] <- "Date"
         names(step_temp)[names(step_temp) == "V2"] <- "Axis"
         names(step_temp)[names(step_temp) == "V3"] <- "AxisNum"
-        names(step_temp)[names(step_temp) == "V3"] <- "AxisNum"
-        step_temp[, DIST  := NULL]
-        step_temp[, SZA   := 90 - Elevat]
+        names(step_temp)[names(step_temp) == "V4"] <- "AxisStep"
+        names(step_temp)[names(step_temp) == "V5"] <- "SunAngle"
+        names(step_temp)[names(step_temp) == "V6"] <- "StepsTaken"
+        names(step_temp)[names(step_temp) == "V7"] <- "TrackerAngle"
         step_temp[, year  := year( Date)]
         step_temp[, month := month(Date)]
         step_temp[, doy   := yday( Date)]
 
-        ## Get metadata for each sun file ----------------------------------
-        sun_meta <- data.table(day              = as_date(ad),
-                               pysolar_basename = basename(ss$fullname),
-                               pysolar_mtime    = file.mtime(ss$fullname),
-                               pysolar_parsed   = Sys.time())
+        ## reshape data
+        ##
+        step_temp
 
-        ## Here we can init more variables of the database -----------------
-        step_temp[Azimuth <= 180, preNoon := TRUE ]
-        step_temp[Azimuth >  180, preNoon := FALSE]
+        reshape(step_temp, idvar = "Date", direction = "wide")
+        melt(step_temp, id.vars = "Date", measure.vars = "Axis")
 
-        ## Init DB variables for next processes ----------------------------
-        ## For CM-21
-        step_temp[, CM21_sig                := as.numeric(NA)  ]
-        step_temp[, CM21_sig_sd             := as.numeric(NA)  ]
-        step_temp[, CM21_sig_wo_dark        := as.numeric(NA)  ]
-        step_temp[, cm21_bad_data_flag      := as.character(NA)]
-        ## For INCLINED CM-21
-        step_temp[, CM21INC_sig             := as.numeric(NA)  ]
-        step_temp[, CM21INC_sig_sd          := as.numeric(NA)  ]
-        step_temp[, CM21INC_sig_wo_dark     := as.numeric(NA)  ]
-        step_temp[, cm21INC_bad_data_flag   := as.character(NA)]
-        ## For CHP-1
-        step_temp[, Async_step_count        := as.integer(NA)  ]
-        step_temp[, Async_tracker_flag      := TRUE            ]
-        step_temp[, CHP1_sig                := as.numeric(NA)  ]
-        step_temp[, CHP1_sig_sd             := as.numeric(NA)  ]
-        step_temp[, CHP1_sig_wo_dark        := as.numeric(NA)  ]
-        step_temp[, chp1_R_SD_therm         := as.numeric(NA)  ]
-        step_temp[, chp1_R_meas_ERR         := as.numeric(NA)  ]
-        step_temp[, chp1_R_therm            := as.numeric(NA)  ]
-        step_temp[, chp1_bad_data_flag      := as.character(NA)]
-        step_temp[, chp1_bad_temp_flag      := as.character(NA)]
-        step_temp[, chp1_t_cor_factor       := as.numeric(NA)  ]
-        step_temp[, chp1_temp_UNC           := as.numeric(NA)  ]
-        step_temp[, chp1_temperature        := as.numeric(NA)  ]
-        step_temp[, chp1_temperature_SD     := as.numeric(NA)  ]
-        step_temp[, Sun_Dist_Astropy        := as.numeric(NA)  ]
-        step_temp[, TSI_TOA                 := as.numeric(NA)  ]
-        step_temp[, TSI_1au                 := as.numeric(NA)  ]
-        step_temp[, TSI_source              := as.character(NA)]
-        ## Pressure
-        step_temp[, Pressure                := as.numeric(NA)  ]
-        step_temp[, Pressure_source         := as.character(NA)]
+        stop()
+        ## Get metadata for steps file  ----------------------------------------
+        step_meta <- data.table(day            = as_date(ad),
+                                Steps_basename = basename(ss$fullname),
+                                Steps_mtime    = file.mtime(ss$fullname),
+                                Steps_parsed   = Sys.time())
+
+        ## Init DB variables for next processes --------------------------------
+        step_temp[, Async_basename := as.character(NA)]
+        step_temp[, Async_mtime    := as.POSIXct(NA)  ]
+        step_temp[, Async_parsed   := as.POSIXct(NA)  ]
 
         ## gather data
         if (nrow(gather) == 0) {
@@ -193,29 +169,21 @@ for (YYYY in unique(year(inp_filelist$day))) {
         } else {
             gather     <- rows_upsert(gather, step_temp, by = "Date")
         }
-        gathermeta <- rbind(gathermeta, sun_meta)
-        rm(step_temp, sun_meta, ss)
+        gathermeta <- rbind(gathermeta, step_meta)
+        rm(step_temp, step_meta, ss)
     }
 
 
-    stop()
     BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
 
     setorder(gather, Date)
 
     ## store this month / set data
     write_parquet(gather,  partfile)
-    write_parquet(BB_meta, DB_META_fl)
+    write_parquet(BB_meta, DB_Steps_META_fl)
     rm(gather, gathermeta, submonth)
 }
-rm(subyear)
-
-rm(inp_filelist)
-
-
-
-
-
+rm(subyear, inp_filelist)
 
 
 
@@ -227,8 +195,6 @@ rm(inp_filelist)
 # str(az_count)
 # str(freq_az)
 # str(freq_main)
-# with open(SYNCFILE, "a+") as myfile:
-#     myfile.write(text)
 #
 #
 #
