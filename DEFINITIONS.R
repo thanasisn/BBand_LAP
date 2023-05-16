@@ -12,11 +12,13 @@ SIRENA_DIR   <- "~/DATA_RAW/Bband/CHP1_lap.DIR/"
 SIRENA_GLB   <- "~/DATA_RAW/Bband/AC21_LAP.GLB/"
 SIRENA_INC   <- "~/DATA_RAW/Bband/CM21_LAP.INC/"
 trSYNC_DIR   <- "~/DATA_RAW/tracker_chp1/tracker_SYNC"
+trSTEP_DIR           <- "~/DATA_RAW/tracker_chp1/Tracker_STEP/"
 CHPTMP_DIR   <- "~/DATA_RAW/tracker_chp1/Tracker_THERM"
 SIRENA_TOT   <- "~/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
 RADMON_DIR   <- "~/DATA_RAW/Raddata/3"
 RADMON_GLB   <- "~/DATA_RAW/Raddata/6"
-RADMON_INC   <- "~/DATA_RAW/Raddata/6"
+RADMON_INC   <- "~/DATA_RAW/Raddata/1"
+
 
 
 ##  Other data input  ----------------------------------------------------------
@@ -32,15 +34,17 @@ CHP1_TEMP_EX <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CHP1_Temp.dat"
 
 
 ##  DB specifications  ---------------------------------------------------------
-DB_DIR        <- "~/DATA/Broad_Band/Broad_Band_DB"
-DB_lock       <- "~/DATA/Broad_Band/Broad_Band_DB.stopfile"
-DB_META_fl    <- "~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet" ## Always append to this file
-DB_HASH_fl    <- "~/DATA_RAW/Bband/Broad_Band_DB_hash_table.parquet"
-DB_start_date <- as.Date("1993-01-01")   ## ~ start in 1993-04-19??
-# DB_start_date <- as.Date("2016-01-01")   ## ~ start of chp1
-# DB_start_date <- as.Date("2022-01-01")   ##  For testing
-DB_compress_codec <- "lz4"
-DB_compress_level <- 8
+DB_DIR              <- "~/DATA/Broad_Band/Broad_Band_DB"
+DB_META_fl          <- "~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
+DB_Steps_DIR        <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB/"
+DB_Steps_META_fl    <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB_metadata.parquet"
+DB_Steps_lock       <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB.stopfile"
+DB_lock             <- "~/DATA/Broad_Band/Broad_Band_DB.stopfile"
+DB_HASH_fl          <- "~/DATA_RAW/Bband/Broad_Band_DB_hash_table.parquet"  ## Always append to this file
+DB_start_date       <- as.Date("1993-01-01")   ## ~ start in 1993-04-19??
+DB_Steps_start_date <- as.Date("2016-04-01")
+DB_compress_codec   <- "lz4"
+DB_compress_level   <- 8
 
 
 ## __ DB test paths  -----------------------------------------------------------
