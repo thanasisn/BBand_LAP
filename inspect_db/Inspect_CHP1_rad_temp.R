@@ -163,7 +163,6 @@ for (YYYY in sort(years_to_do)) {
     #' and corrected with exclusions to protect the dark signal calculation.
     #'
 
-
     ## Dynamic outliers ----
     OutliersUP   <- 3.5
     OutliersDOWN <- 4.5
@@ -192,7 +191,7 @@ for (YYYY in sort(years_to_do)) {
     offend <- ppD[ V1 > pplims$upe | V1 < pplims$low ]
 
     if (nrow(offend) > 0) {
-        cat("\n### outlier days\n\n")
+        cat("\n### Dark outlier days\n\n")
         cat(pander(
             offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
         ))
@@ -222,7 +221,7 @@ for (YYYY in sort(years_to_do)) {
     offend <- ppD[ V1 > pplims$upe | V1 < pplims$low ]
 
     if (nrow(offend) > 0) {
-        cat("\n### outlier days\n\n")
+        cat("\n### Dark SD outlier days\n\n")
         cat(pander(
             offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
         ))
@@ -252,7 +251,7 @@ for (YYYY in sort(years_to_do)) {
     offend <- ppD[ V1 > pplims$upe | V1 < pplims$low ]
 
     if (nrow(offend) > 0) {
-        cat("\n### outlier days\n\n")
+        cat("\n### Night outlier days\n\n")
         cat(pander(
             offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
         ))
@@ -283,7 +282,7 @@ for (YYYY in sort(years_to_do)) {
     offend <- ppD[ V1 > pplims$upe | V1 < pplims$low ]
 
     if (nrow(offend) > 0) {
-        cat("\n### outlier days\n\n")
+        cat("\n### Night SD outlier days\n\n")
         cat(pander(
             offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
         ))
