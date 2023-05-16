@@ -156,53 +156,147 @@ for (YYYY in sort(years_to_do)) {
 
 
     ## Check for night time extreme values -------------------------------------
-    dark_test <- year_data[Elevat < DARK_ELEV &
-                               (GLB_wpsm < CM21_MINnightLIM |
-                                    GLB_wpsm > CM21_MAXnightLIM)]
+    #'
+    #' Problems in the night signal especially bellow DARK_ELEV can be spotted
+    #' and corrected with exclusions to protect the dark signal calculation.
+    #'
 
-    if (nrow(dark_test) > 0) {
-        cat("\n### Night radiation outlier days\n\n")
-        cat(
-            pander(
-                dark_test[, .(Min_GLB = min(GLB_wpsm, na.rm = TRUE),
-                              Max_GLB = max(GLB_wpsm, na.rm = TRUE)),
-                          by = as.Date(Date)]
-            )
-        )
-        cat('\n\n')
-    }
-
-    dark_test <- year_data[Elevat < 0 & GLB_SD_wpsm > CM21_MAXSDnightLIM ]
-    if (nrow(dark_test) > 0) {
-        cat("\n### Night radiation SD outlier days\n\n")
-        cat(
-            pander(
-                dark_test[, .(Min_GLB_SD = min(GLB_SD_wpsm, na.rm = TRUE),
-                              Max_GLB_SD = max(GLB_SD_wpsm, na.rm = TRUE)),
-                          by = as.Date(Date)]
-            )
-        )
-        cat('\n\n')
-    }
+    ## Dynamic outliers ----
+    OutliersUP   <- 3.5
+    OutliersDOWN <- 4.5
 
 
-    ## Plot of 'Dark' data -----------------------------------------------------
-    hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
-         main = paste(YYYY, "GHI Elevat <", DARK_ELEV, "°"),
-         breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
-    abline(v = CM21_MAXnightLIM, col = "red", lty = 3)
-    abline(v = CM21_MINnightLIM, col = "red", lty = 3)
-    cat('\n\n')
+    ## Dark data Global --------------------------------------------------------
+    av  <- "GLB_wpsm"
+    ppD <- data.table(year_data[Elevat < DARK_ELEV, get(av), Date])
+    pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
+                    dmax = max(V1, na.rm = T)),
+                by = as.Date(Date)]
+    low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
+    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP   * sd(dmax)]
+    pplims <- data.table(av = av,low = low, upe = upe)
 
-    plot(year_data[Elevat < DARK_ELEV, GLB_wpsm, Date],
+    plot(ppD,
          pch  = 19,
          cex  = .1,
-         main = paste(YYYY, "GHI, Elevat <", DARK_ELEV, "°"),
+         main = paste(YYYY, av, ", Elevat <", DARK_ELEV, "°"),
          xlab = "",
-         ylab = "[Watt/m^2]" )
-    abline(h = CM21_MAXnightLIM, col = "red", lty = 3)
-    abline(h = CM21_MINnightLIM, col = "red", lty = 3)
+         ylab = "[Watt/m^2]")
+    abline(h = pplims$low, col = "red", lty = 3)
+    abline(h = pplims$upe, col = "red", lty = 3)
     cat('\n\n')
+
+    offend <- ppD[ V1 > pplims$upe | V1 < pplims$low ]
+
+    if (nrow(offend) > 0) {
+        cat("\n### Dark outlier days\n\n")
+        cat(pander(
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
+        ))
+        cat('\n\n')
+    }
+
+    ## Dark data Global SD -----------------------------------------------------
+    av  <- "GLB_SD_wpsm"
+    ppD <- data.table(year_data[Elevat < DARK_ELEV, get(av), Date])
+    pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
+                    dmax = max(V1, na.rm = T)),
+                by = as.Date(Date)]
+    low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
+    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP * sd(dmax)]
+    pplims <- data.table(av = av,low = low, upe = upe)
+
+    plot(ppD,
+         pch  = 19,
+         cex  = .1,
+         main = paste(YYYY, av, ", Elevat <", DARK_ELEV, "°"),
+         xlab = "",
+         ylab = "[Watt/m^2]")
+    abline(h = pplims$low, col = "red", lty = 3)
+    abline(h = pplims$upe, col = "red", lty = 3)
+    cat('\n\n')
+
+    offend <- ppD[ V1 > pplims$upe | V1 < pplims$low ]
+
+    if (nrow(offend) > 0) {
+        cat("\n### Dark SD outlier days\n\n")
+        cat(pander(
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
+        ))
+        cat('\n\n')
+    }
+
+
+    ## Night data Global -------------------------------------------------------
+    av  <- "GLB_wpsm"
+    ppD <- data.table(year_data[Elevat < 0, get(av), Date])
+    pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
+                    dmax = max(V1, na.rm = T)),
+                by = as.Date(Date)]
+    low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
+    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP * sd(dmax)]
+    pplims <- data.table(av = av,low = low, upe = upe)
+
+    plot(ppD,
+         pch  = 19,
+         cex  = .1,
+         main = paste(YYYY, av, ", Elevat <", 0, "°"),
+         xlab = "",
+         ylab = "[Watt/m^2]")
+    abline(h = pplims$low, col = "red", lty = 3)
+    abline(h = pplims$upe, col = "red", lty = 3)
+    cat('\n\n')
+
+    offend <- ppD[ V1 > pplims$upe | V1 < pplims$low ]
+
+    if (nrow(offend) > 0) {
+        cat("\n### Night outlier days\n\n")
+        cat(pander(
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
+        ))
+        cat('\n\n')
+    }
+
+
+    ## Night data Global SD ----------------------------------------------------
+    av  <- "GLB_SD_wpsm"
+    ppD <- data.table(year_data[Elevat < 0, get(av), Date])
+    pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
+                    dmax = max(V1, na.rm = T)),
+                by = as.Date(Date)]
+    low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
+    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP * sd(dmax)]
+    pplims <- data.table(av = av,low = low, upe = upe)
+
+    plot(ppD,
+         pch  = 19,
+         cex  = .1,
+         main = paste(YYYY, av, ", Elevat <", 0, "°"),
+         xlab = "",
+         ylab = "[Watt/m^2]")
+    abline(h = pplims$low, col = "red", lty = 3)
+    abline(h = pplims$upe, col = "red", lty = 3)
+    cat('\n\n')
+
+    offend <- ppD[ V1 > pplims$upe | V1 < pplims$low ]
+
+    if (nrow(offend) > 0) {
+        cat("\n### Night SD outlier days\n\n")
+        cat(pander(
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
+        ))
+        cat('\n\n')
+    }
+
+
+
+    ## Distribution of direct and SD -------------------------------------------
+    # hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
+    #      main = paste(YYYY, "GHI Elevat <", DARK_ELEV, "°"),
+    #      breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
+    # abline(v = CM21_MAXnightLIM, col = "red", lty = 3)
+    # abline(v = CM21_MINnightLIM, col = "red", lty = 3)
+    # cat('\n\n')
 
 
     ## Plots of SD -------------------------------------------------------------
@@ -214,14 +308,6 @@ for (YYYY in sort(years_to_do)) {
          ylab = "[Watt/m^2]" )
     cat('\n\n')
 
-    plot(year_data[Elevat < 0, GLB_SD_wpsm, Date],
-         pch  = 19,
-         cex  = .1,
-         main = paste(YYYY, "GHI SD, Elevat <", 0, "°"),
-         xlab = "",
-         ylab = "[Watt/m^2]" )
-    abline(h = CM21_MAXSDnightLIM, col = "red", lty = 3)
-    cat('\n\n')
 
 
     ## Distribution of Global and SD -------------------------------------------
