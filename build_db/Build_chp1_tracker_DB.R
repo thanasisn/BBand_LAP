@@ -1,14 +1,10 @@
-#!/usr/bin/env Rscript
+#!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #'
-#' Read PySolar files `sun_path_.*.dat.gz`
+#' Read *.stp and *.snc  files
 #'
-#' This also initializes a lot of columns in the dataset and meta data.
-#'
-#' Populates:
-#'  - Date
-#'  - Azimuth
+#' This also initializes dataset and meta data for tracker.
 #'
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
@@ -31,7 +27,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
+Script.Name <- "~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -42,7 +38,7 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_Steps_lock)
+mylock(DB_Steps_lock)
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
@@ -268,7 +264,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
         cat("Skipping new rows data inport", partfile, "\n")
         next()
         ## This can work, but there is no need for it.
-        ## Sun script should initialize the DB rows.
     }
 
     ##  read this year files
@@ -368,7 +363,7 @@ ss[!is.na(Async_step_count)]
 sss <- ss[doy==327]
 
 
-# myunlock(DB_Steps_lock)
+myunlock(DB_Steps_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
