@@ -23,9 +23,14 @@ filesin <- list.files(trSTP_DIR,
 
 gather <- data.table()
 for (af in filesin) {
-    gather <- rbind(gather, fread(af))
+    tmp <- fread(af)
+    tmp$file <- af
+    gather <- rbind(gather, tmp)
 
 }
+
+any(duplicated(gather))
+any(duplicated(gather$Date))
 
 
 

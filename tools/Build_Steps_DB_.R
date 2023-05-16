@@ -50,9 +50,11 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
-DB_Steps_META_fl <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB_metadata.parquet"
-trSTP_DIR        <- "~/DATA_RAW/tracker_chp1/Tracker_STEP/"
-DB_Steps_DIR     <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB/"
+DB_Steps_META_fl    <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB_metadata.parquet"
+trSTP_DIR           <- "~/DATA_RAW/tracker_chp1/Tracker_STEP/"
+DB_Steps_DIR        <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB/"
+DB_Steps_start_date <- as_date("2016-04-01")
+
 
 cat("\n Initialize DB and import  Tracker steps files\n\n")
 
@@ -60,16 +62,16 @@ cat("\n Initialize DB and import  Tracker steps files\n\n")
 if (file.exists(DB_Steps_META_fl)) {
     BB_meta <- read_parquet(DB_Steps_META_fl)
     BB_meta <- merge(BB_meta,
-                     data.table(day = seq(from = min(max(BB_meta$day),        ## start of meta data table
-                                                     as_date(DB_start_date)), ## start of project
-                                          to   = (Sys.Date() - 1),            ## don't include today
+                     data.table(day = seq(from = min(max(BB_meta$day),     ## start of meta data table
+                                                     DB_Steps_start_date), ## start of project
+                                          to   = (Sys.Date() - 1),         ## don't include today
                                           by   = "day")),
                      by = "day",
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
 } else {
     warning("STARTING NEW DB!!")
-    BB_meta <- data.table(day = seq(as_date("2016-04-01"), Sys.Date(), by = "day"))
+    BB_meta <- data.table(day = seq(DB_Steps_start_date, Sys.Date(), by = "day"))
     ## For tracker step files
     BB_meta$Steps_basename     <- as.character(NA)
     BB_meta$Steps_mtime        <- as.POSIXct(NA)
@@ -173,20 +175,21 @@ for (YYYY in unique(year(inp_filelist$day))) {
         ## Init DB variables for next processes --------------------------------
         step_temp[, Async_step_count   := as.integer(NA)]
         step_temp[, Async_tracker_flag := TRUE          ]
+        step_temp <- unique(step_temp)
+
 
         ## gather data
         if (nrow(gather) == 0) {
             ## this inits the database table!!
             gather     <- as_tibble(step_temp)
         } else {
-            gather     <- rows_upsert(gather, step_temp, by = "Date")
+            ## Append allow duplicate dates!!!!!
+            gather     <- rows_append(gather, step_temp)
         }
+
         gathermeta <- rbind(gathermeta, step_meta)
         rm(step_temp, step_meta, ss)
     }
-
-    step_temp[step_temp$Date %in% gather$Date ]
-
 
     BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
 
@@ -195,6 +198,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
     ## store this month / set data
     write_parquet(gather,  partfile)
     write_parquet(BB_meta, DB_Steps_META_fl)
+    cat("99 Save: ", partfile, "\n")
     rm(gather, gathermeta, submonth)
 }
 rm(subyear, inp_filelist)
