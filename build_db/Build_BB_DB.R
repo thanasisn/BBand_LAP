@@ -19,6 +19,9 @@ source("~/BBand_LAP//DEFINITIONS.R")
 
 system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
 
+## Build tracker database
+source("~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"       )
+
 ## Import raw data
 source("~/BBand_LAP/build_db/Build_DB_01_pysolar.R"         )
 source("~/BBand_LAP/build_db/Build_DB_02_cm21.R"            )
