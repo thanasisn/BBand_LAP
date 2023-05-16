@@ -19,11 +19,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -49,10 +49,9 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
-TEST <- FALSE
-# TEST <- TRUE
 
-cat("\n Import  CHP-1  data\n\n")
+
+cat("\n Import  CHP-1 tracker async  data\n\n")
 
 ##  Initialize meta data file  -------------------------------------------------
 if (file.exists(DB_META_fl)) {
@@ -118,16 +117,6 @@ inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 
 cat("\n**Parse:",paste(nrow(inp_filelist), "tracker sync files**\n\n"))
 
-## test random
-if (TEST) {
-    cat("\nTEST MODE IS ON!!  ", Script.Name, "\n\n")
-    inp_filelist <- unique(rbind(
-        inp_filelist[ 1:30 ],
-        inp_filelist[sample(1:nrow(inp_filelist), 30)],
-        NULL
-    ))
-    setorder(inp_filelist, day)
-}
 
 
 
