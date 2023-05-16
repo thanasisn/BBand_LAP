@@ -351,16 +351,22 @@ for (YYYY in unique(year(inp_filelist$day))) {
     rm(gather, gathermeta, submonth)
 }
 rm(subyear)
-
 rm(inp_filelist)
+gc()
 
 
-ss<- data.table(open_dataset(DB_Steps_DIR) |> filter(year == 2020) |> collect())
+
+## Find async cases to really remove!
+
+ss <- data.table(open_dataset(DB_Steps_DIR) |> filter(year == 2020) |> collect())
 
 
 ss[!is.na(Async_step_count)]
 
 sss <- ss[doy==327]
+
+
+
 
 
 myunlock(DB_Steps_lock)
