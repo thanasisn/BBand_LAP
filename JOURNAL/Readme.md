@@ -1334,6 +1334,19 @@ I restart it manual at
 
 
 
+## 2023-05-18 09:15
+
+[//]: # (Keywords: #cleaning, #broadband, #brewers)
+
+Cleaned broadband and brewers instruments at
+
+06:07 - 06:10 UTC
+
+A lot of dust from previous rain.
+
+
+
+
 :::
 
 
@@ -1388,11 +1401,12 @@ At least you need `pandoc` installed.
 List of tags
 ============
       5 #async
-      1 #broadband
+      1 #brewers
+      2 #broadband
       1 #ccd
      52 #chp1
       1 #cleaned
-     15 #cleaning
+     16 #cleaning
      11 #cm21
       2 #codding
       3 #data_corruption_certain
