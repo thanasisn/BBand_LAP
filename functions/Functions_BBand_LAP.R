@@ -171,42 +171,33 @@ Relative_diffuse      = c("Relative Diffuse",          NA,                      
 
 
 
-require(stringr)
-tr_var <- function(x, type = "sort") {
-    types <- c("sort", "long", "description", "data")
+#' Get nice name for a variable in DV
+#'
+#' @param x    Name of a column
+#' @param type What to return one of c("short", "long", "description", "data")
+#'
+#' @return     A string for a variable
+#' @export
+#'
+tr_var <- function(x, type = "short") {
+    require(stringr)
+    types <- c("short", "long", "description", "data")
 
     if (!type %in% types) {
         cat("No such column:", type, "\n")
         return(NA)
     }
 
+    ty <- which(type == types)
+    cat(ty,"\n")
     res <- c()
     for (ax in x) {
         res <- c(res,
-                 as.vector(unlist(
-                     dict_BB_DB[str_detect(ax, names(dict_BB_DB))]
-                 ))
+                 as.vector(
+                     unlist(dict_BB_DB[str_detect(ax, names(dict_BB_DB))])[[ty]]
+                 )
         )
     }
     return(res)
 }
-
-if (!type %in% types) {
-    cat("No such column:", type, "\n")
-    return(NA)
-}
-
-
-unlist(dict_BB_DB["Azimuth"])[[2]]
-
-translate("Azimuth")
-
-# trf <- function(var) {
-#     if (!var %in% names(dict_BB_DB)) {
-#         cat("No such variable:", var, "\n")
-#         return(NA)
-#     }
-#      dict_BB_DB[var]
-#      dict_BB_DB[str_detect(var, names(dict_BB_DB))]
-# }
 
