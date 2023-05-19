@@ -166,7 +166,47 @@ Glo_First_Clim_lim    = c("Lim. GHI Clim.",            NA,                      
 Glo_Secon_Clim_lim    = c("Lim. GHI Clim.",            NA,                                                   NA,                                                   NA),
 ClrSW_ref2            = c("Max GHI ref. 2",            NA,                                                   NA,                                                   NA),
 RaylDIFF              = c("Rayleigh Diffuse",          NA,                                                   NA,                                                   NA),
-Relative_diffuse      = c("Relative Diffuse",          NA,                                                   NA,                                                   NA),
-NULL
+Relative_diffuse      = c("Relative Diffuse",          NA,                                                   NA,                                                   NA)
 )
+
+
+
+require(stringr)
+tr_var <- function(x, type = "sort") {
+    types <- c("sort", "long", "description", "data")
+
+    if (!type %in% types) {
+        cat("No such column:", type, "\n")
+        return(NA)
+    }
+
+    res <- c()
+    for (ax in x) {
+        res <- c(res,
+                 as.vector(unlist(
+                     dict_BB_DB[str_detect(ax, names(dict_BB_DB))]
+                 ))
+        )
+    }
+    return(res)
+}
+
+if (!type %in% types) {
+    cat("No such column:", type, "\n")
+    return(NA)
+}
+
+
+unlist(dict_BB_DB["Azimuth"])[[2]]
+
+translate("Azimuth")
+
+# trf <- function(var) {
+#     if (!var %in% names(dict_BB_DB)) {
+#         cat("No such variable:", var, "\n")
+#         return(NA)
+#     }
+#      dict_BB_DB[var]
+#      dict_BB_DB[str_detect(var, names(dict_BB_DB))]
+# }
 
