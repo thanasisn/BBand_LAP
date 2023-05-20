@@ -38,7 +38,7 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_Steps_lock)
+# mylock(DB_Steps_lock)
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
@@ -78,6 +78,9 @@ if (file.exists(DB_Steps_META_fl)) {
     BB_meta$chp1_Async_md5sum   <- as.character(NA)
 }
 
+
+# TEST
+BB_meta$chp1_Async_basename <- as.character(NA)
 
 ## _ Get Tracker steps files  --------------------------------------------------
 inp_filelist <- list.files(path       = trSTEP_DIR,
@@ -272,36 +275,47 @@ for (YYYY in unique(year(inp_filelist$day))) {
         ## get file info
         ss <- subyear[day == ad]
 
-        async    <- rep(FALSE, 1440)  # The snc file exist, so start with all not async
-        asyncstp <- rep(NA,    1440)  # Async magnitude (steps missed)
-
-        ## Recreate time stamp for all minutes of day starting from zero!!!
-        D_minutes <- seq(from       = as.POSIXct(paste(as_date(ad), "00:00:00 UTC")),
-                         length.out = 1440,
-                         by         = "min")
-
         ## _ Read tracker sync file  -------------------------------------------
-        ## TODO we should use step files as more reliable to detect async events!!!
-        syc_temp    <- read.table(ss$fullname, sep = "\t", as.is = TRUE, na.strings = "None")
+        syc_temp    <- fread(ss$fullname, na.strings = "None")
         ## get dates from file
         syc_temp$V1 <- as.POSIXct(syc_temp$V1)
-        ## round to start of each minute
-        async_minu  <- as.POSIXct(format(syc_temp$V1,format = "%F %R"))  ## async end
-        ## get minutes with async
-        uniq_async  <- unique(async_minu)
-        ## async time distance
-        syc_temp$timeDist <- apply(syc_temp[, c('V7', 'V8')], MARGIN = 1, FUN = max, na.rm = T)
 
-        for (amin in uniq_async) {
-            min_ind <- async_minu == amin
-            stepgo  <- syc_temp$V4[min_ind]
-            stepis  <- syc_temp$V5[min_ind]
-            stepout <- suppressWarnings(max(abs( stepgo - stepis ), na.rm = TRUE))
-            if (is.finite(stepout)) {
-                # Async magnitude (count steps missed)
-                asyncstp[ which( D_minutes == amin ) ] <- stepout
-            }
+        names(syc_temp)[names(syc_temp) == "V1"] <- "Date"
+        names(syc_temp)[names(syc_temp) == "V2"] <- "Axis"
+        names(syc_temp)[names(syc_temp) == "V3"] <- "Num"
+        names(syc_temp)[names(syc_temp) == "V4"] <- "Step_Should"
+        names(syc_temp)[names(syc_temp) == "V5"] <- "Step_Response"
+        names(syc_temp)[names(syc_temp) == "V6"] <- "Axis_step"
+        names(syc_temp)[names(syc_temp) == "V7"] <- "Axis_freq"
+        names(syc_temp)[names(syc_temp) == "V8"] <- "Tracker_freq"
+
+        ## reshape data
+        syc_temp$Num <- NULL
+        syc_temp[Axis == "a", Axis := "Azim"]
+        syc_temp[Axis == "z", Axis := "Elev"]
+        dt_azim      <- syc_temp[Axis == "Azim"]
+        dt_elev      <- syc_temp[Axis == "Elev"]
+        dt_azim$Axis <- NULL
+        dt_elev$Axis <- NULL
+
+
+
+        wecare <- grep("Date|Tracker_freq", names(dt_azim),
+                       value = TRUE, ignore.case = TRUE, invert = TRUE)
+
+        for (av in wecare) {
+            names(dt_azim)[names(dt_azim) == av] <- paste0(av, "_Azim")
+            names(dt_elev)[names(dt_elev) == av] <- paste0(av, "_Elev")
         }
+
+        syc_temp <- merge(dt_azim, dt_elev, all = TRUE)
+        syc_temp[, year  := year( Date)]
+        syc_temp[, month := month(Date)]
+        syc_temp[, doy   := yday( Date)]
+
+        stop()
+        ## get minutes with async
+        ## async time distance
 
         ## set async from time back
         syc_temp$async_start <- syc_temp$V1 - syc_temp$timeDist
@@ -369,7 +383,7 @@ sss <- ss[doy==327]
 
 
 
-myunlock(DB_Steps_lock)
+# myunlock(DB_Steps_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
