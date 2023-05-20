@@ -159,9 +159,10 @@ for (YYYY in unique(year(inp_filelist$day))) {
         }
 
         step_temp <- merge(dt_azim, dt_elev, all = TRUE)
-        step_temp[, year  := year( Date)]
-        step_temp[, month := month(Date)]
-        step_temp[, doy   := yday( Date)]
+        step_temp[, year          := year( Date)]
+        step_temp[, month         := month(Date)]
+        step_temp[, doy           := yday( Date)]
+        step_temp[, Tracker_event := "Step"]
 
         ## _ Get metadata for steps file  --------------------------------------
         step_meta <- data.table(day                 = as_date(ad),
@@ -171,8 +172,16 @@ for (YYYY in unique(year(inp_filelist$day))) {
                                 chp1_Steps_md5sum   = as.vector(md5sum(ss$fullname)))
 
         ## _ Init DB variables for next processes ------------------------------
-        step_temp[, Async_step_count   := as.integer(NA)]
-        step_temp[, Async_tracker_flag := as.logical(NA)]
+        step_temp[, Tracker_freq        := as.numeric(NA)]
+        step_temp[, Step_Should_Azim    := as.integer(NA)]
+        step_temp[, Step_Response_Azim  := as.integer(NA)]
+        step_temp[, Axis_step_Azim      := as.numeric(NA)]
+        step_temp[, Axis_freq_Azim      := as.numeric(NA)]
+        step_temp[, Step_Should_Elev    := as.integer(NA)]
+        step_temp[, Step_Response_Elev  := as.integer(NA)]
+        step_temp[, Axis_step_Elev      := as.numeric(NA)]
+        step_temp[, Axis_freq_Elev      := as.numeric(NA)]
+
         step_temp <- unique(step_temp)
 
         ## gather data
@@ -196,7 +205,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
     write_parquet(gather,  partfile)
     write_parquet(BB_meta, DB_Steps_META_fl)
     cat("99 Save: ", partfile, "\n")
-    rm(gather, gathermeta, submonth)
+    rm(gather, gathermeta, subyear)
 }
 rm(subyear, inp_filelist)
 gc()
@@ -276,25 +285,25 @@ for (YYYY in unique(year(inp_filelist$day))) {
         ss <- subyear[day == ad]
 
         ## _ Read tracker sync file  -------------------------------------------
-        syc_temp    <- fread(ss$fullname, na.strings = "None")
+        sync_temp    <- fread(ss$fullname, na.strings = "None")
         ## get dates from file
-        syc_temp$V1 <- as.POSIXct(syc_temp$V1)
+        sync_temp$V1 <- as.POSIXct(sync_temp$V1)
 
-        names(syc_temp)[names(syc_temp) == "V1"] <- "Date"
-        names(syc_temp)[names(syc_temp) == "V2"] <- "Axis"
-        names(syc_temp)[names(syc_temp) == "V3"] <- "Num"
-        names(syc_temp)[names(syc_temp) == "V4"] <- "Step_Should"
-        names(syc_temp)[names(syc_temp) == "V5"] <- "Step_Response"
-        names(syc_temp)[names(syc_temp) == "V6"] <- "Axis_step"
-        names(syc_temp)[names(syc_temp) == "V7"] <- "Axis_freq"
-        names(syc_temp)[names(syc_temp) == "V8"] <- "Tracker_freq"
+        names(sync_temp)[names(sync_temp) == "V1"] <- "Date"
+        names(sync_temp)[names(sync_temp) == "V2"] <- "Axis"
+        names(sync_temp)[names(sync_temp) == "V3"] <- "Num"
+        names(sync_temp)[names(sync_temp) == "V4"] <- "Step_Should"
+        names(sync_temp)[names(sync_temp) == "V5"] <- "Step_Response"
+        names(sync_temp)[names(sync_temp) == "V6"] <- "Axis_step"
+        names(sync_temp)[names(sync_temp) == "V7"] <- "Axis_freq"
+        names(sync_temp)[names(sync_temp) == "V8"] <- "Tracker_freq"
 
         ## reshape data
-        syc_temp$Num <- NULL
-        syc_temp[Axis == "a", Axis := "Azim"]
-        syc_temp[Axis == "z", Axis := "Elev"]
-        dt_azim      <- syc_temp[Axis == "Azim"]
-        dt_elev      <- syc_temp[Axis == "Elev"]
+        sync_temp$Num <- NULL
+        sync_temp[Axis == "a", Axis := "Azim"]
+        sync_temp[Axis == "z", Axis := "Elev"]
+        dt_azim      <- sync_temp[Axis == "Azim"]
+        dt_elev      <- sync_temp[Axis == "Elev"]
         dt_azim$Axis <- NULL
         dt_elev$Axis <- NULL
 
@@ -308,34 +317,13 @@ for (YYYY in unique(year(inp_filelist$day))) {
             names(dt_elev)[names(dt_elev) == av] <- paste0(av, "_Elev")
         }
 
-        syc_temp <- merge(dt_azim, dt_elev, all = TRUE)
-        syc_temp[, year  := year( Date)]
-        syc_temp[, month := month(Date)]
-        syc_temp[, doy   := yday( Date)]
+        sync_temp <- merge(dt_azim, dt_elev, all = TRUE)
+        sync_temp[, year          := year( Date)]
+        sync_temp[, month         := month(Date)]
+        sync_temp[, doy           := yday( Date)]
+        sync_temp[, Tracker_event := "Async"]
 
-        stop()
-        ## get minutes with async
-        ## async time distance
-
-        ## set async from time back
-        syc_temp$async_start <- syc_temp$V1 - syc_temp$timeDist
-        syc_temp$async_start <- as.POSIXct(format(syc_temp$async_start, format = "%F %R"))
-        syc_temp$async_end   <- as.POSIXct(format(syc_temp$V1,          format = "%F %R"))
-        ## create vector of asyncs
-        for (ik in 1:nrow(syc_temp)) {
-            async[ which( D_minutes <= syc_temp$async_end[   ik ] &
-                              D_minutes >= syc_temp$async_start[ ik ]  ) ] <- TRUE   ## !!
-        }
-
-        ## Move dates to the center of each minute, as the rest of DB
-        D_minutes <- D_minutes + 30
-
-        day_data <- data.frame(Date               = D_minutes,
-                               year               = year(D_minutes),
-                               month              = month(D_minutes),
-                               doy                = yday(D_minutes),
-                               Async_tracker_flag = async,
-                               Async_step_count   = asyncstp)
+        names(sync_temp)[!names(sync_temp) %in% names(gather)]
 
         ## get file metadata
         file_meta <- data.table(day                 = as_date(ad),
@@ -344,11 +332,11 @@ for (YYYY in unique(year(inp_filelist$day))) {
                                 chp1_Async_parsed   = Sys.time(),
                                 chp1_Async_md5sum   = as.vector(md5sum(ss$fullname)))
 
-        # gather <- rows_patch(gather, day_data, by = "Date")
-        gather     <- rows_upsert(gather, day_data, by = "Date")
+        # append!! allow duplicate time stamps
+        gather     <- rows_append(gather, sync_temp)
         gathermeta <- rbind(gathermeta, file_meta)
         rm(day_data, file_meta, ss)
-        rm(async, async_minu, syc_temp, uniq_async, stepgo, stepis, min_ind)
+        rm(async, async_minu, sync_temp, uniq_async, stepgo, stepis, min_ind)
     }
 
     BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
@@ -357,7 +345,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
     gather$Async_tracker_flag[!as.Date(gather$Date) %in% syncfldates] <- FALSE
 
     setorder(gather, Date)
-
+stop()
     ## store this month / set data
     write_parquet(gather,  partfile)
     write_parquet(BB_meta, DB_Steps_META_fl)
