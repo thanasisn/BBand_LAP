@@ -149,8 +149,13 @@ for (YYYY in unique(year(inp_filelist$day))) {
         dt_elev      <- step_temp[Axis == "Elev"]
         dt_azim$Axis <- NULL
         dt_elev$Axis <- NULL
+        dt_azim[, Step_feq := c(NA, diff(Date))]
+        dt_elev[, Step_feq := c(NA, diff(Date))]
 
         wecare <- grep("Date|Taken", names(dt_azim),
+                       value = TRUE, ignore.case = TRUE, invert = TRUE)
+
+        wecare <- grep("Date", names(dt_azim),
                        value = TRUE, ignore.case = TRUE, invert = TRUE)
 
         for (av in wecare) {
@@ -373,6 +378,22 @@ plot(test[,Sun_Azim - Tracker_Azim, Sun_Elev])
 hist(test[,Sun_Elev - Tracker_Elev])
 plot(test[,Sun_Elev - Tracker_Elev, Date])
 plot(test[,Sun_Elev - Tracker_Elev, Sun_Elev])
+
+hist(test[,Step_Should_Azim - Step_Response_Azim], breaks = 100)
+hist(test[,Step_Should_Elev - Step_Response_Elev], breaks = 100)
+
+plot(test[,Step_Should_Azim - Step_Response_Azim, Date])
+plot(test[,Step_Should_Elev - Step_Response_Elev, Date])
+
+plot(test[, Step_Azim, Date])
+plot(test[, Step_Elev, Date])
+
+plot(test[, StepsTaken, Date])
+
+plot(test[, Axis_freq_Azim, Date])
+plot(test[, Axis_freq_Elev, Date])
+plot(test[, Tracker_freq, Date])
+
 
 
 
