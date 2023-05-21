@@ -360,10 +360,19 @@ gc()
 ss <- data.table(open_dataset(DB_Steps_DIR) |> filter(year == 2020) |> collect())
 
 
-ss[!is.na(Async_step_count)]
+ss[Tracker_event == "Async", as.Date(Date)]
 
-sss <- ss[doy==327]
+test <- ss[as.Date(Date)=="2020-03-19"]
 
+
+
+hist(test[,Sun_Azim - Tracker_Azim])
+plot(test[,Sun_Azim - Tracker_Azim, Date])
+plot(test[,Sun_Azim - Tracker_Azim, Sun_Elev])
+
+hist(test[,Sun_Elev - Tracker_Elev])
+plot(test[,Sun_Elev - Tracker_Elev, Date])
+plot(test[,Sun_Elev - Tracker_Elev, Sun_Elev])
 
 
 
