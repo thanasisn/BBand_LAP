@@ -341,15 +341,12 @@ for (YYYY in unique(year(inp_filelist$day))) {
 
     BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
 
-    ## mark all days without a sync file as Async cases
-    gather$Async_tracker_flag[!as.Date(gather$Date) %in% syncfldates] <- FALSE
-
     setorder(gather, Date)
-stop()
+
     ## store this month / set data
     write_parquet(gather,  partfile)
     write_parquet(BB_meta, DB_Steps_META_fl)
-    cat("04 Save: ", partfile, "\n")
+    cat("99 Save: ", partfile, "\n")
     rm(gather, gathermeta, submonth)
 }
 rm(subyear)
