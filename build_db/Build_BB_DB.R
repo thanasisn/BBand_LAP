@@ -1,4 +1,4 @@
-#!/opt/R/4.2.3/bin/Rscript
+
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 
@@ -20,7 +20,7 @@ source("~/BBand_LAP//DEFINITIONS.R")
 system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
 
 ## Build tracker database
-source("~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"       )
+# source("~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"       )
 
 ## Import raw data
 source("~/BBand_LAP/build_db/Build_DB_01_pysolar.R"         )

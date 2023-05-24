@@ -264,7 +264,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
     partfile <- paste0(filedir, "/part-0.parquet")
     ## init data collector
     if (file.exists(partfile)) {
-        cat("04 Load: ", partfile, "\n")
+        # cat("04 Load: ", partfile, "\n")
         gather <- read_parquet(partfile)
 
         var <- "year"
@@ -351,7 +351,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
     ## store this month / set data
     write_parquet(gather,  partfile)
     write_parquet(BB_meta, DB_Steps_META_fl)
-    cat("99 Save: ", partfile, "\n")
+    cat("04 Save: ", partfile, "\n")
     rm(gather, gathermeta, submonth)
 }
 rm(subyear)
