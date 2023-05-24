@@ -25,11 +25,16 @@ else
 fi
 
 
-info "Remove data and metadata"
+info "Remove Broad Band data and metadata"
 rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB"
 rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
 rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB.stopfile"
 
+info "Remove CHP-1 tracker data and metadata"
+rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB"
+rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB_metadata.parquet"
+rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB.stopfile"
+  
 info "Get data from Sirena"
 "$HOME/BBand_LAP/tools/Get_data_from_sirena.sh"
 
