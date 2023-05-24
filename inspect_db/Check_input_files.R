@@ -177,6 +177,57 @@ rm(rad_names, radmon_files, sirena_files)
 
 
 
+
+##  ECO-UVA raw data check  ----------------------------------------------------
+
+#'
+#' ## CM-21 files
+#'
+#+ echo=F, include=T, results="asis"
+
+## __ Get Sirena files  --------------------------------------------------------
+sirena_files <- list.files(path        = SIRENA_GLB,
+                           recursive   = TRUE,
+                           pattern     = "[0-9]*06.LAP$",
+                           ignore.case = TRUE,
+                           full.names  = TRUE )
+
+## just in case, there are nested folders with more lap files in Sirens
+sirena_files <- grep("OLD", sirena_files,
+                     ignore.case = TRUE, invert = TRUE, value = TRUE )
+
+## __ Get Radmon files  --------------------------------------------------------
+radmon_files <- list.files(path        = RADMON_GLB,
+                           recursive   = TRUE,
+                           pattern     = "[0-9]*06.LAP$",
+                           ignore.case = TRUE,
+                           full.names  = TRUE )
+
+
+## __  Compare files between Radmon and Sirena  --------------------------------
+sir_names <- basename(sirena_files)
+rad_names <- basename(radmon_files)
+
+
+cat("\n**CM-21:", paste(length(sirena_files), "files from Sirena**\n"))
+cat("\n**CM-21:", paste(length(radmon_files), "files from Radmon**\n"))
+
+
+missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
+if (length(missing_from_sir) > 0) {
+    # warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
+    cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n\n")
+    cat(missing_from_sir, sep = " ")
+    cat("\n\n")
+} else {
+    cat("\nThere aren't any CM-21 files in Radmon missing from Sirena\n\n")
+}
+rm(rad_names, radmon_files, sirena_files)
+
+
+
+
+
 ##  Checksum test  -------------------------------------------------------------
 
 #'
