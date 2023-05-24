@@ -1,4 +1,4 @@
-
+#!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 
@@ -8,38 +8,36 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
 
-
-source("~/BBand_LAP//DEFINITIONS.R")
-
-
-# if (!interactive()) {
-#     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-#     sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
-# }
-
+## Update input files
 system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
 
 ## Build tracker database
-# source("~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"       )
+source("~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"       )
 
-## Import raw data
+## Import raw data from instruments
 source("~/BBand_LAP/build_db/Build_DB_01_pysolar.R"         )
 source("~/BBand_LAP/build_db/Build_DB_02_cm21.R"            )
 source("~/BBand_LAP/build_db/Build_DB_03_chp1.R"            )
 source("~/BBand_LAP/build_db/Build_DB_04_chp1_SNC.R"        )
 source("~/BBand_LAP/build_db/Build_DB_05_chp1_TMP.R"        )
 # source("~/BBand_LAP/build_db/Build_DB_06_cm21inclined.R"    )
+
 source("~/BBand_LAP/build_db/Build_DB_16_cm21_TOT.R"        )
+
 ## Flag bad data
 source("~/BBand_LAP/build_db/Build_DB_30_exclude_ranges.R"  )
+
 ## Apply dark offset and convert to radiation
 source("~/BBand_LAP/build_db/Build_DB_42_cm21_dark_radiat.R")
 source("~/BBand_LAP/build_db/Build_DB_43_chp1_dark_radiat.R")
+
 ## Second pass to construct missing dark !
 source("~/BBand_LAP/build_db/Build_DB_42_cm21_dark_radiat.R")
 source("~/BBand_LAP/build_db/Build_DB_43_chp1_dark_radiat.R")
+
 ## Extra process for CHP-1 temperature
 source("~/BBand_LAP/build_db/Build_DB_44_chp1_temp_correc.R")
+
 ## Add other data from other sources
 source("~/BBand_LAP/build_db/Import_50_TSI.R"               )
 source("~/BBand_LAP/build_db/Import_51_Pressure.R"          )
