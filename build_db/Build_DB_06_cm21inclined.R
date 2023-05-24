@@ -49,25 +49,6 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
 
-#### ~ ~ ~ ~ USE A TEST DB ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ####
-TEST_DB <- FALSE
-if (TEST_DB) {
-    source("~/BBand_LAP/DEFINITIONS.R")
-    cat("\n * * * Using a temp DB * * * \n\n")
-    ## copy data to temp
-    tyear <- 2017
-    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
-    system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-    system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
-    ## replace paths with test paths
-    DB_DIR     <- test_DB_DIR
-    DB_lock    <- test_DB_lock
-    DB_META_fl <- test_DB_META_fl
-    DB_HASH_fl <- test_DB_HASH_fl
-}
-#### ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ####
-
 
 cat("\n Import  INCLINED CM-21  data\n\n")
 
