@@ -1,11 +1,11 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Check CHP-1 and CM-21 source files "
+#' title:         "Check data source files integrity"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Inspect raw data for potensial problems."
+#' abstract:      "Inspect raw data for potential problems."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -47,6 +47,12 @@
 #'
 #' - Lists Sirena files
 #' - Lists Radmon files
+#' - Incremental Stores metadata for source files
+#'    - mtime
+#'    - md5sum
+#'    - basename
+#'    - parsed date
+#' - Checks stored data for inconsistencies
 #'
 #+ echo=F, include=T
 
@@ -93,7 +99,7 @@ sirena_files <- list.files(path        = SIRENA_DIR,
                            pattern     = "[0-9]*03.LAP$",
                            ignore.case = TRUE,
                            full.names  = TRUE )
-## just in case, there are nested folders with more lap files in Sirens
+## just in case, there are nested folders with more lap files in Sirena
 sirena_files <- grep("OLD", sirena_files,
                      ignore.case = TRUE, invert = TRUE, value = TRUE )
 
@@ -114,7 +120,7 @@ cat("\n**CHP-1:", paste(length(sirena_files), "files from Sirena**\n"))
 cat("\n**CHP-1:", paste(length(radmon_files), "files from Radmon**\n"))
 
 
-missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
+missing_from_sir <- rad_names[!rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
     # warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
     cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n\n")
@@ -181,14 +187,14 @@ rm(rad_names, radmon_files, sirena_files)
 ##  ECO-UVA raw data check  ----------------------------------------------------
 
 #'
-#' ## CM-21 files
+#' ## EKO files
 #'
 #+ echo=F, include=T, results="asis"
 
 ## __ Get Sirena files  --------------------------------------------------------
-sirena_files <- list.files(path        = SIRENA_GLB,
+sirena_files <- list.files(path        = SIRENA_EKO,
                            recursive   = TRUE,
-                           pattern     = "[0-9]*06.LAP$",
+                           pattern     = "[0-9]*05.LAP$",
                            ignore.case = TRUE,
                            full.names  = TRUE )
 
@@ -199,7 +205,7 @@ sirena_files <- grep("OLD", sirena_files,
 ## __ Get Radmon files  --------------------------------------------------------
 radmon_files <- list.files(path        = RADMON_GLB,
                            recursive   = TRUE,
-                           pattern     = "[0-9]*06.LAP$",
+                           pattern     = "[0-9]*05.LAP$",
                            ignore.case = TRUE,
                            full.names  = TRUE )
 
@@ -209,8 +215,8 @@ sir_names <- basename(sirena_files)
 rad_names <- basename(radmon_files)
 
 
-cat("\n**CM-21:", paste(length(sirena_files), "files from Sirena**\n"))
-cat("\n**CM-21:", paste(length(radmon_files), "files from Radmon**\n"))
+cat("\n**EKO:", paste(length(sirena_files), "files from Sirena**\n"))
+cat("\n**EKO:", paste(length(radmon_files), "files from Radmon**\n"))
 
 
 missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
@@ -220,7 +226,7 @@ if (length(missing_from_sir) > 0) {
     cat(missing_from_sir, sep = " ")
     cat("\n\n")
 } else {
-    cat("\nThere aren't any CM-21 files in Radmon missing from Sirena\n\n")
+    cat("\nThere aren't any EKO files in Radmon missing from Sirena\n\n")
 }
 rm(rad_names, radmon_files, sirena_files)
 
@@ -258,46 +264,54 @@ parthash <- melt(data = parthash,
                  na.rm = TRUE)
 parthash$variable <- NULL
 
+
+
 ## __ Update hash table  -------------------------------------------------------
 if (!file.exists(DB_HASH_fl)) {
-    ## Nothing to compare to, just store table
+    ## Nothing to compare to, just store the new table
     write_parquet(x = parthash, sink = DB_HASH_fl)
 } else {
     ## Add new hashes to permanent storage
+
+    ## read stored
     mainhash <- read_parquet(DB_HASH_fl)
-    mainhash <- mainhash[!duplicated(mainhash[ , md5sum, basename]), ]
+
+    # ## why?
+    # mainhash <- mainhash[!duplicated(mainhash[ , md5sum, basename]), ]
+
+    ## merge stored with current in DB
+    parthash <- unique(rbind(parthash, mainhash))
     write_parquet(x = parthash, sink = DB_HASH_fl)
 }
-
-
 
 
 ## __ Check duplicate hashes  --------------------------------------------------
 dups <- mainhash[duplicated(mainhash$md5sum)]
 if (nrow(dups) > 0) {
     cat("\n**There are ", nrow(dups), " files with the same checksum**\n\n")
+    setorder(dups, md5sum, basename)
     # \scriptsize
     # \footnotesize
     # \small
     cat("\n \\footnotesize \n\n")
-    pander(dups,
-           caption = "Files with the same md5sum")
-    # cat("\n\n \\normalsize \n\n")
+    panderOptions('table.split.table', Inf)
+    cat(pander(dups,
+           caption = "Files with the same md5sum"))
+    cat("\n \n \\normalsize \n \n")
+    # cat("\n\n \\ \n\n")
 } else {
     cat("\n**All checksum are unique**\n")
 }
 
 
 ## __ Check files with different hashes  ---------------------------------------
-
-## TODO
-# tabs <- as.data.table(table(mainhash$basename))
-# mainhash[basename %in% tabs[ N > 1, V1 ]]
-
-cat("\n**There are ", " files with the same filename and different hash**\n\n")
 tabs <- mainhash[, .N, by = basename]
-tabs[N > 1, ]
-
+tabs <- tabs[N > 1, ]
+if (nrow(tabs) > 0) {
+    cat("\n**There are ", nrow(tabs), " files with the same filename and different hash**\n\n")
+} else {
+    cat("**There are no files with the same filename and different md5 hash**\n\n")
+}
 
 
 
@@ -306,9 +320,7 @@ tabs[N > 1, ]
 ## - list snc
 ## - list therm
 ## - list step
-## - check md5sum
-
-
+## - more instruments
 
 
 
