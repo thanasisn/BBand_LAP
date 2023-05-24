@@ -12,28 +12,27 @@ exec 2> >(tee -i "${ERR_FILE}" >&2)
 info "START :: $0 :: $* ::"
 
 echo ""
-echo "ARE YOU SURE?"
+echo " * *  STOP BE CAREFUL !!  * *"
 echo ""
-
-read -p "Do you want to NUKE the database and rebuild everything? " conf
-
+read -p "Do you want to DELETE the Broad Band database? " conf
+echo ""
 if   [[ $conf == "yes" ]]; then
-    echo "Start form scratch"
-else
-    echo "Exit"
-    exit 99
+    info "Remove Broad Band data and metadata"
+    rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB"
+    rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
+    rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB.stopfile"
 fi
 
+echo ""
+read -p "Do you want to DELETE the CHP-1 tracker database? " conf
+echo ""
+if   [[ $conf == "yes" ]]; then
+    info "Remove CHP-1 tracker data and metadata"
+    rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB"
+    rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB_metadata.parquet"
+    rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB.stopfile"
+fi
 
-info "Remove Broad Band data and metadata"
-rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB"
-rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
-rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB.stopfile"
-
-info "Remove CHP-1 tracker data and metadata"
-rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB"
-rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB_metadata.parquet"
-rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB.stopfile"
   
 info "Get data from Sirena"
 "$HOME/BBand_LAP/tools/Get_data_from_sirena.sh"

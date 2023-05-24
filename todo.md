@@ -12,9 +12,3 @@
 - missing inclined files may be in radmon folder
   - binary files exist in sirena
 
-- create dictionary/table fro DB and metadata
-  - names()
-  - proper sort name
-  - proper long name
-  - description
-

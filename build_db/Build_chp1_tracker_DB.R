@@ -79,8 +79,6 @@ if (file.exists(DB_Steps_META_fl)) {
 }
 
 
-# TEST
-BB_meta$chp1_Async_basename <- as.character(NA)
 
 ## _ Get Tracker steps files  --------------------------------------------------
 inp_filelist <- list.files(path       = trSTEP_DIR,
@@ -102,7 +100,8 @@ cat("\n**Found:", paste(nrow(inp_filelist), "Tracker steps files**\n"))
 ## only new files in the date range
 inp_filelist <- inp_filelist[!inp_filelist$basename %in% BB_meta$chp1_Steps_basename]
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
-
+## ignore current and future dates
+inp_filelist <- inp_filelist[ day < as.Date(Sys.Date())]
 cat("\n**Parse:",paste(nrow(inp_filelist), "Tracker steps files**\n\n"))
 
 
@@ -166,7 +165,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
         step_temp <- merge(dt_azim, dt_elev, all = TRUE)
         step_temp[, year          := year( Date)]
         step_temp[, month         := month(Date)]
-        step_temp[, doy           := yday( Date)]
         step_temp[, Tracker_event := "Step"]
 
         ## _ Get metadata for steps file  --------------------------------------
@@ -212,7 +210,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
     cat("99 Save: ", partfile, "\n")
     rm(gather, gathermeta, subyear)
 }
-rm(subyear, inp_filelist)
+rm(inp_filelist)
 gc()
 
 
@@ -233,7 +231,7 @@ cat("\n**Found:",paste(length(inp_filelist), "tracker sync files**\n"))
 
 inp_filelist <- data.table(fullname = inp_filelist)
 inp_filelist[, chp1_Async_basename := basename(fullname)]
-stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$chp1_Async_basename))) == FALSE )
+stopifnot(all(duplicated(sub("\\..*", "", inp_filelist$chp1_Async_basename))) == FALSE)
 
 inp_filelist$day <- as.Date(parse_date_time(
     sub("\\.snc", "", sub("sun_tracker_", "", inp_filelist$chp1_Async_basename)),
@@ -242,15 +240,12 @@ setorder(inp_filelist, day)
 cat("\n**Found:",paste(nrow(inp_filelist), "tracker sync files**\n"))
 
 
-## days with a sync file
-syncfldates  <- inp_filelist$day
-
 ## only new files in the date range
 inp_filelist <- inp_filelist[!inp_filelist$chp1_Async_basename %in% BB_meta$chp1_Async_basename]
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
-
+## ignore current and future dates
+inp_filelist <- inp_filelist[ day < as.Date(Sys.Date())]
 cat("\n**Parse:",paste(nrow(inp_filelist), "tracker sync files**\n\n"))
-
 
 
 
@@ -312,8 +307,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
         dt_azim$Axis <- NULL
         dt_elev$Axis <- NULL
 
-
-
         wecare <- grep("Date|Tracker_freq", names(dt_azim),
                        value = TRUE, ignore.case = TRUE, invert = TRUE)
 
@@ -325,7 +318,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
         sync_temp <- merge(dt_azim, dt_elev, all = TRUE)
         sync_temp[, year          := year( Date)]
         sync_temp[, month         := month(Date)]
-        sync_temp[, doy           := yday( Date)]
         sync_temp[, Tracker_event := "Async"]
 
         names(sync_temp)[!names(sync_temp) %in% names(gather)]
@@ -340,8 +332,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         # append!! allow duplicate time stamps
         gather     <- rows_append(gather, sync_temp)
         gathermeta <- rbind(gathermeta, file_meta)
-        rm(day_data, file_meta, ss)
-        rm(async, async_minu, sync_temp, uniq_async, stepgo, stepis, min_ind)
+        rm(file_meta, ss, sync_temp)
     }
 
     BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
@@ -352,12 +343,10 @@ for (YYYY in unique(year(inp_filelist$day))) {
     write_parquet(gather,  partfile)
     write_parquet(BB_meta, DB_Steps_META_fl)
     cat("04 Save: ", partfile, "\n")
-    rm(gather, gathermeta, submonth)
+    rm(gather, gathermeta, subyear)
 }
-rm(subyear)
 rm(inp_filelist)
 gc()
-
 
 
 ## Find async cases to really remove!
@@ -388,7 +377,7 @@ plot(test[,Step_Should_Elev - Step_Response_Elev, Date])
 plot(test[, Step_Azim, Date])
 plot(test[, Step_Elev, Date])
 
-plot(test[, StepsTaken, Date])
+# plot(test[, StepsTaken, Date])
 
 plot(test[, Axis_freq_Azim, Date])
 plot(test[, Axis_freq_Elev, Date])
