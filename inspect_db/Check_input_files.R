@@ -276,11 +276,13 @@ if (!file.exists(DB_HASH_fl)) {
     ## read stored
     mainhash <- read_parquet(DB_HASH_fl)
 
-    # ## why?
-    # mainhash <- mainhash[!duplicated(mainhash[ , md5sum, basename]), ]
 
     ## merge stored with current in DB
     parthash <- unique(rbind(parthash, mainhash))
+
+    stop()
+    ## why?
+    mainhash <- mainhash[!duplicated(mainhash[ , md5sum, basename]), ]
     write_parquet(x = parthash, sink = DB_HASH_fl)
 }
 
@@ -289,7 +291,7 @@ if (!file.exists(DB_HASH_fl)) {
 dups <- mainhash[duplicated(mainhash$md5sum)]
 if (nrow(dups) > 0) {
     cat("\n**There are ", nrow(dups), " files with the same checksum**\n\n")
-    setorder(dups, md5sum, basename)
+    setorder(dups, md5sum)
     # \scriptsize
     # \footnotesize
     # \small
