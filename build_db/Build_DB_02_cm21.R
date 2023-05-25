@@ -43,9 +43,9 @@ source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
+library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
-library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 library(tools,      warn.conflicts = TRUE, quietly = TRUE)
 
 
@@ -90,7 +90,6 @@ cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 ## only new files in the date range
 inp_filelist <- inp_filelist[!inp_filelist$cm21_basename %in% BB_meta$cm21_basename]
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
-
 cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
 
 
@@ -128,7 +127,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
         } else {
             cat("Skipping new rows data inport", partfile, "\n")
             next()
-            ## This can work, but there is no need for it.
             ## Sun script should initialize the DB rows.
         }
 
@@ -143,6 +141,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
                              by         = "min" )
 
             ## __  Read LAP file  --------------------------------------------------
+            if (nrow(ss)>1) {stop("Multiple input files!!")}
             lap   <- fread(ss$fullname, na.strings = "-9")
             lap$V1 <- as.numeric(lap$V1)
             lap$V2 <- as.numeric(lap$V2)
@@ -174,7 +173,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
             gathermeta <- rbind(gathermeta, file_meta)
             rm(day_data, file_meta, ss, lap)
         }
-
+        ## insert new meta data
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
 
         setorder(gather, Date)
