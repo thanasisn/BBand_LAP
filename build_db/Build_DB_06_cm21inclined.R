@@ -40,7 +40,7 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
@@ -136,6 +136,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
                              by         = "min")
 
             ## __  Read LAP file  --------------------------------------------------
+            if (nrow(ss)>1) {stop("Multiple input files!!")}
             lap    <- fread(ss$fullname, na.strings = "-9")
             lap$V1 <- as.numeric(lap$V1)
             lap$V2 <- as.numeric(lap$V2)

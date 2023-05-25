@@ -11,8 +11,10 @@ Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
 ## Update input files
 system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
 
+try(
 ## Build tracker database
 source("~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"       )
+)
 
 ## Import raw data from instruments
 source("~/BBand_LAP/build_db/Build_DB_01_pysolar.R"         )
