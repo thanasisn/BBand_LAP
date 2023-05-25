@@ -114,7 +114,8 @@ syncfldates  <- inp_filelist$day
 ## only new files in the date range
 inp_filelist <- inp_filelist[!inp_filelist$chp1_sync_basename %in% BB_meta$chp1_sync_basename]
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
-
+## ignore current and future dates
+inp_filelist <- inp_filelist[ day < as.Date(Sys.Date())]
 cat("\n**Parse:",paste(nrow(inp_filelist), "tracker sync files**\n\n"))
 
 
