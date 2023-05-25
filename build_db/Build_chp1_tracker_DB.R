@@ -372,6 +372,23 @@ BB <- data.table(open_dataset(DB_DIR)                      |>
                      filter(Date > stdate & Date < eddate) |>
                      select(Date, Elevat, Azimuth)         |> collect())
 
+
+## Check mimutes and steps takem
+
+ST <- SS[Tracker_event == "Step"]
+
+ST[, Date30 := 30 + as.POSIXct((as.numeric(Date) %/% 60) * 60, origin = "1970-01-01") ]
+
+
+steps <- ST[, .(NStepAzim = sum(is.numeric(StepsTaken_Azim)),
+                NStepElev = sum(is.numeric(StepsTaken_Elev)),
+                .N), by = Date30 ]
+table(steps$NStepAzim)
+table(steps$NStepElev)
+table(steps$N)
+
+table(steps)
+
 gc()
 
 
@@ -407,38 +424,54 @@ ASBB <- merge(SS, BB, by = "Date", all = TRUE)
 
 # TEST
 ASBB <- ASBB[ year(Date) == 2023, ]
+ASBB$sync <- TRUE
+
+ASBB[                , Step_Diff := Step_Should_Azim - Step_Response_Azim]
+ASBB[is.na(Step_Diff), Step_Diff := Step_Should_Elev - Step_Response_Elev]
+
+ASBB[                , Freq_Axis := Axis_freq_Elev]
+ASBB[is.na(Freq_Axis), Freq_Axis := Axis_freq_Azim]
+
 
 days <- unique(ASBB[!is.na(Tracker_event), as.Date(Date)])
+
+
 
 for (ad in days) {
     temp <- ASBB[as.Date(Date) == ad]
 
-    temp[, Step_Diff := Step_Should_Azim - Step_Response_Azim]
-    temp[is.na(Step_Diff), Step_Diff := Step_Should_Elev - Step_Response_Elev]
 
-    temp$sync <- NA
-
-    temp[                , Freq_Axis := Axis_freq_Elev]
-    temp[is.na(Freq_Axis), Freq_Axis := Axis_freq_Azim]
-
-    freq <- temp[!is.na(Freq_Axis) & Freq_Axis > 0 , Freq_Axis, Date  ]
-
+    freq <- temp[!is.na(Freq_Axis) & Freq_Axis > 0 , Freq_Axis, Date ]
     freq[, SDate := Date - Freq_Axis]
 
-    for(ii in nrow(freq) ){
-        temp[ Date >= freq[ii]$Date & Date < freq[ii]$SDate, sync := FALSE]
+    for (ii in nrow(freq)){
+        ASBB[ Date <= freq[ii]$Date & Date >= freq[ii]$SDate, sync := FALSE]
     }
 
 
+
+    stop()
 }
 
+hist(ASBB$Tracker_freq)
+hist(ASBB$Freq_Axis)
 
+test <- ASBB[ Freq_Axis > Tracker_freq]
+test <- rm.cols.NA.DT(test)
+
+
+ASBB <- ASBB[Tracker_event == "Step"]
+ASBB <- rm.cols.NA.DT(ASBB)
+
+
+table(ASBB$sync)
 
 ## ASYNC
 ## - No step data for the minute
 ## - Go back from async cases and chech data
 
-
+## Tracker_freq: time of each loop in tracker
+## Axis_freq:    time of each movement
 
 stop()
 
