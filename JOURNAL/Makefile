@@ -1,7 +1,7 @@
 
 .PHONY := preprocess
 .DEFAULT_GOAL := all
-all: pdf html 
+all: pdf html
 
 ## list source files
 markdowns := $(shell find -name "*.md" | grep "[0-9]\{4\}" | sort -V)
