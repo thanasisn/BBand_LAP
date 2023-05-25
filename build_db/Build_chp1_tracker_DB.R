@@ -380,9 +380,13 @@ ST <- SS[Tracker_event == "Step"]
 ST[, Date30 := 30 + as.POSIXct((as.numeric(Date) %/% 60) * 60, origin = "1970-01-01") ]
 
 
-steps <- ST[, .(NStepAzim = sum(is.numeric(StepsTaken_Azim)),
-                NStepElev = sum(is.numeric(StepsTaken_Elev)),
+steps <- ST[, .(NStepAzim = sum(is.numeric(StepsTaken_Azim), na.rm = TRUE),
+                NStepElev = sum(is.numeric(StepsTaken_Elev), na.rm = TRUE),
                 .N), by = Date30 ]
+
+ST[ is.numeric(StepsTaken_Azim) , .N, by = Date30 ]
+
+
 table(steps$NStepAzim)
 table(steps$NStepElev)
 table(steps$N)
