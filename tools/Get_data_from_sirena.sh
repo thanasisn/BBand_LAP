@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#### Get data from sirena for local processing.
+#### Get data from sirena.
 
 ## this sould be mounted
 SOURCE="/media/sirena_lapdata_ro"
@@ -8,7 +8,7 @@ SOURCE="/media/sirena_lapdata_ro"
 
 if mountpoint -q "$SOURCE" ; then
 
-    echo "get CM21 signal files 'LAP'"
+    echo "get signal files 'LAP' of CM-21 global"
     rsync -rhvt                                    \
         --include '*/'                             \
         --include '*.LAP'                          \
@@ -18,6 +18,25 @@ if mountpoint -q "$SOURCE" ; then
         "$SOURCE/archive/Bband/AC21_LAP.GLB/"      \
         "$HOME/DATA_RAW/Bband/AC21_LAP.GLB"
 
+    echo "get signal files 'LAP' of CM-21 inclined"
+    rsync -rhvt                                    \
+        --include '*/'                             \
+        --include '*.LAP'                          \
+        --include '*.lap'                          \
+        --include '*.ori'                          \
+        --exclude '*'                              \
+        "$SOURCE/archive/Bband/CM21_LAP.INC/"      \
+        "$HOME/DATA_RAW/Bband/CM21_LAP.INC"
+
+    echo "get signal files 'LAP' of ECO UVA? inclined"
+    rsync -rhvt                                    \
+        --include '*/'                             \
+        --include '*.LAP'                          \
+        --include '*.lap'                          \
+        --include '*.ori'                          \
+        --exclude '*'                              \
+        "$SOURCE/archive/Bband/EKO_LAP.GLB/"       \
+        "$HOME/DATA_RAW/Bband/EKO_LAP.GLB"
 
     echo "get CHP1 signal files"
     rsync -rhvt                                    \
