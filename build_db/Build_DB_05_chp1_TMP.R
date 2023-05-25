@@ -17,11 +17,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -113,7 +113,8 @@ cat("\n**Found:",paste(nrow(inp_filelist), "CHP-1 temperature files**\n"))
 ## only new files in the date range
 inp_filelist <- inp_filelist[!inp_filelist$chp1_temp_basename %in% BB_meta$chp1_temp_basename]
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
-
+## ignore current and future dates
+inp_filelist <- inp_filelist[ day < as.Date(Sys.Date())]
 cat("\n**Parse:",paste(nrow(inp_filelist), "CHP-1 temperature files**\n\n"))
 
 ## test random
