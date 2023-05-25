@@ -1347,6 +1347,17 @@ A lot of dust from previous rain.
 
 
 
+## 2023-05-25 08:52 [ThanasisN]
+
+[//]: # (Keywords: #chp1)
+
+Clean spider web from inside of CHP-1 sun shader at
+
+05:52 UTC
+
+
+
+
 :::
 
 
@@ -1404,7 +1415,7 @@ List of tags
       1 #brewers
       2 #broadband
       1 #ccd
-     52 #chp1
+     53 #chp1
       1 #cleaned
      16 #cleaning
      11 #cm21

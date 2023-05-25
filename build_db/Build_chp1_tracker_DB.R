@@ -349,15 +349,74 @@ rm(inp_filelist)
 gc()
 
 
+
+
+
+## Inspect data
+source("~/CODE/FUNCTIONS/R/data.R")
+
+ST <- data.table(open_dataset(DB_Steps_DIR) |> filter(Tracker_event == "Step")  |> collect())
+ST <- rm.cols.NA.DT(ST)
+
+AS <- data.table(open_dataset(DB_Steps_DIR) |> filter(Tracker_event == "Async")  |> collect())
+AS <- rm.cols.NA.DT(AS)
+
+stdate <- min(ST$Date) - 120
+eddate <- max(ST$Date) + 120
+
+BB <- data.table(open_dataset(DB_DIR)                      |>
+                     filter(Date > stdate & Date < eddate) |>
+                     select(Date, Elevat, Azimuth)         |> collect())
+
+gc()
+
+
+hist(ST[, Sun_Azim - Tracker_Azim ])
+# plot(ST[, Sun_Azim - Tracker_Azim, Date ])
+
+hist(ST[, Sun_Elev - Tracker_Elev ])
+# plot(ST[, Sun_Elev - Tracker_Elev, Date ])
+
+hist(ST[, Step_feq_Elev ], breaks = 100)
+hist(ST[, Step_feq_Azim ], breaks = 100)
+
+hist(AS[, Tracker_freq], breaks = 100)
+
+hist(AS[, Axis_step_Azim], breaks = 100)
+hist(AS[, Axis_step_Elev], breaks = 100)
+hist(AS[, Axis_freq_Elev], breaks = 100)
+hist(AS[, Axis_freq_Azim], breaks = 100)
+
+hist(AS[, Tracker_freq], breaks = 100)
+
+
+hist(AS[, Step_Should_Azim],   breaks = 100)
+hist(AS[, Step_Response_Azim], breaks = 100)
+hist(AS[, Step_Should_Elev],   breaks = 100)
+hist(AS[, Step_Response_Elev], breaks = 100)
+
+hist(AS[, Step_Should_Azim - Step_Response_Azim],   breaks = 100)
+hist(AS[, Step_Should_Elev - Step_Response_Elev],   breaks = 100)
+
+
+ASBB <- merge(AS, BB, by = "Date", all = TRUE)
+
+ASBB <- ASBB[ year(Date) == 2023 ]
+ASBB <- ASBB[ Elevat > -1 ]
+
+
+stop()
+
 ## Find async cases to really remove!
 
-ss <- data.table(open_dataset(DB_Steps_DIR) |> filter(year == 2020) |> collect())
+ss <- data.table(open_dataset(DB_Steps_DIR) |> filter(year == 2023) |> collect())
 
 
 ss[Tracker_event == "Async", as.Date(Date)]
 
 test <- ss[as.Date(Date)=="2020-03-19"]
 
+test <- ss[year(Date)==2023]
 
 
 hist(test[,Sun_Azim - Tracker_Azim])
