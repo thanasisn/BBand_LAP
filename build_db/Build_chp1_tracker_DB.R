@@ -293,7 +293,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         names(sync_temp)[names(sync_temp) == "V2"] <- "Axis"
         names(sync_temp)[names(sync_temp) == "V3"] <- "Num"
         names(sync_temp)[names(sync_temp) == "V4"] <- "Step_Should"
-        names(sync_temp)[names(sync_temp) == "V5"] <- "Step_Response"
+        names(sync_temp)[names(sync_temp) == "V5"] <- "Step_Should"
         names(sync_temp)[names(sync_temp) == "V6"] <- "Axis_step"
         names(sync_temp)[names(sync_temp) == "V7"] <- "Axis_freq"
         names(sync_temp)[names(sync_temp) == "V8"] <- "Tracker_freq"
@@ -307,7 +307,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
         dt_azim$Axis <- NULL
         dt_elev$Axis <- NULL
 
-        wecare <- grep("Date|Tracker_freq", names(dt_azim),
+        wecare <- grep("Date|Tracker_freq|Step_diff", names(dt_azim),
                        value = TRUE, ignore.case = TRUE, invert = TRUE)
 
         for (av in wecare) {
@@ -355,14 +355,18 @@ gc()
 ## Inspect data
 source("~/CODE/FUNCTIONS/R/data.R")
 
-ST <- data.table(open_dataset(DB_Steps_DIR) |> filter(Tracker_event == "Step")  |> collect())
-ST <- rm.cols.NA.DT(ST)
+# ST <- data.table(open_dataset(DB_Steps_DIR) |> filter(Tracker_event == "Step")  |> collect())
+# ST <- rm.cols.NA.DT(ST)
+#
+# AS <- data.table(open_dataset(DB_Steps_DIR) |> filter(Tracker_event == "Async")  |> collect())
+# AS <- rm.cols.NA.DT(AS)
 
-AS <- data.table(open_dataset(DB_Steps_DIR) |> filter(Tracker_event == "Async")  |> collect())
-AS <- rm.cols.NA.DT(AS)
 
-stdate <- min(ST$Date) - 120
-eddate <- max(ST$Date) + 120
+SS <- data.table(open_dataset(DB_Steps_DIR) |>  collect())
+
+stdate <- min(SS$Date) - 120
+eddate <- max(SS$Date) + 120
+
 
 BB <- data.table(open_dataset(DB_DIR)                      |>
                      filter(Date > stdate & Date < eddate) |>
@@ -371,38 +375,69 @@ BB <- data.table(open_dataset(DB_DIR)                      |>
 gc()
 
 
-hist(ST[, Sun_Azim - Tracker_Azim ])
+hist(SS[, Sun_Azim - Tracker_Azim ])
 # plot(ST[, Sun_Azim - Tracker_Azim, Date ])
 
-hist(ST[, Sun_Elev - Tracker_Elev ])
+hist(SS[, Sun_Elev - Tracker_Elev ])
 # plot(ST[, Sun_Elev - Tracker_Elev, Date ])
 
-hist(ST[, Step_feq_Elev ], breaks = 100)
-hist(ST[, Step_feq_Azim ], breaks = 100)
+hist(SS[, Step_feq_Elev ], breaks = 100)
+hist(SS[, Step_feq_Azim ], breaks = 100)
 
-hist(AS[, Tracker_freq], breaks = 100)
+hist(SS[, Tracker_freq], breaks = 100)
 
-hist(AS[, Axis_step_Azim], breaks = 100)
-hist(AS[, Axis_step_Elev], breaks = 100)
-hist(AS[, Axis_freq_Elev], breaks = 100)
-hist(AS[, Axis_freq_Azim], breaks = 100)
+hist(SS[, Axis_step_Azim], breaks = 100)
+hist(SS[, Axis_step_Elev], breaks = 100)
+hist(SS[, Axis_freq_Elev], breaks = 100)
+hist(SS[, Axis_freq_Azim], breaks = 100)
 
-hist(AS[, Tracker_freq], breaks = 100)
-
-
-hist(AS[, Step_Should_Azim],   breaks = 100)
-hist(AS[, Step_Response_Azim], breaks = 100)
-hist(AS[, Step_Should_Elev],   breaks = 100)
-hist(AS[, Step_Response_Elev], breaks = 100)
-
-hist(AS[, Step_Should_Azim - Step_Response_Azim],   breaks = 100)
-hist(AS[, Step_Should_Elev - Step_Response_Elev],   breaks = 100)
+hist(SS[, Tracker_freq], breaks = 100)
 
 
-ASBB <- merge(AS, BB, by = "Date", all = TRUE)
+hist(SS[, Step_Should_Azim],   breaks = 100)
+hist(SS[, Step_Response_Azim], breaks = 100)
+hist(SS[, Step_Should_Elev],   breaks = 100)
+hist(SS[, Step_Response_Elev], breaks = 100)
 
-ASBB <- ASBB[ year(Date) == 2023 ]
-ASBB <- ASBB[ Elevat > -1 ]
+hist(SS[, Step_Should_Azim - Step_Response_Azim],   breaks = 100)
+hist(SS[, Step_Should_Elev - Step_Response_Elev],   breaks = 100)
+
+
+ASBB <- merge(SS, BB, by = "Date", all = TRUE)
+
+# TEST
+ASBB <- ASBB[ year(Date) == 2023, ]
+
+days <- unique(ASBB[!is.na(Tracker_event), as.Date(Date)])
+
+for (ad in days) {
+    temp <- ASBB[as.Date(Date) == ad]
+
+    temp[, Step_Diff := Step_Should_Azim - Step_Response_Azim]
+    temp[is.na(Step_Diff), Step_Diff := Step_Should_Elev - Step_Response_Elev]
+
+    temp$sync <- NA
+
+    temp[                , Freq_Axis := Axis_freq_Elev]
+    temp[is.na(Freq_Axis), Freq_Axis := Axis_freq_Azim]
+
+    freq <- temp[!is.na(Freq_Axis) & Freq_Axis > 0 , Freq_Axis, Date  ]
+
+    freq[, SDate := Date - Freq_Axis]
+
+    for(ii in nrow(freq) ){
+        temp[ Date >= freq[ii]$Date & Date < freq[ii]$SDate, sync := FALSE]
+    }
+
+
+}
+
+
+
+## ASYNC
+## - No step data for the minute
+## - Go back from async cases and chech data
+
 
 
 stop()
