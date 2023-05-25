@@ -279,10 +279,11 @@ if (!file.exists(DB_HASH_fl)) {
 
     ## merge stored with current in DB
     parthash <- unique(rbind(parthash, mainhash))
-
-    stop()
-    ## why?
+    ## order to keep most resent afte deduplication
+    setorder(parthash, md5sum, -parsed )
+    ## keep unique combination of md5sum and basenames
     mainhash <- mainhash[!duplicated(mainhash[ , md5sum, basename]), ]
+
     write_parquet(x = parthash, sink = DB_HASH_fl)
 }
 
@@ -291,7 +292,7 @@ if (!file.exists(DB_HASH_fl)) {
 dups <- mainhash[duplicated(mainhash$md5sum)]
 if (nrow(dups) > 0) {
     cat("\n**There are ", nrow(dups), " files with the same checksum**\n\n")
-    setorder(dups, md5sum)
+    setorder(dups, md5sum, basename)
     # \scriptsize
     # \footnotesize
     # \small
@@ -311,6 +312,12 @@ tabs <- mainhash[, .N, by = basename]
 tabs <- tabs[N > 1, ]
 if (nrow(tabs) > 0) {
     cat("\n**There are ", nrow(tabs), " files with the same filename and different hash**\n\n")
+
+    cat("\n \\footnotesize \n\n")
+    panderOptions('table.split.table', Inf)
+    cat(pander(tabs,
+           caption = "Files with the same filename and different hash!!"))
+    cat("\n \n \\normalsize \n \n")
 } else {
     cat("**There are no files with the same filename and different md5 hash**\n\n")
 }
