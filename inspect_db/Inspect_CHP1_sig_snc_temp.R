@@ -111,7 +111,7 @@ if (length(args) > 0) {
 
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 
-## years in the data base with CHP-1 data
+## years in the data base
 datayears <- opendata() |>
     filter(!is.na(CHP1_sig)) |>
     select(year) |>
@@ -334,7 +334,7 @@ for (YYYY in sort(years_to_do)) {
                               "Negative signal",
                               "All signal"),
            lty = 1, bty = "n", cex = 0.8,
-           col = c("red", "blue", "black"))
+           col = c("blue", "red", "black"))
     cat('\n\n')
 
 

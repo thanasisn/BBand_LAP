@@ -53,11 +53,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -110,9 +110,6 @@ if (length(args) > 0) {
 }
 
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
-
-
-
 
 ## years in the data base
 datayears <- opendata() |>
@@ -326,7 +323,7 @@ for (YYYY in sort(years_to_do)) {
                               "Negative signal",
                               "All signal"),
            lty = 1, bty = "n", cex = 0.8,
-           col = c("red", "blue", "black"))
+           col = c("blue", "red", "black"))
     cat('\n\n')
 
 
