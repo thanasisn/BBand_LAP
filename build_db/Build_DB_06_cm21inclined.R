@@ -40,7 +40,7 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
@@ -75,7 +75,9 @@ inp_filelist <- list.files(path        = SIRENA_INC,
                            full.names  = TRUE)
 cat("\n**Found:", paste(length(inp_filelist), "INCLINED CM-21 files from Sirena**\n"))
 ## just in case, there are nested folders with more lap files in Sirens
-inp_filelist <- grep("OLD", inp_filelist, ignore.case = T, invert = T, value = T )
+inp_filelist <- grep("OLD", inp_filelist, ignore.case = T, invert = T, value = T)
+inp_filelist <- grep("Horizontal", inp_filelist, ignore.case = T, invert = T, value = T)
+
 
 inp_filelist <- data.table(fullname = inp_filelist)
 inp_filelist[, cm21inc_basename := basename(fullname)]
@@ -136,7 +138,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
                              by         = "min")
 
             ## __  Read LAP file  --------------------------------------------------
-            if (nrow(ss)>1) {stop("Multiple input files!!")}
+            if (nrow(ss) > 1) {stop("Multiple input files!!")}
             lap    <- fread(ss$fullname, na.strings = "-9")
             lap$V1 <- as.numeric(lap$V1)
             lap$V2 <- as.numeric(lap$V2)
