@@ -311,8 +311,6 @@ for (YYYY in sort(datayears)) {
     plot(sun_down[, (GLB_wpsm - tot_glb) / tot_glb, Date],
          main = "(GLB_wpsm - tot_glb) / tot_glb  Elevation<0")
 
-
-
 }
 
 
