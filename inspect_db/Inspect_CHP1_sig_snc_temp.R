@@ -278,7 +278,7 @@ for (YYYY in sort(years_to_do)) {
          cex  = .1,
          main = paste("CHP1 signal ", YYYY ),
          xlab = "Elevation",
-         ylab = "CHP1 signal" )
+         ylab = "CHP1 signal")
     points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
     cat('\n\n')
@@ -289,7 +289,7 @@ for (YYYY in sort(years_to_do)) {
          cex  = .1,
          main = paste("CHP1 signal ", YYYY),
          xlab = "",
-         ylab = "CHP1 signal" )
+         ylab = "CHP1 signal")
     points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
     abline(h = yearlims[ an == "CHP1_sig", low], lty = 3, col = "red")
@@ -300,7 +300,7 @@ for (YYYY in sort(years_to_do)) {
     plot(year_data$Elevat, year_data$CHP1_sig_sd,
          pch  = 19,
          cex  = .1,
-         main = paste("CHP1 signal SD", YYYY ),
+         main = paste("CHP1 signal SD", YYYY),
          xlab = "Elevation",
          ylab = "CHP1 signal SD")
     abline(h = yearlims[ an == "CHP1_sig_sd", low], lty = 3, col = "red")
@@ -319,7 +319,7 @@ for (YYYY in sort(years_to_do)) {
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CHP-1 signal ",  YYYY) )
+         main = paste("Cum Sum of CHP-1 signal ",  YYYY))
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -349,7 +349,7 @@ for (YYYY in sort(years_to_do)) {
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CHP-1 sd ",  YYYY) )
+         main = paste("Cum Sum of CHP-1 sd ",  YYYY))
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -376,7 +376,7 @@ for (YYYY in sort(years_to_do)) {
     title(main = paste("CHP1value by month", YYYY))
     cat('\n\n')
 
-    boxplot(year_data$CHP1_sig_sd ~ month_vec )
+    boxplot(year_data$CHP1_sig_sd ~ month_vec)
     title(main = paste("CHP1sd by month", YYYY))
     cat('\n\n')
 
