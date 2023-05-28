@@ -111,9 +111,6 @@ if (length(args) > 0) {
 
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 
-
-
-
 ## years in the data base
 datayears <- opendata() |> select(year) |> unique() |> collect() |> pull()
 
@@ -264,9 +261,9 @@ for (YYYY in sort(years_to_do)) {
     plot(year_data$Elevat, year_data$CM21_sig,
          pch  = 19,
          cex  = .1,
-         main = paste("CM21 signal ", YYYY ),
+         main = paste("CM21 signal ", YYYY),
          xlab = "Elevation",
-         ylab = "CM21 signal" )
+         ylab = "CM21 signal")
     points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
     cat('\n\n')
@@ -275,9 +272,9 @@ for (YYYY in sort(years_to_do)) {
     plot(year_data$Date, year_data$CM21_sig,
          pch  = 19,
          cex  = .1,
-         main = paste("CM21 signal ", YYYY ),
+         main = paste("CM21 signal ", YYYY),
          xlab = "",
-         ylab = "CM21 signal" )
+         ylab = "CM21 signal")
     points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
     abline(h = yearlims[ an == "CM21_sig", low], lty = 3, col = "red")
@@ -288,7 +285,7 @@ for (YYYY in sort(years_to_do)) {
     plot(year_data$Elevat, year_data$CM21_sig_sd,
          pch  = 19,
          cex  = .1,
-         main = paste("CM21 signal SD", YYYY ),
+         main = paste("CM21 signal SD", YYYY),
          xlab = "Elevation",
          ylab = "CM21 signal SD")
     abline(h = yearlims[ an == "CM21_sig_sd", low], lty = 3, col = "red")
@@ -307,7 +304,7 @@ for (YYYY in sort(years_to_do)) {
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM-21 signal ",  YYYY) )
+         main = paste("Cum Sum of CM-21 signal ",  YYYY))
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -337,7 +334,7 @@ for (YYYY in sort(years_to_do)) {
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM-21 sd ",  YYYY) )
+         main = paste("Cum Sum of CM-21 sd ",  YYYY))
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -500,3 +497,4 @@ tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+
