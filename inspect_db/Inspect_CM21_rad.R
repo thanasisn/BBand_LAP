@@ -139,7 +139,7 @@ hist( BB |> select("GLB_wpsm") |> collect() |> pull(), breaks = 100)
 
 
 
-GHI_negative <- BB |> filter(GLB_wpsm < -25) |> select(Date) |> collect()
+GHI_negative <- BB |> filter(GLB_wpsm < -20) |> select(Date) |> collect()
 pander(GHI_negative)
 
 
