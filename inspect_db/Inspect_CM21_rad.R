@@ -124,8 +124,14 @@ BB |>
     summarise( across(all_of(vars), list( max = ~ max(., na.rm = T),
                                           min = ~ min(., na.rm = T)) ) ) |> collect()
 
+## histogram of SD
+hist( BB |> select("GLB_SD_wpsm") |> collect() |> pull() )
 
-stop("TEST")
+## extreme SD to check
+BB |> filter(GLB_SD_wpsm > 1000) |> select(Date) |> collect()
+
+
+# stop("TEST")
 
 
 ## years in the data base
