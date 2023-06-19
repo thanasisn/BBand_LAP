@@ -111,6 +111,21 @@ if (length(args) > 0) {
 
 # cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 
+vars <- c("GLB_wpsm", "GLB_SD_wpsm")
+
+BB <- opendata()
+
+names(BB)
+
+BB |>
+    summarise( across(all_of(vars), ~ max(., na.rm = T) ) ) |> collect()
+
+BB |>
+    summarise( across(all_of(vars), list( max = ~ max(., na.rm = T),
+                                          min = ~ min(., na.rm = T)) ) ) |> collect()
+
+
+stop("TEST")
 
 
 ## years in the data base
