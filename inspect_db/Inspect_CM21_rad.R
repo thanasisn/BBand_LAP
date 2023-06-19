@@ -120,15 +120,27 @@ names(BB)
 BB |>
     summarise( across(all_of(vars), ~ max(., na.rm = T) ) ) |> collect()
 
+## get range
 BB |>
     summarise( across(all_of(vars), list( max = ~ max(., na.rm = T),
                                           min = ~ min(., na.rm = T)) ) ) |> collect()
 
 ## histogram of SD
-hist( BB |> select("GLB_SD_wpsm") |> collect() |> pull() )
+hist( BB |> select("GLB_SD_wpsm") |> collect() |> pull(), breaks = 100)
 
 ## extreme SD to check
-BB |> filter(GLB_SD_wpsm > 1000) |> select(Date) |> collect()
+SD_outliers <- BB |> filter(GLB_SD_wpsm > 400) |> select(Date) |> collect()
+pander(SD_outliers)
+
+
+## histogram of GHI radiation
+hist( BB |> select("GLB_wpsm") |> collect() |> pull(), breaks = 100)
+
+
+
+
+GHI_negative <- BB |> filter(GLB_wpsm < -25) |> select(Date) |> collect()
+pander(GHI_negative)
 
 
 # stop("TEST")
