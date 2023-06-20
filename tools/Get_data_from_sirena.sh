@@ -72,14 +72,28 @@ else
 fi
 
 ## commit data to git
-cd "$HOME/DATA_RAW/Bband" # || echo "missing folder" && exit
-## add all files
-find . -type f -not -path '*/\.git/*' -print0 |\
-       xargs -t -0 git add 
-## commit and push
-git commit -uno -a -m "Commit $(date +'%F %R')"
-git push -f
-git push --tag 
+folders=(
+    "$HOME/DATA_RAW/Bband"
+    "$HOME/DATA_RAW/tracker_chp1"
+)
+
+for i in "${folders[@]}"; do
+    echo
+    info " $i "
+    echo
+    [ ! -d "$i" ] && echo "Not a folder: $i" && continue
+    ## go through sub folders
+    cd "$i" || return
+    ## in the git folder here
+    pwd
+    ## add files we care about
+    find . -type f -not -path '*/\.git/*' -print0 |\
+           xargs -t -0 git add -f
+    ## commit and push
+    git commit -uno -a -m "Commit $(date +'%F %R')"
+    git push -f
+    git push --tag 
+done
 
 
 echo "FIN"
