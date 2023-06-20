@@ -10,5 +10,5 @@
 - use/check Async step data
 
 - missing inclined files may be in radmon folder
-  - binary files exist in sirena
 
+- when creating radiation from dark corrected make sure to clean the previous radiation data in order to update changes in bad_data_flags
