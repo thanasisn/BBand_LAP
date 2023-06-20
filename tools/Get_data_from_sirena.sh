@@ -72,4 +72,16 @@ else
     echo "...exit..."
 fi
 
+## commit data to git
+cd "/$HOME/DATA_RAW/Bband" || echo "missing folder" && exit
+    ## add all files
+    find . -type f -print0 |\
+           xargs -t -0 git add 
+    ## commit and push
+    git commit -uno -a -m "Commit $(date +'%F %R')"
+    git push -f
+    git push --tag 
+
+
+
 exit 0
