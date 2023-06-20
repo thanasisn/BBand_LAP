@@ -125,22 +125,46 @@ BB |>
     summarise( across(all_of(vars), list( max = ~ max(., na.rm = T),
                                           min = ~ min(., na.rm = T)) ) ) |> collect()
 
-## histogram of SD
-hist( BB |> select("GLB_SD_wpsm") |> collect() |> pull(), breaks = 100)
+
+#'
+#' ## Stats on whole data set.
+#'
+#'
+#+ include=T, echo=F
+
+## histogram of GHI SD
+hist(
+    BB |> select("GLB_SD_wpsm") |> collect() |> pull(),
+    breaks = 100,
+    xlab   =  expression(W %.% m^-2),
+    main   = "Distribution of GLB SD"
+)
+
+## histogram of GHI
+hist(
+    BB |> select("GLB_wpsm") |> collect() |> pull(),
+    breaks = 100,
+    xlab   =  expression(W %.% m^-2),
+    main   = "Distribution of GLB"
+)
+
 
 ## extreme SD to check
 SD_outliers <- BB |> filter(GLB_SD_wpsm > 400) |> select(Date) |> collect()
 pander(SD_outliers)
 
 
-## histogram of GHI radiation
-hist( BB |> select("GLB_wpsm") |> collect() |> pull(), breaks = 100)
-
-
-
-
 GHI_negative <- BB |> filter(GLB_wpsm < -20) |> select(Date) |> collect()
 pander(GHI_negative)
+
+extreme <-  BB |>
+    group_by(as.Date(Date)) |>
+    summarise( across(all_of(vars), list(max = ~ max(., na.rm = T),
+                                         min = ~ min(., na.rm = T)))) |>
+    collect()
+
+extreme
+
 
 
 # stop("TEST")
