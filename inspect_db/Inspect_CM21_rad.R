@@ -111,19 +111,15 @@ if (length(args) > 0) {
 
 # cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 
-vars <- c("GLB_wpsm", "GLB_SD_wpsm")
+
+
+
+##  Overall statistics  --------------------------------------------------------
 
 BB <- opendata()
 
-names(BB)
-
-BB |>
-    summarise( across(all_of(vars), ~ max(., na.rm = T) ) ) |> collect()
-
-## get range
-BB |>
-    summarise( across(all_of(vars), list( max = ~ max(., na.rm = T),
-                                          min = ~ min(., na.rm = T)) ) ) |> collect()
+## variables for stats
+vars <- c("GLB_wpsm", "GLB_SD_wpsm")
 
 
 #'
@@ -153,22 +149,41 @@ hist(
 SD_outliers <- BB |> filter(GLB_SD_wpsm > 400) |> select(Date) |> collect()
 pander(SD_outliers)
 
+SD_negative <- BB |> filter(GLB_SD_wpsm < 0) |> select(Date) |> collect()
+pander(SD_negative)
 
+
+## extreme values to check
 GHI_negative <- BB |> filter(GLB_wpsm < -20) |> select(Date) |> collect()
 pander(GHI_negative)
 
-extreme <-  BB |>
-    group_by(as.Date(Date)) |>
-    summarise( across(all_of(vars), list(max = ~ max(., na.rm = T),
-                                         min = ~ min(., na.rm = T)))) |>
-    collect()
-
-extreme
 
 
+## get daily ranges
+extreme <- data.table(BB |>
+    group_by(Day = as.Date(Date)) |>
+    filter(!is.na(GLB_wpsm))      |>
+    summarise(across(all_of(vars), list(max = ~ max(., na.rm = T),
+                                        min = ~ min(., na.rm = T)))) |>
+    collect())
 
-# stop("TEST")
 
+plot(extreme[, GLB_wpsm_max, Day])
+plot(extreme[, GLB_wpsm_min, Day])
+
+plot(extreme[, GLB_SD_wpsm_max, Day])
+plot(extreme[, GLB_SD_wpsm_min, Day])
+
+
+
+pander(
+    head(extreme[order(extreme$GLB_SD_wpsm_min, decreasing = T)], 10)
+)
+
+
+
+
+##  Yearly plots  --------------------------------------------------------------
 
 ## years in the data base
 datayears <- opendata() |>
@@ -212,18 +227,18 @@ for (YYYY in sort(years_to_do)) {
     )
 
 
-    ## Check for night time extreme values -------------------------------------
+    ## _ Check for night time extreme values -----------------------------------
     #'
     #' Problems in the night signal especially bellow DARK_ELEV can be spotted
     #' and corrected with exclusions to protect the dark signal calculation.
     #'
 
-    ## Dynamic outliers ----
+    ## __ Dynamic outliers limits ----
     OutliersUP   <- 3.5
     OutliersDOWN <- 4.5
 
 
-    ## Dark data Global --------------------------------------------------------
+    ## _ Dark data Global ------------------------------------------------------
     av  <- "GLB_wpsm"
     ppD <- data.table(year_data[Elevat < DARK_ELEV, get(av), Date])
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
@@ -253,7 +268,7 @@ for (YYYY in sort(years_to_do)) {
         cat('\n\n')
     }
 
-    ## Dark data Global SD -----------------------------------------------------
+    ## _ Dark data Global SD ---------------------------------------------------
     av  <- "GLB_SD_wpsm"
     ppD <- data.table(year_data[Elevat < DARK_ELEV, get(av), Date])
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
@@ -284,7 +299,7 @@ for (YYYY in sort(years_to_do)) {
     }
 
 
-    ## Night data Global -------------------------------------------------------
+    ## _ Night data Global -----------------------------------------------------
     av  <- "GLB_wpsm"
     ppD <- data.table(year_data[Elevat < 0, get(av), Date])
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
@@ -315,7 +330,7 @@ for (YYYY in sort(years_to_do)) {
     }
 
 
-    ## Night data Global SD ----------------------------------------------------
+    ## _ Night data Global SD --------------------------------------------------
     av  <- "GLB_SD_wpsm"
     ppD <- data.table(year_data[Elevat < 0, get(av), Date])
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
@@ -347,7 +362,7 @@ for (YYYY in sort(years_to_do)) {
 
 
 
-    ## Distribution of direct and SD -------------------------------------------
+    ## _ Distribution of direct and SD -----------------------------------------
     # hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
     #      main = paste(YYYY, "GHI Elevat <", DARK_ELEV, "°"),
     #      breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
@@ -356,7 +371,7 @@ for (YYYY in sort(years_to_do)) {
     # cat('\n\n')
 
 
-    ## Plots of SD -------------------------------------------------------------
+    ## _ Plots of SD -----------------------------------------------------------
     plot(year_data[Elevat > 0, GLB_SD_wpsm, Date],
          pch  = 19,
          cex  = .1,
@@ -367,7 +382,7 @@ for (YYYY in sort(years_to_do)) {
 
 
 
-    ## Distribution of Global and SD -------------------------------------------
+    ## _ Distribution of Global and SD -----------------------------------------
     wattlimit <- 50
     hist(year_data[GLB_wpsm > wattlimit, GLB_wpsm],
          main = paste(YYYY, "GHI >", wattlimit, "[Watt/m^2]"),
@@ -382,7 +397,7 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
 
-    ## Scatter points by sun position ------------------------------------------
+    ## _ Scatter points by sun position ----------------------------------------
     plot(year_data$Elevat, year_data$GLB_wpsm,
          pch  = 19,
          cex  = .1,
@@ -400,7 +415,7 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
 
-    ## Scatter points by date --------------------------------------------------
+    ## _ Scatter points by date ------------------------------------------------
     plot(year_data$Date, year_data$GLB_wpsm,
          pch  = 19,
          cex  = .1,
@@ -410,7 +425,7 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
 
-    ## Scatter points by time of day -------------------------------------------
+    ## _ Scatter points by time of day -----------------------------------------
     plot(year_data[preNoon == TRUE, Elevat],
          year_data[preNoon == TRUE, GLB_wpsm],
          pch  = 19,
@@ -458,7 +473,7 @@ for (YYYY in sort(years_to_do)) {
 
 
 
-    ## Box plots by week -------------------------------------------------------
+    ## _ Box plots by week -----------------------------------------------------
     year_data[ , weekn := week(Date) ]
 
     boxplot(year_data[Elevat > 0, GLB_wpsm] ~ year_data[Elevat > 0, weekn],
