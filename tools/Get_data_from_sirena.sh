@@ -69,19 +69,19 @@ if mountpoint -q "$SOURCE" ; then
 else
     echo ""
     echo "No DATA mount point found!!"
-    echo "...exit..."
 fi
 
 ## commit data to git
-cd "/$HOME/DATA_RAW/Bband" || echo "missing folder" && exit
-    ## add all files
-    find . -type f -print0 |\
-           xargs -t -0 git add 
-    ## commit and push
-    git commit -uno -a -m "Commit $(date +'%F %R')"
-    git push -f
-    git push --tag 
+cd "$HOME/DATA_RAW/Bband" # || echo "missing folder" && exit
+## add all files
+find . -type f -not -path '*/\.git/*' -print0 |\
+       xargs -t -0 git add 
+## commit and push
+git commit -uno -a -m "Commit $(date +'%F %R')"
+git push -f
+git push --tag 
 
 
+echo "FIN"
 
 exit 0
