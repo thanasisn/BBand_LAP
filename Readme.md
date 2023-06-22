@@ -115,6 +115,7 @@ Some aspects on the implementation of this project.
 - There is a trade-of with the disk usage/wearing, especially when starting from scratch.
 - New data should be easy to be added on daily base on all levels.
 - New process and analysis should be easy to added for all data.
+- Goal to become a framework for all broadband instruments data analysis and manipulation.
 
 ## Documentation and usage
 
