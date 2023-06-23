@@ -13,4 +13,6 @@
 
 - SD==0 ; rad mon bad data
 
+- incremental check of the number of data
+
 - when creating radiation from dark corrected make sure to clean the previous radiation data in order to update changes in bad_data_flags
