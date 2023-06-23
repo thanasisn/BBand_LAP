@@ -102,8 +102,8 @@ done
 rsync -ar --exclude='.git/' "$HOME/DATA_RAW/Bband/"        "$HOME/DATA_RAW/.Bband_capture"
 rsync -ar --exclude='.git/' "$HOME/DATA_RAW/tracker_chp1/" "$HOME/DATA_RAW/.tracker_chp1_capture"
 
-
-echo "---------------------"
-echo "-- FIN SIRENA SYNC --"
-echo "---------------------"
+echo
+echo "  ---------------------"
+echo "  -- FIN SIRENA SYNC --"
+echo "  ---------------------"
 exit 0
