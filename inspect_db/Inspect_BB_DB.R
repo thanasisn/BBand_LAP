@@ -1,6 +1,12 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
+#'
+#' This run post process on the data.
+#' - Create data checks reports
+#' - Creates overview of previous processes
+#' - Creates daily plots
+#'
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
@@ -94,36 +100,36 @@ try({
 
 try({
     cat("\n\n 20. Inspect CHP-1 radiation\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/20_Inspect_CHP1_rad_temp.R",
-                      # params      = list(CLEAN = FALSE),
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+    rmarkdown::render(input      = "~/BBand_LAP/inspect_db/20_Inspect_CHP1_rad_temp.R",
+                      # params     = list(CLEAN = FALSE),
+                      output_dir = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
 try({
     cat("\n\n 21. Inspect CM-21 radiation\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/21_Inspect_CM21_rad.R",
-                      # params      = list(CLEAN = FALSE),
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+    rmarkdown::render(input      = "~/BBand_LAP/inspect_db/21_Inspect_CM21_rad.R",
+                      # params     = list(CLEAN = FALSE),
+                      output_dir = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
 
 
 
 try({
-    cat("\n\n 12. Plot daily radiation\n")
-    source("~/BBand_LAP/inspect_db/Plot_daily_CHP1_L1.R")
+    cat("\n\n 30. Plot daily radiation\n")
+    source("~/BBand_LAP/inspect_db/30_Plot_daily_CHP1_L1.R")
 })
 try({
-    cat("\n\n 13. Plot daily radiation\n")
-    source("~/BBand_LAP/inspect_db/Plot_daily_CM21_L1.R")
+    cat("\n\n 31. Plot daily radiation\n")
+    source("~/BBand_LAP/inspect_db/31_Plot_daily_CM21_L1.R")
 })
 
 
 
 try({
-    cat("\n\n 14. Inspect CM-21 radiation\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/Inspect_TOT_GLB.R",
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+    cat("\n\n 60. Inspect CM-21/TOT radiation\n")
+    rmarkdown::render(input      = "~/BBand_LAP/inspect_db/60_Inspect_TOT_GLB.R",
+                      output_dir = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
 

@@ -81,12 +81,9 @@ folders=(
 
 for i in "${folders[@]}"; do
     echo
-    info " $i "
-    echo
     [ ! -d "$i" ] && echo "Not a folder: $i" && continue
-    ## go through sub folders
+    ## get into the git folder 
     cd "$i" || return
-    ## in the git folder here
     pwd
     ## add files we care about
     find . -type f -not -path '*/\.git/*' -print0 |\
