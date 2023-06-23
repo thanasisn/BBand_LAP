@@ -62,47 +62,46 @@ try({
 
 
 
-try({
-    cat("\n\n 3a. Inspect INCLINED CM-21 signal CLEAN\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/03_Inspect_CM21INC_sig.R",
-                      params      = list(CLEAN = TRUE),
-                      output_file = "03_Inspect_CM21INC_sig_CLEAN.pdf",
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
-})
+# try({
+#     cat("\n\n 3a. Inspect INCLINED CM-21 signal CLEAN\n")
+#     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/03_Inspect_CM21INC_sig.R",
+#                       params      = list(CLEAN = TRUE),
+#                       output_file = "03_Inspect_CM21INC_sig_CLEAN.pdf",
+#                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+# })
 # try({
 #     cat("\n\n 3b. Inspect INCLINED CM-21 signal DIRTY\n")
-#     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/Inspect_CM21INC_sig.R",
+#     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/03_Inspect_CM21INC_sig.R",
 #                       params      = list(CLEAN = FALSE),
-#                       output_file = "Inspect_CM21INC_sig_DIRTY.pdf",
+#                       output_file = "03_Inspect_CM21INC_sig_DIRTY.pdf",
 #                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 # })
 
 
 
 
-
-
 try({
-    cat("\n\n 8. Plot daily CHP-1 signals\n")
-    source("~/BBand_LAP/inspect_db/Plot_daily_CHP1_sig.R")
+    cat("\n\n 10. Plot daily CHP-1 signals\n")
+    source("~/BBand_LAP/inspect_db/10_Plot_daily_CHP1_sig.R")
 })
 try({
-    cat("\n\n 9. Plot daily CM-21 signals\n")
-    source("~/BBand_LAP/inspect_db/Plot_daily_CM21_sig.R")
+    cat("\n\n 11. Plot daily CM-21 signals\n")
+    source("~/BBand_LAP/inspect_db/11_Plot_daily_CM21_sig.R")
 })
 
 
 
+
 try({
-    cat("\n\n 10. Inspect CHP-1 radiation\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/Inspect_CHP1_rad_temp.R",
+    cat("\n\n 20. Inspect CHP-1 radiation\n")
+    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/20_Inspect_CHP1_rad_temp.R",
                       # params      = list(CLEAN = FALSE),
                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
 try({
-    cat("\n\n 11. Inspect CM-21 radiation\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/Inspect_CM21_rad.R",
+    cat("\n\n 21. Inspect CM-21 radiation\n")
+    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/21_Inspect_CM21_rad.R",
                       # params      = list(CLEAN = FALSE),
                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 })
