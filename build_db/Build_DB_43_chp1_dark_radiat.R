@@ -28,11 +28,11 @@
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -164,7 +164,7 @@ for (af in filelist$names) {
         daydata <- data_use[ as.Date(Date) == aday ]
 
         if (any(is.na(daydata$Elevat))) {
-            cat("The day is not initialized:", format(as.Date(aday)), "\n")
+            cat("The day is not initialized:", format(as.Date(aday, origin = "1970-01-01")),"\n")
             next()
         }
 
@@ -247,8 +247,7 @@ for (af in filelist$names) {
     write_parquet(BB_meta, DB_META_fl)
     cat("43 Save: ", af, "\n\n")
     ## clean
-    rm(datapart, meta_day)
-
+    rm(datapart)
 }
 
 

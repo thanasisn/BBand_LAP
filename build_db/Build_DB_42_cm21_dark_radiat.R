@@ -160,7 +160,7 @@ for (af in filelist$names) {
         daydata <- data_use[ as.Date(Date) == aday ]
 
         if (any(is.na(daydata$Elevat))) {
-            cat("The day is not initialized:", format(as.Date(aday)),"\n")
+            cat("The day is not initialized:", format(as.Date(aday, origin = "1970-01-01")),"\n")
             next()
         }
 
@@ -207,14 +207,14 @@ for (af in filelist$names) {
             dark_generator <- dark_function_2(dark_day    = dark_day,
                                               DCOUNTLIM   = DCOUNTLIM,
                                               type        = "median",
-                                              missingdark = missingdark )
+                                              missingdark = missingdark)
             ## Create dark signal for every minute
             todays_dark_correction <- dark_generator(daydata$Date)
             dark_flag              <- "COMPUTED"
         }
 
         ## __ Apply dark correction for the day  -------------------------------
-        daydata[, CM21_sig_wo_dark := CM21_sig - todays_dark_correction ]
+        daydata[, CM21_sig_wo_dark := CM21_sig - todays_dark_correction]
 
         ## __ Convert signal to radiation --------------------------------------
         daydata[, GLB_wpsm    := CM21_sig_wo_dark * cm21factor(Date)]
@@ -248,8 +248,7 @@ for (af in filelist$names) {
     write_parquet(BB_meta, DB_META_fl)
     cat("42 Save: ", af, "\n\n")
     ## clean
-    rm(datapart, meta_day)
-
+    rm(datapart)
 }
 
 
