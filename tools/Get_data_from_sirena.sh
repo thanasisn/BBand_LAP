@@ -90,7 +90,7 @@ for i in "${folders[@]}"; do
     pwd
     ## add files we care about
     find . -type f -not -path '*/\.git/*' -print0 |\
-           xargs -t -0 git add -f
+           xargs -0 git add -f
     ## commit and push
     git commit -uno -a -m "Commit $(date +'%F %R')"
     git push -f
