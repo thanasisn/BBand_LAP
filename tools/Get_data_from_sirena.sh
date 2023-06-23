@@ -6,8 +6,9 @@
 ## Run rsync if mounted ----------------------------------------------
 SOURCE="/media/sirena_lapdata_ro"
 if mountpoint -q "$SOURCE" ; then
-
-    echo "get signal files 'LAP' of CM-21 global"
+    
+    echo "- - - - - - - - - - - - - - - - - - - -" 
+    echo "Get signal files 'LAP' of CM-21 global"
     rsync -arvt                                    \
         --include '*/'                             \
         --include '*.LAP'                          \
@@ -17,7 +18,8 @@ if mountpoint -q "$SOURCE" ; then
         "$SOURCE/archive/Bband/AC21_LAP.GLB/"      \
         "$HOME/DATA_RAW/Bband/AC21_LAP.GLB"
 
-    echo "get signal files 'LAP' of CM-21 inclined"
+    echo "- - - - - - - - - - - - - - - - - - - -" 
+    echo "Get signal files 'LAP' of CM-21 inclined"
     rsync -arvt                                    \
         --include '*/'                             \
         --include '*.LAP'                          \
@@ -27,7 +29,8 @@ if mountpoint -q "$SOURCE" ; then
         "$SOURCE/archive/Bband/CM21_LAP.INC/"      \
         "$HOME/DATA_RAW/Bband/CM21_LAP.INC"
 
-    echo "get signal files 'LAP' of ECO UVA? inclined"
+    echo "- - - - - - - - - - - - - - - - - - - -" 
+    echo "Get signal files 'LAP' of ECO UVA? inclined"
     rsync -arvt                                    \
         --include '*/'                             \
         --include '*.LAP'                          \
@@ -37,19 +40,21 @@ if mountpoint -q "$SOURCE" ; then
         "$SOURCE/archive/Bband/EKO_LAP.GLB/"       \
         "$HOME/DATA_RAW/Bband/EKO_LAP.GLB"
 
-    echo "get CHP1 signal files"
+    echo "- - - - - - - - - - - - - - - - - - - -" 
+    echo "Get CHP1 signal files"
     rsync -arvt                                    \
         "$SOURCE/archive/Bband/CHP1_lap.DIR/"      \
         "$HOME/DATA_RAW/Bband/CHP1_lap.DIR"
 
-
-    echo "get total radiation files 'TOT.DAT'"
+    echo "- - - - - - - - - - - - - - - - - - - -" 
+    echo "Get total radiation files 'TOT.DAT'"
     rsync -arvt                                    \
         --delete                                   \
         "$SOURCE/products/Bband/AC21_lap.GLB/"     \
         "$HOME/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
 
 
+    echo "- - - - - - - - - - - - - - - - - - - -" 
     echo "get other relative files"
     rsync -arvt                                    \
         --include '*/'                             \
