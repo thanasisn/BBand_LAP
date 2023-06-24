@@ -15,4 +15,6 @@
 
 - incremental check of the number of data
 
+- progress bar
+
 - when creating radiation from dark corrected make sure to clean the previous radiation data in order to update changes in bad_data_flags
