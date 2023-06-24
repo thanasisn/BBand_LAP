@@ -91,8 +91,8 @@ panderOptions("table.split.table",        120   )
 
 
 ## __  Variables  --------------------------------------------------------------
-CLEAN        <- TRUE
-# CLEAN        <- FALSE
+CLEAN <- TRUE
+# CLEAN <- FALSE
 
 
 ## __ Execution control  -------------------------------------------------------
@@ -298,7 +298,6 @@ for (YYYY in sort(years_to_do)) {
         cat('\n\n')
     }
 
-
     ## _ Night data Global -----------------------------------------------------
     av  <- "GLB_wpsm"
     ppD <- data.table(year_data[Elevat < 0, get(av), Date])
@@ -447,9 +446,9 @@ for (YYYY in sort(years_to_do)) {
 
 
     minelevet <- -1
-    xlim <- range(year_data$Elevat)
+    xlim <- range(year_data$Elevat, na.rm = TRUE)
     gap  <- 1
-    xlim[2] <- xlim[2] + abs(diff(range(year_data[Elevat > minelevet ,Elevat]))) + gap
+    xlim[2] <- xlim[2] + abs(diff(range(year_data[Elevat > minelevet, Elevat], na.rm = TRUE))) + gap
     xlim[1] <- minelevet
 
     plot(year_data[preNoon == TRUE & Elevat > minelevet, Elevat],
@@ -474,7 +473,7 @@ for (YYYY in sort(years_to_do)) {
 
 
     ## _ Box plots by week -----------------------------------------------------
-    year_data[ , weekn := week(Date) ]
+    year_data[ , weekn := week(Date)]
 
     boxplot(year_data[Elevat > 0, GLB_wpsm] ~ year_data[Elevat > 0, weekn],
             xlab = "Week", ylab = "[Watt/m^2]")
