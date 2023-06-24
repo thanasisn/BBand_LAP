@@ -88,8 +88,8 @@ panderOptions("table.split.table",        120   )
 
 
 ## __  Variables  --------------------------------------------------------------
-CLEAN        <- TRUE
-# CLEAN        <- FALSE
+CLEAN <- TRUE
+# CLEAN <- FALSE
 
 
 ## __ Execution control  -------------------------------------------------------
@@ -157,25 +157,25 @@ for (YYYY in sort(years_to_do)) {
     year_data[!is.na(chp1_bad_temp_flag), chp1_temperature_SD := NA]
 
 
-    ## Check for night time extreme values -------------------------------------
+    ## _ Check for night time extreme values -----------------------------------
     #'
     #' Problems in the night signal especially bellow DARK_ELEV can be spotted
     #' and corrected with exclusions to protect the dark signal calculation.
     #'
 
-    ## Dynamic outliers ----
+    ## __ Dynamic outliers limits ----
     OutliersUP   <- 3.5
     OutliersDOWN <- 4.5
 
 
-    ## Dark data Direct --------------------------------------------------------
+    ## _ Dark data Global ------------------------------------------------------
     av  <- "DIR_wpsm"
     ppD <- data.table(year_data[Elevat < DARK_ELEV, get(av), Date])
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
                     dmax = max(V1, na.rm = T)),
                 by = as.Date(Date)]
     low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
-    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP * sd(dmax)]
+    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP   * sd(dmax)]
     pplims <- data.table(av = av,low = low, upe = upe)
 
     plot(ppD,
@@ -198,7 +198,7 @@ for (YYYY in sort(years_to_do)) {
         cat('\n\n')
     }
 
-    ## Dark data Direct SD -----------------------------------------------------
+    ## _ Dark data Global SD ---------------------------------------------------
     av  <- "DIR_SD_wpsm"
     ppD <- data.table(year_data[Elevat < DARK_ELEV, get(av), Date])
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
@@ -228,7 +228,7 @@ for (YYYY in sort(years_to_do)) {
         cat('\n\n')
     }
 
-    ## Night data Direct -------------------------------------------------------
+    ## _ Night data Global -----------------------------------------------------
     av  <- "DIR_wpsm"
     ppD <- data.table(year_data[Elevat < 0, get(av), Date])
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
@@ -259,7 +259,7 @@ for (YYYY in sort(years_to_do)) {
     }
 
 
-    ## Night data Direct SD ----------------------------------------------------
+    ## _ Night data Global SD --------------------------------------------------
     av  <- "DIR_SD_wpsm"
     ppD <- data.table(year_data[Elevat < 0, get(av), Date])
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
@@ -291,7 +291,7 @@ for (YYYY in sort(years_to_do)) {
 
 
 
-    ## Distribution of direct and SD -------------------------------------------
+    ## _ Distribution of direct and SD -----------------------------------------
     wattlimit <- 50
     hist(year_data[ DIR_wpsm > wattlimit, DIR_wpsm],
          main = paste(YYYY, "Direct  >", wattlimit, "[Watt/m^2]"),
@@ -342,7 +342,7 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
 
-    ## Scatter points by date --------------------------------------------------
+    ## _ Scatter points by date ------------------------------------------------
     plot(year_data$Date, year_data$HOR_wpsm,
          pch  = 19,
          cex  = .1,
@@ -352,7 +352,7 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
 
-    ## Scatter points by time of day -------------------------------------------
+    ## _ Scatter points by time of day -----------------------------------------
     plot(year_data[preNoon == TRUE, Elevat],
          year_data[preNoon == TRUE, HOR_wpsm],
          pch  = 19,
@@ -374,9 +374,9 @@ for (YYYY in sort(years_to_do)) {
 
 
     minelevet <- -1
-    xlim <- range(year_data$Elevat)
+    xlim <- range(year_data$Elevat, na.rm = TRUE)
     gap  <- 1
-    xlim[2] <- xlim[2] + abs(diff(range(year_data[Elevat > minelevet ,Elevat]))) + gap
+    xlim[2] <- xlim[2] + abs(diff(range(year_data[Elevat > minelevet, Elevat], na.rm = TRUE))) + gap
     xlim[1] <- minelevet
 
     plot(year_data[preNoon == TRUE & Elevat > minelevet, Elevat],
@@ -400,8 +400,8 @@ for (YYYY in sort(years_to_do)) {
 
 
 
-    ## Box plots by week -------------------------------------------------------
-    year_data[ , weekn := week(Date) ]
+    ## _ Box plots by week -----------------------------------------------------
+    year_data[ , weekn := week(Date)]
 
     boxplot(year_data[Elevat > 0, HOR_wpsm] ~ year_data[Elevat > 0, weekn],
             xlab = "Week", ylab = "[Watt/m^2]")
