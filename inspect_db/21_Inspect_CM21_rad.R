@@ -460,9 +460,9 @@ for (YYYY in sort(years_to_do)) {
          main = paste("GHI morning/evening balance", YYYY),
          xaxt = "n",
          xlab = "Sun Elevation",
-         ylab = "[Watt/m^2]" )
+         ylab = expression(W %.% m^-2))
 
-    points(-year_data[preNoon == FALSE & Elevat > minelevet, Elevat] + gap + abs(diff(range(year_data$Elevat))),
+    points(-year_data[preNoon == FALSE & Elevat > minelevet, Elevat] + gap + abs(diff(range(year_data$Elevat, na.rm = TRUE))),
            year_data[preNoon == FALSE & Elevat > minelevet, GLB_wpsm],
            pch = 19,
            cex = 0.05,

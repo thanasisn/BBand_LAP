@@ -92,7 +92,7 @@ CLEAN <- TRUE
 # CLEAN <- FALSE
 
 TEST  <- FALSE
-TEST  <- TRUE
+# TEST  <- TRUE
 
 ## __ Execution control  -------------------------------------------------------
 ## When knitting
@@ -124,7 +124,6 @@ datayears <- opendata() |>
 ## TODO compare output files with parsed dates from meta
 years_to_do <- datayears
 
-# TEST
 if (TEST) {
     years_to_do <- 2023
 }
@@ -197,7 +196,7 @@ for (YYYY in sort(years_to_do)) {
     if (nrow(offend) > 0) {
         cat("\n### Dark outlier days\n\n")
         cat(pander(
-            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date)]
         ))
         cat('\n\n')
     }
@@ -209,7 +208,7 @@ for (YYYY in sort(years_to_do)) {
                     dmax = max(V1, na.rm = T)),
                 by = as.Date(Date)]
     low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
-    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP * sd(dmax)]
+    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP   * sd(dmax)]
     pplims <- data.table(av = av,low = low, upe = upe)
 
     plot(ppD,
@@ -227,7 +226,7 @@ for (YYYY in sort(years_to_do)) {
     if (nrow(offend) > 0) {
         cat("\n### Dark SD outlier days\n\n")
         cat(pander(
-            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date)]
         ))
         cat('\n\n')
     }
@@ -239,7 +238,7 @@ for (YYYY in sort(years_to_do)) {
                     dmax = max(V1, na.rm = T)),
                 by = as.Date(Date)]
     low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
-    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP * sd(dmax)]
+    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP   * sd(dmax)]
     pplims <- data.table(av = av,low = low, upe = upe)
 
     plot(ppD,
@@ -257,7 +256,7 @@ for (YYYY in sort(years_to_do)) {
     if (nrow(offend) > 0) {
         cat("\n### Night outlier days\n\n")
         cat(pander(
-            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date)]
         ))
         cat('\n\n')
     }
@@ -288,7 +287,7 @@ for (YYYY in sort(years_to_do)) {
     if (nrow(offend) > 0) {
         cat("\n### Night SD outlier days\n\n")
         cat(pander(
-            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
+            offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date)]
         ))
         cat('\n\n')
     }
@@ -299,7 +298,7 @@ for (YYYY in sort(years_to_do)) {
     wattlimit <- 50
     hist(year_data[ DIR_wpsm > wattlimit, DIR_wpsm],
          main = paste(YYYY, "Direct  >", wattlimit, "[Watt/m^2]"),
-         breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
+         breaks = 100 , las = 1, probability = T, xlab = "[Watt/m^2]")
     lines(density(year_data$DIR_wpsm, na.rm = T), col = "orange", lwd = 3)
     cat('\n\n')
 
@@ -334,7 +333,7 @@ for (YYYY in sort(years_to_do)) {
          cex  = .1,
          main = paste("Direct Beam ", YYYY),
          xlab = "",
-         ylab = "[Watt/m^2]" )
+         ylab = "[Watt/m^2]")
     cat('\n\n')
 
     plot(year_data$Azimuth, year_data$HOR_wpsm,
@@ -342,7 +341,7 @@ for (YYYY in sort(years_to_do)) {
          cex  = .1,
          main = paste("Direct Horizontal ", YYYY),
          xlab = "Azimuth [°]",
-         ylab = "[Watt/m^2]" )
+         ylab = "[Watt/m^2]")
     cat('\n\n')
 
 
@@ -352,7 +351,7 @@ for (YYYY in sort(years_to_do)) {
          cex  = .1,
          main = paste("Direct Horizontal ", YYYY),
          xlab = "",
-         ylab = "[Watt/m^2]" )
+         ylab = "[Watt/m^2]")
     cat('\n\n')
 
 
@@ -364,7 +363,7 @@ for (YYYY in sort(years_to_do)) {
          col  = "blue",
          main = paste("Direct Horizontal ", YYYY),
          xlab = "Elevation [°]",
-         ylab = "[Watt/m^2]" )
+         ylab = "[Watt/m^2]")
     points(year_data[preNoon == FALSE, Elevat],
            year_data[preNoon == FALSE, HOR_wpsm],
            pch = 19,
@@ -392,9 +391,9 @@ for (YYYY in sort(years_to_do)) {
          main = paste("DHI morning/evening balance", YYYY),
          xaxt = "n",
          xlab = "Sun Elevation",
-         ylab = "[Watt/m^2]" )
+         ylab = expression(W %.% m^-2))
 
-    points(-year_data[preNoon == FALSE & Elevat > minelevet, Elevat] + gap + abs(diff(range(year_data$Elevat))),
+    points(-year_data[preNoon == FALSE & Elevat > minelevet, Elevat] + gap + abs(diff(range(year_data$Elevat, na.rm = TRUE))),
            year_data[preNoon == FALSE & Elevat > minelevet, HOR_wpsm],
            pch = 19,
            cex = 0.05,
@@ -446,7 +445,7 @@ for (YYYY in sort(years_to_do)) {
         plot(year_data$Date, year_data$chp1_temperature,
              pch  = 19,
              cex  = .5,
-             main = paste("CHP1 temperature ", YYYY ),
+             main = paste("CHP1 temperature ", YYYY),
              xlab = "",
              ylab = "CHP1 temperature [C]" )
         cat('\n\n')
@@ -454,9 +453,9 @@ for (YYYY in sort(years_to_do)) {
         plot(year_data$Elevat, year_data$chp1_temperature_SD,
              pch  = 19,
              cex  = .5,
-             main = paste("CHP1 temperature SD", YYYY ),
+             main = paste("CHP1 temperature SD", YYYY),
              xlab = "Elevation [°]",
-             ylab = "CHP1 temperature SD [C]")
+             ylab = "CHP1 temperature SD [C°]")
         cat('\n\n')
     }
 }
