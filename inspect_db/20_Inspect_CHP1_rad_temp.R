@@ -91,6 +91,8 @@ panderOptions("table.split.table",        120   )
 CLEAN <- TRUE
 # CLEAN <- FALSE
 
+TEST  <- FALSE
+TEST  <- TRUE
 
 ## __ Execution control  -------------------------------------------------------
 ## When knitting
@@ -123,7 +125,9 @@ datayears <- opendata() |>
 years_to_do <- datayears
 
 # TEST
-# years_to_do <- 2021
+if (TEST) {
+    years_to_do <- 2023
+}
 
 #'
 #' ## Intro
