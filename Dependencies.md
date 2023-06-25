@@ -5,7 +5,6 @@
 
 ### `build_db`
 
-            renv:    0.17.3
            arrow:    12.0.1
       data.table:    1.14.8
            dplyr:     1.1.2
@@ -41,3 +40,16 @@
           pander:     0.6.5
            tools:     4.2.3
        rmarkdown:      2.22
+
+### `tools`
+
+           arrow:    12.0.1
+      data.table:    1.14.8
+           dplyr:     1.1.2
+     htmlwidgets:     1.6.2
+        optparse:     1.7.3
+          plotly:    4.10.2
+            funr:     0.3.2
+            renv:    0.17.3
+       lubridate:     1.9.2
+           shiny:     1.7.4
