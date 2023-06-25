@@ -8,19 +8,41 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
 
-## Describe environmnet
 
-stop()
+## __ Describe environment -----------------------------------------------------
+env_info <- "~/BBand_LAP/Dependencies.md"
 
-## Update input files
+cat("\n## BBand_LAP Current Running Environment\n", file = env_info)
+cat("\n", R.version.string, "\n", file = env_info, append = TRUE)
+
+cat("\n### `build_db`\n\n", file = env_info, append = TRUE)
+pkgs <- renv::dependencies("~/BBand_LAP/build_db/")
+for (ap in unique(pkgs$Package)) {
+    cat(sprintf("%16s:  %8s\n", ap, packageVersion(ap)), file = env_info, append = TRUE)
+}
+cat("\n### `inspect_db`\n\n", file = env_info, append = TRUE)
+pkgs <- renv::dependencies("~/BBand_LAP/inspect_db/")
+for (ap in unique(pkgs$Package)) {
+    cat(sprintf("%16s:  %8s\n", ap, packageVersion(ap)), file = env_info, append = TRUE)
+}
+cat("\n### `process`\n\n", file = env_info, append = TRUE)
+pkgs <- renv::dependencies("~/BBand_LAP/process/")
+for (ap in unique(pkgs$Package)) {
+    cat(sprintf("%16s:  %8s\n", ap, packageVersion(ap)), file = env_info, append = TRUE)
+}
+
+
+
+## Update input files ----------------------------------------------------------
 system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
 
+## Build tracker database ------------------------------------------------------
+## TODO: Under development
 try(
-## Build tracker database
-source("~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"       )
+    source("~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"       )
 )
 
-## Import raw data from instruments
+## Import raw data from instruments --------------------------------------------
 source("~/BBand_LAP/build_db/Build_DB_01_pysolar.R"         )
 source("~/BBand_LAP/build_db/Build_DB_02_cm21.R"            )
 source("~/BBand_LAP/build_db/Build_DB_03_chp1.R"            )
@@ -30,10 +52,13 @@ source("~/BBand_LAP/build_db/Build_DB_06_cm21inclined.R"    )
 
 source("~/BBand_LAP/build_db/Build_DB_16_cm21_TOT.R"        )
 
-## Flag bad data
+## Flag bad data ---------------------------------------------------------------
 source("~/BBand_LAP/build_db/Build_DB_30_exclude_ranges.R"  )
 
-## Apply dark offset and convert to radiation
+
+## Raw to actual data ----------------------------------------------------------
+
+## __ Apply dark offset and convert to radiation -------------------------------
 source("~/BBand_LAP/build_db/Build_DB_42_cm21_dark_radiat.R")
 source("~/BBand_LAP/build_db/Build_DB_43_chp1_dark_radiat.R")
 
@@ -41,10 +66,10 @@ source("~/BBand_LAP/build_db/Build_DB_43_chp1_dark_radiat.R")
 source("~/BBand_LAP/build_db/Build_DB_42_cm21_dark_radiat.R")
 source("~/BBand_LAP/build_db/Build_DB_43_chp1_dark_radiat.R")
 
-## Extra process for CHP-1 temperature
+## __ Extra process for CHP-1 temperature --------------------------------------
 source("~/BBand_LAP/build_db/Build_DB_44_chp1_temp_correc.R")
 
-## Add other data from other sources
+## Add data from other sources -------------------------------------------------
 source("~/BBand_LAP/build_db/Import_50_TSI.R"               )
 source("~/BBand_LAP/build_db/Import_51_Pressure.R"          )
 
