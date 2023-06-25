@@ -8,6 +8,10 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
 
+## Describe environmnet
+
+stop()
+
 ## Update input files
 system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
 
