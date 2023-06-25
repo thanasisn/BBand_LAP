@@ -9,29 +9,6 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
 
 
-## __ Describe environment -----------------------------------------------------
-env_info <- "~/BBand_LAP/Dependencies.md"
-
-cat("\n## BBand_LAP Current Running Environment\n", file = env_info)
-cat("\n", R.version.string, "\n", file = env_info, append = TRUE)
-
-cat("\n### `build_db`\n\n", file = env_info, append = TRUE)
-pkgs <- renv::dependencies("~/BBand_LAP/build_db/")
-for (ap in unique(pkgs$Package)) {
-    cat(sprintf("%16s:  %8s\n", ap, packageVersion(ap)), file = env_info, append = TRUE)
-}
-cat("\n### `inspect_db`\n\n", file = env_info, append = TRUE)
-pkgs <- renv::dependencies("~/BBand_LAP/inspect_db/")
-for (ap in unique(pkgs$Package)) {
-    cat(sprintf("%16s:  %8s\n", ap, packageVersion(ap)), file = env_info, append = TRUE)
-}
-cat("\n### `process`\n\n", file = env_info, append = TRUE)
-pkgs <- renv::dependencies("~/BBand_LAP/process/")
-for (ap in unique(pkgs$Package)) {
-    cat(sprintf("%16s:  %8s\n", ap, packageVersion(ap)), file = env_info, append = TRUE)
-}
-
-
 
 ## Update input files ----------------------------------------------------------
 system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
@@ -76,6 +53,10 @@ source("~/BBand_LAP/build_db/Import_51_Pressure.R"          )
 
 
 cat("\n\nEND of Building the DB\n\n")
+
+## __ Describe environment -----------------------------------------------------
+source("~/BBand_LAP/tools/List_dependencies.R")
+
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
