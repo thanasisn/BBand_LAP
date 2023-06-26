@@ -6,6 +6,7 @@ List of tags
       2 #broadband
       1 #ccd
      53 #chp1
+      1 #CHP-1
       1 #cleaned
      16 #cleaning
      11 #cm21

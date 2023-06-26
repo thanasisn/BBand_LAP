@@ -1358,6 +1358,19 @@ Clean spider web from inside of CHP-1 sun shader at
 
 
 
+## 2023-06-26 11:26 [ThanasisN]
+
+[//]: # (Keywords: #CHP-1)
+
+CHP-1 was cleaned from spider webs, in frond off the instrument window at
+
+08:26 - 08:30 UTC
+
+Also, instrument enclosure was sprayed with penetrating oil to deter insects.
+
+
+
+
 :::
 
 
@@ -1416,6 +1429,7 @@ List of tags
       2 #broadband
       1 #ccd
      53 #chp1
+      1 #CHP-1
       1 #cleaned
      16 #cleaning
      11 #cm21
