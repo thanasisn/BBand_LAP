@@ -23,7 +23,7 @@
        lubridate:     1.9.2
            tidyr:     1.3.0
            tools:     4.2.3
-       rmarkdown:      2.22
+       rmarkdown:      2.23
 
 ### `process`
 
@@ -39,7 +39,7 @@
            knitr:      1.43
           pander:     0.6.5
            tools:     4.2.3
-       rmarkdown:      2.22
+       rmarkdown:      2.23
 
 ### `tools`
 
@@ -52,4 +52,4 @@
             funr:     0.3.2
             renv:    0.17.3
        lubridate:     1.9.2
-           shiny:     1.7.4
+           shiny:   1.7.4.1
