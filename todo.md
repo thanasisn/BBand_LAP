@@ -17,4 +17,6 @@
 
 - progress bar
 
+- there is an wrong SZA value in 1995, see trends
+
 - when creating radiation from dark corrected make sure to clean the previous radiation data in order to update changes in bad_data_flags
