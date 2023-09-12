@@ -5,17 +5,16 @@ List of tags
       1 #brewers
       2 #broadband
       1 #ccd
-     53 #chp1
-      1 #CHP-1
+     54 #chp1
       1 #cleaned
      16 #cleaning
-     11 #cm21
+     12 #cm21
       2 #codding
       3 #data_corruption_certain
       1 #data_format_change
-     33 #data_loss
+     34 #data_loss
       3 #down_time
-      5 #error
+      6 #error
       2 #inclined
       7 #katastroph
       5 #leveling
