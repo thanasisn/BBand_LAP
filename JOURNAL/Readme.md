@@ -14,6 +14,29 @@ Other journals and log exist, but are not included here.
 
 \newpage
 
+# 1996
+
+::: {.columns columngap=4em column-rule="1px solid black"}
+
+
+## 1996-02-08 00:00 [ThanasisN]
+
+[//]: # (Keywords: #cm21, #data_loss, #error)
+
+Systematic cut-off of measurements due to gain error.
+
+Occurs until the night of 1996-02-29.
+
+Bias on daily radiation.
+
+
+
+
+:::
+
+
+\newpage
+
 # 2015
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
@@ -1360,7 +1383,7 @@ Clean spider web from inside of CHP-1 sun shader at
 
 ## 2023-06-26 11:26 [ThanasisN]
 
-[//]: # (Keywords: #CHP-1)
+[//]: # (Keywords: #chp1)
 
 CHP-1 was cleaned from spider webs, in frond off the instrument window at
 
@@ -1428,17 +1451,16 @@ List of tags
       1 #brewers
       2 #broadband
       1 #ccd
-     53 #chp1
-      1 #CHP-1
+     54 #chp1
       1 #cleaned
      16 #cleaning
-     11 #cm21
+     12 #cm21
       2 #codding
       3 #data_corruption_certain
       1 #data_format_change
-     33 #data_loss
+     34 #data_loss
       3 #down_time
-      5 #error
+      6 #error
       2 #inclined
       7 #katastroph
       5 #leveling
