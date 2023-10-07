@@ -5,51 +5,51 @@
 
 ### `build_db`
 
-           arrow:    12.0.1
+           arrow:  13.0.0.1
       data.table:    1.14.8
-           dplyr:     1.1.2
-           knitr:      1.43
-       lubridate:     1.9.2
+           dplyr:     1.1.3
+           knitr:      1.44
+       lubridate:     1.9.3
            tools:     4.2.3
           pander:     0.6.5
 
 ### `inspect_db`
 
-           arrow:    12.0.1
+           arrow:  13.0.0.1
       data.table:    1.14.8
-           dplyr:     1.1.2
-           knitr:      1.43
+           dplyr:     1.1.3
+           knitr:      1.44
           pander:     0.6.5
-       lubridate:     1.9.2
+       lubridate:     1.9.3
            tidyr:     1.3.0
            tools:     4.2.3
-       rmarkdown:      2.23
+       rmarkdown:      2.25
 
 ### `process`
 
-           arrow:    12.0.1
+           arrow:  13.0.0.1
       data.table:    1.14.8
             doMC:     1.3.8
-           dplyr:     1.1.2
+           dplyr:     1.1.3
          foreach:     1.5.2
-       lubridate:     1.9.2
+       lubridate:     1.9.3
          arsenal:     3.6.3
        compareDF:     2.3.5
-           Hmisc:     5.1.0
-           knitr:      1.43
+           Hmisc:     5.1.1
+           knitr:      1.44
           pander:     0.6.5
            tools:     4.2.3
-       rmarkdown:      2.23
+       rmarkdown:      2.25
 
 ### `tools`
 
-           arrow:    12.0.1
+           arrow:  13.0.0.1
       data.table:    1.14.8
-           dplyr:     1.1.2
+           dplyr:     1.1.3
      htmlwidgets:     1.6.2
         optparse:     1.7.3
           plotly:    4.10.2
             funr:     0.3.2
-            renv:     1.0.0
-       lubridate:     1.9.2
-           shiny:   1.7.4.1
+            renv:     1.0.3
+       lubridate:     1.9.3
+           shiny:     1.7.5
