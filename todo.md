@@ -1,6 +1,8 @@
 
 - implement packrat
 
+- on SDR trends we see some erroneous azimuth/SZA combinations on 29years
+
 - remove old plots
 - edit sync data
 
