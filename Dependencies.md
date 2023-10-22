@@ -52,4 +52,4 @@
             funr:     0.3.2
             renv:     1.0.3
        lubridate:     1.9.3
-           shiny:     1.7.5
+           shiny:   1.7.5.1
