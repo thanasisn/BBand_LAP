@@ -1394,6 +1394,19 @@ Also, instrument enclosure was sprayed with penetrating oil to deter insects.
 
 
 
+## 2023-10-25 09:22
+
+[//]: # (Keywords: #key_1, #key_2)
+
+Tracker is not tracking from yesterday.
+
+Reset it today. Tried to find zero, but failed and continue trying forever.
+
+Stop it reconnected, and now can not communicate with the control unit
+
+
+
+
 :::
 
 
@@ -1463,6 +1476,8 @@ List of tags
       6 #error
       2 #inclined
       7 #katastroph
+      1 #key_1
+      1 #key_2
       5 #leveling
       1 #mounting
       2 #panic
