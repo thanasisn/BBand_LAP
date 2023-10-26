@@ -1407,6 +1407,17 @@ Stop it reconnected, and now can not communicate with the control unit
 
 
 
+## 2023-10-26 11:20
+
+[//]: # (Keywords: #key_1, #key_2)
+
+We replaced 2 failed capacitors.
+Re install the board.
+But still there is no communication with the tracker
+
+
+
+
 :::
 
 
@@ -1476,8 +1487,8 @@ List of tags
       6 #error
       2 #inclined
       7 #katastroph
-      1 #key_1
-      1 #key_2
+      2 #key_1
+      2 #key_2
       5 #leveling
       1 #mounting
       2 #panic
