@@ -17,8 +17,8 @@ List of tags
       6 #error
       2 #inclined
       7 #katastroph
-      1 #key_1
-      1 #key_2
+      2 #key_1
+      2 #key_2
       5 #leveling
       1 #mounting
       2 #panic
