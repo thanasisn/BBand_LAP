@@ -45,7 +45,7 @@
 #' ---
 
 #'
-#'  **QCRad**
+#' **QCRad**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -689,8 +689,11 @@ if (TEST_01) {
 
     range(test$test, na.rm = T)
 
+
     hist(test$test, breaks = 100,
-         main = "TSI_TOA - DIR_strict")
+         main = "TSI_TOA - DIR_strict",
+         xlab = "")
+    cat("\n\n")
 
     test <- BB |>
         mutate(test = Glo_max_ref - GLB_strict) |>
@@ -699,7 +702,10 @@ if (TEST_01) {
     range(test$test, na.rm = T)
 
     hist(test$test, breaks = 100,
-         main = "Glo_max_ref - GLB_strict")
+         main = "Glo_max_ref - GLB_strict",
+         xlab = "")
+    cat("\n\n")
+
 
     if (DO_PLOTS) {
 
@@ -709,6 +715,9 @@ if (TEST_01) {
 
         test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
         ## TODO
+        if (nrow(test) == 0) {
+            cat("\nNO PLOTS FOR DIRECT QCv9_01_dir_flag\n\n")
+        }
         for (ad in sort(unique(as.Date(test$Date)))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
@@ -730,6 +739,9 @@ if (TEST_01) {
 
         ## Plot Global radiation
         test <- BB |> filter(!is.na(QCv9_01_glb_flag) ) |> collect() |> as.data.table()
+        if (nrow(test) == 0) {
+            cat("\nNO PLOTS FOR GLOBAL QCv9_01_glb_flag\n\n")
+        }
         for (ad in sort(unique(as.Date(c(test$Date))))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
