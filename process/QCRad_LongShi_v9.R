@@ -263,11 +263,10 @@ for (af in filelist$names) {
     #'
     #+ echo=TEST_01, include=T
     if (TEST_01) {
-        cat(paste("\n1. Physically Possible Limits.\n\n"))
-
         testN        <- 1
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+        cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
         InitVariableBBDB(flagname_DIR, as.character(NA))
         InitVariableBBDB(flagname_GLB, as.character(NA))
