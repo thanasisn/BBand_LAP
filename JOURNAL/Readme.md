@@ -1394,9 +1394,9 @@ Also, instrument enclosure was sprayed with penetrating oil to deter insects.
 
 
 
-## 2023-10-25 09:22
+## 2023-10-25 09:22 [ThanasisN]
 
-[//]: # (Keywords: #key_1, #key_2)
+[//]: # (Keywords: #tracker, #chp1, #problem)
 
 Tracker is not tracking from yesterday.
 
@@ -1407,13 +1407,24 @@ Stop it reconnected, and now can not communicate with the control unit
 
 
 
-## 2023-10-26 11:20
+## 2023-10-26 11:20 [ThanasisN]
 
 [//]: # (Keywords: #key_1, #key_2)
 
 We replaced 2 failed capacitors.
 Re install the board.
 But still there is no communication with the tracker
+
+
+
+
+## 2023-10-30 13:54 [ThanasisN]
+
+[//]: # (Keywords: #tracker, #chp1, #problem)
+
+CHP-1 tracker still not working.
+Possible a faulty transistor.
+Will replace tomorrow.
 
 
 
@@ -1475,7 +1486,7 @@ List of tags
       1 #brewers
       2 #broadband
       1 #ccd
-     54 #chp1
+     56 #chp1
       1 #cleaned
      16 #cleaning
      12 #cm21
@@ -1487,12 +1498,12 @@ List of tags
       6 #error
       2 #inclined
       7 #katastroph
-      2 #key_1
-      2 #key_2
+      1 #key_1
+      1 #key_2
       5 #leveling
       1 #mounting
       2 #panic
-      5 #problem
+      7 #problem
       2 #pysolar
       2 #radmon
       1 #radmon_reboot
@@ -1502,6 +1513,6 @@ List of tags
       1 #sync
       1 #temp
       1 #test
-      8 #tracker
+     10 #tracker
      20 #tracker2
       1 #works
