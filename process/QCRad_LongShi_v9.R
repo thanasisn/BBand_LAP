@@ -208,7 +208,7 @@ for (af in filelist$names) {
 
     ## __ Daytime radiation only  ----------------------------------------------
 
-    ## use this as processing marker
+    ## use this as a general processing marker for this script
     datapart$QCv9_01_dir_flag <- "pass"
 
     ## Direct beam DNI
@@ -678,10 +678,13 @@ if (TEST_01) {
     flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
     flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
 
-    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
-    cat("\n\n")
-    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
-    cat("\n\n")
+    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
+               caption = flagname_DIR))
+    cat(" \n \n")
+
+    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always"),
+               caption = flagname_GLB))
+    cat(" \n \n")
 
     test <- BB |>
         mutate(test = TSI_TOA - DIR_strict) |>
@@ -693,7 +696,7 @@ if (TEST_01) {
     hist(test$test, breaks = 100,
          main = "TSI_TOA - DIR_strict",
          xlab = "")
-    cat("\n\n")
+    cat(" \n \n")
 
     test <- BB |>
         mutate(test = Glo_max_ref - GLB_strict) |>
@@ -704,7 +707,7 @@ if (TEST_01) {
     hist(test$test, breaks = 100,
          main = "Glo_max_ref - GLB_strict",
          xlab = "")
-    cat("\n\n")
+    cat(" \n \n")
 
 
     if (DO_PLOTS) {
