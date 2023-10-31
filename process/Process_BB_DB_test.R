@@ -12,11 +12,16 @@ Script.Name <- "~/BBand_LAP/process/Process_BB_DB_test.R"
 library(rmarkdown)
 
 
-try({
-    render(input      = "~/BBand_LAP/process/Legacy_CM21_R30_export.R",
-           output_dir = "~/BBand_LAP/REPORTS/REPORTS")
-})
+# try({
+#     render(input      = "~/BBand_LAP/process/Legacy_CM21_R30_export.R",
+#            output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+# })
 
+try({
+    render(input         = "~/BBand_LAP/process/QCRad_LongShi_v9.R",
+           output_format = " bookdown::pdf_document2",
+           output_dir    = "~/BBand_LAP/REPORTS/REPORTS")
+})
 
 
 tac <- Sys.time()
