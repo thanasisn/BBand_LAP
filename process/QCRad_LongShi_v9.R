@@ -93,11 +93,11 @@ if (!interactive()) {
     sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
-library(data.table, warn.conflicts = TRUE, quietly = TRUE)
-library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
-library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
-library(pander,     warn.conflicts = TRUE, quietly = TRUE)
+library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
+library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Variables  -----------------------------------------------------------------
 sun_elev_min     <-  -2 * 0.103  ## Drop ALL radiation data when sun is below this point
@@ -488,8 +488,7 @@ for (af in filelist$names) {
 
 
     ## 6. Rayleigh Limit Diffuse Comparison  -----------------------------------
-    #' \FloatBarrier
-    #' \newpage
+    #'
     #' ## 6. Rayleigh Limit Diffuse Comparison
     #'
     #' Compare inferred diffuse radiation with a modeled value of diffuse,
@@ -501,7 +500,6 @@ for (af in filelist$names) {
     #' - Difference of Sun observation angle due to different instruments location.
     #' - Cases of instrument windows cleaning
     #'
-    #+ echo=TEST_06, include=T
 
     # criteria
     QS$Rayleigh_upper_lim <- 500    # Upper departure diffuse limit
@@ -551,12 +549,10 @@ for (af in filelist$names) {
 
     ## 7. Test for obstacles  --------------------------------------------------
     #'
-    #' \newpage
     #' ## 7. Test for obstacles
     #'
     #' This is deactivated
     #'
-    #+ echo=TEST_07, include=T
     if (TEST_07) {
         cat(paste("\n7. Obstacles test.\n\n"))
 
@@ -586,8 +582,7 @@ for (af in filelist$names) {
 
 
     ## 8. Test for inverted values  --------------------------------------------
-    #' \FloatBarrier
-    #' \newpage
+    #'
     #' ## 8. Test for inverted values
     #'
     #' Test the ratio of Diffuse / Global radiation.
@@ -634,8 +629,7 @@ for (af in filelist$names) {
 
 
     ## 9. Clearness index test  ------------------------------------------------
-    #' \FloatBarrier
-    #' \newpage
+    #'
     #' ## 9. Clearness index test
     #'
     #' This filter is mine, and is applied on GHI data.
@@ -645,9 +639,9 @@ for (af in filelist$names) {
     #'
     #' For larger elevation angles manual inspection is needed.
 
-    QS$CL_idx_max <<-  1.13   # Upper Clearness index accepted level
-    QS$CL_idx_min <<- -0.001  # Lower Clearness index accepted level
-    QS$CL_idx_ele <<-  8      # Apply for elevations above this angle
+    QS$CL_idx_max <-  1.13   # Upper Clearness index accepted level
+    QS$CL_idx_min <- -0.001  # Lower Clearness index accepted level
+    QS$CL_idx_ele <-  8      # Apply for elevations above this angle
 
     if (TEST_09) {
         cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
@@ -674,11 +668,13 @@ for (af in filelist$names) {
     write_parquet(x = datapart, sink = af)
     cat("Save: ", af, "\n\n")
 
-    stop()
+    ## store filters parameters
+    saveRDS(object = QS,
+            file   = sub("\\.R", "_parameters.Rds",Script.Name))
+
     ## clean
     rm(datapart)
     dummy <- gc()
-
 }
 
 myunlock(DB_lock)
@@ -694,7 +690,8 @@ myunlock(DB_lock)
 
 ## open data base for plots
 BB <- opendata()
-
+## load filter parameters
+QS <- readRDS(sub("\\.R", "_parameters.Rds",Script.Name))
 
 ## __ Part of data we care for  ------------------------------------------------
 if (PARTIAL == TRUE) {
@@ -809,7 +806,6 @@ if (TEST_01) {
     dummy <- gc()
     if (!interactive()) dummy <- dev.off()
 }
-#' -----------------------------------------------------------------------------
 #+ echo=F, include=T
 
 
@@ -905,7 +901,6 @@ if (TEST_02) {
     dummy <- gc()
     if (!interactive()) dummy <- dev.off()
 }
-#' -----------------------------------------------------------------------------
 #+ echo=F, include=T
 
 
@@ -1034,7 +1029,6 @@ if (TEST_03) {
     dummy <- gc()
     if (!interactive()) dummy <- dev.off()
 }
-#' -----------------------------------------------------------------------------
 #+ echo=F, include=T
 
 
@@ -1153,7 +1147,6 @@ if (TEST_04) {
     dummy <- gc()
     if (!interactive()) dummy <- dev.off()
 }
-#' -----------------------------------------------------------------------------
 #+ echo=F, include=T
 
 
@@ -1226,7 +1219,6 @@ if (TEST_05) {
     dummy <- gc()
     if (!interactive()) dummy <- dev.off()
 }
-#' -----------------------------------------------------------------------------
 #+ echo=F, include=T
 
 
@@ -1301,7 +1293,6 @@ if (TEST_06) {
     dummy <- gc()
     if (!interactive()) dummy <- dev.off()
 }
-#' -----------------------------------------------------------------------------
 #+ echo=F, include=T
 
 
@@ -1315,7 +1306,6 @@ if (TEST_06) {
 if (TEST_07) {
 
 }
-#' -----------------------------------------------------------------------------
 #+ echo=F, include=T
 
 
@@ -1382,7 +1372,6 @@ if (TEST_08) {
     dummy <- gc()
     if (!interactive()) dummy <- dev.off()
 }
-#' -----------------------------------------------------------------------------
 #+ echo=F, include=T
 
 
@@ -1484,7 +1473,6 @@ if (TEST_09) {
     dummy <- gc()
     if (!interactive()) dummy <- dev.off()
 }
-#' -----------------------------------------------------------------------------
 #+ echo=F, include=T
 
 
