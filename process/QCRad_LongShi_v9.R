@@ -342,11 +342,10 @@ for (af in filelist$names) {
     #'
     #+ echo=TEST_03, include=T
     if (TEST_03) {
-        cat(paste("\n3. Comparison tests.\n\n"))
-
         testN        <- 3
         flagname_UPP <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_upp_flag")
         flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
+        cat(paste("\n3. Comparison tests", flagname_UPP, flagname_LOW, "\n\n"))
 
         InitVariableBBDB(flagname_UPP, as.character(NA))
         InitVariableBBDB(flagname_LOW, as.character(NA))
@@ -877,10 +876,10 @@ if (TEST_03) {
     flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_UPP)), useNA = "always")))
-    cat("\n\n")
-    cat(pander(table(collect(select(BB, !!flagname_LOW)), useNA = "always")))
-    cat("\n\n")
+    cat(" \n \n")
 
+    cat(pander(table(collect(select(BB, !!flagname_LOW)), useNA = "always")))
+    cat(" \n \n")
 
     years <- (BB |> filter(!is.na(DiffuseFraction_kd)) |>
                   select(year) |> unique() |> collect() |> pull())
@@ -891,6 +890,7 @@ if (TEST_03) {
 
         par(mar = c(4, 4, 2, 1))
 
+        ## plot limits by SZA
         plot(pp$SZA, pp$DiffuseFraction_kd,
              ylab = "Not Diffuse fraction", xlab = "SZA", ylim = ylim,
              cex = .1)
@@ -906,8 +906,9 @@ if (TEST_03) {
                cex = .2, col = "red")
         points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, SZA],
                cex = .2, col = "cyan")
+        cat(" \n \n")
 
-
+        ## plot limits by date
         plot(pp$Date, pp$DiffuseFraction_kd,
              ylab = "Not Diffuse fraction", xlab = "SZA", ylim = ylim,
              cex = .1)
@@ -917,8 +918,9 @@ if (TEST_03) {
                cex = .2, col = "red")
         points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, Date],
                cex = .2, col = "cyan")
+        cat(" \n \n")
 
-
+        ## plot limits by Azimuth
         plot(pp$Azimuth, pp$DiffuseFraction_kd,
              ylim = ylim,
              ylab = "Not Diffuse fraction", xlab = "Azimuth",
@@ -929,6 +931,7 @@ if (TEST_03) {
                cex = .2, col = "red")
         points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, Azimuth],
                cex = .2, col = "cyan")
+        cat(" \n \n")
     }
 
     if (DO_PLOTS) {
