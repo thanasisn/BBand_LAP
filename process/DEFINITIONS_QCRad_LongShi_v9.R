@@ -26,14 +26,16 @@ QS$glo_SWdn_amp <- 1.3  # Global departure factor above the model
 #'
 
 # Upper modeled values
-QS$Dir_SWdn_amp     <-    0.91 # Direct departure factor above the model
-QS$Dir_SWdn_off     <- -140    # Direct departure offset above the model
-QS$Glo_SWdn_amp     <- 1.18    # Global departure factor above the model
-QS$Glo_SWdn_off     <- 40      # Global departure offset above the model
+QS$Dir_SWdn_amp     <-    0.91  # Direct departure factor above the model
+QS$Dir_SWdn_off     <- -140     # Direct departure offset above the model
+QS$Glo_SWdn_amp     <-    1.18  # Global departure factor above the model
+QS$Glo_SWdn_off     <-   40     # Global departure offset above the model
 # Minimum accepted values
-QS$dir_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
-QS$glo_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
-
+QS$dir_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
+QS$glo_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
+# Ignore too low values near horizon
+QS$dir_SWdn_too_low <-    3     # Ideal w/m^2
+QS$glo_SWdn_too_low <-    3     # Ideal w/m^2
 
 
 #'
