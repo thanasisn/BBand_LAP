@@ -247,6 +247,7 @@ for (af in filelist$names) {
 
 
     ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ---------------------------------
+    cat("
     #' \FloatBarrier
     #' \newpage
     #' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
@@ -262,6 +263,7 @@ for (af in filelist$names) {
     #' values of the data set.
     #'
     #+ echo=TEST_01, include=T
+    ")
     if (TEST_01) {
         testN        <- 1
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
@@ -285,7 +287,7 @@ for (af in filelist$names) {
                  (flagname_GLB) := "Physical possible limit max (6)"]
 
         rm(list = ls(pattern = "flagname_.*"))
-        gc()
+        dummy <- gc()
     }
 
 
@@ -330,7 +332,7 @@ for (af in filelist$names) {
                  (flagname_GLB) := "Extremely rare limits max (4)"]
 
         rm(list = ls(pattern = "flagname_.*"))
-        gc()
+        dummy <- gc()
     }
 
 
@@ -371,7 +373,7 @@ for (af in filelist$names) {
                  (flagname_LOW) := "Diffuse ratio comp min (12)"]
 
         rm(list = ls(pattern = "flagname_.*"))
-        gc()
+        dummy <- gc()
     }
 
 
@@ -409,7 +411,7 @@ for (af in filelist$names) {
                  (flagname_GLB) := "Second climatological limit (16)"]
 
         rm(list = ls(pattern = "flagname_.*"))
-        gc()
+        dummy <- gc()
     }
 
 
@@ -451,7 +453,7 @@ for (af in filelist$names) {
              (flagname_DIR) := "Possible no tracking (24)"]
 
         rm(list = ls(pattern = "flagname_.*"))
-        gc()
+        dummy <- gc()
     }
 
 
@@ -507,7 +509,7 @@ for (af in filelist$names) {
                  (flagname_BTH) := "Rayleigh diffuse limit (18)"]
 
         rm(list = ls(pattern = "flagname_.*"))
-        gc()
+        dummy <- gc()
     }
 
 
@@ -590,7 +592,7 @@ for (af in filelist$names) {
                  (flagname_BTH) := "Direct > global hard (15)" ]
 
         rm(list = ls(pattern = "flagname_.*"))
-        gc()
+        dummy <- gc()
     }
 
 
@@ -624,7 +626,7 @@ for (af in filelist$names) {
              (flagname_GLB) := "Clearness index limit min (20)" ]
 
         rm(list = ls(pattern = "flagname_.*"))
-        gc()
+        dummy <- gc()
     }
 
 
@@ -636,7 +638,7 @@ for (af in filelist$names) {
     cat("Save: ", af, "\n\n")
     ## clean
     rm(datapart)
-    gc()
+    dummy <- gc()
 
     }
 
