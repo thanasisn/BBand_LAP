@@ -66,8 +66,7 @@
 #'
 #+ echo=F, include=T
 
-
-#+ echo=F, include=F
+#+ echo=F, include=T
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "png"   )
@@ -84,7 +83,6 @@ qc_ver      <- 9
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
-source("~/BBand_LAP/process/DEFINITIONS_QCRad_LongShi_v9.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
 mylock(DB_lock)
@@ -136,7 +134,14 @@ if (interactive()) {
 # TEST
 DO_PLOTS <- TRUE
 
+## __ Select a part of data to plot  -------------------------------------------
+PARTIAL    <- FALSE
+PARTIAL    <- TRUE
+PLOT_FIRST <- as_date("2023-01-01")
+PLOT_LAST  <- as_date("2024-03-31")
 
+## gather configurations for quality control
+QS <<- list()
 
 # ##  Create a test database  ----------------------------------------------------
 # TEST_DB <- TRUE
@@ -195,8 +200,11 @@ rm(temp_to_do, dd)
 
 
 
-## process data
-## loop data base files computing black for CHP-1
+## ~ ~ Apply Filters ~ ~  ------------------------------------------------------
+#'
+#' # Apply Filters
+#'
+#+ include=T
 for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
     datapart[, month := as.integer(month(Date))]
@@ -246,11 +254,9 @@ for (af in filelist$names) {
 
 
 
-    ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ---------------------------------
-    cat("
-    #' \FloatBarrier
-    #' \newpage
-    #' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
+    ## 1. Physically possible limits per BSRN  ---------------------------------
+    #'
+    #' ## 1. Physically possible limits per BSRN
     #'
     #' Test values are within physical/logical limits.
     #'
@@ -261,9 +267,13 @@ for (af in filelist$names) {
     #'
     #' These limit should not be met, they are defined neat the maximum observed
     #' values of the data set.
-    #'
-    #+ echo=TEST_01, include=T
-    ")
+
+    QS$dir_SWdn_min <-  -4    # Minimum direct value to consider valid measurement
+    QS$dir_SWdn_dif <- 327    # Closeness to to TSI
+    QS$glo_SWdn_min <-  -4    # Minimum global value to consider valid measurement
+    QS$glo_SWdn_off <- 160    # Global departure offset above the model
+    QS$glo_SWdn_amp <-   1.3  # Global departure factor above the model
+
     if (TEST_01) {
         testN        <- 1
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
@@ -292,17 +302,27 @@ for (af in filelist$names) {
 
 
 
-    ## 2. EXTREMELY RARE LIMITS PER BSRN  --------------------------------------
-    #' \FloatBarrier
-    #' \newpage
-    #' ## 2. EXTREMELY RARE LIMITS PER BSRN
+    ## 2. Extremely rare limits per BSRN  --------------------------------------
+    #'
+    #' ## 2. Extremely rare limits per BSRN
     #'
     #' These should be a little more restrictive than 1. in order to start
     #' catching erroneous values.
     #'
     #' The choose of those settings may be optimized with an iterative process.
-    #'
-    #+ echo=TEST_02, include=T
+
+    # Upper modeled values
+    QS$Dir_SWdn_amp     <-    0.91  # Direct departure factor above the model
+    QS$Dir_SWdn_off     <- -140     # Direct departure offset above the model
+    QS$Glo_SWdn_amp     <-    1.18  # Global departure factor above the model
+    QS$Glo_SWdn_off     <-   40     # Global departure offset above the model
+    # Minimum accepted values
+    QS$dir_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
+    QS$glo_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
+    # Ignore too low values near horizon
+    QS$dir_SWdn_too_low <-    3     # Ideal w/m^2
+    QS$glo_SWdn_too_low <-    3     # Ideal w/m^2
+
     if (TEST_02) {
         testN        <- 2
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
@@ -337,12 +357,18 @@ for (af in filelist$names) {
 
 
 
-    ## 3. COMPARISON TESTS PER BSRN “non-definitive”  --------------------------
-    #' \FloatBarrier
-    #' \newpage
-    #' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
+    ## 3. Comparison tests per BSRN “non-definitive”  --------------------------
     #'
-    #+ echo=TEST_03, include=T
+    #' ## 3. Comparison tests per BSRN “non-definitive”
+    #'
+
+    QS$dif_rati_po1  <-  0.03  # DiffuceFraction low limit
+    QS$dif_rati_po2  <-  0.08  # My DiffuceFraction low limit
+    QS$dif_sza_break <- 75     # SZA break point
+    QS$dif_rati_pr1  <-  1.03  # DiffuceFraction upper limit
+    QS$dif_rati_pr2  <-  1.06  # My DiffuceFraction upper limit
+    QS$dif_watt_lim  <- 10     # Filter only when GLB is above that
+
     if (TEST_03) {
         testN        <- 3
         flagname_UPP <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_upp_flag")
@@ -379,11 +405,15 @@ for (af in filelist$names) {
 
 
     ## 4. Climatological (configurable) Limits  --------------------------------
-    #' \FloatBarrier
-    #' \newpage
+    #'
     #' ## 4. Climatological (configurable) Limits
     #'
-    #+ echo=TEST_04, include=T
+
+    QS$clim_lim_C3 <- 0.77
+    QS$clim_lim_D3 <- 0.81
+    QS$clim_lim_C1 <- 1.14
+    QS$clim_lim_D1 <- 1.32
+
     if (TEST_04) {
         cat("\n4. Climatological (configurable) Limits.\n\n")
 
@@ -417,15 +447,14 @@ for (af in filelist$names) {
 
 
     ## 5. Tracker is off test  -------------------------------------------------
-    #' \FloatBarrier
-    #' \newpage
+    #'
     #' ## 5. Tracker is off test
     #'
     # This test use a diffuse model will be implemented when one is produced
     # and accepted. For now we omit it to protect from over-fitting prior to
     # make one such model.
     #
-    #+ echo=TEST_05, include=T
+
     ## criteria
     QS$Tracking_min_elev <-   15
     QS$ClrSW_lim         <-    0.85
@@ -473,6 +502,12 @@ for (af in filelist$names) {
     #' - Cases of instrument windows cleaning
     #'
     #+ echo=TEST_06, include=T
+
+    # criteria
+    QS$Rayleigh_upper_lim <- 500    # Upper departure diffuse limit
+    QS$Rayleigh_lower_lim <-  -3    # Lower departure diffuse limit
+    QS$Rayleigh_dif_glo_r <-   0.8  # Low limit diffuse/global < threshold
+    QS$Rayleigh_glo_min   <-  50    # Low limit minimum global
 
     # model
     Rayleigh_diff <- function(SZA, Pressure) {
@@ -570,8 +605,9 @@ for (af in filelist$names) {
     #' the same condition of Sun visibility.
     #'
     #' Additional criteria is needed for any data drop.
-    #'
-    #+ echo=TEST_08, include=T
+
+    QS$dir_glo_invert  <- 5  # Diffuse Inversion test: DIRhor - GLBhor > lim[%]
+    QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
 
     if (TEST_08) {
         cat(paste("\n8. Inversion test.\n\n"))
@@ -608,8 +644,10 @@ for (af in filelist$names) {
     #' kt = GLB / (cos(sza) * TSI).
     #'
     #' For larger elevation angles manual inspection is needed.
-    #'
-    #+ echo=TEST_09, include=T
+
+    QS$CL_idx_max <<-  1.13   # Upper Clearness index accepted level
+    QS$CL_idx_min <<- -0.001  # Lower Clearness index accepted level
+    QS$CL_idx_ele <<-  8      # Apply for elevations above this angle
 
     if (TEST_09) {
         cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
@@ -629,47 +667,50 @@ for (af in filelist$names) {
         dummy <- gc()
     }
 
-
     summary(datapart)
 
     ## store actual data
     datapart <- as_tibble(datapart)
     write_parquet(x = datapart, sink = af)
     cat("Save: ", af, "\n\n")
+
+    stop()
     ## clean
     rm(datapart)
     dummy <- gc()
 
-    }
+}
 
 myunlock(DB_lock)
 
 
 
-##  Inspect quality control data  ----------------------------------------------
+## ~ ~ Inspect quality control results ~ ~ -------------------------------------
+#'
+#' # Inspect quality control results
+#'
+#+ include=T, echo=F
+
 
 ## open data base for plots
 BB <- opendata()
 
 
-## inspect a part of data
-PLOT_FIRST <- as_date("2022-01-01")
-PLOT_LAST  <- as_date("2024-03-31")
+## __ Part of data we care for  ------------------------------------------------
+if (PARTIAL == TRUE) {
+    BB <- BB |> filter(as_date(Date) >= PLOT_FIRST &
+                       as_date(Date) <= PLOT_LAST) |>
+        compute()
 
-# BB <- BB |> filter(as_date(Date) >= PLOT_FIRST &
-#                    as_date(Date) <= PLOT_LAST) |>
-#     compute()
-#
-# yearstodo <- BB |> select(year) |> unique() |> pull(as_vector = TRUE)
-
+    cat("\n\n PARTIAL PLOT ", format(PLOT_FIRST), "--", format(PLOT_LAST), "\n\n")
+}
 
 
 
-
-####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ----------------------------------
+####  1. Physically possible limits per BSRN  ----------------------------------
 #' \FloatBarrier
 #' \newpage
-#' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
+#' ## 1. Physically possible limits per BSRN
 #'
 #+ echo=F, include=T, results="asis"
 if (TEST_01) {
@@ -765,17 +806,18 @@ if (TEST_01) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
-    gc()
-    if (!interactive()) dev.off()
+    dummy <- gc()
+    if (!interactive()) dummy <- dev.off()
 }
 #' -----------------------------------------------------------------------------
+#+ echo=F, include=T
 
 
 
-####  2. EXTREMELY RARE LIMITS PER BSRN  ---------------------------------------
+####  2. Extremely rare limits per BSRN  ---------------------------------------
 #' \FloatBarrier
 #' \newpage
-#' ## 2. EXTREMELY RARE LIMITS PER BSRN
+#' ## 2. Extremely rare limits per BSRN
 #'
 #+ echo=F, include=T, results="asis"
 if (TEST_02) {
@@ -830,7 +872,8 @@ if (TEST_02) {
             ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
             plot(pp$Date, pp$DIR_strict, "l", col = "blue",
                  ylim = ylim, xlab = "", ylab = "wattDIR")
-            title(paste("#2", as.Date(ad, origin = "1970-01-01")))
+            title(paste("#2", as.Date(ad, origin = "1970-01-01"),
+                        "N:", pp[!is.na(QCv9_02_dir_flag), .N]))
             ## plot limits
             lines(pp$Date, pp$Direct_max, col = "red")
             ## mark offending data
@@ -849,7 +892,8 @@ if (TEST_02) {
             ylim <- range(pp$Global_max, pp$GLB_strict, na.rm = T)
             plot(pp$Date, pp$GLB_strict, "l", col = "green",
                  ylim = ylim, xlab = "", ylab = "GLB")
-            title(paste("#2", as.Date(ad, origin = "1970-01-01")))
+            title(paste("#2", as.Date(ad, origin = "1970-01-01"),
+                        "N:", pp[!is.na(QCv9_02_glb_flag), .N] ))
             ## plot limits
             lines(pp$Date, pp$Global_max, col = "red")
             ## mark offending data
@@ -858,17 +902,18 @@ if (TEST_02) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
-    gc()
-    if (!interactive()) dev.off()
+    dummy <- gc()
+    if (!interactive()) dummy <- dev.off()
 }
 #' -----------------------------------------------------------------------------
+#+ echo=F, include=T
 
 
 
-####  3. COMPARISON TESTS PER BSRN “non-definitive”  ---------------------------
+####  3. Comparison tests per BSRN “non-definitive”  ---------------------------
 #' \FloatBarrier
 #' \newpage
-#' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
+#' ## 3. Comparison tests per BSRN “non-definitive”
 #'
 #+ echo=F, include=T, results="asis"
 if (TEST_03) {
@@ -986,10 +1031,11 @@ if (TEST_03) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
-    gc()
-    if (!interactive()) dev.off()
+    dummy <- gc()
+    if (!interactive()) dummy <- dev.off()
 }
 #' -----------------------------------------------------------------------------
+#+ echo=F, include=T
 
 
 
@@ -1104,10 +1150,11 @@ if (TEST_04) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
-    gc()
-    if (!interactive()) dev.off()
+    dummy <- gc()
+    if (!interactive()) dummy <- dev.off()
 }
 #' -----------------------------------------------------------------------------
+#+ echo=F, include=T
 
 
 
@@ -1176,10 +1223,11 @@ if (TEST_05) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
-    gc()
-    if (!interactive()) dev.off()
+    dummy <- gc()
+    if (!interactive()) dummy <- dev.off()
 }
 #' -----------------------------------------------------------------------------
+#+ echo=F, include=T
 
 
 ####  6. Rayleigh Limit Diffuse Comparison  ------------------------------------
@@ -1250,10 +1298,11 @@ if (TEST_06) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
-    gc()
-    if (!interactive()) dev.off()
+    dummy <- gc()
+    if (!interactive()) dummy <- dev.off()
 }
 #' -----------------------------------------------------------------------------
+#+ echo=F, include=T
 
 
 
@@ -1267,6 +1316,7 @@ if (TEST_07) {
 
 }
 #' -----------------------------------------------------------------------------
+#+ echo=F, include=T
 
 
 
@@ -1329,10 +1379,11 @@ if (TEST_08) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
-    gc()
-    if (!interactive()) dev.off()
+    dummy <- gc()
+    if (!interactive()) dummy <- dev.off()
 }
 #' -----------------------------------------------------------------------------
+#+ echo=F, include=T
 
 
 
@@ -1430,10 +1481,11 @@ if (TEST_09) {
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
-    gc()
-    if (!interactive()) dev.off()
+    dummy <- gc()
+    if (!interactive()) dummy <- dev.off()
 }
 #' -----------------------------------------------------------------------------
+#+ echo=F, include=T
 
 
 
@@ -1442,4 +1494,3 @@ tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
-
