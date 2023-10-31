@@ -1046,9 +1046,10 @@ if (TEST_04) {
     flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
-    cat("\n\n")
+    cat(" \n \n")
+
     cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
-    cat("\n\n")
+    cat(" \n \n")
 
     test <- data.table(BB |>
                            filter(!is.na(get(flagname_DIR)) |
@@ -1063,16 +1064,24 @@ if (TEST_04) {
 
     hist(test[, DIR_strict - Dir_First_Clim_lim], breaks = 100,
          main = "Departure Direct from first climatological limti")
+    cat(" \n \n")
 
     hist(test[, DIR_strict - Dir_Secon_Clim_lim], breaks = 100,
          main = "Departure Direct from second climatological limit")
+    cat(" \n \n")
 
     hist(test[, GLB_strict - Glo_First_Clim_lim], breaks = 100,
          main = "Departure Direct from first climatological limti")
+    cat(" \n \n")
 
     hist(test[, GLB_strict - Glo_Secon_Clim_lim], breaks = 100,
          main = "Departure Direct from second climatological limit")
+    cat(" \n \n")
 
+
+
+
+    stop("DDD")
     if (DO_PLOTS) {
 
         if (!interactive()) {
@@ -1081,12 +1090,12 @@ if (TEST_04) {
 
         ## test direct limits
         temp1 <- data.table(BB |>
-                               filter(!is.na(get(flagname_DIR))) |>
-                               select(Date,
-                                      DIR_strict,
-                                      Dir_First_Clim_lim, Dir_Secon_Clim_lim,
-                                      !!flagname_DIR) |>
-                               collect())
+                                filter(!is.na(get(flagname_DIR))) |>
+                                select(Date,
+                                       DIR_strict,
+                                       Dir_First_Clim_lim, Dir_Secon_Clim_lim,
+                                       !!flagname_DIR) |>
+                                collect())
 
         for (ad in sort(unique(as.Date(temp1$Date)))) {
             pp <- data.table(
