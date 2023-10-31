@@ -686,23 +686,25 @@ if (TEST_01) {
                caption = flagname_GLB))
     cat(" \n \n")
 
+    ## TODO display limits on graphs
     test <- BB |>
         mutate(test = TSI_TOA - DIR_strict) |>
         select(test) |> collect()
 
-    range(test$test, na.rm = T)
-
+    cat("\n", range(test$test, na.rm = T), "\n")
 
     hist(test$test, breaks = 100,
          main = "TSI_TOA - DIR_strict",
          xlab = "")
     cat(" \n \n")
 
+
+    ## TODO display limits on graphs
     test <- BB |>
         mutate(test = Glo_max_ref - GLB_strict) |>
         select(test) |> collect()
 
-    range(test$test, na.rm = T)
+    cat("\n", range(test$test, na.rm = T), "\n")
 
     hist(test$test, breaks = 100,
          main = "Glo_max_ref - GLB_strict",
@@ -719,7 +721,7 @@ if (TEST_01) {
         test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
         ## TODO
         if (nrow(test) == 0) {
-            cat("\nNO PLOTS FOR DIRECT QCv9_01_dir_flag\n\n")
+            cat("\nNO CASES FOR DIRECT QCv9_01_dir_flag\n\n")
         }
         for (ad in sort(unique(as.Date(test$Date)))) {
             pp <- data.table(
@@ -743,7 +745,7 @@ if (TEST_01) {
         ## Plot Global radiation
         test <- BB |> filter(!is.na(QCv9_01_glb_flag) ) |> collect() |> as.data.table()
         if (nrow(test) == 0) {
-            cat("\nNO PLOTS FOR GLOBAL QCv9_01_glb_flag\n\n")
+            cat("\nNO CASES FOR GLOBAL QCv9_01_glb_flag\n\n")
         }
         for (ad in sort(unique(as.Date(c(test$Date))))) {
             pp <- data.table(
