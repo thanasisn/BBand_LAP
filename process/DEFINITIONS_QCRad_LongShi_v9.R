@@ -42,12 +42,12 @@ QS$glo_SWdn_too_low <-    3     # Ideal w/m^2
 #' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
 #'
 
-QS$dif_rati_po1  <-  0.03
-QS$dif_rati_po2  <-  0.08
-QS$dif_sza_break <- 75
-QS$dif_rati_pr1  <-  1.03
-QS$dif_rati_pr2  <-  1.06
-QS$dif_watt_lim  <-  10
+QS$dif_rati_po1  <-  0.03  # DiffuceFraction low limit
+QS$dif_rati_po2  <-  0.08  # My DiffuceFraction low limit
+QS$dif_sza_break <- 75     # SZA break point
+QS$dif_rati_pr1  <-  1.03  # DiffuceFraction upper limit
+QS$dif_rati_pr2  <-  1.06  # My DiffuceFraction upper limit
+QS$dif_watt_lim  <- 10     # Filter only when GLB is above that
 
 
 
