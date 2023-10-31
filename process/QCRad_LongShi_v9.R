@@ -783,22 +783,34 @@ if (TEST_02) {
     flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
     flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
 
-    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
-    cat("\n\n")
-    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
-    cat("\n\n")
+    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
+               caption = flagname_DIR))
+    cat(" \n \n")
 
+    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always"),
+               caption = flagname_GLB))
+    cat("\n \n")
 
     test <- BB |>
         mutate(dir = Direct_max - DIR_strict,
                glo = Global_max - GLB_strict) |>
         select(dir, glo) |> collect()
 
-    range(test$dir, na.rm = TRUE)
-    hist(test$dir, breaks = 100)
+    cat("\n", range(test$dir, na.rm = TRUE), "\n")
 
-    range(test$glo, na.rm = TRUE)
-    hist(test$glo, breaks = 100)
+    hist(test$dir, breaks = 100,
+         main = "Direct_max - DIR_strict")
+    abline(v = QS$dir_SWdn_too_low)
+    abline(v = QS$dir_SWdn_min_ext, col = "red")
+    cat("\n \n")
+
+    cat("\n", range(test$glo, na.rm = TRUE), "\n")
+
+    hist(test$glo, breaks = 100,
+         main = "Global_max - GLB_strict")
+    abline(v = QS$glo_SWdn_too_low)
+    abline(v = QS$glo_SWdn_min_ext, col = "red")
+    cat("\n \n")
 
     if (DO_PLOTS) {
 
