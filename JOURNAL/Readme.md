@@ -1429,6 +1429,19 @@ Will replace tomorrow.
 
 
 
+## 2023-10-31 09:59 [ThanasisN]
+
+[//]: # (Keywords: #chp1, #tracker, #problem)
+
+Transistor was replaced,
+
+We can communicate with the controller.
+
+Although, the Azimuth channel is not working.
+
+
+
+
 :::
 
 
@@ -1486,7 +1499,7 @@ List of tags
       1 #brewers
       2 #broadband
       1 #ccd
-     56 #chp1
+     57 #chp1
       1 #cleaned
      16 #cleaning
      12 #cm21
@@ -1503,7 +1516,7 @@ List of tags
       5 #leveling
       1 #mounting
       2 #panic
-      7 #problem
+      8 #problem
       2 #pysolar
       2 #radmon
       1 #radmon_reboot
@@ -1513,6 +1526,6 @@ List of tags
       1 #sync
       1 #temp
       1 #test
-     10 #tracker
+     11 #tracker
      20 #tracker2
       1 #works
