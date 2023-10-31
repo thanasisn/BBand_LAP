@@ -302,11 +302,10 @@ for (af in filelist$names) {
     #'
     #+ echo=TEST_02, include=T
     if (TEST_02) {
-        cat(paste("\n2. Extremely Rare Limits.\n\n"))
-
         testN        <- 2
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+        cat(paste("\n2. Extremely Rare Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
         InitVariableBBDB(flagname_DIR, as.character(NA))
         InitVariableBBDB(flagname_GLB, as.character(NA))
@@ -315,8 +314,8 @@ for (af in filelist$names) {
         datapart[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off]
         datapart[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cosde(SZA)^1.2 + QS$Glo_SWdn_off]
         # Ignore too low values near horizon
-        datapart[Direct_max < 3, Direct_max := NA]
-        datapart[Global_max < 3, Direct_max := NA]
+        datapart[Direct_max < QS$dir_SWdn_too_low, Direct_max := NA]
+        datapart[Global_max < QS$glo_SWdn_too_low, Direct_max := NA]
 
         ## __ Direct  ----------------------------------------------------------
         datapart[DIR_strict < QS$dir_SWdn_min_ext,
