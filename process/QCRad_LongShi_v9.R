@@ -98,6 +98,8 @@ library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
+library(scales,     warn.conflicts = FALSE, quietly = TRUE)
+
 
 ##  Variables  -----------------------------------------------------------------
 sun_elev_min     <-  -2 * 0.103  ## Drop ALL radiation data when sun is below this point
@@ -1079,36 +1081,52 @@ if (TEST_04) {
     cat(" \n \n")
 
 
+    BB$DIR_wpsm
+
+    stop("DDD")
+    ## Yearly plots for Direct
+    years <- (BB |> filter(!is.na(DIR_wpsm)) |>
+                  select(year) |> unique() |> collect() |> pull())
+    ## common scale
+
+    vars <- c("Dir_First_Clim_lim", "Dir_Secon_Clim_lim", "DIR_wpsm")
+
+    ylim <- c(BB |> summarise(across(vars, ~ min(., na.rm = T))) |> collect() |> min(),
+              BB |> summarise(across(vars, ~ max(., na.rm = T))) |> collect() |> max())
+
+
+    for (ay in years) {
+        pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
+
+        plot(pp$SZA, pp$DIR_wpsm,
+             cex  = .1,
+             ylim = ylim,
+             xlab = "SZA",
+             ylab = "Direct Irradiance")
+
+        ## 4. Second climatological limit (16)
+        points(pp$SZA, pp$Dir_Secon_Clim_lim, cex = .2, col = alpha("red",  0.05))
+        ## 4. First climatological limit (17)
+        points(pp$SZA, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.05))
 
 
 
+        table(pp$QCv9_04_dir_flag)
 
-#
-#
-#     if (DO_TEST_04 & !all(is.na(DATA_year$wattDIR))) {
-#         ## . . 4. Plot climatological test ---------------------------------####
+        pp[]
+
+    }
+
+
+
 #         if (any(!is.na(DATA_year$wattDIR))) {
 #             ## check if is the same as above
-#             second_level_D <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D3 * cosde( DATA_year$SZA )**0.2 + 15
-#             first_level_D  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C3 * cosde( DATA_year$SZA )**0.2 + 10
-#             ## For Direct
-#             ylim <- range(second_level_D,
-#                           first_level_D,
-#                           DATA_year$wattDIR,
-#                           na.rm = T)
+
 #             hard <- which(DATA_year$QCF_DIR_04.2 %in% "Second climatological limit (16)")
 #             soft <- which(DATA_year$QCF_DIR_04.1 %in% "First climatological limit (17)")
 #
 #             ####  plot direct by SZA  ####
-#             cat("\n\n")
-#             plot( DATA_year$SZA[Dgood], DATA_year$wattDIR[Dgood],
-#                   cex = .1,
-#                   xlim = xlim,  ylim = ylim,
-#                   xlab = "SZA", ylab = "Direct Irradiance")
-#             ## 4. Second climatological limit (16)
-#             points(DATA_year$SZA, second_level_D, cex = .2, col = alpha("red",  0.05))
-#             ## 4. First climatological limit (17)
-#             points(DATA_year$SZA, first_level_D,  cex = .2, col = alpha("blue", 0.05))
+
 #
 #             ## plot flagged
 #             points(DATA_year$SZA[soft], DATA_year$wattDIR[soft], cex = .7, col = "cyan")
