@@ -427,11 +427,10 @@ for (af in filelist$names) {
     QS$clim_lim_D1 <- 1.32
 
     if (TEST_04) {
-        cat("\n4. Climatological (configurable) Limits.\n\n")
-
         testN        <- 4
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+        cat("\n4. Climatological (configurable) Limits", flagname_DIR, flagname_GLB, "\n\n")
 
         InitVariableBBDB(flagname_DIR, as.character(NA))
         InitVariableBBDB(flagname_GLB, as.character(NA))
@@ -462,13 +461,12 @@ for (af in filelist$names) {
     #'
     #' ## 5. Tracker is off test
     #'
-    # This test use a diffuse model will be implemented when one is produced
-    # and accepted. For now we omit it to protect from over-fitting prior to
-    # make one such model.
-    #
+    #' This test use a diffuse model. Another one will be implemented when one
+    #' is produced and accepted.
+    #'
 
     ## criteria
-    QS$Tracking_min_elev <-   15
+    QS$Tracking_min_elev <-    5
     QS$ClrSW_lim         <-    0.85
     QS$glo_min           <-   25
     ## Global Clear SW model
@@ -476,10 +474,9 @@ for (af in filelist$names) {
     QS$ClrSW_b           <-    1.095
 
     if (TEST_05) {
-        cat(paste("\n5. Tracking test.\n\n"))
-
         testN        <- 5
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+        cat(paste("\n5. Tracking test", flagname_DIR, "\n\n"))
 
         InitVariableBBDB(flagname_DIR, as.character(NA))
 
@@ -1353,7 +1350,7 @@ if (TEST_05) {
     flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
-    cat("\n\n")
+    cat(" \n \n")
 
     test <- data.table(BB |>
                            filter(Elevat > 0) |>
@@ -1365,13 +1362,16 @@ if (TEST_05) {
     hist(test[GLB_strict / ClrSW_ref2 < 2,
               GLB_strict / ClrSW_ref2], breaks = 100)
     abline(v = QS$ClrSW_lim, col = "red", lty = 3)
+    cat(" \n \n")
 
     hist(test[DIFF_strict / GLB_strict > -0.5,
               DIFF_strict / GLB_strict], breaks = 100)
     abline(v = QS$ClrSW_lim, col = "red", lty = 3)
+    cat(" \n \n")
 
     hist(test[, GLB_strict], breaks = 100)
     abline(v = QS$glo_min, col = "red", lty = 3)
+    cat(" \n \n")
 
     if (DO_PLOTS) {
 
