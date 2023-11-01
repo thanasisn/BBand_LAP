@@ -139,7 +139,7 @@ DO_PLOTS <- TRUE
 ## __ Select a part of data to plot  -------------------------------------------
 PARTIAL    <- FALSE
 PARTIAL    <- TRUE
-PLOT_FIRST <- as_date("2023-01-01")
+PLOT_FIRST <- as_date("2022-01-01")
 PLOT_LAST  <- as_date("2024-03-31")
 
 ## gather configurations for quality control
@@ -410,6 +410,16 @@ for (af in filelist$names) {
     #'
     #' ## 4. Climatological (configurable) Limits
     #'
+    #' Limits the maximum expected irradiance based on climatological
+    #' observations levels and the value of TSI.
+    #'
+    #' Some hits on first limits are expected and need manual evaluation.
+    #'
+    #' Hits on second limit should be problematic data.
+    #'
+    #' For GHI this may limit the radiation enhancement cases.
+    #'
+    #' Exclusions should be done case by case.
 
     QS$clim_lim_C3 <- 0.77
     QS$clim_lim_D3 <- 0.81
@@ -994,7 +1004,7 @@ if (TEST_03) {
                     collect()
             )
 
-            layout(matrix(c(1,2), 2, 1, byrow = TRUE))
+            layout(matrix(c(1, 2), 2, 1, byrow = TRUE))
             par(mar = c(2,4,2,1))
 
             plot(pp$Date, pp$DiffuseFraction_kd, "l",
@@ -1007,7 +1017,7 @@ if (TEST_03) {
 
             title(paste("#3", as.Date(ad, origin = "1970-01-01")))
 
-            par(mar = c(2,4,1,1))
+            par(mar = c(2, 4, 1, 1))
             ylim <- range(pp$GLB_strict, pp$DIR_strict, na.rm = T)
             plot( pp$Date, pp$GLB_strict, "l",
                   ylim = ylim, col = "green", ylab = "", xlab = "")
@@ -1025,6 +1035,8 @@ if (TEST_03) {
             points(pp[!is.na(QCv9_03_low_flag), Date],
                    pp[!is.na(QCv9_03_low_flag), GLB_strict],
                    ylim = ylim, col = "magenta")
+            ## reset layout
+            layout(1)
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
@@ -1081,23 +1093,19 @@ if (TEST_04) {
     cat(" \n \n")
 
 
-    BB$DIR_wpsm
-
-    stop("DDD")
     ## Yearly plots for Direct
     years <- (BB |> filter(!is.na(DIR_wpsm)) |>
                   select(year) |> unique() |> collect() |> pull())
+
     ## common scale
-
     vars <- c("Dir_First_Clim_lim", "Dir_Secon_Clim_lim", "DIR_wpsm")
-
     ylim <- c(BB |> summarise(across(vars, ~ min(., na.rm = T))) |> collect() |> min(),
               BB |> summarise(across(vars, ~ max(., na.rm = T))) |> collect() |> max())
-
 
     for (ay in years) {
         pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
 
+        ## plot direct by SZA
         plot(pp$SZA, pp$DIR_wpsm,
              cex  = .1,
              ylim = ylim,
@@ -1105,132 +1113,156 @@ if (TEST_04) {
              ylab = "Direct Irradiance")
 
         ## 4. Second climatological limit (16)
-        points(pp$SZA, pp$Dir_Secon_Clim_lim, cex = .2, col = alpha("red",  0.05))
+        points(pp$SZA, pp$Dir_Secon_Clim_lim, cex = .2, col = alpha("red",  0.01))
         ## 4. First climatological limit (17)
-        points(pp$SZA, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.05))
+        points(pp$SZA, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
+
+        ## plot flagged
+        points(pp[QCv9_04_dir_flag == "First climatological limit (17)",  DIR_wpsm, SZA], cex = .7, col = "cyan"   )
+        points(pp[QCv9_04_dir_flag == "Second climatological limit (16)", DIR_wpsm, SZA], cex = .7, col = "magenta")
+
+        title(main = paste("Direct Beam climatological test 4.", ay))
+        legend("topright",
+               legend = c("Direct measurements", "Second limit", "First limit", "First hit", "Second hit" ),
+               col    = c("black",               "red",          "blue",        "cyan",      "magenta"    ),
+               pch = 19, bty = "n", cex = 0.8 )
+        cat(" \n \n")
 
 
+        ## plot direct by Azimuth
+        plot(pp$Azimuth, pp$DIR_wpsm,
+             cex  = .1,
+             ylim = ylim,
+             xlab = "Azimuth",
+             ylab = "Direct Irradiance")
 
-        table(pp$QCv9_04_dir_flag)
+        ## 4. Second climatological limit (16)
+        points(pp$Azimuth, pp$Dir_Secon_Clim_lim, cex = .2, col = alpha("red",  0.01))
+        ## 4. First climatological limit (17)
+        points(pp$Azimuth, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
 
-        pp[]
+        ## plot flagged
+        points(pp[QCv9_04_dir_flag == "First climatological limit (17)",  DIR_wpsm, Azimuth], cex = .7, col = "cyan"   )
+        points(pp[QCv9_04_dir_flag == "Second climatological limit (16)", DIR_wpsm, Azimuth], cex = .7, col = "magenta")
 
+        title(main = paste("Direct Beam climatological test 4.", ay))
+        legend("topright",
+               legend = c("Direct measurements", "Second limit", "First limit", "First hit", "Second hit" ),
+               col    = c("black",               "red",          "blue",        "cyan",      "magenta"    ),
+               pch = 19, bty = "n", cex = 0.8 )
+        cat(" \n \n")
+
+
+        ## plot direct by Date
+        plot(pp$Date, pp$DIR_wpsm,
+             cex  = .1,
+             ylim = ylim,
+             xlab = "",
+             ylab = "Direct Irradiance")
+
+        ## 4. Second climatological limit (16)
+        points(pp$Date, pp$Dir_Secon_Clim_lim, cex = .2, col = alpha("red",  0.01))
+        ## 4. First climatological limit (17)
+        points(pp$Date, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
+
+        ## plot flagged
+        points(pp[QCv9_04_dir_flag == "First climatological limit (17)",  DIR_wpsm, Date], cex = .7, col = "cyan"   )
+        points(pp[QCv9_04_dir_flag == "Second climatological limit (16)", DIR_wpsm, Date], cex = .7, col = "magenta")
+
+        title(main = paste("Direct Beam climatological test 4.", ay))
+        legend("topright",
+               legend = c("Direct measurements", "Second limit", "First limit", "First hit", "Second hit" ),
+               col    = c("black",               "red",          "blue",        "cyan",      "magenta"    ),
+               pch = 19, bty = "n", cex = 0.8 )
+        cat(" \n \n")
     }
 
 
+    ## Yearly plots for Global
+    years <- (BB |> filter(!is.na(GLB_wpsm)) |>
+                  select(year) |> unique() |> collect() |> pull())
 
-#         if (any(!is.na(DATA_year$wattDIR))) {
-#             ## check if is the same as above
+    ## common scale
+    vars <- c("Glo_First_Clim_lim", "Glo_Secon_Clim_lim", "GLB_wpsm")
+    ylim <- c(BB |> summarise(across(vars, ~ min(., na.rm = T))) |> collect() |> min(),
+              BB |> summarise(across(vars, ~ max(., na.rm = T))) |> collect() |> max())
 
-#             hard <- which(DATA_year$QCF_DIR_04.2 %in% "Second climatological limit (16)")
-#             soft <- which(DATA_year$QCF_DIR_04.1 %in% "First climatological limit (17)")
-#
-#             ####  plot direct by SZA  ####
+    for (ay in years) {
+        pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
 
-#
-#             ## plot flagged
-#             points(DATA_year$SZA[soft], DATA_year$wattDIR[soft], cex = .7, col = "cyan")
-#             points(DATA_year$SZA[hard], DATA_year$wattDIR[hard], cex = .7, col = "magenta")
-#
-#             title(main = paste("Direct Beam climatological test 4.", YY))
-#             legend("topright",
-#                    legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements" ),
-#                    col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
-#                    pch = 19, bty = "n", cex = 0.8 )
-#
-#             ####  plot direct by Azimuth  ####
-#             cat("\n\n")
-#             plot( DATA_year$Azimuth[Dgood], DATA_year$wattDIR[Dgood],
-#                   cex = .1,
-#                   ylim = ylim,
-#                   xlab = "Azimuth", ylab = "Direct Irradiance" )
-#             ## 4. Second climatological limit (16)
-#             points(DATA_year$Azimuth, second_level_D, cex = .2,  col = alpha("red",  0.05))
-#             ## 4. First climatological limit (17)
-#             points(DATA_year$Azimuth, first_level_D,  cex = .2,  col = alpha("blue", 0.05))
-#
-#             ## plot flagged
-#             points(DATA_year$Azimuth[soft], DATA_year$wattDIR[soft], cex = .7, col = "cyan")
-#             points(DATA_year$Azimuth[hard], DATA_year$wattDIR[hard], cex = .7, col = "magenta")
-#
-#             title(main = paste("Direct Beam climatological test 4.", YY))
-#             legend("topright",
-#                    legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements" ),
-#                    col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
-#                    pch = 19, bty = "n", cex = 0.8 )
-#         }
-#
-#
-#         if (any(!is.na(DATA_year$wattGLB))) {
-#             ## check if is the same as above
-#             second_level_G <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D1 * cosde( DATA_year$SZA )**1.2 + 60
-#             first_level_G  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C1 * cosde( DATA_year$SZA )**1.2 + 60
-#             ## For global
-#             ylim <- range(second_level_G,
-#                           first_level_G,
-#                           DATA_year$wattGLB,
-#                           na.rm = TRUE)
-#             hard <- which(DATA_year$QCF_GLB_04.2 %in% "Second climatological limit (16)")
-#             soft <- which(DATA_year$QCF_GLB_04.1 %in% "First climatological limit (17)")
-#
-#             ####  plot global by SZA  ####
-#             cat("\n\n")
-#             plot( DATA_year$SZA[Ggood], DATA_year$wattGLB[Ggood],
-#                   cex = .1,
-#                   xlim = xlim,  ylim = ylim,
-#                   xlab = "SZA", ylab = "Global Irradiance" )
-#             ## 4. Second climatological limit (16)
-#             points(DATA_year$SZA, second_level_G, cex = .2,  col = alpha("red", 0.05))
-#             ## 4. First climatological limit (17)
-#             points(DATA_year$SZA, first_level_G,  cex = .2,  col = alpha("blue",0.05))
-#
-#             ## plot flagged
-#             points(DATA_year$SZA[soft], DATA_year$wattGLB[soft], cex = .7, col = "cyan")
-#             points(DATA_year$SZA[hard], DATA_year$wattGLB[hard], cex = .7, col = "magenta")
-#
-#             title(main = paste("Global climatological test 4.",YY))
-#             legend("topright",
-#                    legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements"),
-#                    col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
-#                    pch = 19, bty = "n", cex = 0.8 )
-#
-#             ####  plot global by Azimuth  ####
-#             cat("\n\n")
-#             plot( DATA_year$Azimuth[Ggood], DATA_year$wattGLB[Ggood],
-#                   cex = .1,
-#                   ylim = ylim,
-#                   xlab = "Azimuth", ylab = "Global Irradiance" )
-#             ## 4. Second climatological limit (16)
-#             points(DATA_year$Azimuth, second_level_G, cex = .2,  col = alpha("red", 0.05))
-#             ## 4. First climatological limit (17)
-#             points(DATA_year$Azimuth, first_level_G,  cex = .2,  col = alpha("blue",0.05))
-#
-#             ## plot flagged
-#             points(DATA_year$Azimuth[soft], DATA_year$wattGLB[soft], cex = .7, col = "cyan")
-#             points(DATA_year$Azimuth[hard], DATA_year$wattGLB[hard], cex = .7, col = "magenta")
-#
-#             title(main = paste("Global climatological test 4.",YY))
-#             legend("topright",
-#                    legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements"),
-#                    col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
-#                    pch = 19, bty = "n", cex = 0.8 )
-#
-#             ## clean
-#             rm(second_level_G, first_level_G, second_level_D, first_level_D, hard, soft)
-#         }
-#
+        ## plot direct by SZA
+        plot(pp$SZA, pp$GLB_wpsm,
+             cex  = .1,
+             ylim = ylim,
+             xlab = "SZA",
+             ylab = "Global Irradiance")
+
+        ## 4. Second climatological limit (16)
+        points(pp$SZA, pp$Glo_Secon_Clim_lim, cex = .2, col = alpha("red",  0.01))
+        ## 4. First climatological limit (17)
+        points(pp$SZA, pp$Glo_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
+
+        ## plot flagged
+        points(pp[QCv9_04_glb_flag == "First climatological limit (17)",  GLB_wpsm, SZA], cex = .7, col = "cyan"   )
+        points(pp[QCv9_04_glb_flag == "Second climatological limit (16)", GLB_wpsm, SZA], cex = .7, col = "magenta")
+
+        title(main = paste("Global climatological test 4.", ay))
+        legend("topright",
+               legend = c("Global measurements", "Second limit", "First limit", "First hit", "Second hit" ),
+               col    = c("black",               "red",          "blue",        "cyan",      "magenta"    ),
+               pch = 19, bty = "n", cex = 0.8 )
+        cat(" \n \n")
 
 
+        ## plot direct by Azimuth
+        plot(pp$Azimuth, pp$GLB_wpsm,
+             cex  = .1,
+             ylim = ylim,
+             xlab = "Azimuth",
+             ylab = "Global Irradiance")
+
+        ## 4. Second climatological limit (16)
+        points(pp$Azimuth, pp$Glo_Secon_Clim_lim, cex = .2, col = alpha("red",  0.01))
+        ## 4. First climatological limit (17)
+        points(pp$Azimuth, pp$Glo_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
+
+        ## plot flagged
+        points(pp[QCv9_04_glb_flag == "First climatological limit (17)",  GLB_wpsm, Azimuth], cex = .7, col = "cyan"   )
+        points(pp[QCv9_04_glb_flag == "Second climatological limit (16)", GLB_wpsm, Azimuth], cex = .7, col = "magenta")
+
+        title(main = paste("Global Beam climatological test 4.", ay))
+        legend("topright",
+               legend = c("Global measurements", "Second limit", "First limit", "First hit", "Second hit" ),
+               col    = c("black",               "red",          "blue",        "cyan",      "magenta"    ),
+               pch = 19, bty = "n", cex = 0.8 )
+        cat(" \n \n")
 
 
+        ## plot direct by Date
+        plot(pp$Date, pp$GLB_wpsm,
+             cex  = .1,
+             ylim = ylim,
+             xlab = "",
+             ylab = "Global Irradiance")
+
+        ## 4. Second climatological limit (16)
+        points(pp$Date, pp$Glo_Secon_Clim_lim, cex = .2, col = alpha("red",  0.01))
+        ## 4. First climatological limit (17)
+        points(pp$Date, pp$Glo_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
+
+        ## plot flagged
+        points(pp[QCv9_04_glb_flag == "First climatological limit (17)",  GLB_wpsm, Date], cex = .7, col = "cyan"   )
+        points(pp[QCv9_04_glb_flag == "Second climatological limit (16)", GLB_wpsm, Date], cex = .7, col = "magenta")
+
+        title(main = paste("Direct Beam climatological test 4.", ay))
+        legend("topright",
+               legend = c("Direct measurements", "Second limit", "First limit", "First hit", "Second hit" ),
+               col    = c("black",               "red",          "blue",        "cyan",      "magenta"    ),
+               pch = 19, bty = "n", cex = 0.8 )
+        cat(" \n \n")
+    }
 
 
-
-
-
-
-
-    stop("DDD")
     if (DO_PLOTS) {
 
         if (!interactive()) {
