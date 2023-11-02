@@ -206,6 +206,8 @@ rm(temp_to_do, dd)
 #'
 #' # Apply Filters
 #'
+#' Go through all files in data base and apply flags.
+#'
 #+ include=T
 for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
@@ -461,7 +463,7 @@ for (af in filelist$names) {
     #'
     #' ## 5. Tracker is off test
     #'
-    #' This test use a diffuse model. Another one will be implemented when one
+    #' This test use a diffuse model. A better one will be implemented when one
     #' is produced and accepted.
     #'
 
@@ -685,7 +687,7 @@ for (af in filelist$names) {
     rm(datapart)
     dummy <- gc()
 }
-
+#+ include=T, echo=F
 myunlock(DB_lock)
 
 
