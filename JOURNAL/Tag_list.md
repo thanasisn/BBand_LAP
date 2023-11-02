@@ -5,7 +5,7 @@ List of tags
       1 #brewers
       2 #broadband
       1 #ccd
-     57 #chp1
+     58 #chp1
       1 #cleaned
      16 #cleaning
      12 #cm21
@@ -22,7 +22,7 @@ List of tags
       5 #leveling
       1 #mounting
       2 #panic
-      8 #problem
+      9 #problem
       2 #pysolar
       2 #radmon
       1 #radmon_reboot
@@ -32,6 +32,6 @@ List of tags
       1 #sync
       1 #temp
       1 #test
-     11 #tracker
+     12 #tracker
      20 #tracker2
       1 #works
