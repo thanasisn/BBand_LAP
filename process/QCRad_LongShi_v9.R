@@ -1096,8 +1096,8 @@ if (TEST_04) {
 
     ## common scale
     vars <- c("Dir_First_Clim_lim", "Dir_Secon_Clim_lim", "DIR_wpsm")
-    ylim <- c(BB |> summarise(across(vars, ~ min(., na.rm = T))) |> collect() |> min(),
-              BB |> summarise(across(vars, ~ max(., na.rm = T))) |> collect() |> max())
+    ylim <- c(BB |> summarise(across(all_of(vars), ~ min(., na.rm = T))) |> collect() |> min(),
+              BB |> summarise(across(all_of(vars), ~ max(., na.rm = T))) |> collect() |> max())
 
     for (ay in years) {
         pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
@@ -1181,8 +1181,8 @@ if (TEST_04) {
 
     ## common scale
     vars <- c("Glo_First_Clim_lim", "Glo_Secon_Clim_lim", "GLB_wpsm")
-    ylim <- c(BB |> summarise(across(vars, ~ min(., na.rm = T))) |> collect() |> min(),
-              BB |> summarise(across(vars, ~ max(., na.rm = T))) |> collect() |> max())
+    ylim <- c(BB |> summarise(across(all_of(vars), ~ min(., na.rm = T))) |> collect() |> min(),
+              BB |> summarise(across(all_of(vars), ~ max(., na.rm = T))) |> collect() |> max())
 
     for (ay in years) {
         pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
