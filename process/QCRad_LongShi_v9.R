@@ -173,6 +173,7 @@ QS <<- list()
 
 ## use this columns as indicator
 ## make it NA to reprocess all
+## TODO make it a daytime or better move it to metadata
 InitVariableBBDB("QCv9_process_flag", as.logical(NA))
 # InitVariableBBDB("QCv9_01_dir_flag",  as.character(NA))
 # OVERWRITEVariableBBDB("QCv9_01_dir_flag", as.character(NA))
