@@ -72,11 +72,11 @@
 
 #+ echo=F, include=T
 ## __ Document options ---------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -106,7 +106,9 @@ library(scales,     warn.conflicts = FALSE, quietly = TRUE)
 
 
 ##  Variables  -----------------------------------------------------------------
-sun_elev_min     <-  -2 * 0.103  ## Drop ALL radiation data when sun is below this point
+## gather configurations for quality control
+QS <<- list()
+QS$sun_elev_min <- -2 * 0.103  ## Drop ALL radiation data when sun is below this point
 
 
 ##  Execution control  ---------------------------------------------------------
@@ -120,6 +122,7 @@ TEST_06  <- FALSE
 TEST_07  <- FALSE
 TEST_08  <- FALSE
 TEST_09  <- FALSE
+TEST_10  <- FALSE
 
 TEST_01  <- TRUE
 TEST_02  <- TRUE
@@ -127,9 +130,10 @@ TEST_03  <- TRUE
 TEST_04  <- TRUE
 TEST_05  <- TRUE
 TEST_06  <- TRUE
-TEST_07  <- TRUE  ## TODO
+TEST_07  <- FALSE  ## TODO
 TEST_08  <- TRUE
 TEST_09  <- TRUE
+TEST_10  <- FALSE  ## TODO
 
 ## mostly for daily plots
 DO_PLOTS     <- TRUE
@@ -146,8 +150,6 @@ PARTIAL    <- TRUE
 PLOT_FIRST <- as_date("2022-01-01")
 PLOT_LAST  <- as_date("2024-03-31")
 
-## gather configurations for quality control
-QS <<- list()
 
 # ##  Create a test database  ----------------------------------------------------
 # TEST_DB <- TRUE
@@ -230,17 +232,17 @@ for (af in filelist$names) {
     datapart$QCv9_process_flag <- TRUE
 
     ## Direct beam DNI
-    datapart[Elevat > sun_elev_min           &
+    datapart[Elevat > QS$sun_elev_min           &
                  is.na(chp1_bad_data_flag)   &
                  Async_tracker_flag == FALSE,
              DIR_strict := DIR_wpsm]
     ## DHI
-    datapart[Elevat > sun_elev_min           &
+    datapart[Elevat > QS$sun_elev_min           &
                  is.na(chp1_bad_data_flag)   &
                  Async_tracker_flag == FALSE,
              HOR_strict := HOR_wpsm]
     ## GHI
-    datapart[Elevat > sun_elev_min           &
+    datapart[Elevat > QS$sun_elev_min           &
                  is.na(cm21_bad_data_flag),
              GLB_strict := GLB_wpsm]
 
@@ -678,6 +680,32 @@ for (af in filelist$names) {
         dummy <- gc()
     }
 
+
+
+    ## 10. Erroneous sun position  ---------------------------------------------
+    #'
+    #' ## 10. Erroneous sun position
+    #'
+    #' This filter is mine.
+    #'
+    #' Create a statistical range to check SZA and Azimuth.
+    #' Implement monthly of by doy.
+    #'
+
+    if (TEST_10) {
+        cat(paste("\n10. Erroneous sun position test.\n\n"))
+
+        testN        <- 10
+        flagname_ALL <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_all_flag")
+
+        InitVariableBBDB(flagname_ALL, as.character(NA))
+
+        rm(list = ls(pattern = "flagname_.*"))
+        dummy <- gc()
+    }
+
+
+
     summary(datapart)
 
     ## store actual data
@@ -708,7 +736,7 @@ myunlock(DB_lock)
 ## open data base for plots
 BB <- opendata()
 ## load filter parameters
-QS <- readRDS(sub("\\.R", "_parameters.Rds",Script.Name))
+QS <- readRDS(sub("\\.R", "_parameters.Rds", Script.Name))
 
 ## __ Part of data we care for  ------------------------------------------------
 if (PARTIAL == TRUE) {
@@ -783,7 +811,7 @@ if (TEST_01) {
         for (ad in sort(unique(as.Date(test$Date)))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
             ylim <- range(pp$TSI_TOA - QS$dir_SWdn_dif, pp$DIR_strict, na.rm = T)
@@ -807,7 +835,7 @@ if (TEST_01) {
         for (ad in sort(unique(as.Date(c(test$Date))))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
             ylim <- range(pp$Glo_max_ref, pp$GLB_strict, na.rm = T)
@@ -881,7 +909,7 @@ if (TEST_02) {
         for (ad in sort(unique(as.Date(test$Date)))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
             ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
@@ -901,7 +929,7 @@ if (TEST_02) {
         for (ad in sort(unique(as.Date(c(test$Date))))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
             ylim <- range(pp$Global_max, pp$GLB_strict, na.rm = T)
@@ -1009,7 +1037,7 @@ if (TEST_03) {
 
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
 
@@ -1292,7 +1320,7 @@ if (TEST_04) {
         for (ad in sort(unique(as.Date(temp1$Date)))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
             if (any(!is.na(pp$DIR_strict))) {
@@ -1324,7 +1352,7 @@ if (TEST_04) {
         for (ad in sort(unique(as.Date(temp1$Date)))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
             if (any(!is.na(pp$GLB_strict))) {
@@ -1404,7 +1432,7 @@ if (TEST_05) {
         for (ad in sort(unique(as.Date(tmp$Date)))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
             ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = T)
@@ -1544,7 +1572,7 @@ if (TEST_06) {
 
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
 
@@ -1637,7 +1665,7 @@ if (TEST_08) {
         for (ad in unique(as.Date(tmp$Date))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
             ylim <- range(pp$GLB_strict, pp$HOR_strict, na.rm = T)
@@ -1709,7 +1737,7 @@ if (TEST_09) {
         for (ay in unique(year(tmp$Date))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
 
@@ -1736,7 +1764,7 @@ if (TEST_09) {
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
             pp <- data.table(
                 BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > sun_elev_min)   |>
+                                 Elevat > QS$sun_elev_min)   |>
                     collect()
             )
 
