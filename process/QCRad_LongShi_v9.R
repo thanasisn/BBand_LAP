@@ -149,23 +149,23 @@ PLOT_LAST  <- as_date("2024-03-31")
 ## gather configurations for quality control
 QS <<- list()
 
-##  Create a test database  ----------------------------------------------------
-TEST_DB <- TRUE
-if (TEST_DB) {
-    source("~/BBand_LAP/DEFINITIONS.R")
-    cat("\n * * * Using a temp DB * * * \n\n")
-    ## copy data to temp
-    tyear <- 2022
-    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
-    system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-    system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
-    ## replace paths with test paths
-    DB_DIR     <- test_DB_DIR
-    DB_lock    <- test_DB_lock
-    DB_META_fl <- test_DB_META_fl
-    DB_HASH_fl <- test_DB_HASH_fl
-}
+# ##  Create a test database  ----------------------------------------------------
+# TEST_DB <- TRUE
+# if (TEST_DB) {
+#     source("~/BBand_LAP/DEFINITIONS.R")
+#     cat("\n * * * Using a temp DB * * * \n\n")
+#     ## copy data to temp
+#     tyear <- 2022
+#     dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
+#     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
+#     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
+#     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
+#     ## replace paths with test paths
+#     DB_DIR     <- test_DB_DIR
+#     DB_lock    <- test_DB_lock
+#     DB_META_fl <- test_DB_META_fl
+#     DB_HASH_fl <- test_DB_HASH_fl
+# }
 
 
 
@@ -175,7 +175,6 @@ if (TEST_DB) {
 ## make it NA to reprocess all
 InitVariableBBDB("QCv9_process_flag", as.logical(NA))
 # InitVariableBBDB("QCv9_01_dir_flag",  as.character(NA))
-
 # OVERWRITEVariableBBDB("QCv9_01_dir_flag", as.character(NA))
 
 ## list data base files
@@ -273,7 +272,7 @@ for (af in filelist$names) {
     #' Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
     #' or need to remove data.
     #'
-    #' Global upper constrain is an modeled GHI value.
+    #' Global upper constrain is an modelled GHI value.
     #'
     #' These limit should not be met, they are defined neat the maximum observed
     #' values of the data set.
@@ -1470,7 +1469,7 @@ if (TEST_06) {
         pp[+(Reduce("+", data.table(is.na(pp[, ..ignore]))) == length(pp[, ..ignore]))]
 
 
-stop("DDD")
+# stop("DDD")
         # points(pp[!is.na(get(flagname_BTH))  ]
 
         ## plot by SZA
@@ -1525,7 +1524,7 @@ stop("DDD")
 
 
 
-    stop("DDD")
+    # stop("DDD")
     if (DO_PLOTS) {
 
         if (!interactive()) {
