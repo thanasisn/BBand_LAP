@@ -78,6 +78,7 @@ if (file.exists(DB_META_fl)) {
     BB_meta$pysolar_basename         <- as.character(BB_meta$pysolar_basename)
     BB_meta$pysolar_mtime            <- as.POSIXct(BB_meta$pysolar_mtime)
     BB_meta$pysolar_parsed           <- as.POSIXct(BB_meta$pysolar_parsed)
+    BB_meta$daylength                <- as.numeric(NA)
     ## For CM-21 meta data
     BB_meta$cm21_Daily_dark          <- as.numeric(NA)
     BB_meta$cm21_bad_data_flagged    <- as.POSIXct(NA)
@@ -215,7 +216,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_meta <- data.table(day              = as_date(ad),
                                    pysolar_basename = basename(ss$fullname),
                                    pysolar_mtime    = file.mtime(ss$fullname),
-                                   pysolar_parsed   = Sys.time())
+                                   pysolar_parsed   = Sys.time(),
+                                   daylength        = sun_temp[Elevat >= 0, .N])
 
             ## Here we can init more variables of the database -----------------
             sun_temp[Azimuth <= 180, preNoon := TRUE ]
