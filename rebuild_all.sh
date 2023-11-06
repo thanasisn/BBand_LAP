@@ -21,6 +21,8 @@ if   [[ $conf == "yes" ]]; then
     rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB"
     rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
     rm -rfv "$HOME/DATA/Broad_Band/Broad_Band_DB.stopfile"
+else
+    echo "DO NOT REMOVED!"
 fi
 
 echo ""
@@ -31,6 +33,8 @@ if   [[ $conf == "yes" ]]; then
     rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB"
     rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB_metadata.parquet"
     rm -rfv "$HOME/DATA/Broad_Band/CHP1_Tracker_steps_DB.stopfile"
+else
+    echo "DO NOT REMOVED!"
 fi
 
   
