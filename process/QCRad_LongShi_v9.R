@@ -57,6 +57,10 @@
 #' "~/RAD_QC/QCRad_LongShi_v8_id_CM21_CHP1.R" and
 #' "~/RAD_QC/QCRad_LongShi_v8_apply_CM21_CHP1.R"
 #'
+#' ## Difference in implementation!
+#'
+#' Here the previous flags do not exclude the next.
+#' In the original if a flag was set then the next filter will ignore the point.
 #'
 #' TODO:
 #'
@@ -518,7 +522,7 @@ for (af in filelist$names) {
     QS$Rayleigh_dif_glo_r <-   0.8  # Low limit diffuse/global < threshold
     QS$Rayleigh_glo_min   <-  50    # Low limit minimum global
 
-    # model
+    # Reference model
     Rayleigh_diff <- function(SZA, Pressure) {
         a    <-   209.3
         b    <-  -708.3
@@ -928,10 +932,12 @@ if (TEST_03) {
     flagname_UPP <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_upp_flag")
     flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
 
-    cat(pander(table(collect(select(BB, !!flagname_UPP)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_UPP)), useNA = "always"),
+               caption = flagname_UPP))
     cat(" \n \n")
 
-    cat(pander(table(collect(select(BB, !!flagname_LOW)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_LOW)), useNA = "always"),
+               caption = flagname_LOW))
     cat(" \n \n")
 
     years <- (BB |> filter(!is.na(DiffuseFraction_kd)) |>
@@ -1058,10 +1064,12 @@ if (TEST_04) {
     flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
     flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
 
-    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
+               caption = flagname_DIR))
     cat(" \n \n")
 
-    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always"),
+               caption = flagname_GLB))
     cat(" \n \n")
 
     test <- data.table(BB |>
@@ -1351,7 +1359,8 @@ if (TEST_05) {
     testN        <- 5
     flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
 
-    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
+               caption = flagname_DIR))
     cat(" \n \n")
 
     test <- data.table(BB |>
@@ -1374,6 +1383,7 @@ if (TEST_05) {
     hist(test[, GLB_strict], breaks = 100)
     abline(v = QS$glo_min, col = "red", lty = 3)
     cat(" \n \n")
+
 
     if (DO_PLOTS) {
 
@@ -1425,14 +1435,81 @@ if (TEST_06) {
     testN        <- 6
     flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
 
-    cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always"),
+               caption = flagname_BTH))
     cat("\n\n")
 
     test <- BB |> select(DIFF_strict, RaylDIFF) |> collect() |> as.data.table()
     hist( test[, DIFF_strict - RaylDIFF ], breaks = 100 )
     abline(v = QS$Rayleigh_lower_lim, lty = 3, col = "red")
     abline(v = QS$Rayleigh_upper_lim, lty = 3, col = "red")
+    cat("\n\n")
 
+
+    ## Yearly plots for Diffuse
+    years <- (BB |> filter(!is.na(DIFF_strict)) |>
+                  select(year) |> unique() |> collect() |> pull())
+
+    for (ay in years) {
+        pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
+
+        ignore <- grep("QCv9_0[1-5]", names(pp), value = T)
+
+        # points(pp[!is.na(get(flagname_BTH))  ]
+
+        ## plot by SZA
+        plot(pp$SZA, pp$DIFF_strict,
+             cex = .1,
+             xlab = "SZA", ylab = "Diffuse Irradiance" )
+        title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", ay))
+
+        ## plot flagged
+        points(pp[!is.na(get(flagname_BTH)),  DIFF_strict, SZA], cex = .7, col = alpha("magenta", 0.2))
+
+        legend("topright",
+               legend = c("Diffuse (inferred)", "Rayleigh limit" ),
+               col    = c("black",              "magenta"),
+               pch = 19, bty = "n", cex = 0.8 )
+        cat(" \n \n")
+
+
+        ## plot by Azimuth
+        plot(pp$Azimuth, pp$DIFF_strict,
+             cex = .1,
+             xlab = "Azimuth", ylab = "Diffuse Irradiance" )
+        title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", ay))
+
+        ## plot flagged
+        points(pp[!is.na(get(flagname_BTH)),  DIFF_strict, Azimuth], cex = .7, col = alpha("magenta", 0.2))
+
+        legend("topright",
+               legend = c("Diffuse (inferred)", "Rayleigh limit" ),
+               col    = c("black",              "magenta"),
+               pch = 19, bty = "n", cex = 0.8 )
+        cat(" \n \n")
+
+
+        ## plot by Date
+        plot(pp$Date, pp$DIFF_strict,
+             cex = .1,
+             xlab = "SZA", ylab = "Diffuse Irradiance" )
+        title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", ay))
+
+        ## plot flagged
+        points(pp[!is.na(get(flagname_BTH)),  DIFF_strict, Date], cex = .7, col = alpha("magenta", 0.2))
+
+        legend("topright",
+               legend = c("Diffuse (inferred)", "Rayleigh limit" ),
+               col    = c("black",              "magenta"),
+               pch = 19, bty = "n", cex = 0.8 )
+        cat(" \n \n")
+
+    }
+
+
+
+
+    stop("DDD")
     if (DO_PLOTS) {
 
         if (!interactive()) {
