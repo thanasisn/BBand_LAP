@@ -149,23 +149,23 @@ PLOT_LAST  <- as_date("2024-03-31")
 ## gather configurations for quality control
 QS <<- list()
 
-# ##  Create a test database  ----------------------------------------------------
-# TEST_DB <- TRUE
-# if (TEST_DB) {
-#     source("~/BBand_LAP/DEFINITIONS.R")
-#     cat("\n * * * Using a temp DB * * * \n\n")
-#     ## copy data to temp
-#     tyear <- 2017
-#     dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
-#     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-#     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-#     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
-#     ## replace paths with test paths
-#     DB_DIR     <- test_DB_DIR
-#     DB_lock    <- test_DB_lock
-#     DB_META_fl <- test_DB_META_fl
-#     DB_HASH_fl <- test_DB_HASH_fl
-# }
+##  Create a test database  ----------------------------------------------------
+TEST_DB <- TRUE
+if (TEST_DB) {
+    source("~/BBand_LAP/DEFINITIONS.R")
+    cat("\n * * * Using a temp DB * * * \n\n")
+    ## copy data to temp
+    tyear <- 2022
+    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
+    system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
+    system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
+    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
+    ## replace paths with test paths
+    DB_DIR     <- test_DB_DIR
+    DB_lock    <- test_DB_lock
+    DB_META_fl <- test_DB_META_fl
+    DB_HASH_fl <- test_DB_HASH_fl
+}
 
 
 
@@ -173,7 +173,8 @@ QS <<- list()
 
 ## use this columns as indicator
 ## make it NA to reprocess all
-InitVariableBBDB("QCv9_01_dir_flag", as.character(NA))
+InitVariableBBDB("QCv9_process_flag", as.logical(NA))
+# InitVariableBBDB("QCv9_01_dir_flag",  as.character(NA))
 
 # OVERWRITEVariableBBDB("QCv9_01_dir_flag", as.character(NA))
 
@@ -187,13 +188,13 @@ dd      <- dirname(filelist$names)
 dd      <- tstrsplit(dd, "/")
 
 filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
-filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
+filelist$flyear  <- as.numeric(unlist(dd[length(dd) - 1]))
 
 
 ## find what needs touching
 BB <- opendata()
 temp_to_do <- data.table(BB |>
-                             filter(is.na(QCv9_01_dir_flag)) |>
+                             filter(is.na(QCv9_process_flag)) |>
                              select(year, month) |>
                              unique()            |>
                              collect()
@@ -225,7 +226,8 @@ for (af in filelist$names) {
     ## __ Daytime radiation only  ----------------------------------------------
 
     ## use this as a general processing marker for this script
-    datapart$QCv9_01_dir_flag <- "pass"
+    # datapart$QCv9_01_dir_flag  <- "pass"
+    datapart$QCv9_process_flag <- TRUE
 
     ## Direct beam DNI
     datapart[Elevat > sun_elev_min           &
@@ -772,6 +774,8 @@ if (TEST_01) {
         }
 
         test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
+        test <- BB |> filter(!is.na(QCv9_01_dir_flag)) |> collect() |> as.data.table()
+
         ## TODO
         if (nrow(test) == 0) {
             cat("\nNO CASES FOR DIRECT QCv9_01_dir_flag\n\n")
@@ -1453,8 +1457,20 @@ if (TEST_06) {
     for (ay in years) {
         pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
 
-        ignore <- grep("QCv9_0[1-5]", names(pp), value = T)
+        ## 1 is always filled
+        ignore <- grep("QCv9_0[2-5]", names(pp), value = T)
 
+        # pp[pp[, rowSums(!is.na(.SD)) > 0, .SDcols = patterns("^QCv9_0[1-5]")],]
+        # pp[pp[, rowSums(is.na(.SD)) > 0, .SDcols = patterns("QCv9_0[1-5]")],]
+        #
+        # pp[pp[, rowSums(is.na(.SD)) > 0, .SDcols = ignore, ], ]
+        #
+        # pp[, ..ignore]
+
+        pp[+(Reduce("+", data.table(is.na(pp[, ..ignore]))) == length(pp[, ..ignore]))]
+
+
+stop("DDD")
         # points(pp[!is.na(get(flagname_BTH))  ]
 
         ## plot by SZA
