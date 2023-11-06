@@ -8,7 +8,7 @@
            arrow:  13.0.0.1
       data.table:    1.14.8
            dplyr:     1.1.3
-           knitr:      1.44
+           knitr:      1.45
        lubridate:     1.9.3
            tools:     4.2.3
           pander:     0.6.5
@@ -18,7 +18,7 @@
            arrow:  13.0.0.1
       data.table:    1.14.8
            dplyr:     1.1.3
-           knitr:      1.44
+           knitr:      1.45
           pander:     0.6.5
        lubridate:     1.9.3
            tidyr:     1.3.0
@@ -36,7 +36,7 @@
          arsenal:     3.6.3
        compareDF:     2.3.5
            Hmisc:     5.1.1
-           knitr:      1.44
+           knitr:      1.45
           pander:     0.6.5
            tools:     4.2.3
        rmarkdown:      2.25
@@ -49,7 +49,7 @@
            dplyr:     1.1.3
      htmlwidgets:     1.6.2
         optparse:     1.7.3
-          plotly:    4.10.2
+          plotly:    4.10.3
             funr:     0.3.2
             renv:     1.0.3
        lubridate:     1.9.3
