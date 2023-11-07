@@ -63,7 +63,8 @@
 #' In the original if a flag was set then the next filter will ignore the point.
 #'
 #' TODO:
-#'
+#' - #6 needs more
+#' - implement ignore previous flags on all plots
 #' - plot combination of flag for each point
 #' - plot cumulative graphs like the old
 #' - Plot daily graphs with all available flags
@@ -89,7 +90,7 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -141,8 +142,13 @@ if (interactive()) {
     DO_PLOTS <- FALSE
 }
 
-# TEST
-DO_PLOTS <- TRUE
+
+# Daily plots
+DO_PLOTS       <- TRUE
+# Ignore previous flagged points in plots
+IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
+IGNORE_FLAGGED <- FALSE
+
 
 ## __ Select a part of data to plot  -------------------------------------------
 PARTIAL    <- FALSE
@@ -151,34 +157,34 @@ PLOT_FIRST <- as_date("2022-01-01")
 PLOT_LAST  <- as_date("2024-03-31")
 
 
-# ##  Create a test database  ----------------------------------------------------
-# TEST_DB <- TRUE
-# if (TEST_DB) {
-#     source("~/BBand_LAP/DEFINITIONS.R")
-#     cat("\n * * * Using a temp DB * * * \n\n")
-#     ## copy data to temp
-#     tyear <- 2022
-#     dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
-#     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-#     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-#     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
-#     ## replace paths with test paths
-#     DB_DIR     <- test_DB_DIR
-#     DB_lock    <- test_DB_lock
-#     DB_META_fl <- test_DB_META_fl
-#     DB_HASH_fl <- test_DB_HASH_fl
-# }
+##  Create a test database  ----------------------------------------------------
+TEST_DB <- TRUE
+if (TEST_DB) {
+    source("~/BBand_LAP/DEFINITIONS.R")
+    cat("\n * * * Using a temp DB * * * \n\n")
+    ## copy data to temp
+    tyear <- 2022
+    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
+    system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
+    system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
+    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
+    ## replace paths with test paths
+    DB_DIR     <- test_DB_DIR
+    DB_lock    <- test_DB_lock
+    DB_META_fl <- test_DB_META_fl
+    DB_HASH_fl <- test_DB_HASH_fl
+    OVERWRITEVariableBBDB("QCv9_process_flag", as.logical(NA))
+}
 
 
 
 ##  Create a new variable to the whole database  -------------------------------
 
-## use this columns as indicator
-## make it NA to reprocess all
+## use this columns as indicator, reset to reprocess all!!
+## TODO use the arguments export to determine if have to run
 ## TODO make it a daytime or better move it to metadata
 InitVariableBBDB("QCv9_process_flag", as.logical(NA))
-# InitVariableBBDB("QCv9_01_dir_flag",  as.character(NA))
-# OVERWRITEVariableBBDB("QCv9_01_dir_flag", as.character(NA))
+# OVERWRITEVariableBBDB("QCv9_process_flag", as.character(NA))
 
 ## list data base files
 filelist <- data.table(
@@ -522,7 +528,7 @@ for (af in filelist$names) {
 
     # criteria
     QS$Rayleigh_upper_lim <- 500    # Upper departure diffuse limit
-    QS$Rayleigh_lower_lim <-  -3    # Lower departure diffuse limit
+    QS$Rayleigh_lower_lim <-  -1    # Lower departure diffuse limit
     QS$Rayleigh_dif_glo_r <-   0.8  # Low limit diffuse/global < threshold
     QS$Rayleigh_glo_min   <-  50    # Low limit minimum global
 
@@ -556,9 +562,27 @@ for (af in filelist$names) {
 
         ## __ Both  ------------------------------------------------------------
         datapart[DIFF_strict - RaylDIFF > QS$Rayleigh_upper_lim,
-                 (flagname_BTH) := "Rayleigh diffuse limit (18)"]
-        datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
-                 (flagname_BTH) := "Rayleigh diffuse limit (18)"]
+                 (flagname_BTH) := "Rayleigh diffuse limit upper (18)"]
+        # datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
+        #          (flagname_BTH) := "Rayleigh diffuse limit lower (18)"]
+
+        ## extra restrictions by me
+        datapart[DIFF_strict - RaylDIFF     < QS$Rayleigh_lower_lim &
+                     DIFF_strict / GLB_wpsm < QS$Rayleigh_dif_glo_r &
+                     GLB_wpsm               > QS$Rayleigh_glo_min,
+                 (flagname_BTH) := "Rayleigh diffuse limit lower (18)"]
+
+        # selg <-  DATA_year$wattGLB > 50
+        # seld <- (DATA_year$DIFF_strict / DATA_year$wattGLB) < 0.8
+        # selr <-  DATA_year$DIFF_strict < (Rayleigh_diff - 1.0)
+        #
+        # Rayleigh_lim <- selg & seld & selr
+        #
+        # ## . . Both --------------------------------------------------------####
+        # DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
+        # DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
+        # DATA_year$QCF_BTH_06[ Rayleigh_lim ]                         <- "Rayleigh diffuse limit (18)"
+
 
         rm(list = ls(pattern = "flagname_.*"))
         dummy <- gc()
@@ -690,10 +714,7 @@ for (af in filelist$names) {
     #'
     #' Create a statistical range to check SZA and Azimuth.
     #' Implement monthly of by doy.
-    #' 
-    #' - group by 10 minutes
-    #' - median SZA AZI
-    #' - distance from median < threshold
+    #'
 
     if (TEST_10) {
         cat(paste("\n10. Erroneous sun position test.\n\n"))
@@ -725,7 +746,7 @@ for (af in filelist$names) {
     dummy <- gc()
 }
 #+ include=T, echo=F
-myunlock(DB_lock)
+# myunlock(DB_lock)
 
 
 
@@ -1466,20 +1487,25 @@ if (TEST_05) {
 #'
 #+ echo=F, include=T, results="asis"
 if (TEST_06) {
-
+stop("DDD")
     testN        <- 6
     flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always"),
                caption = flagname_BTH))
-    cat("\n\n")
+    cat(" \n \n")
 
     test <- BB |> select(DIFF_strict, RaylDIFF) |> collect() |> as.data.table()
     hist( test[, DIFF_strict - RaylDIFF ], breaks = 100 )
     abline(v = QS$Rayleigh_lower_lim, lty = 3, col = "red")
     abline(v = QS$Rayleigh_upper_lim, lty = 3, col = "red")
-    cat("\n\n")
+    cat(" \n \n")
 
+    ## flags to ignore in plots
+    if (IGNORE_FLAGGED) {
+        ignore <- grep(paste0("QCv9_0[1-", testN - 1 ,"]"), names(pp), value = T)
+        cat("**Plots will ignore previoysly flaged points: ", ignore, "**\n")
+    }
 
     ## Yearly plots for Diffuse
     years <- (BB |> filter(!is.na(DIFF_strict)) |>
@@ -1488,21 +1514,36 @@ if (TEST_06) {
     for (ay in years) {
         pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
 
-        ## 1 is always filled
-        ignore <- grep("QCv9_0[2-5]", names(pp), value = T)
+        ## Ignore previously flagged
+        pp[, Ignore := FALSE]
+        if (IGNORE_FLAGGED) {
+            pp[
+                pp[, rowSums(!is.na(.SD)) > 0 &
+                       !is.na(get(flagname_BTH)), .SDcols = patterns("^QCv9_0[1-5]")],
+                Ignore := TRUE
+            ]
+        }
 
-        # pp[pp[, rowSums(!is.na(.SD)) > 0, .SDcols = patterns("^QCv9_0[1-5]")],]
-        # pp[pp[, rowSums(is.na(.SD)) > 0, .SDcols = patterns("QCv9_0[1-5]")],]
-        #
         # pp[pp[, rowSums(is.na(.SD)) > 0, .SDcols = ignore, ], ]
-        #
-        # pp[, ..ignore]
+        # test <- pp[+(Reduce("+", data.table(is.na(pp[, ..ignore]))) == length(pp[, ..ignore]))]
+        # test[!is.na(QCv9_06_bth_flag)]
+        # test2 <- pp[ is.na(QCv9_01_dir_flag) &
+        #                 is.na(QCv9_01_glb_flag) &
+        #                 is.na(QCv9_02_dir_flag) &
+        #                 is.na(QCv9_02_glb_flag) &
+        #                 is.na(QCv9_03_upp_flag) &
+        #                 is.na(QCv9_03_low_flag) &
+        #                 is.na(QCv9_04_dir_flag) &
+        #                 is.na(QCv9_04_glb_flag) &
+        #                 is.na(QCv9_04_glb_flag) &
+        #                 is.na(QCv9_05_dir_flag) &
+        #                 !is.na(QCv9_06_bth_flag)
+        # ]
+#
+#         pp[!is.na(get(flagname_BTH)) &  !Ignore,  .(DIFF_strict, SZA, Ignore,get(flagname_BTH))]
+#         pp[!is.na(get(flagname_BTH)) &   Ignore,  .(DIFF_strict, SZA, Ignore,get(flagname_BTH))]
+#         pp[!is.na(get(flagname_BTH)) ,  .(DIFF_strict, SZA, Ignore,get(flagname_BTH))]
 
-        pp[+(Reduce("+", data.table(is.na(pp[, ..ignore]))) == length(pp[, ..ignore]))]
-
-
-# stop("DDD")
-        # points(pp[!is.na(get(flagname_BTH))  ]
 
         ## plot by SZA
         plot(pp$SZA, pp$DIFF_strict,
@@ -1511,7 +1552,7 @@ if (TEST_06) {
         title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", ay))
 
         ## plot flagged
-        points(pp[!is.na(get(flagname_BTH)),  DIFF_strict, SZA], cex = .7, col = alpha("magenta", 0.2))
+        points(pp[!is.na(get(flagname_BTH)) & !Ignore, DIFF_strict, SZA], cex = .7, col = alpha("magenta", 0.2))
 
         legend("topright",
                legend = c("Diffuse (inferred)", "Rayleigh limit" ),
@@ -1527,7 +1568,7 @@ if (TEST_06) {
         title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", ay))
 
         ## plot flagged
-        points(pp[!is.na(get(flagname_BTH)),  DIFF_strict, Azimuth], cex = .7, col = alpha("magenta", 0.2))
+        points(pp[!is.na(get(flagname_BTH)) & !Ignore, DIFF_strict, Azimuth], cex = .7, col = alpha("magenta", 0.2))
 
         legend("topright",
                legend = c("Diffuse (inferred)", "Rayleigh limit" ),
@@ -1543,7 +1584,7 @@ if (TEST_06) {
         title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", ay))
 
         ## plot flagged
-        points(pp[!is.na(get(flagname_BTH)),  DIFF_strict, Date], cex = .7, col = alpha("magenta", 0.2))
+        points(pp[!is.na(get(flagname_BTH)) & !Ignore, DIFF_strict, Date], cex = .7, col = alpha("magenta", 0.2))
 
         legend("topright",
                legend = c("Diffuse (inferred)", "Rayleigh limit" ),
@@ -1552,7 +1593,6 @@ if (TEST_06) {
         cat(" \n \n")
 
     }
-
 
 
 
@@ -1579,9 +1619,24 @@ if (TEST_06) {
                     collect()
             )
 
+            ## Ignore previously flagged
+            pp[, Ignore := FALSE]
+            if (IGNORE_FLAGGED) {
+                pp[
+                    pp[, rowSums(!is.na(.SD)) > 0 &
+                           !is.na(get(flagname_BTH)), .SDcols = patterns("^QCv9_0[1-5]")],
+                    Ignore := TRUE
+                ]
+            }
+
+            ## skip if all points are ignored
+            if (all(pp$Ignore) == TRUE) next()
+
+            ## start figure
             layout(matrix(c(1, 2), 2, 1, byrow = TRUE))
             par(mar = c(2, 4, 2, 1))
 
+            ## plot limits
             ylim <- range(pp$DIFF_strict, pp$RaylDIFF, na.rm = T)
             if (ylim[1] < -10) ylim[1] <- -10
             plot(pp$Date, pp$DIFF_strict, "l",
@@ -1591,15 +1646,16 @@ if (TEST_06) {
 
             title(paste("#6", as.Date(ad, origin = "1970-01-01")))
 
+            ## plots data
             par(mar = c(2,4,1,1))
             ylim <- range(pp$GLB_strict, pp$DIR_strict, na.rm = T)
             plot(pp$Date, pp$GLB_strict, "l",
                  ylim = ylim, col = "green", ylab = "", xlab = "")
             lines(pp$Date, pp$DIR_strict, col = "blue" )
 
-            points(pp[!is.na(get(flagname_BTH)), DIR_strict, Date],
+            points(pp[!is.na(get(flagname_BTH)) & !Ignore, DIR_strict, Date],
                    ylim = ylim, col = "pink")
-            points(pp[!is.na(get(flagname_BTH)), GLB_strict, Date],
+            points(pp[!is.na(get(flagname_BTH)) & !Ignore, GLB_strict, Date],
                    ylim = ylim, col = "magenta")
 
             layout(1,1)
