@@ -92,5 +92,7 @@ grep "\[//\]" **/*.md |\
 
 cat "$taglist" >> "$targetfile"
 
+# Create TOC
+"$HOME/PROGRAMS/gh-md-toc" --insert --no-backup "$targetfile"
 
 exit 0
