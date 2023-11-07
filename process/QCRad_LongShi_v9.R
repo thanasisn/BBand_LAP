@@ -90,7 +90,7 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -157,25 +157,26 @@ PLOT_FIRST <- as_date("2022-01-01")
 PLOT_LAST  <- as_date("2024-03-31")
 
 
-##  Create a test database  ----------------------------------------------------
-TEST_DB <- TRUE
-if (TEST_DB) {
-    source("~/BBand_LAP/DEFINITIONS.R")
-    cat("\n * * * Using a temp DB * * * \n\n")
-    ## copy data to temp
-    tyear <- 2022
-    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
-    system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-    system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
-    ## replace paths with test paths
-    DB_DIR     <- test_DB_DIR
-    DB_lock    <- test_DB_lock
-    DB_META_fl <- test_DB_META_fl
-    DB_HASH_fl <- test_DB_HASH_fl
-    OVERWRITEVariableBBDB("QCv9_process_flag", as.logical(NA))
-    OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.logical(NA))
-}
+# ##  Create a test database  ----------------------------------------------------
+# TEST_DB <- TRUE
+# if (TEST_DB) {
+#     source("~/BBand_LAP/DEFINITIONS.R")
+#     cat("\n * * * Using a temp DB * * * \n\n")
+#     ## copy data to temp
+#     tyear <- 2022
+#     dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
+#     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
+#     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
+#     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
+#     ## replace paths with test paths
+#     DB_DIR     <- test_DB_DIR
+#     DB_lock    <- test_DB_lock
+#     DB_META_fl <- test_DB_META_fl
+#     DB_HASH_fl <- test_DB_HASH_fl
+#     OVERWRITEVariableBBDB("QCv9_process_flag", as.POSIXct(NA))
+#     warning("THIS IS FOR DEVELOPMENT")
+#     OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
+# }
 
 
 ##  Create a new variable to the whole database  -------------------------------
@@ -183,8 +184,10 @@ if (TEST_DB) {
 ## use this columns as indicator, reset to reprocess all!!
 ## TODO use the arguments export to determine if have to run
 ## TODO make it a daytime or better move it to metadata
-InitVariableBBDB("QCv9_process_flag", as.logical(NA))
-# OVERWRITEVariableBBDB("QCv9_process_flag", as.character(NA))
+InitVariableBBDB("QCv9_process_flag", as.POSIXct(NA))
+# warning("THIS IS FOR DEVELOPMENT")
+# OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
+
 
 ## list data base files
 filelist <- data.table(
@@ -235,7 +238,7 @@ for (af in filelist$names) {
 
     ## use this as a general processing marker for this script
     # datapart$QCv9_01_dir_flag  <- "pass"
-    datapart$QCv9_process_flag <- TRUE
+    datapart$QCv9_process_flag <- Sys.time()
 
     ## Direct beam DNI
     datapart[Elevat > QS$sun_elev_min           &
@@ -298,8 +301,8 @@ for (af in filelist$names) {
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
         cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
-        InitVariableBBDB(flagname_DIR, as.character(NA))
-        InitVariableBBDB(flagname_GLB, as.character(NA))
+        # InitVariableBBDB(flagname_DIR, as.character(NA))
+        # InitVariableBBDB(flagname_GLB, as.character(NA))
 
         ## __ Direct  ----------------------------------------------------------
         datapart[DIR_strict < QS$dir_SWdn_min,
@@ -347,8 +350,8 @@ for (af in filelist$names) {
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
         cat(paste("\n2. Extremely Rare Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
-        InitVariableBBDB(flagname_DIR, as.character(NA))
-        InitVariableBBDB(flagname_GLB, as.character(NA))
+        # InitVariableBBDB(flagname_DIR, as.character(NA))
+        # InitVariableBBDB(flagname_GLB, as.character(NA))
 
         # Compute reference values
         datapart[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off]
@@ -393,8 +396,8 @@ for (af in filelist$names) {
         flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
         cat(paste("\n3. Comparison tests", flagname_UPP, flagname_LOW, "\n\n"))
 
-        InitVariableBBDB(flagname_UPP, as.character(NA))
-        InitVariableBBDB(flagname_LOW, as.character(NA))
+        # InitVariableBBDB(flagname_UPP, as.character(NA))
+        # InitVariableBBDB(flagname_LOW, as.character(NA))
 
         ## __ Proposed filter  -------------------------------------------------
         datapart[DiffuseFraction_kd  > QS$dif_rati_pr1  &
@@ -448,8 +451,8 @@ for (af in filelist$names) {
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
         cat("\n4. Climatological (configurable) Limits", flagname_DIR, flagname_GLB, "\n\n")
 
-        InitVariableBBDB(flagname_DIR, as.character(NA))
-        InitVariableBBDB(flagname_GLB, as.character(NA))
+        # InitVariableBBDB(flagname_DIR, as.character(NA))
+        # InitVariableBBDB(flagname_GLB, as.character(NA))
 
         ## __ Direct -----------------------------------------------------------
         datapart[, Dir_First_Clim_lim := TSI_TOA * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
@@ -494,7 +497,7 @@ for (af in filelist$names) {
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
         cat(paste("\n5. Tracking test", flagname_DIR, "\n\n"))
 
-        InitVariableBBDB(flagname_DIR, as.character(NA))
+        # InitVariableBBDB(flagname_DIR, as.character(NA))
 
         ## Clear Sky Sort-Wave model
         datapart[, ClrSW_ref2 := (QS$ClrSW_a / Sun_Dist_Astropy^2) * cosde(SZA)^QS$ClrSW_b]
@@ -555,8 +558,8 @@ for (af in filelist$names) {
         flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
         cat(paste("\n6. Rayleigh Limit Diffuse Comparison", flagname_BTH, "\n\n"))
 
-        InitVariableBBDB(flagname_BTH, as.character(NA))
-
+        # InitVariableBBDB(flagname_BTH, as.character(NA))
+        # OVERWRITEVariableBBDB(flagname_BTH, as.character(NA))
 
         datapart[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = Pressure)]
 
@@ -565,6 +568,12 @@ for (af in filelist$names) {
                  (flagname_BTH) := "Rayleigh diffuse limit upper (18)"]
         # datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
         #          (flagname_BTH) := "Rayleigh diffuse limit lower (18)"]
+
+        # datapart[DIFF_strict - RaylDIFF > QS$Rayleigh_upper_lim,
+        #          .N]
+        # datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
+        #          .N]
+        # table(datapart$QCv9_06_bth_flag)
 
         ## extra restrictions by me
         datapart[DIFF_strict - RaylDIFF     < QS$Rayleigh_lower_lim &
@@ -651,7 +660,7 @@ for (af in filelist$names) {
         testN        <- 8
         flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
 
-        InitVariableBBDB(flagname_BTH, as.character(NA))
+        # InitVariableBBDB(flagname_BTH, as.character(NA))
 
         ## __ Both  ------------------------------------------------------------
         datapart[, Relative_diffuse := 100 * (HOR_strict  - GLB_strict) / GLB_strict ]
@@ -744,7 +753,7 @@ for (af in filelist$names) {
     dummy <- gc()
 }
 #+ include=T, echo=F
-# myunlock(DB_lock)
+myunlock(DB_lock)
 
 
 
@@ -1492,6 +1501,21 @@ if (TEST_06) {
     cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always"),
                caption = flagname_BTH))
     cat(" \n \n")
+
+    datapart <- data.table(BB |> collect())
+
+    test <- datapart[DIFF_strict - RaylDIFF     < QS$Rayleigh_lower_lim &
+                         DIFF_strict / GLB_wpsm < QS$Rayleigh_dif_glo_r &
+                     GLB_wpsm               > QS$Rayleigh_glo_min,]
+
+    hist(test$GLB_wpsm)
+
+    # ## extra restrictions by me
+    # datapart[DIFF_strict - RaylDIFF     < QS$Rayleigh_lower_lim &
+    #              DIFF_strict / GLB_wpsm < QS$Rayleigh_dif_glo_r &
+    #              GLB_wpsm               > QS$Rayleigh_glo_min,
+    #          (flagname_BTH) := "Rayleigh diffuse limit lower (18)"]
+
 
     test <- BB |> select(DIFF_strict, RaylDIFF) |> collect() |> as.data.table()
     hist( test[, DIFF_strict - RaylDIFF ], breaks = 100 )
