@@ -125,16 +125,16 @@ TEST_08  <- FALSE
 TEST_09  <- FALSE
 TEST_10  <- FALSE
 
-TEST_01  <- TRUE
-TEST_02  <- TRUE
-TEST_03  <- TRUE
-TEST_04  <- TRUE
-TEST_05  <- TRUE
+# TEST_01  <- TRUE
+# TEST_02  <- TRUE
+# TEST_03  <- TRUE
+# TEST_04  <- TRUE
+# TEST_05  <- TRUE
 TEST_06  <- TRUE
 TEST_07  <- FALSE  ## TODO
-TEST_08  <- TRUE
-TEST_09  <- TRUE
-TEST_10  <- FALSE  ## TODO
+# TEST_08  <- TRUE
+# TEST_09  <- TRUE
+# TEST_10  <- FALSE  ## TODO
 
 ## mostly for daily plots
 DO_PLOTS     <- TRUE
@@ -174,8 +174,8 @@ if (TEST_DB) {
     DB_META_fl <- test_DB_META_fl
     DB_HASH_fl <- test_DB_HASH_fl
     OVERWRITEVariableBBDB("QCv9_process_flag", as.logical(NA))
+    OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.logical(NA))
 }
-
 
 
 ##  Create a new variable to the whole database  -------------------------------
@@ -541,19 +541,19 @@ for (af in filelist$names) {
         e    <-   287.85
         f    <-     0.046725
         mu_0 <- cosde(SZA)
-        return( a * mu_0     +
-                    b * mu_0 ^ 2 +
-                    c * mu_0 ^ 3 +
-                    d * mu_0 ^ 4 +
-                    e * mu_0 ^ 5 +
+        return( a * mu_0      +
+                    b * mu_0^2 +
+                    c * mu_0^3 +
+                    d * mu_0^4 +
+                    e * mu_0^5 +
                     f * mu_0 * Pressure)
     }
 
     if (TEST_06) {
-        cat(paste("\n6. Rayleigh Limit Diffuse Comparison.\n\n"))
 
         testN        <- 6
         flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
+        cat(paste("\n6. Rayleigh Limit Diffuse Comparison", flagname_BTH, "\n\n"))
 
         InitVariableBBDB(flagname_BTH, as.character(NA))
 
@@ -579,8 +579,6 @@ for (af in filelist$names) {
         # Rayleigh_lim <- selg & seld & selr
         #
         # ## . . Both --------------------------------------------------------####
-        # DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
-        # DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
         # DATA_year$QCF_BTH_06[ Rayleigh_lim ]                         <- "Rayleigh diffuse limit (18)"
 
 
@@ -1487,7 +1485,7 @@ if (TEST_05) {
 #'
 #+ echo=F, include=T, results="asis"
 if (TEST_06) {
-stop("DDD")
+
     testN        <- 6
     flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
 
