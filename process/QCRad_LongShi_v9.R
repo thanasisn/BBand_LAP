@@ -690,7 +690,10 @@ for (af in filelist$names) {
     #'
     #' Create a statistical range to check SZA and Azimuth.
     #' Implement monthly of by doy.
-    #'
+    #' 
+    #' - group by 10 minutes
+    #' - median SZA AZI
+    #' - distance from median < threshold
 
     if (TEST_10) {
         cat(paste("\n10. Erroneous sun position test.\n\n"))
