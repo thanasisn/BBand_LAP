@@ -1,12 +1,149 @@
 
 
-# About
+# Broadband Journal
+
+## About
 
 This is a journal mainly for the instruments CM-21 and CHP-1 of LAP.
 
 Other incidents on the roof may be reported here. 
 
 Other journals and log exist, but are not included here. 
+
+
+## Table of Contents
+
+::: {.columns columngap=4em column-rule="1px solid black"}
+
+<!--ts-->
+* [Broadband Journal](#broadband-journal)
+   * [About](#about)
+   * [Table of Contents](#table-of-contents)
+* [1996](#1996)
+   * [1996-02-08 00:00 [ThanasisN]](#1996-02-08-0000-thanasisn)
+* [2015](#2015)
+   * [2015-12-30 [ThanasisN]](#2015-12-30-thanasisn)
+* [2016](#2016)
+   * [2016-01-08 [ThanasisN]](#2016-01-08-thanasisn)
+   * [2016-01-29 [ThanasisN]](#2016-01-29-thanasisn)
+   * [2016-01-30 [ThanasisN]](#2016-01-30-thanasisn)
+   * [2016-03-07 [ThanasisN]](#2016-03-07-thanasisn)
+   * [2016-03-28 [ThanasisN]](#2016-03-28-thanasisn)
+   * [2016-04-01 [ThanasisN]](#2016-04-01-thanasisn)
+   * [2016-04-11 [ThanasisN]](#2016-04-11-thanasisn)
+   * [2016-04-13 [ThanasisN]](#2016-04-13-thanasisn)
+   * [2016-04-14 [ThanasisN]](#2016-04-14-thanasisn)
+   * [2016-04-15 [ThanasisN]](#2016-04-15-thanasisn)
+   * [2016-04-20 [ThanasisN]](#2016-04-20-thanasisn)
+   * [2016-05-16 [ThanasisN]](#2016-05-16-thanasisn)
+   * [2016-05-25 [ThanasisN]](#2016-05-25-thanasisn)
+   * [2016-05-27 [ThanasisN]](#2016-05-27-thanasisn)
+   * [2016-05-31 [ThanasisN]](#2016-05-31-thanasisn)
+   * [2016-06-03 [ThanasisN]](#2016-06-03-thanasisn)
+   * [2016-06-07 [ThanasisN]](#2016-06-07-thanasisn)
+   * [2016-06-09 [ThanasisN]](#2016-06-09-thanasisn)
+   * [2016-06-15 [ThanasisN]](#2016-06-15-thanasisn)
+   * [2016-06-16 [ThanasisN]](#2016-06-16-thanasisn)
+   * [2016-07-04 09:40 [ThanasisN]](#2016-07-04-0940-thanasisn)
+   * [2016-07-05 [ThanasisN]](#2016-07-05-thanasisn)
+   * [2016-07-07 [ThanasisN]](#2016-07-07-thanasisn)
+   * [2016-07-19 [ThanasisN]](#2016-07-19-thanasisn)
+   * [2016-07-21 [ThanasisN]](#2016-07-21-thanasisn)
+   * [2016-07-22 [ThanasisN]](#2016-07-22-thanasisn)
+   * [2016-08-31  [ThanasisN]](#2016-08-31--thanasisn)
+   * [2016-09-23  [ThanasisN]](#2016-09-23--thanasisn)
+   * [2016-10-31 [ThanasisN]](#2016-10-31-thanasisn)
+* [2017](#2017)
+   * [2017-01-10 [ThanasisN]](#2017-01-10-thanasisn)
+   * [2017-01-11 [ThanasisN]](#2017-01-11-thanasisn)
+   * [2017-01-12 [ThanasisN]](#2017-01-12-thanasisn)
+   * [2017-01-19 [ThanasisN]](#2017-01-19-thanasisn)
+   * [2017-02-22 [ThanasisN]](#2017-02-22-thanasisn)
+   * [2017-03-03 12:39 [ThanasisN]](#2017-03-03-1239-thanasisn)
+   * [2017-05-04 09:30 [ThanasisN]](#2017-05-04-0930-thanasisn)
+   * [2017-07-12 09:34 [ThanasisN]](#2017-07-12-0934-thanasisn)
+   * [2017-08-09 [ThanasisN]](#2017-08-09-thanasisn)
+   * [2017-08-15 [ThanasisN]](#2017-08-15-thanasisn)
+   * [2017-08-16 [ThanasisN]](#2017-08-16-thanasisn)
+   * [2017-08-17 09:45 [ThanasisN]](#2017-08-17-0945-thanasisn)
+   * [2017-08-22 [ThanasisN]](#2017-08-22-thanasisn)
+   * [2017-09-07 [ThanasisN]](#2017-09-07-thanasisn)
+   * [2017-09-13 09:10 [ThanasisN]](#2017-09-13-0910-thanasisn)
+   * [2017-10-02 09:30 [ThanasisN]](#2017-10-02-0930-thanasisn)
+   * [2017-10-09 11:17 [ThanasisN]](#2017-10-09-1117-thanasisn)
+   * [2017-10-30 09:23 [ThanasisN]](#2017-10-30-0923-thanasisn)
+   * [2017-12-05 [ThanasisN]](#2017-12-05-thanasisn)
+   * [2017-12-13 [ThanasisN]](#2017-12-13-thanasisn)
+   * [2017-12-15 [ThanasisN]](#2017-12-15-thanasisn)
+   * [2017-12-18 10:04 [ThanasisN]](#2017-12-18-1004-thanasisn)
+   * [2017-12-25 [ThanasisN]](#2017-12-25-thanasisn)
+   * [2017-12-26 [ThanasisN]](#2017-12-26-thanasisn)
+* [2018](#2018)
+   * [2018-01-18 [ThanasisN]](#2018-01-18-thanasisn)
+   * [2018-03-20 [ThanasisN]](#2018-03-20-thanasisn)
+   * [2018-03-23 11:36 [ThanasisN]](#2018-03-23-1136-thanasisn)
+   * [2018-04-12 08:35 [ThanasisN]](#2018-04-12-0835-thanasisn)
+   * [2018-04-17 08:34 [ThanasisN]](#2018-04-17-0834-thanasisn)
+   * [2018-05-16 10:35 [ThanasisN]](#2018-05-16-1035-thanasisn)
+   * [2018-05-18 [ThanasisN]](#2018-05-18-thanasisn)
+   * [2018-12-07 [ThanasisN]](#2018-12-07-thanasisn)
+* [2019](#2019)
+   * [2019-04-11 09:27 [ThanasisN]](#2019-04-11-0927-thanasisn)
+   * [2019-05-06 [ThanasisN]](#2019-05-06-thanasisn)
+   * [2019-05-10 09:22 [ThanasisN]](#2019-05-10-0922-thanasisn)
+   * [2019-05-13 [ThanasisN]](#2019-05-13-thanasisn)
+   * [2019-05-18 09:10 [ThanasisN]](#2019-05-18-0910-thanasisn)
+   * [2019-05-30 10:13 [ThanasisN]](#2019-05-30-1013-thanasisn)
+   * [2019-06-12 10:54 [ThanasisN]](#2019-06-12-1054-thanasisn)
+   * [2019-06-17 09:35 [ThanasisN]](#2019-06-17-0935-thanasisn)
+   * [2019-06-27 08:33 [ThanasisN]](#2019-06-27-0833-thanasisn)
+   * [2019-07-04 [ThanasisN]](#2019-07-04-thanasisn)
+   * [2019-07-12 10:26 [ThanasisN]](#2019-07-12-1026-thanasisn)
+   * [2019-07-26 08:59 [ThanasisN]](#2019-07-26-0859-thanasisn)
+   * [2019-12-16 11:00 [ThanasisN]](#2019-12-16-1100-thanasisn)
+* [2020](#2020)
+   * [2020-01-03 [ThanasisN]](#2020-01-03-thanasisn)
+   * [2020-04-29 09:05 [ThanasisN]](#2020-04-29-0905-thanasisn)
+   * [2020-04-30 12:12 [ThanasisN]](#2020-04-30-1212-thanasisn)
+   * [2020-05-07 10:31 [ThanasisN]](#2020-05-07-1031-thanasisn)
+   * [2020-06-10 10:59 [ThanasisN]](#2020-06-10-1059-thanasisn)
+* [2022](#2022)
+   * [2022-02-17 00:00 [ThanasisN]](#2022-02-17-0000-thanasisn)
+   * [2022-02-21 00:00 [ThanasisN]](#2022-02-21-0000-thanasisn)
+   * [2022-02-21 13:50 [ThanasisN]](#2022-02-21-1350-thanasisn)
+   * [2022-05-23 [ThanasisN]](#2022-05-23-thanasisn)
+   * [2022-06-03 [ThanasisN]](#2022-06-03-thanasisn)
+   * [2022-06-16 00:00 [BA]](#2022-06-16-0000-ba)
+   * [2022-06-27 11:40 [ThanasisN]](#2022-06-27-1140-thanasisn)
+* [2023](#2023)
+   * [2023-03-28 15:48 [ThanasisN]](#2023-03-28-1548-thanasisn)
+   * [2023-03-28 17:31 [ThanasisN]](#2023-03-28-1731-thanasisn)
+   * [2023-04-03 09:14 [ThanasisN]](#2023-04-03-0914-thanasisn)
+   * [2023-04-04 12:59 [ThanasisN]](#2023-04-04-1259-thanasisn)
+   * [2023-04-19 09:19 [ThanasisN]](#2023-04-19-0919-thanasisn)
+   * [2023-05-18 09:15 [ThanasisN]](#2023-05-18-0915-thanasisn)
+   * [2023-05-25 08:52 [ThanasisN]](#2023-05-25-0852-thanasisn)
+   * [2023-06-26 11:26 [ThanasisN]](#2023-06-26-1126-thanasisn)
+   * [2023-10-25 09:22 [ThanasisN]](#2023-10-25-0922-thanasisn)
+   * [2023-10-26 11:20 [ThanasisN]](#2023-10-26-1120-thanasisn)
+   * [2023-10-30 13:54 [ThanasisN]](#2023-10-30-1354-thanasisn)
+   * [2023-10-31 09:59 [ThanasisN]](#2023-10-31-0959-thanasisn)
+   * [2023-11-02 11:13 [ThanasisN]](#2023-11-02-1113-thanasisn)
+   * [2023-11-06 12:30 [ThanasisN]](#2023-11-06-1230-thanasisn)
+   * [2023-11-07 11:00 [ThanasisN]](#2023-11-07-1100-thanasisn)
+* [Journal instructions](#journal-instructions)
+   * [Format for entries](#format-for-entries)
+      * [Filenames should be numerical sorted](#filenames-should-be-numerical-sorted)
+      * [File template](#file-template)
+   * [Build a journal document entries files](#build-a-journal-document-entries-files)
+* [List of tags](#list-of-tags)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+<!-- Added by: athan, at: 2023-11-07T15:28:27 EET -->
+
+<!--te-->
+
+:::
 
 
 -----
@@ -580,7 +717,7 @@ Seems like a reboot or disconnection at
 
 [//]: # (Keywords: #chp1, #tracker2, #async, #data_loss, #katastroph, #panic, #suspicious_data )
 
-#### Tracker found to be on park location.
+**Tracker found to be on park location.**
 
 Seems like software was freeze.
 
@@ -589,7 +726,7 @@ Radmon-pc was rebooted -> tracker working properly.
 Sighting seems correct.
 
 
-#### All BB instruments have bad data!!!!!
+**All BB instruments have bad data!!!!!**
 
 Seems like a step of values before and after reboot!!!
 
@@ -683,13 +820,13 @@ seems that tracker now performs better.
 
 [//]: # (Keywords: #error, #problem, #data_corruption_certain) 
 
-#### Description
+**Description**
 
 Noise on all broadbands
 
 CHP-1 tracker was stack due to radmon
 
-#### Actions
+**Actions**
 
 Reboot was done.
 
@@ -883,14 +1020,14 @@ This happened close to disconnection.
 
 [//]: # (Keywords: #katastroph, #leveling, #silica, #down_time)
 
-#### radmon was down
+**Radmon was down**
 
-radmon had a disk corruption and was down for few days.
+Radmon had a disk corruption and was down for few days.
 
 The system probably is in good order now.
 
 
-#### For CHP-1 was performed
+**For CHP-1 was performed**
 
 - Leveling
 - Silica gel replacement
@@ -1465,6 +1602,20 @@ The tracker had a burned out microcontroller.
 
 
 
+## 2023-11-07 11:00 [ThanasisN]
+
+[//]: # (Keywords: #chp1, #problem)
+
+The CHP-1 was removed to fix a problem with the silica gel compartment.
+
+The instrument was taken to a metal workshop where the threads of the body and the silica gel compartment were altered.
+
+It was installed, with new silica gel.
+
+The tracker was checked and was level.
+
+
+
 :::
 
 
@@ -1522,7 +1673,7 @@ List of tags
       1 #brewers
       2 #broadband
       1 #ccd
-     59 #chp1
+     60 #chp1
       1 #cleaned
      16 #cleaning
      12 #cm21
@@ -1539,7 +1690,7 @@ List of tags
       5 #leveling
       1 #mounting
       2 #panic
-      9 #problem
+     10 #problem
       2 #pysolar
       2 #radmon
       1 #radmon_reboot

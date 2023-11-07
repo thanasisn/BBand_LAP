@@ -21,7 +21,6 @@ $(TARGET): Makefile Readme.md
 	  --standalone                    \
 	  --listings                      \
 	  --highlight-style kate          \
-	  --toc                           \
 	  --metadata-file   .index.yaml   \
 	  --from            markdown      \
 	  --to              pdf           \
@@ -31,6 +30,7 @@ $(TARGET): Makefile Readme.md
 	  --out             '$@'          \
 	  Readme.md
 
+	  #--toc                           \
 
 ## create doc file
 TARGET = Journal.odt
@@ -38,13 +38,13 @@ odt: $(TARGET)
 $(TARGET): Makefile Readme.md
 	-pandoc                           \
 	  --standalone                    \
-	  --toc                           \
 	  --metadata-file   .index.yaml   \
 	  --from            markdown      \
 	  --to              odt           \
 	  --out             '$@'          \
 	  Readme.md
 
+	  #--toc                           \
 
 ## create html file
 TARGET = Journal.html
@@ -52,7 +52,6 @@ html: $(TARGET)
 $(TARGET): Makefile Readme.md
 	-pandoc                           \
 	  --standalone                    \
-	  --toc                           \
 	  --metadata-file   .index.yaml   \
 	  --mathjax                       \
 	  --lua-filter      .columns.lua  \
@@ -62,4 +61,5 @@ $(TARGET): Makefile Readme.md
 	  --out             '$@'          \
 	  Readme.md
 
+	  # --toc                           \
 

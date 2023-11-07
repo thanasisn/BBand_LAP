@@ -16,7 +16,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 * [Broad Band LAP](#broad-band-lap)
    * [Table of Contents](#table-of-contents)
    * [What it does](#what-it-does)
-      * [For CHP-1](#for-chp-1)
+      * [For CHP-1](#for-chp)
       * [For CM-21](#for-cm-21)
       * [Other processes](#other-processes)
       * [Tools](#tools)
@@ -26,7 +26,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-05-12T20:04:43 EEST -->
+<!-- Added by: athan, at: 2023-11-07T15:13:25 EET -->
 
 <!--te-->
 
