@@ -293,6 +293,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, QCv9_06_bth_flag        := as.character(NA)]
             sun_temp[, QCv9_08_bth_flag        := as.character(NA)]
             sun_temp[, QCv9_09_glb_flag        := as.character(NA)]
+            sun_temp[, QCv9_10_all_flag        := as.character(NA)]
+
 
             ## gather data
             if (nrow(gather) == 0) {
