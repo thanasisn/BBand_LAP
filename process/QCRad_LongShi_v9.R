@@ -699,7 +699,7 @@ for (af in filelist$names) {
         testN        <- 9
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
 
-        InitVariableBBDB(flagname_GLB, as.character(NA))
+        # InitVariableBBDB(flagname_GLB, as.character(NA))
 
         ## __ Global  ----------------------------------------------------------
         datapart[ClearnessIndex_kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
@@ -729,7 +729,7 @@ for (af in filelist$names) {
         testN        <- 10
         flagname_ALL <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_all_flag")
 
-        InitVariableBBDB(flagname_ALL, as.character(NA))
+        # InitVariableBBDB(flagname_ALL, as.character(NA))
 
         rm(list = ls(pattern = "flagname_.*"))
         dummy <- gc()
