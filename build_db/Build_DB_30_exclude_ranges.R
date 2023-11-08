@@ -75,10 +75,10 @@ if (!all((ranges_CHP1$Until - ranges_CHP1$From) >= 1)) {
     pander(ranges_CHP1[ !ranges_CHP1$From < ranges_CHP1$Until, ])
     stop("Inverted ranges in ", CHP1_EXCLUDE, "!!!")
 }
-## capitalize
+## Capitalize comments
 ranges_CHP1$Comment <- sub("(.)", "\\U\\1", ranges_CHP1$Comment, perl = TRUE)
 ranges_CHP1$Comment[ranges_CHP1$Comment == ""] <- "NO DESCRIPTION"
-## compute time span
+## Compute time span of exclutions
 ranges_CHP1$HourSpan <- (as.numeric(ranges_CHP1$Until) - as.numeric(ranges_CHP1$From)) / 3600
 
 
@@ -118,10 +118,10 @@ if (!all((ranges_CHP1_temp$Until - ranges_CHP1_temp$From) >= 1)) {
     pander(ranges_CHP1_temp[ !ranges_CHP1_temp$From < ranges_CHP1_temp$Until, ])
     stop("Inverted ranges in ", CHP1_TEMP_EX, "!!!")
 }
-## capitalize
+## Capitalize comments
 ranges_CHP1_temp$Comment <- sub("(.)", "\\U\\1", ranges_CHP1_temp$Comment, perl = TRUE)
 ranges_CHP1_temp$Comment[ranges_CHP1_temp$Comment == ""] <- "NO DESCRIPTION"
-## compute time span
+## Compute time span of exclutions
 ranges_CHP1_temp$HourSpan <- (as.numeric(ranges_CHP1_temp$Until) - as.numeric(ranges_CHP1_temp$From)) / 3600
 
 
@@ -227,8 +227,9 @@ dd      <- tstrsplit(dd, "/")
 filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
-
-## list data set to be touched
+## FIXME this doesn't work as expected
+## TODO create a meta data variable as.POSIXct for applied exclutions
+## List data set to be touched
 ## This will update the whole database when any of the param files changed.
 ## A better approach will be to check if the values in the param files have been
 ## excluded, but this is infrequent so this works well enough.
