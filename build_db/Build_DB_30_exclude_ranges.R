@@ -47,14 +47,14 @@ source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
-library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
-library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
-library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
-library(data.table, warn.conflicts = TRUE, quietly = TRUE)
-library(tools,      warn.conflicts = TRUE, quietly = TRUE)
-library(pander,     warn.conflicts = TRUE, quietly = TRUE)
+library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+library(tools,      warn.conflicts = FALSE, quietly = TRUE)
+library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 
 
@@ -243,6 +243,26 @@ todosets <- unique(rbind(
             .(month = month(day), year = year(day))]
 ))
 
+
+BB_meta[is.na(chp1_bad_data_flagged)                   |
+            chp1_bad_data_flagged < chp1_exclude_mtime |
+            chp1_bad_temp_flagged < chp1_temp_exclude_mtime,
+        .(month = month(day), year = year(day))]
+
+BB_meta[is.na(cm21_bad_data_flagged) |
+            cm21_bad_data_flagged < cm21_exclude_mtime,
+        .(month = month(day), year = year(day))]
+
+BB_meta[is.na(cm21_bad_data_flagged) ,
+        .(month = month(day), year = year(day))]
+
+BB_meta[    cm21_bad_data_flagged < cm21_exclude_mtime,
+        .(month = month(day), year = year(day))]
+
+BB_meta[, cm21_bad_data_flagged]
+BB_meta[, chp1_bad_data_flagged]
+
+
 range(BB_meta$cm21_bad_data_flagged)
 range(BB_meta$chp1_bad_data_flagged)
 range(BB_meta$chp1_bad_temp_flagged)
@@ -253,6 +273,10 @@ filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 rm(todosets, dd)
 
 
+stop("DD")
+
+##  Apply exclusion ranges to DB  ----------------------------------------------
+
 for (af in na.omit(filelist$names)) {
     datapart <- read_parquet(af)
     ## add columns for this set
@@ -261,7 +285,7 @@ for (af in na.omit(filelist$names)) {
 
     cat("30 Load: ", af, "\n")
 
-    ## CHP-1 flag bad data -----------------------------------------------------
+    ## _ CHP-1 flag bad data ---------------------------------------------------
     for (i in 1:nrow(ranges_CHP1)) {
         lower  <- ranges_CHP1$From[   i]
         upper  <- ranges_CHP1$Until[  i]
@@ -274,7 +298,7 @@ for (af in na.omit(filelist$names)) {
         rm(tempex)
     }
 
-    ## CHP-1 flag physical limits anomalies  -----------------------------------
+    ## _ CHP-1 flag physical limits anomalies  ---------------------------------
     datapart <- data.table(datapart)
     datapart[CHP1_sig < chp1_signal_lower_limit(Date) & !is.na(chp1_bad_data_flag),
              chp1_bad_data_flag := "Abnormal LOW signal"]
@@ -282,7 +306,7 @@ for (af in na.omit(filelist$names)) {
              chp1_bad_data_flag := "Abnormal HIGH signal"]
     datapart <- as_tibble(datapart)
 
-    ## CHP-1 flag temperature --------------------------------------------------
+    ## _ CHP-1 flag temperature ------------------------------------------------
     for (i in 1:nrow(ranges_CHP1_temp)) {
         lower  <- ranges_CHP1_temp$From[   i]
         upper  <- ranges_CHP1_temp$Until[  i]
@@ -295,7 +319,7 @@ for (af in na.omit(filelist$names)) {
         rm(tempex)
     }
 
-    ## CHP-1 flag temperature physical limits ----------------------------------
+    ## _ CHP-1 flag temperature physical limits --------------------------------
     datapart <- data.table(datapart)
     datapart[chp1_temperature > CHP1_TEMP_MAX        & !is.na(chp1_bad_temp_flag),
              chp1_bad_temp_flag := "Abnormal HIGH temperature"]
@@ -307,7 +331,7 @@ for (af in na.omit(filelist$names)) {
 
 
 
-    ## CM-21 flag data ---------------------------------------------------------
+    ## _ CM-21 flag data -------------------------------------------------------
     for (i in 1:nrow(ranges_CM21)) {
         lower  <- ranges_CM21$From[   i]
         upper  <- ranges_CM21$Until[  i]
@@ -321,7 +345,7 @@ for (af in na.omit(filelist$names)) {
         rm(tempex)
     }
 
-    ## CM-21 flag physical limits anomalies  -----------------------------------
+    ## _ CM-21 flag physical limits anomalies  ---------------------------------
     datapart <- data.table(datapart)
     datapart[CM21_sig < cm21_signal_lower_limit(Date) & !is.na(cm21_bad_data_flag),
              cm21_bad_data_flag := "Abnormal LOW signal"]
@@ -331,7 +355,7 @@ for (af in na.omit(filelist$names)) {
 
 
 
-    ## Store data --------------------------------------------------------------
+    ## _ Store data ------------------------------------------------------------
     chg_days <- unique(as.Date(datapart$Date))
 
     ## save flagged metadata
