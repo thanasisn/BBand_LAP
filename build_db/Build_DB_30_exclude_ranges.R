@@ -17,12 +17,11 @@
 #'
 #' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
 #'
-#'
 #+ echo=F, include=T
 
 
 #+ echo=F, include=F
-## __ Document options ---------------------------------------------------------
+## __ Document options __ ------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
@@ -30,10 +29,11 @@ knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
-## __ Set environment  ---------------------------------------------------------
+## __ Set environment __ -------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB_30_exclude_ranges.R"
+Script.ID   <- "30"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -41,13 +41,15 @@ if (!interactive()) {
 }
 
 
-## __ Load libraries  ----------------------------------------------------------
+## __ Load libraries __ --------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+
+## __ Execution lock __ --------------------------------------------------------
+mylock(DB_lock)
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
@@ -55,7 +57,6 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
-
 
 
 
@@ -78,9 +79,8 @@ if (!all((ranges_CHP1$Until - ranges_CHP1$From) >= 1)) {
 ## Capitalize comments
 ranges_CHP1$Comment <- sub("(.)", "\\U\\1", ranges_CHP1$Comment, perl = TRUE)
 ranges_CHP1$Comment[ranges_CHP1$Comment == ""] <- "NO DESCRIPTION"
-## Compute time span of exclutions
+## Compute time span of exclusions
 ranges_CHP1$HourSpan <- (as.numeric(ranges_CHP1$Until) - as.numeric(ranges_CHP1$From)) / 3600
-
 
 #'
 #' Check time ranges span in hours
@@ -98,7 +98,6 @@ cat('\n\n\\normalsize\n\n')
 cat('\n\n\\footnotesize\n\n')
 pander(data.table(table(ranges_CHP1$Comment)))
 cat('\n\n\\normalsize\n\n')
-
 
 
 
@@ -121,9 +120,8 @@ if (!all((ranges_CHP1_temp$Until - ranges_CHP1_temp$From) >= 1)) {
 ## Capitalize comments
 ranges_CHP1_temp$Comment <- sub("(.)", "\\U\\1", ranges_CHP1_temp$Comment, perl = TRUE)
 ranges_CHP1_temp$Comment[ranges_CHP1_temp$Comment == ""] <- "NO DESCRIPTION"
-## Compute time span of exclutions
+## Compute time span of exclusions
 ranges_CHP1_temp$HourSpan <- (as.numeric(ranges_CHP1_temp$Until) - as.numeric(ranges_CHP1_temp$From)) / 3600
-
 
 #'
 #' Check time ranges span in hours
@@ -145,7 +143,6 @@ cat('\n\n\\normalsize\n\n')
 
 
 
-
 ## Load CM-21 exclusions -------------------------------------------------------
 cm21_exclude_mtime <- file.mtime(CM21_EXCLUDE)
 ranges_CM21        <- read.table(CM21_EXCLUDE,
@@ -162,10 +159,10 @@ if (!all((ranges_CM21$Until - ranges_CM21$From) >= 1)) {
     pander(ranges_CM21[ !ranges_CM21$From < ranges_CM21$Until, ])
     stop("Inverted ranges in ", CM21_EXCLUDE, "!!!")
 }
-## capitalize
+## Capitalize comments
 ranges_CM21$Comment <- sub("(.)", "\\U\\1", ranges_CM21$Comment, perl = TRUE)
 ranges_CM21$Comment[ranges_CM21$Comment == ""] <- "NO DESCRIPTION"
-## compute time span
+## Compute time span of exclusions
 ranges_CM21$HourSpan <- (as.numeric(ranges_CM21$Until) - as.numeric(ranges_CM21$From)) / 3600
 
 #'
@@ -190,32 +187,30 @@ cat('\n\n\\normalsize\n\n')
 
 
 
-
-##  Initialize meta data file  -------------------------------------------------
+## _ Initialize meta data file  ------------------------------------------------
 if (file.exists(DB_META_fl)) {
     BB_meta <- read_parquet(DB_META_fl)
-    ## add more days
+    ## Add more days if needed
     BB_meta <- merge(BB_meta,
                      data.table(day = seq(max(BB_meta$day), Sys.Date(),
                                           by = "day")),
                      by = "day",
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
-    ## new columns
+    ## New columns can go here
 } else {
     stop("HAVE TO STAR A NEW DB!!")
 }
 
-names(BB_meta)
 
 
+##  Flag exclusions file by file  ----------------------------------------------
+##
+##  FIXME should find a better method through arrow dataset to mark everything
+##  at once and update files as needed.
+##
 
-
-
-## Flag exclusions file by file  -----------------------------------------------
-## FIXME should find a better method through arrow dataset
-
-## list data base files
+## List data base files
 filelist <- data.table(
     names = list.files(DB_DIR,
                        pattern = "*.parquet",
@@ -224,66 +219,43 @@ filelist <- data.table(
 dd      <- dirname(filelist$names)
 dd      <- tstrsplit(dd, "/")
 
-filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
-filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
+filelist$flmonth <- as.numeric(unlist(dd[length(dd)    ]))
+filelist$flyear  <- as.numeric(unlist(dd[length(dd) - 1]))
 
-## FIXME this doesn't work as expected
-## TODO create a meta data variable as.POSIXct for applied exclutions
-## List data set to be touched
-## This will update the whole database when any of the param files changed.
-## A better approach will be to check if the values in the param files have been
-## excluded, but this is infrequent so this works well enough.
+## _ List data set to be touched  ----------------------------------------------
+##
+##  This will update the whole database when any of the param files change.
+##  A better approach will be to check if the values in the param files have
+##  been excluded and have to be updated.
+##  This is infrequent, so this works well enough.
+##
+##  Allow some wiggle room in the comparison (1sec). Either wise it always
+##  update everything.
+##
 todosets <- unique(rbind(
-    BB_meta[is.na(chp1_bad_data_flagged)                   |
-                chp1_bad_data_flagged < chp1_exclude_mtime |
-                chp1_bad_temp_flagged < chp1_temp_exclude_mtime,
+    BB_meta[is.na(chp1_bad_data_flagged)                            |
+                chp1_bad_data_flagged < chp1_exclude_mtime      - 1 |
+                chp1_bad_temp_flagged < chp1_temp_exclude_mtime - 1 ,
             .(month = month(day), year = year(day))],
     BB_meta[is.na(cm21_bad_data_flagged) |
-                cm21_bad_data_flagged < cm21_exclude_mtime,
+                cm21_bad_data_flagged < cm21_exclude_mtime - 1 ,
             .(month = month(day), year = year(day))]
 ))
 
-
-BB_meta[is.na(chp1_bad_data_flagged)                   |
-            chp1_bad_data_flagged < chp1_exclude_mtime |
-            chp1_bad_temp_flagged < chp1_temp_exclude_mtime,
-        .(month = month(day), year = year(day))]
-
-BB_meta[is.na(cm21_bad_data_flagged) |
-            cm21_bad_data_flagged < cm21_exclude_mtime,
-        .(month = month(day), year = year(day))]
-
-BB_meta[is.na(cm21_bad_data_flagged) ,
-        .(month = month(day), year = year(day))]
-
-BB_meta[    cm21_bad_data_flagged < cm21_exclude_mtime,
-        .(month = month(day), year = year(day))]
-
-BB_meta[, cm21_bad_data_flagged]
-BB_meta[, chp1_bad_data_flagged]
-
-
-range(BB_meta$cm21_bad_data_flagged)
-range(BB_meta$chp1_bad_data_flagged)
-range(BB_meta$chp1_bad_temp_flagged)
-
-
-## select what to touch
+## Select files to touch
 filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
 rm(todosets, dd)
 
 
-stop("DD")
 
 ##  Apply exclusion ranges to DB  ----------------------------------------------
-
 for (af in na.omit(filelist$names)) {
     datapart <- read_parquet(af)
     ## add columns for this set
     datapart[["year"]]  <- as.integer(year( datapart$Date))
     datapart[["month"]] <- as.integer(month(datapart$Date))
 
-    cat("30 Load: ", af, "\n")
+    cat(paste0(Script.ID, " Load: "), af, "\n")
 
     ## _ CHP-1 flag bad data ---------------------------------------------------
     for (i in 1:nrow(ranges_CHP1)) {
@@ -358,26 +330,26 @@ for (af in na.omit(filelist$names)) {
     ## _ Store data ------------------------------------------------------------
     chg_days <- unique(as.Date(datapart$Date))
 
-    ## save flagged metadata
+    ## Save flagged metadata
     BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime     ]
     BB_meta[day %in% chg_days, chp1_bad_temp_flagged := chp1_temp_exclude_mtime]
     BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime     ]
 
-    ## store actual data
+    ## Store actual data
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
-    cat("30 Save: ", af, "\n\n")
+    cat(paste0(Script.ID, " Save: "), af, "\n\n")
     rm(datapart)
 }
 
-## clean
+## Clean
 rm(BB_meta)
 rm(filelist)
 rm(ranges_CHP1)
 rm(ranges_CM21)
 
 
-## Show some info for the dataset flags
+## __ Show some info for the flags __ ------------------------------------------
 BB <- opendata()
 
 wecare <- c("cm21_bad_data_flag", "chp1_bad_data_flag", "chp1_bad_temp_flag")
@@ -388,7 +360,7 @@ for (acol in wecare) {
 }
 
 
-
+## __ Execution Unlock __ ------------------------------------------------------
 myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

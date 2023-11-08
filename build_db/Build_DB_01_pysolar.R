@@ -35,6 +35,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB_01_pysolar.R"
+Script.ID   <- "01"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -78,7 +79,7 @@ if (file.exists(DB_META_fl)) {
     BB_meta$pysolar_basename         <- as.character(BB_meta$pysolar_basename)
     BB_meta$pysolar_mtime            <- as.POSIXct(BB_meta$pysolar_mtime)
     BB_meta$pysolar_parsed           <- as.POSIXct(BB_meta$pysolar_parsed)
-    BB_meta$data_exclutions_applied  <- as.POSIXct(NA)
+    ## BB_meta$data_exclusions_applied  <- as.POSIXct(NA)
     BB_meta$daylength                <- as.integer(NA)
     ## For CM-21 meta data
     BB_meta$cm21_Daily_dark          <- as.numeric(NA)
@@ -101,7 +102,7 @@ if (file.exists(DB_META_fl)) {
     BB_meta$cm21_parsed              <- as.POSIXct(NA)
     BB_meta$cm21_sig_NAs             <- as.integer(NA)
     BB_meta$cm21_sig_sd_NAs          <- as.integer(NA)
-    ## For INCLINED CM-21 meta data
+    ## For INCLINED CM-21 metadata
     BB_meta$cm21inc_Daily_dark       <- as.numeric(NA)
     BB_meta$cm21inc_bad_data_flagged <- as.POSIXct(NA)
     BB_meta$cm21inc_basename         <- as.character(NA)
@@ -122,7 +123,7 @@ if (file.exists(DB_META_fl)) {
     BB_meta$cm21inc_parsed           <- as.POSIXct(NA)
     BB_meta$cm21inc_sig_NAs          <- as.integer(NA)
     BB_meta$cm21inc_sig_sd_NAs       <- as.integer(NA)
-    ## Fro CHP-1 meta data
+    ## For CHP-1 metadata
     BB_meta$chp1_Daily_dark          <- as.numeric(NA)
     BB_meta$chp1_bad_data_flagged    <- as.POSIXct(NA)
     BB_meta$chp1_bad_temp_flagged    <- as.POSIXct(NA)
@@ -172,25 +173,25 @@ cat("\n**Found:",paste(nrow(inp_filelist), "PySolar files**\n"))
 inp_filelist <- inp_filelist[!inp_filelist$basename %in% BB_meta$pysolar_basename]
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 
-cat("\n**Parse:",paste(nrow(inp_filelist), "PySolar files**\n\n"))
+cat("\n**Parse:", paste(nrow(inp_filelist), "PySolar files**\n\n"))
 
 
 
 ##  Import PySolar files  ------------------------------------------------------
 for (YYYY in unique(year(inp_filelist$day))) {
     subyear <- inp_filelist[year(day) == YYYY]
-    ## months to do
+    ## Months to do
     for (mm in subyear[, unique(month(day))]) {
         submonth <- subyear[month(day) == mm]
-        ## export file name and hive dir
+        ## Export file name and hive dir
         filedir <- paste0(DB_DIR, "/", YYYY, "/", mm, "/" )
         dir.create(filedir, recursive = TRUE, showWarnings = FALSE)
         partfile <- paste0(filedir, "/part-0.parquet")
-        ## init data collector
+        ## Init data collector
         if (file.exists(partfile)) {
             cat("01 Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
-            ## columns may be missing while repacking dataset
+            ## Columns may be missing while repacking dataset
             gather$year  <- year(gather$Date)
             gather$month <- month(gather$Date)
         } else {
@@ -198,7 +199,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
             gather <- data.table()
         }
 
-        ##  read this month set files
+        ##  Read this month set files
         gathermeta <- data.table()
         for (ad in submonth$day) {
             ss <- submonth[day == ad]
@@ -297,9 +298,9 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, QCv9_10_all_flag        := as.character(NA)]
 
 
-            ## gather data
+            ## Gather data
             if (nrow(gather) == 0) {
-                ## this inits the database table!!
+                ## This inits the database table!!
                 gather     <- as_tibble(sun_temp)
             } else {
                 gather     <- rows_upsert(gather, sun_temp, by = "Date")
@@ -312,7 +313,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
 
         setorder(gather, Date)
 
-        ## store this month / set data
+        ## Store this month / set data
         write_parquet(gather,  partfile)
         write_parquet(BB_meta, DB_META_fl)
         rm(gather, gathermeta, submonth)
