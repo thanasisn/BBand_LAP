@@ -23,10 +23,10 @@ if (!interactive()) {
     sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
-library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
-library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
-library(data.table, warn.conflicts = TRUE, quietly = TRUE)
+library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 
 options(max.print = 1500)
 
