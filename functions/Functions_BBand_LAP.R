@@ -17,6 +17,8 @@ opendata <- function() {
 
 
 
+
+
 #' Write the dataset for BBand_LAP
 #'
 #' @details  This is unified method to write this project dataset
@@ -54,6 +56,8 @@ InitVariableBBDB <- function(varname, vartype) {
         cat("Create column: ", varname, "\n")
         BB <- BB |> mutate( !!varname := vartype) |> compute()
         writedata(BB)
+    } else {
+        warning(paste0("Variable exist: ", varname, "\n", " !! IGNORING VARIABLE INIT !!"))
     }
     BB <- opendata()
 }
@@ -83,6 +87,34 @@ OVERWRITEVariableBBDB <- function(varname, vartype) {
     }
     BB <- opendata()
 }
+
+
+
+#' Create and init a new column/variable in the Broad Band metadata dataset.
+#'
+#' @param varname  The name of the new column to create.
+#' @param vartype  The data type use to fill the new column.
+#'
+#' @return         Nothing. It edit the dataset in place and writes to disk.
+#' @export
+#'
+#' @examples       InitVariableBBmeta("new_varile_name", as.character(NA))
+#'
+InitVariableBBmeta <- function(varname, vartype) {
+    BB_meta   <- read_parquet(DB_META_fl)
+    if (!is.character(varname)) stop()
+    if (is.null(vartype)) stop()
+
+    if (!any(names(BB_meta) == varname)) {
+        cat("Create column: ", varname, "\n")
+        BB_meta <- BB_meta |> mutate( !!varname := vartype) |> compute()
+        write_parquet(BB_meta, DB_META_fl)
+        cat("Metadata saved to file")
+    } else {
+        warning(paste0("Variable exist: ", varname, "\n", " !! IGNORING VARIABLE INIT !!"))
+    }
+}
+
 
 
 

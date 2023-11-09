@@ -83,7 +83,7 @@ INITDAY <- paste0(year(Sys.Date()), "-01-01")
 INISTEP <- 3
 
 ## TEST override start day
-INITDAY <- "2023-04-15"
+INITDAY <- "2023-08-22"
 INISTEP <- 1
 
 option_list <-  list(

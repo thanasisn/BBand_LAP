@@ -189,7 +189,7 @@ InitVariableBBDB("QCv9_process_flag", as.POSIXct(NA))
 # OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
 
 
-## list data base files
+## List data base files
 filelist <- data.table(
     names = list.files(DB_DIR,
                        pattern = "*.parquet",
@@ -201,8 +201,35 @@ dd      <- tstrsplit(dd, "/")
 filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd) - 1]))
 
+varname <- paste0("QCv", qc_ver, "_processed")
+vartype <- as.POSIXct(NA)
+
+
+BB_meta   <- read_parquet(DB_META_fl)
+if (!is.character(varname)) stop()
+if (is.null(vartype)) stop()
+
+if (!any(names(BB_meta) == varname)) {
+    cat("Create column: ", varname, "\n")
+    BB_meta <- BB_meta |> mutate( !!varname := vartype) |> compute()
+    write_parquet(BB_meta, DB_META_fl)
+    cat("Metadata saved to file")
+} else {
+    warning(paste0("Variable exist: ", varname, "\n", " !! IGNORING VARIABLE INIT !!"))
+}
+
+
+
+
+
+sort(names(BB_meta))
+
+paste0("QCv", qc_ver, "_processed")
+
+InitVariableBBDB()
 
 ## find what needs touching
+## TODO use meta data flags for each instrument?
 BB <- opendata()
 temp_to_do <- data.table(BB |>
                              filter(is.na(QCv9_process_flag)) |>
