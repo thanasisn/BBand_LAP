@@ -173,9 +173,10 @@ PLOT_LAST  <- as_date("2024-03-31")
 #     DB_lock    <- test_DB_lock
 #     DB_META_fl <- test_DB_META_fl
 #     DB_HASH_fl <- test_DB_HASH_fl
-#     OVERWRITEVariableBBDB("QCv9_process_flag", as.POSIXct(NA))
-#     warning("THIS IS FOR DEVELOPMENT")
-#     OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
+#     OVERWRITEVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
+#     # OVERWRITEVariableBBDB("QCv9_process_flag", as.POSIXct(NA))
+#     # warning("THIS IS FOR DEVELOPMENT")
+#     # OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
 # }
 
 
@@ -184,7 +185,7 @@ PLOT_LAST  <- as_date("2024-03-31")
 ## use this columns as indicator, reset to reprocess all!!
 ## TODO use the arguments export to determine if have to run
 ## TODO make it a daytime or better move it to metadata
-InitVariableBBDB("QCv9_process_flag", as.POSIXct(NA))
+# InitVariableBBDB("QCv9_process_flag", as.POSIXct(NA))
 # warning("THIS IS FOR DEVELOPMENT")
 # OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
 
@@ -201,46 +202,38 @@ dd      <- tstrsplit(dd, "/")
 filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd) - 1]))
 
-varname <- paste0("QCv", qc_ver, "_processed")
-vartype <- as.POSIXct(NA)
+
+## Init watchdog variables in metadata
+InitVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
+InitVariableBBmeta(paste0("QCv", qc_ver, "_filters_md5"), as.character(NA))
 
 
-BB_meta   <- read_parquet(DB_META_fl)
-if (!is.character(varname)) stop()
-if (is.null(vartype)) stop()
-
-if (!any(names(BB_meta) == varname)) {
-    cat("Create column: ", varname, "\n")
-    BB_meta <- BB_meta |> mutate( !!varname := vartype) |> compute()
-    write_parquet(BB_meta, DB_META_fl)
-    cat("Metadata saved to file")
-} else {
-    warning(paste0("Variable exist: ", varname, "\n", " !! IGNORING VARIABLE INIT !!"))
-}
-
-
-
-
-
-sort(names(BB_meta))
-
-paste0("QCv", qc_ver, "_processed")
-
-InitVariableBBDB()
-
-## find what needs touching
-## TODO use meta data flags for each instrument?
-BB <- opendata()
-temp_to_do <- data.table(BB |>
-                             filter(is.na(QCv9_process_flag)) |>
-                             select(year, month) |>
-                             unique()            |>
-                             collect()
+## Find what needs touching
+## TODO check for hash consistency also!
+temp_to_do <- data.table( BB_meta |>
+                              filter(is.na(get(paste0("QCv", qc_ver, "_applied")))) |>
+                              mutate(year  = year(day), month = month(day)) |>
+                              select(year, month) |>
+                              unique()            |>
+                              collect()
 )
-rm(BB)
+
+
+
+# ## find what needs touching
+# ## TODO use meta data flags for each instrument?
+# BB <- opendata()
+# temp_to_do <- data.table(BB |>
+#                              filter(is.na(QCv9_process_flag)) |>
+#                              select(year, month) |>
+#                              unique()            |>
+#                              collect()
+# )
+# rm(BB)
 
 ## select what data set files to touch
 filelist <- filelist[temp_to_do, on = .(flmonth = month, flyear = year)]
+filelist <- filelist[!is.na(names)]
 rm(temp_to_do, dd)
 
 
@@ -763,15 +756,22 @@ for (af in filelist$names) {
     }
 
 
-
-    summary(datapart)
-
-    ## store actual data
+    ##  Store data in the database  --------------------------------------------
     datapart <- as_tibble(datapart)
     write_parquet(x = datapart, sink = af)
     cat("Save: ", af, "\n\n")
 
-    ## store filters parameters
+    ##  Update meta data  ------------------------------------------------------
+    amonth <- unique(datapart$month)
+    ayear  <- unique(datapart$year)
+    BB_meta[month(day) == amonth & year(day) == ayear,
+            (eval(paste0("QCv", qc_ver, "_applied"))) := Sys.time()]
+    BB_meta[month(day) == amonth & year(day) == ayear,
+            (eval(paste0("QCv", qc_ver, "_filters_md5"))) := digest::digest(QS, algo = "md5")]
+
+    write_parquet(BB_meta, DB_META_fl)
+
+    ##  Store filters parameters  ----------------------------------------------
     saveRDS(object = QS,
             file   = sub("\\.R", "_parameters.Rds",Script.Name))
 
@@ -782,6 +782,8 @@ for (af in filelist$names) {
 #+ include=T, echo=F
 myunlock(DB_lock)
 
+
+## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 
 ## ~ ~ Inspect quality control results ~ ~ -------------------------------------
