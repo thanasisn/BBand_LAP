@@ -43,11 +43,11 @@ source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
 
-library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
-library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
-library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
-library(data.table, warn.conflicts = TRUE, quietly = TRUE)
-library(tools,      warn.conflicts = TRUE, quietly = TRUE)
+library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 
 
 
