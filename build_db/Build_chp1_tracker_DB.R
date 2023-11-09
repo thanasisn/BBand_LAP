@@ -40,11 +40,11 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 # mylock(DB_Steps_lock)
 
-library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
-library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
-library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
-library(data.table, warn.conflicts = TRUE, quietly = TRUE)
-library(tools,      warn.conflicts = TRUE, quietly = TRUE)
+library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 
 
 ## STEP files import -----------------------------------------------------------
