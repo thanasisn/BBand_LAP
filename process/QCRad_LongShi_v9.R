@@ -114,27 +114,27 @@ QS$sun_elev_min <- -2 * 0.103  ## Drop ALL radiation data when sun is below this
 
 ##  Execution control  ---------------------------------------------------------
 
-TEST_01  <- FALSE
-TEST_02  <- FALSE
-TEST_03  <- FALSE
-TEST_04  <- FALSE
-TEST_05  <- FALSE
-TEST_06  <- FALSE
-TEST_07  <- FALSE
-TEST_08  <- FALSE
-TEST_09  <- FALSE
-TEST_10  <- FALSE
+QS$TEST_01  <- FALSE
+QS$TEST_02  <- FALSE
+QS$TEST_03  <- FALSE
+QS$TEST_04  <- FALSE
+QS$TEST_05  <- FALSE
+QS$TEST_06  <- FALSE
+QS$TEST_07  <- FALSE
+QS$TEST_08  <- FALSE
+QS$TEST_09  <- FALSE
+QS$TEST_10  <- FALSE
 
-# TEST_01  <- TRUE
-# TEST_02  <- TRUE
-# TEST_03  <- TRUE
-# TEST_04  <- TRUE
-# TEST_05  <- TRUE
-TEST_06  <- TRUE
-TEST_07  <- FALSE  ## TODO
-# TEST_08  <- TRUE
-# TEST_09  <- TRUE
-# TEST_10  <- FALSE  ## TODO
+# QS$TEST_01  <- TRUE
+# QS$TEST_02  <- TRUE
+# QS$TEST_03  <- TRUE
+# QS$TEST_04  <- TRUE
+# QS$TEST_05  <- TRUE
+QS$TEST_06  <- TRUE
+QS$TEST_07  <- FALSE  ## TODO
+# QS$TEST_08  <- TRUE
+# QS$TEST_09  <- TRUE
+# QS$TEST_10  <- FALSE  ## TODO
 
 ## mostly for daily plots
 DO_PLOTS     <- TRUE
@@ -173,6 +173,7 @@ PLOT_LAST  <- as_date("2024-03-31")
 #     DB_lock    <- test_DB_lock
 #     DB_META_fl <- test_DB_META_fl
 #     DB_HASH_fl <- test_DB_HASH_fl
+#     InitVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
 #     OVERWRITEVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
 #     # OVERWRITEVariableBBDB("QCv9_process_flag", as.POSIXct(NA))
 #     # warning("THIS IS FOR DEVELOPMENT")
@@ -181,14 +182,6 @@ PLOT_LAST  <- as_date("2024-03-31")
 
 
 ##  Create a new variable to the whole database  -------------------------------
-
-## use this columns as indicator, reset to reprocess all!!
-## TODO use the arguments export to determine if have to run
-## TODO make it a daytime or better move it to metadata
-# InitVariableBBDB("QCv9_process_flag", as.POSIXct(NA))
-# warning("THIS IS FOR DEVELOPMENT")
-# OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
-
 
 ## List data base files
 filelist <- data.table(
@@ -209,16 +202,17 @@ InitVariableBBmeta(paste0("QCv", qc_ver, "_filters_md5"), as.character(NA))
 
 
 ## Find what needs touching
-## TODO check for hash consistency also!
-temp_to_do <- data.table( BB_meta |>
-                              filter(is.na(get(paste0("QCv", qc_ver, "_applied")))) |>
-                              mutate(year  = year(day), month = month(day)) |>
-                              select(year, month) |>
-                              unique()            |>
-                              collect()
+## TODO check for md5 hash consistency also!
+BB_meta <- read_parquet(DB_META_fl)
+temp_to_do <- data.table(BB_meta |>
+                             filter(is.na(get(paste0("QCv", qc_ver, "_applied")))) |>
+                             mutate(year  = year(day), month = month(day)) |>
+                             select(year, month) |>
+                             unique()            |>
+                             collect()
 )
 
-
+names(BB_meta)
 
 # ## find what needs touching
 # ## TODO use meta data flags for each instrument?
@@ -315,7 +309,7 @@ for (af in filelist$names) {
     QS$glo_SWdn_off <- 160    # Global departure offset above the model
     QS$glo_SWdn_amp <-   1.3  # Global departure factor above the model
 
-    if (TEST_01) {
+    if (QS$TEST_01) {
         testN        <- 1
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
@@ -364,7 +358,7 @@ for (af in filelist$names) {
     QS$dir_SWdn_too_low <-    3     # Ideal w/m^2
     QS$glo_SWdn_too_low <-    3     # Ideal w/m^2
 
-    if (TEST_02) {
+    if (QS$TEST_02) {
         testN        <- 2
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
@@ -410,7 +404,7 @@ for (af in filelist$names) {
     QS$dif_rati_pr2  <-  1.06  # My DiffuceFraction upper limit
     QS$dif_watt_lim  <- 10     # Filter only when GLB is above that
 
-    if (TEST_03) {
+    if (QS$TEST_03) {
         testN        <- 3
         flagname_UPP <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_upp_flag")
         flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
@@ -465,7 +459,7 @@ for (af in filelist$names) {
     QS$clim_lim_C1 <- 1.14
     QS$clim_lim_D1 <- 1.32
 
-    if (TEST_04) {
+    if (QS$TEST_04) {
         testN        <- 4
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
@@ -512,7 +506,7 @@ for (af in filelist$names) {
     QS$ClrSW_a           <- 1050.5
     QS$ClrSW_b           <-    1.095
 
-    if (TEST_05) {
+    if (QS$TEST_05) {
         testN        <- 5
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
         cat(paste("\n5. Tracking test", flagname_DIR, "\n\n"))
@@ -572,8 +566,7 @@ for (af in filelist$names) {
                     f * mu_0 * Pressure)
     }
 
-    if (TEST_06) {
-
+    if (QS$TEST_06) {
         testN        <- 6
         flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
         cat(paste("\n6. Rayleigh Limit Diffuse Comparison", flagname_BTH, "\n\n"))
@@ -623,7 +616,7 @@ for (af in filelist$names) {
     #'
     #' This is deactivated
     #'
-    if (TEST_07) {
+    if (QS$TEST_07) {
         cat(paste("\n7. Obstacles test.\n\n"))
 
         ## . . . Direct --------------------------------------------------------
@@ -674,7 +667,7 @@ for (af in filelist$names) {
     QS$dir_glo_invert  <- 5  # Diffuse Inversion test: DIRhor - GLBhor > lim[%]
     QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
 
-    if (TEST_08) {
+    if (QS$TEST_08) {
         cat(paste("\n8. Inversion test.\n\n"))
 
         testN        <- 8
@@ -713,7 +706,7 @@ for (af in filelist$names) {
     QS$CL_idx_min <- -0.001  # Lower Clearness index accepted level
     QS$CL_idx_ele <-  8      # Apply for elevations above this angle
 
-    if (TEST_09) {
+    if (QS$TEST_09) {
         cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
 
         testN        <- 9
@@ -743,7 +736,7 @@ for (af in filelist$names) {
     #' Implement monthly of by doy.
     #'
 
-    if (TEST_10) {
+    if (QS$TEST_10) {
         cat(paste("\n10. Erroneous sun position test.\n\n"))
 
         testN        <- 10
@@ -762,13 +755,11 @@ for (af in filelist$names) {
     cat("Save: ", af, "\n\n")
 
     ##  Update meta data  ------------------------------------------------------
-    amonth <- unique(datapart$month)
-    ayear  <- unique(datapart$year)
-    BB_meta[month(day) == amonth & year(day) == ayear,
-            (eval(paste0("QCv", qc_ver, "_applied"))) := Sys.time()]
-    BB_meta[month(day) == amonth & year(day) == ayear,
-            (eval(paste0("QCv", qc_ver, "_filters_md5"))) := digest::digest(QS, algo = "md5")]
-
+    update_meta <- data.table(day = unique(as.Date(datapart$Date)))
+    update_meta[, (eval(paste0("QCv", qc_ver, "_applied"))) := Sys.time()]
+    update_meta[, (eval(paste0("QCv", qc_ver, "_filters_md5"))) := digest::digest(QS, algo = "md5")]
+    ## insert new meta data
+    BB_meta <- rows_update(BB_meta, update_meta, by = "day")
     write_parquet(BB_meta, DB_META_fl)
 
     ##  Store filters parameters  ----------------------------------------------
@@ -783,7 +774,9 @@ for (af in filelist$names) {
 myunlock(DB_lock)
 
 
+
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
+
 
 
 ## ~ ~ Inspect quality control results ~ ~ -------------------------------------
@@ -815,8 +808,7 @@ if (PARTIAL == TRUE) {
 #' ## 1. Physically possible limits per BSRN
 #'
 #+ echo=F, include=T, results="asis"
-if (TEST_01) {
-
+if (QS$TEST_01) {
     testN        <- 1
     flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
     flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
@@ -923,8 +915,7 @@ if (TEST_01) {
 #' ## 2. Extremely rare limits per BSRN
 #'
 #+ echo=F, include=T, results="asis"
-if (TEST_02) {
-
+if (QS$TEST_02) {
     testN        <- 2
     flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
     flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
@@ -1018,8 +1009,7 @@ if (TEST_02) {
 #' ## 3. Comparison tests per BSRN “non-definitive”
 #'
 #+ echo=F, include=T, results="asis"
-if (TEST_03) {
-
+if (QS$TEST_03) {
     testN        <- 3
     flagname_UPP <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_upp_flag")
     flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
@@ -1150,8 +1140,7 @@ if (TEST_03) {
 #' ## 4. Climatological (configurable) Limits
 #'
 #+ echo=F, include=T, results="asis"
-if (TEST_04) {
-
+if (QS$TEST_04) {
     testN        <- 4
     flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
     flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
@@ -1446,8 +1435,7 @@ if (TEST_04) {
 #' ## 5. Tracker is off test
 #'
 #+ echo=F, include=T, results="asis"
-if (TEST_05) {
-
+if (QS$TEST_05) {
     testN        <- 5
     flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
 
@@ -1522,8 +1510,7 @@ if (TEST_05) {
 #' ## 6. Rayleigh Limit Diffuse Comparison
 #'
 #+ echo=F, include=T, results="asis"
-if (TEST_06) {
-
+if (QS$TEST_06) {
     testN        <- 6
     flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
 
@@ -1726,7 +1713,7 @@ if (TEST_06) {
 #' ## 7. Test for obstacles
 #'
 #+ echo=F, include=T, results="asis"
-if (TEST_07) {
+if (QS$TEST_07) {
 
 }
 #+ echo=F, include=T
@@ -1739,8 +1726,7 @@ if (TEST_07) {
 #' ## 8. Test for inverted values
 #'
 #+ echo=F, include=T, results="asis"
-if (TEST_08) {
-
+if (QS$TEST_08) {
     testN        <- 8
     flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
 
@@ -1805,8 +1791,7 @@ if (TEST_08) {
 #' ## 9. Clearness index test
 #'
 #+ echo=F, include=T, results="asis"
-if (TEST_09) {
-
+if (QS$TEST_09) {
     testN        <- 9
     flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
 

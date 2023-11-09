@@ -65,9 +65,8 @@ if (!all((ranges_CM21$Until - ranges_CM21$From) >= 1)) {
 ## --
 
 ## For Brave ----
-BROWSER_CMD <- "brave-browser --window-size=1240,720 --incognito -app=file://"
-cat(paste("Will always do a killall",gsub(" .*", "", BROWSER_CMD), "!!"), "\n")
-system(paste( "killall", gsub(" .*", "", BROWSER_CMD)))
+## use a user-data-dir to avoid load my custom colors
+BROWSER_CMD <- "brave-browser --window-size=1240,720 --user-data-dir=/tmp/bravetmp --incognito -app=file://"
 ## --
 
 ## Data folder
