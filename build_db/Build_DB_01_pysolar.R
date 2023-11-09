@@ -72,14 +72,14 @@ if (file.exists(DB_META_fl)) {
 } else {
     warning("STARTING NEW DB!!")
     BB_meta <- data.table(day = seq(as_date(DB_start_date), Sys.Date(), by = "day"))
-    ## add general columns
+    ## General processing columns
     BB_meta$pysolar_basename         <- as.character(NA)
     BB_meta$pysolar_mtime            <- as.POSIXct(NA)
     BB_meta$pysolar_parsed           <- as.POSIXct(NA)
     BB_meta$pysolar_basename         <- as.character(BB_meta$pysolar_basename)
     BB_meta$pysolar_mtime            <- as.POSIXct(BB_meta$pysolar_mtime)
     BB_meta$pysolar_parsed           <- as.POSIXct(BB_meta$pysolar_parsed)
-    ## BB_meta$data_exclusions_applied  <- as.POSIXct(NA)
+    # BB_meta$QCv9_applied  <- as.POSIXct(NA)
     BB_meta$daylength                <- as.integer(NA)
     ## For CM-21 meta data
     BB_meta$cm21_Daily_dark          <- as.numeric(NA)
@@ -296,7 +296,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, QCv9_08_bth_flag        := as.character(NA)]
             sun_temp[, QCv9_09_glb_flag        := as.character(NA)]
             sun_temp[, QCv9_10_all_flag        := as.character(NA)]
-
 
             ## Gather data
             if (nrow(gather) == 0) {
