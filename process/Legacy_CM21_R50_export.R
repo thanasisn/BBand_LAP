@@ -53,8 +53,6 @@
 
 
 
-
-
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
@@ -106,7 +104,7 @@ BB_meta  <- read_parquet(DB_META_fl)
 BB       <- opendata()
 
 # test
-datayears <- 2022
+# datayears <- 2022
 
 editedyears <- as.vector(na.omit(unique(
     year(BB_meta$day)[year(BB_meta$day) >= year(BB_meta$cm21_parsed)]
@@ -179,7 +177,6 @@ dummy <- gc()
 # $ preNoon   : logi  TRUE TRUE TRUE TRUE TRUE TRUE ...
 
 
-stop()
 
 
 
@@ -202,16 +199,14 @@ if (COMPARE) {
         ## load new files
         legacy <- readRDS(alf)
         yyyy   <- unique(year(legacy$Date))[1]
-        legacy <- legacy[!is.na(CM21value), ]
-        legacy$Azimuth        <- NULL
+        legacy <- legacy[!is.na(wattGLB), ]
         legacy$Elevat         <- NULL
         # legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
 
         ## load old files
-        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_signal/LAP_CM21_H_S1_", yyyy, ".Rds")))
-        baseDT$Azimuth  <- NULL
+        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_global/LAP_CM21_H_L0_", yyyy, ".Rds")))
         baseDT$Elevat   <- NULL
-        baseDT$QFlag_1  <- NULL
+        baseDT$QFlag_2  <- NULL
 
 
         setequal(names(baseDT), names(legacy))
@@ -261,8 +256,6 @@ if (COMPARE) {
             vold <- paste0(av, ".old")
             nodl <- paste0(av, ".new")
 
-
-
             if (!is.numeric(sss[[vold]])) next()
 
             ## remove low diff data
@@ -310,6 +303,7 @@ if (COMPARE) {
                 title(paste(vold, nodl))
             }
         }
+
 
         ## keep non empty
         sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
