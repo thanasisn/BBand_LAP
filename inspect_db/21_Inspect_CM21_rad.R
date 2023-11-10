@@ -430,7 +430,7 @@ for (YYYY in sort(years_to_do)) {
          pch  = 19,
          cex  = .1,
          col  = "blue",
-         main = paste("Direct Horizontal ", YYYY),
+         main = paste("Global ", YYYY),
          xlab = "Elevation [°]",
          ylab = "[Watt/m^2]" )
     points(year_data[preNoon == FALSE, Elevat],
@@ -442,12 +442,12 @@ for (YYYY in sort(years_to_do)) {
            legend = c("Before noon", "After noon"),
            col    = c("blue",        "green"),
            pch    = 19, bty = "n")
-    cat('\n\n')
+    cat(" \n \n")
 
 
     minelevet <- -1
-    xlim <- range(year_data$Elevat, na.rm = TRUE)
-    gap  <- 1
+    xlim      <- range(year_data$Elevat, na.rm = TRUE)
+    gap       <- 1
     xlim[2] <- xlim[2] + abs(diff(range(year_data[Elevat > minelevet, Elevat], na.rm = TRUE))) + gap
     xlim[1] <- minelevet
 
@@ -467,8 +467,25 @@ for (YYYY in sort(years_to_do)) {
            pch = 19,
            cex = 0.05,
            col = "green")
-    cat('\n\n')
+    cat(" \n \n")
 
+    plot(year_data[preNoon == TRUE & Elevat > minelevet, Elevat],
+         year_data[preNoon == TRUE & Elevat > minelevet, GLB_wpsm],
+         xlim = xlim,
+         pch  = 19,
+         cex  = .05,
+         col  = "green",
+         main = paste("GHI morning/evening balance", YYYY),
+         xaxt = "n",
+         xlab = "Sun Elevation",
+         ylab = expression(W %.% m^-2))
+
+    points(-year_data[preNoon == FALSE & Elevat > minelevet, Elevat] + gap + abs(diff(range(year_data$Elevat, na.rm = TRUE))),
+           year_data[preNoon == FALSE & Elevat > minelevet, GLB_wpsm],
+           pch = 19,
+           cex = 0.05,
+           col = "blue")
+    cat(" \n \n")
 
 
 
