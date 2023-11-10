@@ -5,11 +5,11 @@
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:    "Data quality for radiation measurements as described by
-#'               CN Long and Y Shi, September 2006, DOE/SC-ARM/TR-074.
-#'               - The QCRad Value Added Product Surface
-#'               Radiation Measurement Quality Control Testing Including
-#'               Climatology_Long2006.pdf"
+#' abstract:      "Data quality for radiation measurements as described by
+#'                 CN Long and Y Shi, September 2006, DOE/SC-ARM/TR-074.
+#'                 - The QCRad Value Added Product Surface
+#'                 Radiation Measurement Quality Control Testing Including
+#'                 Climatology_Long2006.pdf"
 #'
 #' documentclass: article
 #' classoption:   a4paper,oneside
@@ -125,11 +125,11 @@ QS$TEST_08  <- FALSE
 QS$TEST_09  <- FALSE
 QS$TEST_10  <- FALSE
 
-# QS$TEST_01  <- TRUE
-# QS$TEST_02  <- TRUE
-# QS$TEST_03  <- TRUE
-# QS$TEST_04  <- TRUE
-# QS$TEST_05  <- TRUE
+QS$TEST_01  <- TRUE
+QS$TEST_02  <- TRUE
+QS$TEST_03  <- TRUE
+QS$TEST_04  <- TRUE
+QS$TEST_05  <- TRUE
 QS$TEST_06  <- TRUE
 QS$TEST_07  <- FALSE  ## TODO
 # QS$TEST_08  <- TRUE
@@ -210,10 +210,6 @@ temp_to_do <- data.table(BB_meta |>
                              unique()            |>
                              collect()
 )
-
-names(BB_meta)
-
-
 
 ## select what data set files to touch
 filelist <- filelist[temp_to_do, on = .(flmonth = month, flyear = year)]
@@ -301,9 +297,6 @@ for (af in filelist$names) {
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
         cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
-        # InitVariableBBDB(flagname_DIR, as.character(NA))
-        # InitVariableBBDB(flagname_GLB, as.character(NA))
-
         ## __ Direct  ----------------------------------------------------------
         datapart[DIR_strict < QS$dir_SWdn_min,
                  (flagname_DIR) := "Physical possible limit min (5)"]
@@ -350,9 +343,6 @@ for (af in filelist$names) {
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
         cat(paste("\n2. Extremely Rare Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
-        # InitVariableBBDB(flagname_DIR, as.character(NA))
-        # InitVariableBBDB(flagname_GLB, as.character(NA))
-
         # Compute reference values
         datapart[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off]
         datapart[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cosde(SZA)^1.2 + QS$Glo_SWdn_off]
@@ -395,9 +385,6 @@ for (af in filelist$names) {
         flagname_UPP <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_upp_flag")
         flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
         cat(paste("\n3. Comparison tests", flagname_UPP, flagname_LOW, "\n\n"))
-
-        # InitVariableBBDB(flagname_UPP, as.character(NA))
-        # InitVariableBBDB(flagname_LOW, as.character(NA))
 
         ## __ Proposed filter  -------------------------------------------------
         datapart[DiffuseFraction_kd  > QS$dif_rati_pr1  &
@@ -451,9 +438,6 @@ for (af in filelist$names) {
         flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
         cat("\n4. Climatological (configurable) Limits", flagname_DIR, flagname_GLB, "\n\n")
 
-        # InitVariableBBDB(flagname_DIR, as.character(NA))
-        # InitVariableBBDB(flagname_GLB, as.character(NA))
-
         ## __ Direct -----------------------------------------------------------
         datapart[, Dir_First_Clim_lim := TSI_TOA * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
         datapart[DIR_strict > Dir_First_Clim_lim,
@@ -496,8 +480,6 @@ for (af in filelist$names) {
         testN        <- 5
         flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
         cat(paste("\n5. Tracking test", flagname_DIR, "\n\n"))
-
-        # InitVariableBBDB(flagname_DIR, as.character(NA))
 
         ## Clear Sky Sort-Wave model
         datapart[, ClrSW_ref2 := (QS$ClrSW_a / Sun_Dist_Astropy^2) * cosde(SZA)^QS$ClrSW_b]
@@ -556,9 +538,6 @@ for (af in filelist$names) {
         testN        <- 6
         flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
         cat(paste("\n6. Rayleigh Limit Diffuse Comparison", flagname_BTH, "\n\n"))
-
-        # InitVariableBBDB(flagname_BTH, as.character(NA))
-        # OVERWRITEVariableBBDB(flagname_BTH, as.character(NA))
 
         datapart[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = Pressure)]
 
@@ -659,8 +638,6 @@ for (af in filelist$names) {
         testN        <- 8
         flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
 
-        # InitVariableBBDB(flagname_BTH, as.character(NA))
-
         ## __ Both  ------------------------------------------------------------
         datapart[, Relative_diffuse := 100 * (HOR_strict  - GLB_strict) / GLB_strict ]
         datapart[ is.infinite(Relative_diffuse), Relative_diffuse := NA]
@@ -727,8 +704,6 @@ for (af in filelist$names) {
 
         testN        <- 10
         flagname_ALL <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_all_flag")
-
-        # InitVariableBBDB(flagname_ALL, as.character(NA))
 
         rm(list = ls(pattern = "flagname_.*"))
         dummy <- gc()
