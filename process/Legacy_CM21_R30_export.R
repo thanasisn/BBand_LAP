@@ -133,7 +133,7 @@ for (YYYY in datayears) {
     year_data <- data.table(year_data)
 
     if (!file.exists(legacyout) |
-        file.mtime(legacyout) < max(BB_meta$cm21_bad_data_flagged, na.rm = T) |
+        file.mtime(legacyout) < max(BB_meta$cm21_bad_data_flagged, na.rm = TRUE) |
         YYYY %in% editedyears) {
         cat("Will export ", legacyout, "\n")
     } else {
@@ -197,13 +197,13 @@ if (COMPARE) {
         ## load new files
         legacy <- readRDS(alf)
         yyyy   <- unique(year(legacy$Date))[1]
-        legacy <- legacy[!is.na(CM21value),]
+        legacy <- legacy[!is.na(CM21value), ]
         legacy$Azimuth        <- NULL
         legacy$Elevat         <- NULL
         # legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
 
         ## load old files
-        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_signal/LAP_CM21_H_S1_",yyyy,".Rds")))
+        baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_signal/LAP_CM21_H_S1_", yyyy, ".Rds")))
         baseDT$Azimuth  <- NULL
         baseDT$Elevat   <- NULL
         baseDT$QFlag_1  <- NULL
@@ -247,38 +247,40 @@ if (COMPARE) {
         }
         sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
 
-        wecare <- wecare[paste0(wecare,".old") %in% names(sss)]
+        wecare <- wecare[paste0(wecare, ".old") %in% names(sss)]
 
         for (av in wecare) {
-            vold <- paste0(av,".old")
-            nodl <- paste0(av,".new")
+            vold <- paste0(av, ".old")
+            nodl <- paste0(av, ".new")
 
             if (!is.numeric(sss[[vold]])) next()
 
             ## remove low diff data
-            vec <- sss[[vold]]/sss[[nodl]]
+            vec <- sss[[vold]] / sss[[nodl]]
             rat <- abs(vec) > 0.996
 
             sss[[vold]][rat] <- NA
             sss[[nodl]][rat] <- NA
 
 
-            vec <- sss[[vold]]/sss[[nodl]]
+            vec <- sss[[vold]] / sss[[nodl]]
 
             if (!all(is.na(vec))) {
-                hist( vec, breaks = 100 )
-                summary( vec )
+                hist(vec, breaks = 100)
+                summary(vec)
 
                 plot(sss[[vold]], sss[[nodl]],
                      xlab = vold, ylab = nodl)
             }
 
-            differ <- 100 * abs( (sss[[vold]] - sss[[nodl]]) / sss[[vold]] )
+            differ <- 100 * abs(
+                (sss[[vold]] - sss[[nodl]]) / sss[[vold]]
+            )
             vec    <- differ <  0.1
 
             if (!all(is.na(differ))) {
-                hist( differ, breaks = 100 )
-                summary( differ )
+                hist(differ, breaks = 100)
+                summary(differ)
             }
 
             sss[[vold]][vec] <- NA
@@ -311,7 +313,7 @@ if (COMPARE) {
         Hmisc::html(Hmisc::describe(sss))
         cat("\n\n")
 
-        gather <- rbind(gather,sss, fill=T)
+        gather <- rbind(gather, sss, fill = TRUE)
 
         # cat("\n\n")
         # cat(paste("\n\n###  compareDF ", yyyy, "\n\n"))
