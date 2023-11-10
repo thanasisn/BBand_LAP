@@ -196,15 +196,15 @@ filelist$flyear  <- as.numeric(unlist(dd[length(dd) - 1]))
 
 
 ## Init watchdog variables in metadata
-InitVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
-InitVariableBBmeta(paste0("QCv", qc_ver, "_filters_md5"), as.character(NA))
+InitVariableBBmeta("QCv9_applied",     as.POSIXct(NA))
+InitVariableBBmeta("QCv9_filters_md5", as.character(NA))
 
 
 ## Find what needs touching
 ## TODO check for md5 hash consistency also!
 BB_meta <- read_parquet(DB_META_fl)
 temp_to_do <- data.table(BB_meta |>
-                             filter(is.na(get(paste0("QCv", qc_ver, "_applied")))) |>
+                             filter(is.na(get("QCv9_applied")))) |>
                              mutate(year  = year(day), month = month(day)) |>
                              select(year, month) |>
                              unique()            |>
@@ -237,17 +237,17 @@ for (af in filelist$names) {
     ## __ Daytime radiation only  ----------------------------------------------
 
     ## Direct beam DNI
-    datapart[Elevat > QS$sun_elev_min           &
+    datapart[Elevat > QS$sun_elev_min        &
                  is.na(chp1_bad_data_flag)   &
                  Async_tracker_flag == FALSE,
              DIR_strict := DIR_wpsm]
     ## DHI
-    datapart[Elevat > QS$sun_elev_min           &
+    datapart[Elevat > QS$sun_elev_min        &
                  is.na(chp1_bad_data_flag)   &
                  Async_tracker_flag == FALSE,
              HOR_strict := HOR_wpsm]
     ## GHI
-    datapart[Elevat > QS$sun_elev_min           &
+    datapart[Elevat > QS$sun_elev_min        &
                  is.na(cm21_bad_data_flag),
              GLB_strict := GLB_wpsm]
 
@@ -717,7 +717,7 @@ for (af in filelist$names) {
 
     ##  Update meta data  ------------------------------------------------------
     update_meta <- data.table(day = unique(as.Date(datapart$Date)))
-    update_meta[, (eval(paste0("QCv", qc_ver, "_applied"))) := Sys.time()]
+    update_meta[, (eval("QCv9_applied")) := Sys.time()]
     update_meta[, (eval(paste0("QCv", qc_ver, "_filters_md5"))) := digest::digest(QS, algo = "md5")]
     ## insert new meta data
     BB_meta <- rows_update(BB_meta, update_meta, by = "day")
