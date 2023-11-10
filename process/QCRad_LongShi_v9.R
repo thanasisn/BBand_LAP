@@ -175,7 +175,6 @@ PLOT_LAST  <- as_date("2024-03-31")
 #     DB_HASH_fl <- test_DB_HASH_fl
 #     InitVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
 #     OVERWRITEVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
-#     # OVERWRITEVariableBBDB("QCv9_process_flag", as.POSIXct(NA))
 #     # warning("THIS IS FOR DEVELOPMENT")
 #     # OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
 # }
@@ -214,16 +213,7 @@ temp_to_do <- data.table(BB_meta |>
 
 names(BB_meta)
 
-# ## find what needs touching
-# ## TODO use meta data flags for each instrument?
-# BB <- opendata()
-# temp_to_do <- data.table(BB |>
-#                              filter(is.na(QCv9_process_flag)) |>
-#                              select(year, month) |>
-#                              unique()            |>
-#                              collect()
-# )
-# rm(BB)
+
 
 ## select what data set files to touch
 filelist <- filelist[temp_to_do, on = .(flmonth = month, flyear = year)]
@@ -249,10 +239,6 @@ for (af in filelist$names) {
     ##  Create strict radiation data  ------------------------------------------
 
     ## __ Daytime radiation only  ----------------------------------------------
-
-    ## use this as a general processing marker for this script
-    # datapart$QCv9_01_dir_flag  <- "pass"
-    datapart$QCv9_process_flag <- Sys.time()
 
     ## Direct beam DNI
     datapart[Elevat > QS$sun_elev_min           &
@@ -601,7 +587,7 @@ for (af in filelist$names) {
         # Rayleigh_lim <- selg & seld & selr
         #
         # ## . . Both --------------------------------------------------------####
-        # DATA_year$QCF_BTH_06[ Rayleigh_lim ]                         <- "Rayleigh diffuse limit (18)"
+        # DATA_year$QCF_BTH_06[ Rayleigh_lim ]   <- "Rayleigh diffuse limit (18)"
 
 
         rm(list = ls(pattern = "flagname_.*"))

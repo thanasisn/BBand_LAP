@@ -61,7 +61,7 @@ knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
-knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(fig.pos   = "!h"    )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -124,9 +124,11 @@ for (YYYY in datayears) {
     ## get data from DB
     year_data <- BB |>
         filter(year == YYYY) |>
-        select(c("Date", "CM21_sig", "CM21_sig_sd", "CM21_sig_wo_dark",
-                 "Azimuth", "Elevat",
-                 "cm21_bad_data_flag")) |>
+        select(c(
+            "Date", "CM21_sig", "CM21_sig_sd", "CM21_sig_wo_dark",
+            "Azimuth", "Elevat",
+            "cm21_bad_data_flag"
+        )) |>
         collect()
     year_data <- data.table(year_data)
 
