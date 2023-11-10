@@ -20,6 +20,10 @@
 #' - \captionsetup{font=small}
 #'
 #' output:
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  7.5
+#'     fig_height: 5
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
@@ -30,10 +34,6 @@
 #'     toc_depth:        4
 #'     fig_width:        8
 #'     fig_height:       5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  7.5
-#'     fig_height: 5
 #'
 #' date: "`r format(Sys.time(), '%F')`"
 #'
@@ -105,15 +105,13 @@ datayears <- opendata() |>  select(year) |> unique() |> collect() |> pull() |> s
 BB_meta  <- read_parquet(DB_META_fl)
 BB       <- opendata()
 
-datayears <- 2022
+# test
+# datayears <- 2022
 
 editedyears <- as.vector(na.omit(unique(
     year(BB_meta$day)[year(BB_meta$day) >= year(BB_meta$cm21_parsed)]
 )))
 
-
-## test
-# datayears <- NULL
 
 
 ## export legacy files
@@ -121,7 +119,7 @@ for (YYYY in datayears) {
     ## legacy filename
     legacyout <- paste0("~/DATA/Broad_Band/CM21_H_signal/Legacy_LAP_CM21_H_S1_", YYYY, ".Rds")
 
-    ## get data from DB
+    ## get relevant data from DB
     year_data <- BB |>
         filter(year == YYYY) |>
         select(c(
@@ -137,10 +135,9 @@ for (YYYY in datayears) {
         YYYY %in% editedyears) {
         cat("Will export ", legacyout, "\n")
     } else {
-        cat("SKIPPING ", legacyout, "\n")
+        cat("SKIP export ", legacyout, "\n")
         next()
     }
-
 
     ## Apply some filtering ----------------------------------------------------
     cat("\nRemove bad data regions\n")
@@ -165,7 +162,7 @@ for (YYYY in datayears) {
               file   = legacyout)
     rm(year_data)
 }
-gc()
+dummy <- gc()
 
 ## Old format of CM21_H_S1
 # $ Date          : POSIXct, format: "2007-01-08 00:00:30" "2007-01-08 00:01:30" ...
@@ -227,10 +224,11 @@ if (COMPARE) {
             vold <- paste0(av,".old")
             nodl <- paste0(av,".new")
 
+            ## remove identical values
             vec <- sss[[vold]] == sss[[nodl]]
             sss[[vold]][vec] <- NA
             sss[[nodl]][vec] <- NA
-
+            ## remove empty columns
             if (all(is.na(sss[[vold]])) & all(is.na(sss[[nodl]]))) {
                 sss[[vold]] <- NULL
                 sss[[nodl]] <- NULL
@@ -245,13 +243,17 @@ if (COMPARE) {
             #          ylab = nodl)
             # }
         }
+        ## remove empty rows
         sss <- sss[apply(sss, MARGIN = 1, function(x) sum(is.na(x))) < ncol(sss) - 1 ]
 
         wecare <- wecare[paste0(wecare, ".old") %in% names(sss)]
 
+        ## compare remaining data
         for (av in wecare) {
             vold <- paste0(av, ".old")
             nodl <- paste0(av, ".new")
+
+
 
             if (!is.numeric(sss[[vold]])) next()
 
@@ -271,6 +273,7 @@ if (COMPARE) {
 
                 plot(sss[[vold]], sss[[nodl]],
                      xlab = vold, ylab = nodl)
+                title(paste(vold, nodl))
             }
 
             differ <- 100 * abs(
@@ -279,7 +282,8 @@ if (COMPARE) {
             vec    <- differ <  0.1
 
             if (!all(is.na(differ))) {
-                hist(differ, breaks = 100)
+                hist(differ, breaks = 100,
+                     main = paste("Relative difference" ,vold, nodl))
                 summary(differ)
             }
 
@@ -289,8 +293,14 @@ if (COMPARE) {
             if (!all(is.na(sss[[vold]])) & !all(is.na(sss[[nodl]]))) {
                 plot(sss[[vold]], sss[[nodl]],
                      xlab = vold, ylab = nodl)
+                title(paste(vold, nodl))
             }
 
+            if (!all(is.na(sss[[vold]])) & !all(is.na(sss[[nodl]]))) {
+                plot(sss$Date, sss[[vold]]/sss[[nodl]],
+                     xlab = vold, ylab = nodl)
+                title(paste(vold, nodl))
+            }
         }
 
         ## keep non empty
@@ -300,16 +310,17 @@ if (COMPARE) {
         sss <- rm.cols.NA.DT(sss)
 
 
-        cat("\n\n")
+        cat(" \n \n")
         cat(paste("\n\n###  Hmisc::describe ", yyyy, "\n\n"))
-        cat("\n\n")
+        cat(" \n \n")
 
         cat("\n\n```\n")
         cat(print(Hmisc::describe(sss)), sep = "\n")
         cat("```\n\n")
-        cat("\n\n")
+
         print(plot(Hmisc::describe(sss)))
         cat("\n\n")
+
         Hmisc::html(Hmisc::describe(sss))
         cat("\n\n")
 
@@ -365,25 +376,28 @@ if (COMPARE) {
         # cat("\n\n")
 
 
-
-
         cat(paste("\n\n### NON common data summary ", yyyy, "\n\n"))
 
-        cat("\n\n")
+        cat(" \n \n")
         cat(pander(summary(sss)))
-        cat("\n\n")
+        cat(" \n \n")
     }
+
 
     cat(paste("\n\n##  All data summary \n\n"))
 
-    pander(summary(gather))
+
+    cat(pander(summary(gather)))
 
     cat("\n\n```\n")
     cat(print(Hmisc::describe(gather)), sep = "\n")
     cat("```\n\n")
-    cat("\n\n")
+
+    pander(print(Hmisc::describe(gather)))
+
     print(plot(Hmisc::describe(gather)))
     cat("\n\n")
+
     Hmisc::html(Hmisc::describe(gather))
     cat("\n\n")
 
