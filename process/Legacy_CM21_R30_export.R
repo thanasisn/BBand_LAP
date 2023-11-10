@@ -296,7 +296,7 @@ if (COMPARE) {
                 title(paste(vold, nodl))
             }
 
-            if (!all(is.na(sss[[vold]])) & !all(is.na(sss[[nodl]]))) {
+            if (!all(is.na(sss[[vold]]/sss[[nodl]]))) {
                 plot(sss$Date, sss[[vold]]/sss[[nodl]],
                      xlab = vold, ylab = nodl)
                 title(paste(vold, nodl))
