@@ -717,15 +717,15 @@ for (af in filelist$names) {
 
     ##  Update meta data  ------------------------------------------------------
     update_meta <- data.table(day = unique(as.Date(datapart$Date)))
-    update_meta[, (eval("QCv9_applied")) := Sys.time()]
-    update_meta[, (eval(paste0("QCv", qc_ver, "_filters_md5"))) := digest::digest(QS, algo = "md5")]
+    update_meta[, (eval("QCv9_applied"))     := Sys.time()]
+    update_meta[, (eval("QCv9_filters_md5")) := digest::digest(QS, algo = "md5")]
     ## insert new meta data
     BB_meta <- rows_update(BB_meta, update_meta, by = "day")
     write_parquet(BB_meta, DB_META_fl)
 
     ##  Store filters parameters  ----------------------------------------------
     saveRDS(object = QS,
-            file   = sub("\\.R", "_parameters.Rds",Script.Name))
+            file   = sub("\\.R", "_parameters.Rds", Script.Name))
 
     ## clean
     rm(datapart)
