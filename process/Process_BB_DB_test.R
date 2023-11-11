@@ -13,7 +13,7 @@ library(rmarkdown)
 
 
 try({
-    render(input      = "~/BBand_LAP/process/Legacy_CM21_R50_export.R",
+    render(input      = "~/BBand_LAP/process/Legacy_CM21_R60_export.R",
            output_dir = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
