@@ -69,6 +69,7 @@ if (!interactive()) {
 
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 # mylock(DB_lock)
 
@@ -105,9 +106,82 @@ DATA[, V3 := NULL]
 
 ##  Evaluate  ------------------------------------------------------------------
 
+## Show only stats for the main machine
+DATA <- DATA[Host == "sagan"]
+
 
 ## TODO  DB size, rows, variables
 ## TODO  metadata size, rows, variables
+
+## Broad band data base
+BB <- opendata()
+gather <- data.frame(
+    Name = "BBDB",
+    Rows = BB |> nrow(),
+    Vars = BB |> ncol(),
+    Size = strsplit(
+        system(
+            paste('du -sh', DB_DIR),
+            intern = TRUE),
+        "\t")[[1]][1]
+)
+rm(BB)
+
+## Broad band data base meta data
+BB <- open_dataset(DB_META_fl)
+gather <- rbind(gather,
+                data.frame(
+                    Name = "BBDB meta",
+                    Rows = BB |> nrow(),
+                    Vars = BB |> ncol(),
+                    Size = strsplit(
+                        system(
+                            paste('du -sh', DB_META_fl),
+                            intern = TRUE),
+                        "\t")[[1]][1]
+                )
+)
+rm(BB)
+
+
+## Tracker data base
+BB <- open_dataset(DB_Steps_DIR)
+gather <- rbind(gather,
+                data.frame(
+                    Name = "TrackerDB",
+                    Rows = BB |> nrow(),
+                    Vars = BB |> ncol(),
+                    Size = strsplit(
+                        system(
+                            paste('du -sh', DB_Steps_DIR),
+                            intern = TRUE),
+                        "\t")[[1]][1]
+                )
+)
+rm(BB)
+
+
+## Tracker data base meta data
+BB <- open_dataset(DB_Steps_META_fl)
+gather <- rbind(gather,
+                data.frame(
+                    Name = "TrackerDB meta",
+                    Rows = BB |> nrow(),
+                    Vars = BB |> ncol(),
+                    Size = strsplit(
+                        system(
+                            paste('du -sh', DB_Steps_META_fl),
+                            intern = TRUE),
+                        "\t")[[1]][1]
+                )
+)
+rm(BB)
+
+
+
+
+gather
+
 
 
 #'
@@ -146,7 +220,6 @@ cat(" \n \n")
 #' ## Total Executions
 #'
 #+ echo=F, include=T
-stats <-
 DATA[, G   := 0]
 DATA[, GID := 0]
 DATA[Script == "Build_DB_01_pysolar.R", G := 1]
@@ -173,9 +246,28 @@ points(total[N < median(N) , Minutes, Date],
 
 
 
+partial <- DATA[, .(Minutes = sum(Minutes),
+                    Date    = min(Date),
+                    .N),
+                by = .(GID, Category) ]
+
+for (as in unique(partial$Category)) {
+    pp <- partial[Category == as]
+    plot(pp[,Minutes,Date],
+         main = paste("Total execution: ", as))
+    points(pp[N == median(N), Minutes, Date],
+           col = "green")
+    points(pp[N > median(N),  Minutes, Date],
+           col = "blue")
+    points(pp[N < median(N),  Minutes, Date],
+           col = "red")
+}
+
+
+
 
 #' \newpage
-#' ## Scrip statistics
+#' ## Script statistics
 #'
 #+ echo=F, include=T, results = "as.is", out.height = "30%"
 for (as in last$Script) {
