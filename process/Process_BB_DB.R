@@ -44,6 +44,14 @@ try({
            output_dir    = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
+## This should be the last thing to run on the data
+try({
+    render(input         = "~/BBand_LAP/inspect_db/99_Self_evaluation.R",
+           output_format = " bookdown::pdf_document2",
+           output_dir    = "~/BBand_LAP/REPORTS/REPORTS")
+})
+
+
 system("$HOME/BBand_LAP/process/Upload_reports.sh")
 
 
