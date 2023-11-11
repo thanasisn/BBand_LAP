@@ -94,7 +94,7 @@ panderOptions("table.split.table",        120   )
 
 ## __ Execution control  -------------------------------------------------------
 COMPARE <- TRUE
-# COMPARE <- FALSE
+COMPARE <- FALSE
 
 
 ## years in the data base
@@ -115,7 +115,7 @@ editedyears <- as.vector(na.omit(unique(
 ## export legacy files
 for (YYYY in datayears) {
     ## legacy filename
-    legacyout <- paste0("~/DATA/Broad_Band/CM21_H_global/Legacy_LAP_CM21_H_L0_", YYYY, ".Rds")
+    legacyout <- paste0("~/DATA/Broad_Band/CM21_H_global/LAP_CM21_H_L0_", YYYY, ".Rds")
 
     ## get relevant data from DB
     year_data <- BB |>
@@ -200,14 +200,15 @@ if (COMPARE) {
         legacy <- readRDS(alf)
         yyyy   <- unique(year(legacy$Date))[1]
         legacy <- legacy[!is.na(wattGLB), ]
-        legacy$Elevat         <- NULL
+        legacy$Elevat    <- NULL
+        legacy$preNoon   <- NULL
         # legacy <- legacy[apply(legacy, MARGIN = 1, function(x) sum(is.na(x))) < ncol(legacy) - 1 ]
 
         ## load old files
         baseDT <- data.table(readRDS(paste0("~/DATA/Broad_Band/CM21_H_global/LAP_CM21_H_L0_", yyyy, ".Rds")))
         baseDT$Elevat   <- NULL
         baseDT$QFlag_2  <- NULL
-
+        baseDT$preNoon  <- NULL
 
         setequal(names(baseDT), names(legacy))
 
@@ -383,6 +384,7 @@ if (COMPARE) {
         cat(" \n \n")
         cat(pander(summary(sss)))
         cat(" \n \n")
+
     }
 
 
