@@ -27,7 +27,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-11-11T17:58:02 EET -->
+<!-- Added by: athan, at: 2023-11-11T18:09:41 EET -->
 
 <!--te-->
 
@@ -35,21 +35,15 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 ## Data overview
 
 
-------------------------------------------------
-Name                     Rows   Vars        Size
------------------- ---------- ------ -----------
-BBDB                 16230240     80     3.1 GiB
 
-BBDB meta               11272     82     3.3 MiB
-
-TrackerDB             7569150     23   146.5 MiB
-
-TrackerDB meta           2780      9   172.0 KiB
-
-Raw files hashes       413727      4     4.4 MiB
-
-**Total**            24227169    198     3.2 GiB
-------------------------------------------------
+| Name             |     Rows | Vars |      Size |
+|:-----------------|---------:|-----:|----------:|
+| BBDB             | 16230240 |   80 |   3.1 GiB |
+| BBDB meta        |    11272 |   82 |   3.3 MiB |
+| TrackerDB        |  7569150 |   23 | 146.5 MiB |
+| TrackerDB meta   |     2780 |    9 | 172.0 KiB |
+| Raw files hashes |   413727 |    4 |   4.4 MiB |
+| **Total**        | 24227169 |  198 |   3.2 GiB |
 
 
 
@@ -133,7 +127,6 @@ Some aspects on the implementation of this project.
 - There are some files with extra meta data for the data in the database and the analysis performed.
 - We use features of the `arrow` library, and also `data.table` when it is more suitable or clear to code.
 - The analysis should be able to be performed with under 8Gb of RAM, but is not assured.
-  - Currently the data set use $3.1$ GB of disk space, with $16e6$ rows and $71$ columns.
 - There is a trade-of with the disk usage/wearing, especially when starting from scratch.
 - New data should be easy to be added on daily base on all levels.
 - New process and analysis should be easy to added for all data.

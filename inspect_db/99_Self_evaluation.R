@@ -204,7 +204,8 @@ gather$Size <- humanReadable(gather$Size)
 
 cat(
     pander_return(
-        gather, justify = "lrrr"
+        gather, justify = "lrrr",
+        style = "rmarkdown"
     ),
     sep = "\n",
     file = "~/BBand_LAP/.databasestats.md"
