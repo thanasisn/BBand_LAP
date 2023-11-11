@@ -94,7 +94,7 @@ panderOptions("table.split.table",        120   )
 
 ## __ Execution control  -------------------------------------------------------
 COMPARE <- TRUE
-# COMPARE <- FALSE
+COMPARE <- FALSE
 
 
 ## years in the data base
@@ -115,7 +115,7 @@ editedyears <- as.vector(na.omit(unique(
 ## export legacy files
 for (YYYY in datayears) {
     ## legacy filename
-    legacyout <- paste0("~/DATA/Broad_Band/CM21_H_global/Legacy_LAP_CM21_H_L1_", YYYY, ".Rds")
+    legacyout <- paste0("~/DATA/Broad_Band/CM21_H_global/LAP_CM21_H_L1_", YYYY, ".Rds")
 
     ## get relevant data from DB
     year_data <- BB |>
