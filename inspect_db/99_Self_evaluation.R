@@ -87,6 +87,7 @@ DATA$Date <- as.POSIXct(strptime(DATA[, paste(V1,V2)], "%F %H:%M:%OS"))
 DATA[, V1 := NULL]
 DATA[, V2 := NULL]
 ## Check units
+# table(DATA$V6)
 stopifnot(DATA[, all(V6 == "mins")])
 DATA[, V6 := NULL]
 ## Check execution time
@@ -103,6 +104,12 @@ DATA[, V3 := NULL]
 
 
 ##  Evaluate  ------------------------------------------------------------------
+
+
+## TODO  DB size, rows, variables
+## TODO  metadata size, rows, variables
+
+
 #'
 #' ## Last executions
 #'
@@ -136,10 +143,41 @@ cat(" \n \n")
 
 
 #' \newpage
+#' ## Total Executions
+#'
+#+ echo=F, include=T
+stats <-
+DATA[, G   := 0]
+DATA[, GID := 0]
+DATA[Script == "Build_DB_01_pysolar.R", G := 1]
+
+c <- 0
+for (i in 1:nrow(DATA)) {
+    c <- c + DATA$G[i]
+    DATA$GID[i] <- c
+}
+
+total <- DATA[, .(Minutes = sum(Minutes),
+                  Date    = min(Date),
+                  .N),
+              by = GID]
+
+plot(total[, Minutes, Date],
+     main = "Total execution")
+points(total[N == median(N) , Minutes, Date],
+       col = "green")
+points(total[N > median(N) , Minutes, Date],
+       col = "blue")
+points(total[N < median(N) , Minutes, Date],
+       col = "red")
+
+
+
+
+#' \newpage
 #' ## Scrip statistics
 #'
 #+ echo=F, include=T, results = "as.is", out.height = "30%"
-
 for (as in last$Script) {
     pp <- DATA[Script == as]
     plot(pp[,Minutes,Date],
@@ -147,12 +185,8 @@ for (as in last$Script) {
 }
 
 
-"Build_DB_01_pysolar.R"
 
 
-test <- data.table(as.factor(DATA$Script))
-
-test[V1 == "Build_DB_01_pysolar.R", as.numeric(unique(V1))]
 
 
 
