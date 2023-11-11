@@ -52,4 +52,7 @@ info "Create plots and reports"
 info "Run other processes"
 "$HOME/BBand_LAP/process/Process_BB_DB.R"
 
+info "Update Readme.md file"
+"$HOME/BBand_LAP/.update_readme.sh"
+
 exit 0 
