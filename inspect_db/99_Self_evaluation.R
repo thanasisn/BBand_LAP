@@ -75,11 +75,10 @@ source("~/CODE/FUNCTIONS/R/execlock.R")
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
-library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 
-
-
+##  Parse data  ----------------------------------------------------------------
 DATA <- fread("~/BBand_LAP/REPORTS/LOGs/Run.log",
               fill = TRUE,
               blank.lines.skip = TRUE)
@@ -97,13 +96,30 @@ if (is.numeric(DATA$V5)) {
 ## Parse script
 DATA[, Script   := basename(V4)]
 DATA[, Category := basename(dirname(V4))]
+DATA[, V4 := NULL]
+## Parse host
+DATA[, c("User", "Host") := tstrsplit(V3, "@")]
+DATA[, V3 := NULL]
 
 
-table(DATA$Script)
-table(DATA$Category)
+##  Evaluate  ------------------------------------------------------------------
+#'
+#' ## Last executions
+#'
+#+ echo=F, include=T
+last <- DATA[DATA[, .I[which.max(Date)], by = .(Script, Category)]$V1]
+last <- last[, .(Script, Category, Date, Minutes)]
+last$Minutes <- round(last$Minutes, 2)
+setorder(last, Date)
+pander(last, justify = "lllr")
+cat(" \n \n")
 
 
-stop()
+
+
+
+
+
 
 #' **END**
 #+ include=T, echo=F
