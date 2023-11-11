@@ -180,7 +180,7 @@ PLOT_LAST  <- as_date("2024-03-31")
 # }
 
 
-##  Create a new variable to the whole database  -------------------------------
+##  Find what needs update  ----------------------------------------------------
 
 ## List data base files
 filelist <- data.table(
@@ -194,22 +194,34 @@ dd      <- tstrsplit(dd, "/")
 filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd) - 1]))
 
-
 ## Init watchdog variables in metadata
 InitVariableBBmeta("QCv9_applied",     as.POSIXct(NA))
 InitVariableBBmeta("QCv9_filters_md5", as.character(NA))
 
-
 ## Find what needs touching
 ## TODO check for md5 hash consistency also!
 BB_meta <- read_parquet(DB_META_fl)
-temp_to_do <- data.table(BB_meta |>
-                             filter(is.na(get("QCv9_applied")))) |>
-                             mutate(year  = year(day), month = month(day)) |>
-                             select(year, month) |>
-                             unique()            |>
-                             collect()
-)
+
+## Don't want multiple configurations to exist
+##   Or check if the last hash is different from the rest
+if (length(unique(na.omit(BB_meta$QCv9_filters_md5))) > 1) {
+    ## Do all the months
+    temp_to_do <- data.table(BB_meta |>
+                                 mutate(year  = year(day), month = month(day)) |>
+                                 select(year, month) |>
+                                 unique()            |>
+                                 collect()
+    )
+} else {
+    ## Do only empty months
+    temp_to_do <- data.table(BB_meta |>
+                                 filter(is.na(get("QCv9_applied"))) |>
+                                 mutate(year  = year(day), month = month(day)) |>
+                                 select(year, month) |>
+                                 unique()            |>
+                                 collect()
+    )
+}
 
 ## select what data set files to touch
 filelist <- filelist[temp_to_do, on = .(flmonth = month, flyear = year)]
@@ -1126,7 +1138,7 @@ if (QS$TEST_04) {
                            collect())
 
     hist(test[, DIR_strict - Dir_First_Clim_lim], breaks = 100,
-         main = "Departure Direct from first climatological limti")
+         main = "Departure Direct from first climatological limit")
     cat(" \n \n")
 
     hist(test[, DIR_strict - Dir_Secon_Clim_lim], breaks = 100,
