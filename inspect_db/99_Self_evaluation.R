@@ -116,6 +116,32 @@ cat(" \n \n")
 
 
 
+#' \newpage
+#' ## Executions statistics
+#'
+#+ echo=F, include=T
+stats <-
+    DATA[, .(
+        Median = round(median(Minutes), 2),
+        Min    = round(min(Minutes)   , 2),
+        Max    = round(max(Minutes)   , 2),
+        Mean   = round(mean(Minutes)  , 2),
+        .N
+    ),
+    by = Script]
+stats <- stats[order(match(Script, last$Script))]
+pander(stats, justify = "lrrrrr")
+cat(" \n \n")
+
+
+
+
+for (as in last$Script) {
+
+}
+
+
+
 
 
 
