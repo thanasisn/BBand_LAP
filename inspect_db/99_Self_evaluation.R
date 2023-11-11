@@ -1,7 +1,7 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Project perfomance"
+#' title:         "Project performance monitoring"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -52,14 +52,13 @@ knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
-knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(fig.pos   = "!h"    )
 
 
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_db/99_Self_evaluation.R"
-Script.ID   <- "99"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -71,12 +70,12 @@ if (!interactive()) {
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
+library(gdata,      warn.conflicts = FALSE, quietly = TRUE)
 
 
 ##  Parse data  ----------------------------------------------------------------
@@ -84,11 +83,10 @@ DATA <- fread("~/BBand_LAP/REPORTS/LOGs/Run.log",
               fill = TRUE,
               blank.lines.skip = TRUE)
 ## Create datetime
-DATA$Date <- as.POSIXct(strptime(DATA[, paste(V1,V2)], "%F %H:%M:%OS"))
+DATA$Date <- as.POSIXct(strptime(DATA[, paste(V1, V2)], "%F %H:%M:%OS"))
 DATA[, V1 := NULL]
 DATA[, V2 := NULL]
 ## Check units
-# table(DATA$V6)
 stopifnot(DATA[, all(V6 == "mins")])
 DATA[, V6 := NULL]
 ## Check execution time
@@ -108,10 +106,12 @@ DATA[, V3 := NULL]
 
 ## Show only stats for the main machine
 DATA <- DATA[Host == "sagan"]
+xlim <- range(DATA$Date)
 
-
-## TODO  DB size, rows, variables
-## TODO  metadata size, rows, variables
+#'
+#' ## Data overview
+#'
+#+ echo=F, include=T
 
 ## Broad band data base
 BB <- opendata()
@@ -121,7 +121,7 @@ gather <- data.frame(
     Vars = BB |> ncol(),
     Size = strsplit(
         system(
-            paste('du -sh', DB_DIR),
+            paste("du -s", DB_DIR),
             intern = TRUE),
         "\t")[[1]][1]
 )
@@ -136,13 +136,12 @@ gather <- rbind(gather,
                     Vars = BB |> ncol(),
                     Size = strsplit(
                         system(
-                            paste('du -sh', DB_META_fl),
+                            paste("du -s", DB_META_fl),
                             intern = TRUE),
                         "\t")[[1]][1]
                 )
 )
 rm(BB)
-
 
 ## Tracker data base
 BB <- open_dataset(DB_Steps_DIR)
@@ -153,13 +152,12 @@ gather <- rbind(gather,
                     Vars = BB |> ncol(),
                     Size = strsplit(
                         system(
-                            paste('du -sh', DB_Steps_DIR),
+                            paste("du -s", DB_Steps_DIR),
                             intern = TRUE),
                         "\t")[[1]][1]
                 )
 )
 rm(BB)
-
 
 ## Tracker data base meta data
 BB <- open_dataset(DB_Steps_META_fl)
@@ -170,17 +168,49 @@ gather <- rbind(gather,
                     Vars = BB |> ncol(),
                     Size = strsplit(
                         system(
-                            paste('du -sh', DB_Steps_META_fl),
+                            paste("du -s", DB_Steps_META_fl),
                             intern = TRUE),
                         "\t")[[1]][1]
                 )
 )
 rm(BB)
 
+## Broad Band data hash file storage
+BB <- open_dataset(DB_HASH_fl)
+gather <- rbind(gather,
+                data.frame(
+                    Name = "Raw files hashes",
+                    Rows = BB |> nrow(),
+                    Vars = BB |> ncol(),
+                    Size = strsplit(
+                        system(
+                            paste("du -s", DB_HASH_fl),
+                            intern = TRUE),
+                        "\t")[[1]][1]
+                )
+)
+rm(BB)
 
+gather$Size <- as.numeric(gather$Size) * 1024
+gather <- rbind(gather,
+                data.frame(
+                    Name = "**Total**",
+                           Rows = sum(gather$Rows),
+                           Vars = sum(gather$Vars),
+                           Size = sum(gather$Size)
+                    )
+)
+gather$Size <- humanReadable(gather$Size)
 
-
-gather
+cat(
+    pander_return(
+        gather, justify = "lrrr"
+    ),
+    sep = "\n",
+    file = "~/BBand_LAP/.databasestats.md"
+)
+pander(gather, justify = "lrrr")
+cat(" \n \n")
 
 
 
@@ -236,24 +266,25 @@ total <- DATA[, .(Minutes = sum(Minutes),
               by = GID]
 
 plot(total[, Minutes, Date],
+     xlim = xlim,
      main = "Total execution")
-points(total[N == median(N) , Minutes, Date],
+points(total[N == median(N), Minutes, Date],
        col = "green")
-points(total[N > median(N) , Minutes, Date],
+points(total[N > median(N),  Minutes, Date],
        col = "blue")
-points(total[N < median(N) , Minutes, Date],
+points(total[N < median(N),  Minutes, Date],
        col = "red")
-
 
 
 partial <- DATA[, .(Minutes = sum(Minutes),
                     Date    = min(Date),
                     .N),
-                by = .(GID, Category) ]
+                by = .(GID, Category)]
 
 for (as in unique(partial$Category)) {
     pp <- partial[Category == as]
-    plot(pp[,Minutes,Date],
+    plot(pp[, Minutes, Date],
+         xlim = xlim,
          main = paste("Total execution: ", as))
     points(pp[N == median(N), Minutes, Date],
            col = "green")
@@ -265,26 +296,19 @@ for (as in unique(partial$Category)) {
 
 
 
-
 #' \newpage
 #' ## Script statistics
 #'
 #+ echo=F, include=T, results = "as.is", out.height = "30%"
 for (as in last$Script) {
     pp <- DATA[Script == as]
-    plot(pp[,Minutes,Date],
+    plot(pp[, Minutes, Date],
+         xlim = xlim,
          main = as)
 }
 
-
-
-
-
-
-
 #' **END**
 #+ include=T, echo=F
-# myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
