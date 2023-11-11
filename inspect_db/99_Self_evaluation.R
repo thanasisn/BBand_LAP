@@ -135,15 +135,24 @@ cat(" \n \n")
 
 
 
+#' \newpage
+#' ## Scrip statistics
+#'
+#+ echo=F, include=T, results = "as.is", out.height = "30%"
 
 for (as in last$Script) {
-
+    pp <- DATA[Script == as]
+    plot(pp[,Minutes,Date],
+         main = as)
 }
 
 
+"Build_DB_01_pysolar.R"
 
 
+test <- data.table(as.factor(DATA$Script))
 
+test[V1 == "Build_DB_01_pysolar.R", as.numeric(unique(V1))]
 
 
 
