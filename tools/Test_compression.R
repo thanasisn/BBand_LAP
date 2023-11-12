@@ -29,7 +29,7 @@ library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 
 
-results <- "~/BBand_LAP/tools/DB_compression_test.Rds"
+results <- "~/BBand_LAP/SIDE_DATA/DB_compression_test.Rds"
 
 
 # ##  Create a test database  ----------------------------------------------------
