@@ -78,40 +78,16 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(gdata,      warn.conflicts = FALSE, quietly = TRUE)
 
 
-##  Parse data  ----------------------------------------------------------------
-DATA <- fread("~/BBand_LAP/REPORTS/LOGs/Run.log",
-              fill = TRUE,
-              blank.lines.skip = TRUE)
-## Create datetime
-DATA$Date <- as.POSIXct(strptime(DATA[, paste(V1, V2)], "%F %H:%M:%OS"))
-DATA[, V1 := NULL]
-DATA[, V2 := NULL]
-## Check units
-stopifnot(DATA[, all(V6 == "mins")])
-DATA[, V6 := NULL]
-## Check execution time
-if (is.numeric(DATA$V5)) {
-    names(DATA)[names(DATA) == "V5"] <- "Minutes"
-}
-## Parse script
-DATA[, Script   := basename(V4)]
-DATA[, Category := basename(dirname(V4))]
-DATA[, V4 := NULL]
-## Parse host
-DATA[, c("User", "Host") := tstrsplit(V3, "@")]
-DATA[, V3 := NULL]
 
 
-##  Evaluate  ------------------------------------------------------------------
+##  Evaluate data sizes  ------------------------------------------------------------
 
-## Show only stats for the main machine
-DATA <- DATA[Host == "sagan"]
-xlim <- range(DATA$Date)
-
+## _ Gather data size -----------------------------------------------------------------
 #'
-#' ## Data overview
+#' ## Data size overview
 #'
 #+ echo=F, include=T
+
 
 overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size.Rds"
 
@@ -217,33 +193,65 @@ if (!file.exists(overview_data)) {
     saveRDS(DATA, overview_data)
 }
 
-
-gather$Size <- humanReadable(gather$Size)
-gather$Date <- NULL
+pp <- gather
+pp$Size <- humanReadable(pp$Size)
+pp$Date <- NULL
 
 cat(
     pander_return(
-        gather, justify = "lrrrr",
+        pp, justify = "lrrrr",
         style = "rmarkdown"
     ),
     sep = "\n",
     file = "~/BBand_LAP/.databasestats.md"
 )
-pander(gather, justify = "lrrrr")
+pander(pp, justify = "lrrrr")
 cat(" \n \n")
 
 
 
+## _ Plot data size ------------------------------------------------------------
+
+## TODO plot sizes
 
 
 
 
-stop()
 
 
 
+##  Evaluate execution times  --------------------------------------------------
+
+## _ Parse data  ---------------------------------------------------------------
+DATA <- fread("~/BBand_LAP/REPORTS/LOGs/Run.log",
+              fill = TRUE,
+              blank.lines.skip = TRUE)
+## Create datetime
+DATA$Date <- as.POSIXct(strptime(DATA[, paste(V1, V2)], "%F %H:%M:%OS"))
+DATA[, V1 := NULL]
+DATA[, V2 := NULL]
+## Check units
+stopifnot(DATA[, all(V6 == "mins")])
+DATA[, V6 := NULL]
+## Check execution time
+if (is.numeric(DATA$V5)) {
+    names(DATA)[names(DATA) == "V5"] <- "Minutes"
+}
+## Parse script
+DATA[, Script   := basename(V4)]
+DATA[, Category := basename(dirname(V4))]
+DATA[, V4 := NULL]
+## Parse host
+DATA[, c("User", "Host") := tstrsplit(V3, "@")]
+DATA[, V3 := NULL]
 
 
+## Show only stats for the main machine
+DATA <- DATA[Host == "sagan"]
+xlim <- range(DATA$Date)
+
+
+## _ Last executions time  -----------------------------------------------------
 #'
 #' ## Last executions
 #'
@@ -256,9 +264,9 @@ pander(last, justify = "lllr")
 cat(" \n \n")
 
 
-
+## _ Executions statistics  ----------------------------------------------------
 #' \newpage
-#' ## Executions statistics
+#' ## Executions times statistics
 #'
 #+ echo=F, include=T
 stats <-
@@ -276,6 +284,7 @@ cat(" \n \n")
 
 
 
+## _ Total Executions times  ---------------------------------------------------
 #' \newpage
 #' ## Total Executions
 #'
@@ -326,6 +335,7 @@ for (as in unique(partial$Category)) {
 
 
 
+## _ Script time statistics  ---------------------------------------------------
 #' \newpage
 #' ## Script statistics
 #'
@@ -336,6 +346,10 @@ for (as in last$Script) {
          xlim = xlim,
          main = as)
 }
+
+
+
+
 
 #' **END**
 #+ include=T, echo=F
