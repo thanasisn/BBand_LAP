@@ -113,6 +113,8 @@ xlim <- range(DATA$Date)
 #'
 #+ echo=F, include=T
 
+overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size.Rds"
+
 ## Broad band data base
 BB <- opendata()
 gather <- data.frame(
@@ -203,7 +205,21 @@ gather <- rbind(gather,
 gather <- data.table(gather)
 gather[, "Bytes/Value" := round(Size / (as.double(Rows) * as.double(Vars)), 2)]
 
+
+
+## Gather results
+gather[, Date := Sys.time()]
+if (!file.exists(overview_data)) {
+    saveRDS(gather, overview_data)
+} else {
+    DATA <- readRDS(overview_data)
+    DATA <- unique(rbind(DATA, gather, fill = T))
+    saveRDS(DATA, overview_data)
+}
+
+
 gather$Size <- humanReadable(gather$Size)
+gather$Date <- NULL
 
 cat(
     pander_return(
@@ -215,6 +231,16 @@ cat(
 )
 pander(gather, justify = "lrrrr")
 cat(" \n \n")
+
+
+
+
+
+
+
+stop()
+
+
 
 
 

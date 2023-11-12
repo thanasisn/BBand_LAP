@@ -27,23 +27,25 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-11-12T12:29:09 EET -->
+<!-- Added by: athan, at: 2023-11-12T18:31:36 EET -->
 
 <!--te-->
+
+
 
 
 ## Data status overview
 
 
 
-| Name             |     Rows | Vars |      Size | Bytes/Value |
-|:-----------------|---------:|-----:|----------:|------------:|
-| BBDB             | 16233120 |   80 |   3.1 GiB |        2.55 |
-| BBDB meta        |    11273 |   82 |   3.3 MiB |         3.7 |
-| TrackerDB        |  7571253 |   23 | 146.8 MiB |        0.88 |
-| TrackerDB meta   |     2781 |    9 | 172.0 KiB |        7.04 |
-| Raw files hashes |   413731 |    4 |   4.4 MiB |        2.81 |
-| **Total**        | 24232158 |  198 |   3.2 GiB |        0.72 |
+
+
+[1] "\n\n| Name             |     Rows | Vars |      Size | Bytes/Value |\n|:-----------------|---------:|-----:|----------:|------------:|\n| BBDB             | 16233120 |   79 |   3.0 GiB |        2.51 |\n| BBDB meta        |    11273 |   82 |   3.0 MiB |        3.39 |\n| TrackerDB        |  7571253 |   23 | 145.6 MiB |        0.88 |\n| TrackerDB meta   |     2781 |    9 | 172.0 KiB |        7.04 |\n| Raw files hashes |   438142 |    4 |   4.5 MiB |        2.72 |\n| **Total**        | 24256569 |  197 |   3.1 GiB |        0.71 |\n\n"
+attr(,"class")
+[1] "knit_asis"
+attr(,"knit_cacheable")
+[1] NA
+
 
 
 
