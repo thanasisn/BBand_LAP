@@ -78,12 +78,13 @@ if (!interactive()) {
 
 
 ## __ Load libraries  ----------------------------------------------------------
-source("~/BBand_LAP/DEFINITIONS.R")
-
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
+
+source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 
 
 ##  CHP-1 raw data check  ------------------------------------------------------
@@ -269,7 +270,7 @@ parthash$variable <- NULL
 ## __ Update hash table  -------------------------------------------------------
 if (!file.exists(DB_HASH_fl)) {
     ## Nothing to compare to, just store the new table
-    write_parquet(x = parthash, sink = DB_HASH_fl)
+    writePARQUET(x = parthash, sink = DB_HASH_fl)
 } else {
     ## Add new hashes to permanent storage
 
@@ -284,7 +285,7 @@ if (!file.exists(DB_HASH_fl)) {
     ## keep unique combination of md5sum and basenames
     mainhash <- mainhash[!duplicated(mainhash[ , md5sum, basename]), ]
 
-    write_parquet(x = parthash, sink = DB_HASH_fl)
+    writePARQUET(x = parthash, sink = DB_HASH_fl)
 }
 
 
