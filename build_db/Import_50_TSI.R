@@ -42,14 +42,14 @@ if (!interactive()) {
 
 
 ## __ Load libraries  ----------------------------------------------------------
+library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
-
-library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
-library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
-library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 
 
 ##  Load all TSI data  ---------------------------------------------------------
@@ -115,7 +115,7 @@ for (af in filelist$names) {
     datapart <- rows_update(datapart, TSI, by = "Date", unmatched = "ignore")
 
     ## store actual data
-    write_parquet(x = datapart, sink = af)
+    writePARQUET(x = datapart, sink = af)
     cat("50 Save: ", af, "\n\n")
     ## clean
     rm(datapart)
