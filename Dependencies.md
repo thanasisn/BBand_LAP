@@ -23,6 +23,7 @@
        lubridate:     1.9.3
            tidyr:     1.3.0
            tools:     4.2.3
+           gdata:     3.0.0
        rmarkdown:      2.25
 
 ### `process`
@@ -40,6 +41,8 @@
           pander:     0.6.5
            tools:     4.2.3
        rmarkdown:      2.25
+          digest:    0.6.33
+          scales:     1.2.1
 
 ### `tools`
 
