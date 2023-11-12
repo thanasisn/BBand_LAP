@@ -27,11 +27,32 @@ opendata <- function() {
 #' @export
 #'
 writedata <- function(.) {
-    write_dataset(., path      = DB_DIR,
-                  format       = "parquet",
-                  partitioning = c("year", "month"),
-                  hive_style   = FALSE)
+    write_dataset(., path           = DB_DIR,
+                  format            = "parquet",
+                  compression       = DB_compress_codec,
+                  compression_level = DB_compress_level,
+                  partitioning      = c("year", "month"),
+                  hive_style        = FALSE)
     cat("Written dataset: ", DB_DIR, "\n")
+}
+
+
+
+
+#' Write a parquet file with this project options
+#'
+#' @param x     Object to save
+#' @param sink  Path to file
+#'
+#' @return      Nothing. Creates new file
+#' @export
+#'
+writePARQUET <- function(x, sink){
+    write_parquet(x    = x,
+                  sink = sink,
+                  compression       = DB_compress_codec,
+                  compression_level = DB_compress_level)
+
 }
 
 
