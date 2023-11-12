@@ -45,7 +45,7 @@ DB_HASH_fl          <- "~/DATA_RAW/Bband/Broad_Band_DB_hash_table.parquet"  ## A
 DB_start_date       <- as.Date("1993-01-01")   ## ~ start in 1993-04-19??
 DB_Steps_start_date <- as.Date("2016-04-01")
 DB_compress_codec   <- "lz4"
-DB_compress_level   <- 8
+DB_compress_level   <- 9
 
 
 ## __ DB test paths  -----------------------------------------------------------
