@@ -27,18 +27,24 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-11-12T09:42:22 EET -->
+<!-- Added by: athan, at: 2023-11-12T12:29:09 EET -->
 
 <!--te-->
 
 
 ## Data status overview
 
-[1] "\n\n| Name             |     Rows | Vars |      Size |\n|:-----------------|---------:|-----:|----------:|\n| BBDB             | 16233120 |   78 |   3.1 GiB |\n| BBDB meta        |    11273 |   82 |   3.2 MiB |\n| TrackerDB        |  7571253 |   23 | 145.6 MiB |\n| TrackerDB meta   |     2781 |    9 | 172.0 KiB |\n| Raw files hashes |   413731 |    4 |   4.4 MiB |\n| **Total**        | 24232158 |  196 |   3.2 GiB |\n\n"
-attr(,"class")
-[1] "knit_asis"
-attr(,"knit_cacheable")
-[1] NA
+
+
+| Name             |     Rows | Vars |      Size | Bytes/Value |
+|:-----------------|---------:|-----:|----------:|------------:|
+| BBDB             | 16233120 |   80 |   3.1 GiB |        2.55 |
+| BBDB meta        |    11273 |   82 |   3.3 MiB |         3.7 |
+| TrackerDB        |  7571253 |   23 | 146.8 MiB |        0.88 |
+| TrackerDB meta   |     2781 |    9 | 172.0 KiB |        7.04 |
+| Raw files hashes |   413731 |    4 |   4.4 MiB |        2.81 |
+| **Total**        | 24232158 |  198 |   3.2 GiB |        0.72 |
+
 
 
 ## What it does
@@ -99,7 +105,8 @@ attr(,"knit_cacheable")
 ## TODO
 
 - Replace and compare processes from "CM_21_GLB"
-  - Some of the first stages have been replaced
+  - All the major stages have been replaced
+  - Secondary processes are to be ported
 - Process more instruments
 - Interactive plot of db variables
 - Import libRadtran data
