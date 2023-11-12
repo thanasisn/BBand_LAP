@@ -86,6 +86,8 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/process/QCRad_LongShi_v9.R"
 qc_ver      <- 9
 
+parameter_fl <- paste0("~/BBand_LAP/SIDE_DATA/", basename(sub("\\.R", "_parameters.Rds", Script.Name)))
+
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
@@ -723,7 +725,7 @@ for (af in filelist$names) {
 
     ##  Store filters parameters  ----------------------------------------------
     saveRDS(object = QS,
-            file   = sub("\\.R", "_parameters.Rds", Script.Name))
+            file   = parameter_fl)
 
     ## clean
     rm(datapart)
@@ -748,7 +750,7 @@ myunlock(DB_lock)
 ## open data base for plots
 BB <- opendata()
 ## load filter parameters
-QS <- readRDS(sub("\\.R", "_parameters.Rds", Script.Name))
+QS <- readRDS(parameter_fl)
 
 ## __ Part of data we care for  ------------------------------------------------
 if (PARTIAL == TRUE) {
