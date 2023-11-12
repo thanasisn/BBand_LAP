@@ -15,7 +15,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 <!--ts-->
 * [Broad Band LAP](#broad-band-lap)
    * [Table of Contents](#table-of-contents)
-   * [Data overview](#data-overview)
+   * [Data status overview](#data-status-overview)
    * [What it does](#what-it-does)
       * [For CHP-1](#for-chp-1)
       * [For CM-21](#for-cm-21)
@@ -27,24 +27,18 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-11-11T18:09:41 EET -->
+<!-- Added by: athan, at: 2023-11-12T09:42:22 EET -->
 
 <!--te-->
 
 
-## Data overview
+## Data status overview
 
-
-
-| Name             |     Rows | Vars |      Size |
-|:-----------------|---------:|-----:|----------:|
-| BBDB             | 16230240 |   80 |   3.1 GiB |
-| BBDB meta        |    11272 |   82 |   3.3 MiB |
-| TrackerDB        |  7569150 |   23 | 146.5 MiB |
-| TrackerDB meta   |     2780 |    9 | 172.0 KiB |
-| Raw files hashes |   413727 |    4 |   4.4 MiB |
-| **Total**        | 24227169 |  198 |   3.2 GiB |
-
+[1] "\n\n| Name             |     Rows | Vars |      Size |\n|:-----------------|---------:|-----:|----------:|\n| BBDB             | 16233120 |   78 |   3.1 GiB |\n| BBDB meta        |    11273 |   82 |   3.2 MiB |\n| TrackerDB        |  7571253 |   23 | 145.6 MiB |\n| TrackerDB meta   |     2781 |    9 | 172.0 KiB |\n| Raw files hashes |   413731 |    4 |   4.4 MiB |\n| **Total**        | 24232158 |  196 |   3.2 GiB |\n\n"
+attr(,"class")
+[1] "knit_asis"
+attr(,"knit_cacheable")
+[1] NA
 
 
 ## What it does
