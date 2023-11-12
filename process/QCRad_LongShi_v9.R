@@ -90,7 +90,7 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -132,7 +132,7 @@ QS$TEST_04  <- TRUE
 QS$TEST_05  <- TRUE
 QS$TEST_06  <- TRUE
 QS$TEST_07  <- FALSE  ## TODO
-# QS$TEST_08  <- TRUE
+QS$TEST_08  <- TRUE
 # QS$TEST_09  <- TRUE
 # QS$TEST_10  <- FALSE  ## TODO
 
@@ -157,27 +157,27 @@ PLOT_FIRST <- as_date("2022-01-01")
 PLOT_LAST  <- as_date("2024-03-31")
 
 
-##  Create a test database  ----------------------------------------------------
-TEST_DB <- TRUE
-if (TEST_DB) {
-    source("~/BBand_LAP/DEFINITIONS.R")
-    cat("\n * * * Using a temp DB * * * \n\n")
-    ## copy data to temp
-    tyear <- 2022
-    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
-    system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-    system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
-    ## replace paths with test paths
-    DB_DIR     <- test_DB_DIR
-    DB_lock    <- test_DB_lock
-    DB_META_fl <- test_DB_META_fl
-    DB_HASH_fl <- test_DB_HASH_fl
-    InitVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
-    OVERWRITEVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
-    # warning("THIS IS FOR DEVELOPMENT")
-    # OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
-}
+# ##  Create a test database  ----------------------------------------------------
+# TEST_DB <- TRUE
+# if (TEST_DB) {
+#     source("~/BBand_LAP/DEFINITIONS.R")
+#     cat("\n * * * Using a temp DB * * * \n\n")
+#     ## copy data to temp
+#     tyear <- 2022
+#     dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
+#     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
+#     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
+#     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
+#     ## replace paths with test paths
+#     DB_DIR     <- test_DB_DIR
+#     DB_lock    <- test_DB_lock
+#     DB_META_fl <- test_DB_META_fl
+#     DB_HASH_fl <- test_DB_HASH_fl
+#     InitVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
+#     OVERWRITEVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
+#     # warning("THIS IS FOR DEVELOPMENT")
+#     # OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
+# }
 
 
 ##  Find what needs update  ----------------------------------------------------
@@ -730,7 +730,7 @@ for (af in filelist$names) {
     dummy <- gc()
 }
 #+ include=T, echo=F
-# myunlock(DB_lock)
+myunlock(DB_lock)
 
 
 
@@ -1477,16 +1477,6 @@ if (QS$TEST_06) {
                caption = flagname_BTH))
     cat(" \n \n")
 
-    datapart <- data.table(BB |> collect())
-
-    test <- datapart[DIFF_strict - RaylDIFF     < QS$Rayleigh_lower_lim &
-                         DIFF_strict / GLB_wpsm < QS$Rayleigh_dif_glo_r &
-                     GLB_wpsm               > QS$Rayleigh_glo_min,]
-
-    datapart[ , get(flagname_BTH)]
-
-stop()
-
     test <- BB |> select(DIFF_strict, RaylDIFF) |> collect() |> as.data.table()
     hist(test[, DIFF_strict - RaylDIFF ], breaks = 100)
     abline(v = QS$Rayleigh_lower_lim, lty = 3, col = "red")
@@ -1516,27 +1506,6 @@ stop()
             ]
         }
 
-        # pp[pp[, rowSums(is.na(.SD)) > 0, .SDcols = ignore, ], ]
-        # test <- pp[+(Reduce("+", data.table(is.na(pp[, ..ignore]))) == length(pp[, ..ignore]))]
-        # test[!is.na(QCv9_06_bth_flag)]
-        # test2 <- pp[ is.na(QCv9_01_dir_flag) &
-        #                 is.na(QCv9_01_glb_flag) &
-        #                 is.na(QCv9_02_dir_flag) &
-        #                 is.na(QCv9_02_glb_flag) &
-        #                 is.na(QCv9_03_upp_flag) &
-        #                 is.na(QCv9_03_low_flag) &
-        #                 is.na(QCv9_04_dir_flag) &
-        #                 is.na(QCv9_04_glb_flag) &
-        #                 is.na(QCv9_04_glb_flag) &
-        #                 is.na(QCv9_05_dir_flag) &
-        #                 !is.na(QCv9_06_bth_flag)
-        # ]
-#
-#         pp[!is.na(get(flagname_BTH)) &  !Ignore,  .(DIFF_strict, SZA, Ignore,get(flagname_BTH))]
-#         pp[!is.na(get(flagname_BTH)) &   Ignore,  .(DIFF_strict, SZA, Ignore,get(flagname_BTH))]
-#         pp[!is.na(get(flagname_BTH)) ,  .(DIFF_strict, SZA, Ignore,get(flagname_BTH))]
-
-
         ## plot by SZA
         plot(pp$SZA, pp$DIFF_strict,
              cex = .1,
@@ -1544,11 +1513,12 @@ stop()
         title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", ay))
 
         ## plot flagged
-        points(pp[!is.na(get(flagname_BTH)) & !Ignore, DIFF_strict, SZA], cex = .7, col = alpha("magenta", 0.2))
+        points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIFF_strict, SZA], cex = .7, col = alpha("magenta", 0.09))
+        points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIFF_strict, SZA], cex = .7, col = alpha("red", 0.4))
 
         legend("topright",
-               legend = c("Diffuse (inferred)", "Rayleigh limit" ),
-               col    = c("black",              "magenta"),
+               legend = c("Diffuse (inferred)", "Rayleigh limit broad", "Rayleigh limit narrow"),
+               col    = c("black",              "magenta",             "red"),
                pch = 19, bty = "n", cex = 0.8 )
         cat(" \n \n")
 
@@ -1560,11 +1530,12 @@ stop()
         title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", ay))
 
         ## plot flagged
-        points(pp[!is.na(get(flagname_BTH)) & !Ignore, DIFF_strict, Azimuth], cex = .7, col = alpha("magenta", 0.2))
+        points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIFF_strict, Azimuth], cex = .7, col = alpha("magenta", 0.09))
+        points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIFF_strict, Azimuth], cex = .7, col = alpha("red", 0.7))
 
         legend("topright",
-               legend = c("Diffuse (inferred)", "Rayleigh limit" ),
-               col    = c("black",              "magenta"),
+               legend = c("Diffuse (inferred)", "Rayleigh limit broad", "Rayleigh limit narrow"),
+               col    = c("black",              "magenta",             "red"),
                pch = 19, bty = "n", cex = 0.8 )
         cat(" \n \n")
 
@@ -1576,19 +1547,19 @@ stop()
         title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", ay))
 
         ## plot flagged
-        points(pp[!is.na(get(flagname_BTH)) & !Ignore, DIFF_strict, Date], cex = .7, col = alpha("magenta", 0.2))
+        points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIFF_strict, Date], cex = .7, col = alpha("magenta", 0.09))
+        points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIFF_strict, Date], cex = .7, col = alpha("red", 0.7))
 
         legend("topright",
-               legend = c("Diffuse (inferred)", "Rayleigh limit" ),
-               col    = c("black",              "magenta"),
+               legend = c("Diffuse (inferred)", "Rayleigh limit broad", "Rayleigh limit narrow"),
+               col    = c("black",              "magenta",             "red"),
                pch = 19, bty = "n", cex = 0.8 )
         cat(" \n \n")
 
     }
 
 
-
-    # stop("DDD")
+    ## Daily plots
     if (DO_PLOTS) {
 
         if (!interactive()) {
@@ -1598,7 +1569,7 @@ stop()
         ## plot on upper limit
 
         tmp <- BB |>
-            filter(!is.na(get(flagname_BTH))) |>
+            filter(get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)") |>
             select(Date) |>
             collect() |>
             as.data.table()
@@ -1645,12 +1616,12 @@ stop()
                  ylim = ylim, col = "green", ylab = "", xlab = "")
             lines(pp$Date, pp$DIR_strict, col = "blue" )
 
-            points(pp[!is.na(get(flagname_BTH)) & !Ignore, DIR_strict, Date],
-                   ylim = ylim, col = "pink")
-            points(pp[!is.na(get(flagname_BTH)) & !Ignore, GLB_strict, Date],
-                   ylim = ylim, col = "magenta")
+            points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIR_strict, Date], ylim = ylim, col = alpha("magenta", 0.5))
+            points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, GLB_strict, Date], ylim = ylim, col = alpha("magenta", 0.5))
+            points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIR_strict, Date], ylim = ylim, col = "red")
+            points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, GLB_strict, Date], ylim = ylim, col = "red")
 
-            layout(1,1)
+            layout(1, 1)
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
