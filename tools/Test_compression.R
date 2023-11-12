@@ -27,24 +27,23 @@ library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
-#library(tools,      warn.conflicts = TRUE, quietly = TRUE)
-library(shiny)
-library(plotly)
 
 
 ##  Create a test database  ----------------------------------------------------
-
 TEST_DB <- TRUE
-
 if (TEST_DB) {
     source("~/BBand_LAP/DEFINITIONS.R")
     cat("\n * * * Using a temp DB * * * \n\n")
     ## copy data to temp
-    tyear <- 2017
-    dir.create(test_DB_DIR)
+    tyear <- sample(1993:2023, 5)
+    tyear <- c(2015, 2007, 1999, 2021, 1993)
+    tyear <- c(2021)
+    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
+    for (ay in tyear) {
+        system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", ay))
+    }
     ## replace paths with test paths
     DB_DIR     <- test_DB_DIR
     DB_lock    <- test_DB_lock
@@ -67,33 +66,52 @@ dir_size <- function(path, recursive = TRUE) {
 
 
 
-dir_size(DB_DIR) / 1024^2
-
-
-
-DB_DIR
-
-# for (algo in c("snappy", "gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
-
-for (algo in c( "gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
+for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
     if (codec_is_available(algo)) {
-        cat("Algo ", algo, "\n")
-        paste0(DB_DIR, "_", algo)
-
-        write_dataset(BB, path     = paste0(DB_DIR, "_", algo),
-                      compression  = algo,
-                      compression_level = 100,
-                      format       = "parquet",
-                      partitioning = c("year", "month"),
-                      hive_style   = FALSE)
-
-        # cat( dir_size(paste0(DB_DIR, "_", algo)) / 1024^2, "\n")
+        cat("AVAILABLE:", algo, "\n")
     }
 }
 
+# for (algo in c("snappy", "gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
 
-write_dataset()
+gatherDB <- data.frame()
+for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
+    if (codec_is_available(algo)) {
+        cat("Algo ", algo, "\n")
+        targetdb <- paste0(DB_DIR, "_temp")
+        system(paste("rm -rf ", targetdb))
 
+        for (comLev in c(25, 50, 75, 100)) {
+
+
+            ## try compression
+            aa <- system.time(
+                write_dataset(BB, path          = targetdb,
+                              compression       = algo,
+                              compression_level = comLev,
+                              format            = "parquet",
+                              partitioning      = c("year", "month"),
+                              hive_style        = FALSE)
+            )
+            ## gather stats
+            temp <- data.frame(
+                Date = Sys.time(),
+                Host = Sys.info()["nodename"],
+                User = aa[1],
+                Syst = aa[2],
+                Elap = aa[3],
+                Algo = algo,
+                Level = comLev,
+                Size = strsplit(system(paste("du -s", targetdb), intern = TRUE), "\t")[[1]][1]
+            )
+
+            cat(temp$Algo, "level:", temp$Level, "Elap:", temp$Elap, "Size:", temp$Size, "\n")
+
+            gatherDB <- rbind(gatherDB, temp)
+
+        }
+    }
+}
 
 
 
