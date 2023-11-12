@@ -129,7 +129,7 @@ InitVariableBBmeta <- function(varname, vartype) {
     if (!any(names(BB_meta) == varname)) {
         cat("Create column: ", varname, "\n")
         BB_meta <- BB_meta |> mutate( !!varname := vartype) |> compute()
-        write_parquet(BB_meta, DB_META_fl)
+        writePARQUET(BB_meta, DB_META_fl)
         cat("Metadata saved to file")
     } else {
         warning(paste0("Variable exist: ", varname, "\n", " !! IGNORING VARIABLE INIT !!"))
@@ -153,7 +153,7 @@ OVERWRITEVariableBBmeta <- function(varname, vartype) {
     if (any(names(BB_meta) == varname)) {
         cat("Overwrite column: ", varname, "\n")
         BB_meta <- BB_meta |> mutate( !!varname := vartype) |> compute()
-        write_parquet(BB_meta, DB_META_fl)
+        writePARQUET(BB_meta, DB_META_fl)
         cat("Metadata saved to file")
     } else {
         stop(paste("The column", varname, "not exist to overwrite"))

@@ -710,7 +710,6 @@ for (af in filelist$names) {
 
     ##  Store data in the database  --------------------------------------------
     datapart <- as_tibble(datapart)
-    # write_parquet(x = datapart, sink = af)
     writePARQUET(datapart, af)
     cat("Save: ", af, "\n\n")
 
@@ -720,7 +719,6 @@ for (af in filelist$names) {
     update_meta[, (eval("QCv9_filters_md5")) := digest::digest(QS, algo = "md5")]
     ## insert new meta data
     BB_meta <- rows_update(BB_meta, update_meta, by = "day")
-    # write_parquet(BB_meta, DB_META_fl)
     writePARQUET(BB_meta, DB_META_fl)
 
     ##  Store filters parameters  ----------------------------------------------
