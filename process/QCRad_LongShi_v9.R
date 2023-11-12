@@ -90,7 +90,7 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -157,27 +157,27 @@ PLOT_FIRST <- as_date("2022-01-01")
 PLOT_LAST  <- as_date("2024-03-31")
 
 
-# ##  Create a test database  ----------------------------------------------------
-# TEST_DB <- TRUE
-# if (TEST_DB) {
-#     source("~/BBand_LAP/DEFINITIONS.R")
-#     cat("\n * * * Using a temp DB * * * \n\n")
-#     ## copy data to temp
-#     tyear <- 2022
-#     dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
-#     system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-#     system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-#     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
-#     ## replace paths with test paths
-#     DB_DIR     <- test_DB_DIR
-#     DB_lock    <- test_DB_lock
-#     DB_META_fl <- test_DB_META_fl
-#     DB_HASH_fl <- test_DB_HASH_fl
-#     InitVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
-#     OVERWRITEVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
-#     # warning("THIS IS FOR DEVELOPMENT")
-#     # OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
-# }
+##  Create a test database  ----------------------------------------------------
+TEST_DB <- TRUE
+if (TEST_DB) {
+    source("~/BBand_LAP/DEFINITIONS.R")
+    cat("\n * * * Using a temp DB * * * \n\n")
+    ## copy data to temp
+    tyear <- 2022
+    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
+    system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
+    system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
+    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
+    ## replace paths with test paths
+    DB_DIR     <- test_DB_DIR
+    DB_lock    <- test_DB_lock
+    DB_META_fl <- test_DB_META_fl
+    DB_HASH_fl <- test_DB_HASH_fl
+    InitVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
+    OVERWRITEVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
+    # warning("THIS IS FOR DEVELOPMENT")
+    # OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
+}
 
 
 ##  Find what needs update  ----------------------------------------------------
@@ -556,29 +556,15 @@ for (af in filelist$names) {
         ## __ Both  ------------------------------------------------------------
         datapart[DIFF_strict - RaylDIFF > QS$Rayleigh_upper_lim,
                  (flagname_BTH) := "Rayleigh diffuse limit upper (18)"]
-        # datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
-        #          (flagname_BTH) := "Rayleigh diffuse limit lower (18)"]
-
-        # datapart[DIFF_strict - RaylDIFF > QS$Rayleigh_upper_lim,
-        #          .N]
-        # datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
-        #          .N]
-        # table(datapart$QCv9_06_bth_flag)
+        datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
+                 (flagname_BTH) := "Rayleigh diffuse limit lower broad (18)"]
 
         ## extra restrictions by me
         datapart[DIFF_strict - RaylDIFF     < QS$Rayleigh_lower_lim &
                      DIFF_strict / GLB_wpsm < QS$Rayleigh_dif_glo_r &
                      GLB_wpsm               > QS$Rayleigh_glo_min,
-                 (flagname_BTH) := "Rayleigh diffuse limit lower (18)"]
+                 (flagname_BTH) := "Rayleigh diffuse limit lower narrow (18)"]
 
-        # selg <-  DATA_year$wattGLB > 50
-        # seld <- (DATA_year$DIFF_strict / DATA_year$wattGLB) < 0.8
-        # selr <-  DATA_year$DIFF_strict < (Rayleigh_diff - 1.0)
-        #
-        # Rayleigh_lim <- selg & seld & selr
-        #
-        # ## . . Both --------------------------------------------------------####
-        # DATA_year$QCF_BTH_06[ Rayleigh_lim ]   <- "Rayleigh diffuse limit (18)"
 
 
         rm(list = ls(pattern = "flagname_.*"))
@@ -744,7 +730,7 @@ for (af in filelist$names) {
     dummy <- gc()
 }
 #+ include=T, echo=F
-myunlock(DB_lock)
+# myunlock(DB_lock)
 
 
 
@@ -1497,17 +1483,12 @@ if (QS$TEST_06) {
                          DIFF_strict / GLB_wpsm < QS$Rayleigh_dif_glo_r &
                      GLB_wpsm               > QS$Rayleigh_glo_min,]
 
-    hist(test$GLB_wpsm)
+    datapart[ , get(flagname_BTH)]
 
-    # ## extra restrictions by me
-    # datapart[DIFF_strict - RaylDIFF     < QS$Rayleigh_lower_lim &
-    #              DIFF_strict / GLB_wpsm < QS$Rayleigh_dif_glo_r &
-    #              GLB_wpsm               > QS$Rayleigh_glo_min,
-    #          (flagname_BTH) := "Rayleigh diffuse limit lower (18)"]
-
+stop()
 
     test <- BB |> select(DIFF_strict, RaylDIFF) |> collect() |> as.data.table()
-    hist( test[, DIFF_strict - RaylDIFF ], breaks = 100 )
+    hist(test[, DIFF_strict - RaylDIFF ], breaks = 100)
     abline(v = QS$Rayleigh_lower_lim, lty = 3, col = "red")
     abline(v = QS$Rayleigh_upper_lim, lty = 3, col = "red")
     cat(" \n \n")
