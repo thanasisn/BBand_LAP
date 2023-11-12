@@ -200,17 +200,20 @@ gather <- rbind(gather,
                            Size = sum(gather$Size)
                     )
 )
+gather <- data.table(gather)
+gather[, "Bytes/Value" := round(Size / (as.double(Rows) * as.double(Vars)), 2)]
+
 gather$Size <- humanReadable(gather$Size)
 
 cat(
     pander_return(
-        gather, justify = "lrrr",
+        gather, justify = "lrrrr",
         style = "rmarkdown"
     ),
     sep = "\n",
     file = "~/BBand_LAP/.databasestats.md"
 )
-pander(gather, justify = "lrrr")
+pander(gather, justify = "lrrrr")
 cat(" \n \n")
 
 
@@ -314,4 +317,3 @@ tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
-
