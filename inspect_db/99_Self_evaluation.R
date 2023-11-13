@@ -215,7 +215,7 @@ cat(" \n \n")
 #'
 #' ## Data size plots
 #'
-#+ echo=F, include=T, results = "as.is"
+#+ echo=F, include=T, results = "asis"
 vars <- grep("Name|Date", names(DATA), value = TRUE, invert = TRUE)
 
 for (av in vars) {
@@ -390,7 +390,7 @@ for (as in unique(partial$Category)) {
 #' \newpage
 #' ## Script statistics
 #'
-#+ echo=F, include=T, results = "as.is", out.height = "30%"
+#+ echo=F, include=T, results = "asis", out.height = "30%"
 for (as in last$Script) {
     pp <- DATA[Script == as]
     plot(pp[, Minutes, Date],
