@@ -212,12 +212,61 @@ cat(" \n \n")
 
 ## _ Plot data size ------------------------------------------------------------
 
-## TODO plot sizes
+#'
+#' ## Data size plots
+#'
+#+ echo=F, include=T, results = "as.is"
+vars <- grep("Name|Date", names(DATA), value = TRUE, invert = TRUE)
+
+for (av in vars) {
+
+    types <- unique(DATA$Name)
+
+    DATA[, .(get(av), Date, Name)]
+    ylim <- range(DATA[, .(get(av))], na.rm = T)
+    xlim <- range(DATA[, Date], na.rm = T)
+
+    par("mar" = c(1,5,4,0.1))
+
+    plot(1,
+         xlab = "",
+         ylab = av,
+         ylim = ylim,
+         xlim = xlim,
+         las  = 1,
+         xaxt = "n",
+         yaxt = "n")
+    axis.POSIXct(1, pretty(DATA[, Date]))
+
+    if (av == "Size") {
+        axis(2, at = pretty(DATA[[av]]),
+                labels = humanReadable(pretty(DATA[[av]])),
+             las = 2)
+    } else {
+        axis(2, pretty(DATA[[av]]), las = 2)
+    }
+
+    cc <- 1
+    for (at in types) {
+        pp <- DATA[Name == at , .(get(av), Date)]
+        cc <- cc + 1
+        lines(pp$Date, pp$V1, col = cc)
+    }
+
+    par(xpd = TRUE)
+    legend("topleft",
+           inset = c(-.2, -.17),
+           legend = types,
+           bty = "n", lty = 1,
+           col = 2:length(types),
+           ncol = 3)
+    par(xpd = FALSE)
+
+    cat(" \n \n")
+
+}
 
 
-
-
-stop()
 
 
 ##  Evaluate execution times  --------------------------------------------------
@@ -252,10 +301,10 @@ xlim <- range(DATA$Date)
 
 
 ## _ Last executions time  -----------------------------------------------------
-#'
+#' \newpage
 #' # Execution times overview
 #'
-#' ## Last executions
+#' ## Last run
 #'
 #+ echo=F, include=T
 last <- DATA[DATA[, .I[which.max(Date)], by = .(Script, Category)]$V1]
