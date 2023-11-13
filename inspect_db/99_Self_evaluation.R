@@ -84,7 +84,7 @@ library(gdata,      warn.conflicts = FALSE, quietly = TRUE)
 
 ## _ Gather data size -----------------------------------------------------------------
 #'
-#' ## Data size overview
+#' # Data size overview
 #'
 #+ echo=F, include=T
 
@@ -217,7 +217,7 @@ cat(" \n \n")
 
 
 
-
+stop()
 
 
 ##  Evaluate execution times  --------------------------------------------------
@@ -252,6 +252,8 @@ xlim <- range(DATA$Date)
 
 
 ## _ Last executions time  -----------------------------------------------------
+#'
+#' # Execution times overview
 #'
 #' ## Last executions
 #'
