@@ -197,13 +197,12 @@ pp <- gather
 pp$Size <- humanReadable(pp$Size)
 pp$Date <- NULL
 
-cat(
+writeLines(
     pander_return(
         pp, justify = "lrrrr",
         style = "rmarkdown"
     ),
-    sep = "\n",
-    file = "~/BBand_LAP/.databasestats.md"
+    con = "~/BBand_LAP/.databasestats.md"
 )
 pander(pp, justify = "lrrrr")
 cat(" \n \n")
@@ -226,7 +225,7 @@ for (av in vars) {
     ylim <- range(DATA[, .(get(av))], na.rm = T)
     xlim <- range(DATA[, Date], na.rm = T)
 
-    par("mar" = c(1,5,4,0.1))
+    par("mar" = c(2,5,4,0.1))
 
     plot(1,
          xlab = "",
@@ -265,7 +264,6 @@ for (av in vars) {
     cat(" \n \n")
 
 }
-
 
 
 
