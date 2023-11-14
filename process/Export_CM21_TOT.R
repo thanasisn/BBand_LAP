@@ -150,6 +150,7 @@ for (yyyy in yearstodo) {
     ## _ Drop bad data  --------------------------------------------------------
     DATA[!is.na(cm21_bad_data_flag), GLB_wpsm    := NA]
     DATA[ is.na(GLB_wpsm),           GLB_SD_wpsm := NA]
+    DATA[, cm21_bad_data_flag := NULL]
 
     ## _ Random SZA check  -----------------------------------------------------
     ##   Check some days for SZA inconsistencies
@@ -183,7 +184,7 @@ for (yyyy in yearstodo) {
     for (ad in missza) {
         new_sza <- pzen(yyyy, 1:1440, ad)
         DATA[doy == ad, lap_sza := new_sza]
-        cat("\n\nFilled LAP SZA for doy:", ad, "\n\n")
+        cat("\nFilled LAP SZA for doy:", ad, "\n")
     }
 
     ## _ Convert NA to -9  -----------------------------------------------------
@@ -196,101 +197,57 @@ for (yyyy in yearstodo) {
     plot(DATA[, GLB_wpsm   , Date], main = paste(yyyy, "GLOBAL"))
     plot(DATA[, GLB_SD_wpsm, Date], main = paste(yyyy, "Global SD"))
 
-    ## create dir
+    ## create output dir
     outputdir <- paste0(TOT_EXPORT, "/", yyyy, "/")
     dir.create( outputdir, showWarnings = FALSE, recursive = TRUE)
-
-
-
-
-
-
-
-stop("DDDD")
-
-}
-
-
-
-
-
-
-#+ include=TRUE, echo=F, results="asis"
-for (afile in input_files) {
-
-    ## create all minutes
-    allminutes <- seq( as.POSIXct(paste0(yyyy, "-01-01 00:00:30")),
-                       as.POSIXct(paste0(yyyy, "-12-31 23:59:30")),
-                       by = "mins" )
-
-    ## create dir
-    outputdir <- paste0(TOT_EXPORT, yyyy, "/")
-    dir.create( outputdir, showWarnings = F )
 
 
     cat('\\begin{multicols}{3}')
     cat('\\scriptsize\n')
 
-
-    ## export each day
-    for (dd in alldays) {
+    ## _ Export each day  ------------------------------------------------------
+    for (dd in DATA[, unique(as.Date(Date))]) {
         dateD <- as.Date(dd, origin = "1970-01-01")
         yyyy  <- year(dateD)
         doy   <- yday(dateD)
 
-        aday <- ayear[ day == dateD ]
+        aday <- DATA[as.Date(Date) == dateD]
         if (nrow(aday) != 1440 ) {
-            stop("Day do not have 1440 minutes!!")
+            stop("Day does not have 1440 minutes!!")
         }
 
-        ## this day output file
+        ##  Output file
         filename <- paste0(outputdir, strftime(dateD, format = "TOT%3j%y.DAT"))
 
-        ## may skip output if day has no global data
-        if (all(aday$wattGLB == -9)) {
+        ##  Skip output if day has no global data
+        if (all(aday$GLB_wpsm == -9)) {
             cat("\\textbf{",paste0(dateD,": NO GHI DATA}\\\\\n"))
-            # cat(paste(dateD,"\n"), file = missingday, append = T )
             next()
         }
 
-        ## my definition of sza
-        SZA     <- -(aday$Eleva - 90)
-
-        if (any(is.na(SZA))) {
-            stop("SZA should be always defined for TOT output files (", dateD,") \nHave to correct this!!")
-        }
-
-        ## format time like the others
+        ##  Format time like the others
         TIME_UT <- as.numeric((aday$Date - as.POSIXct( dateD ) + 30) / 3600)
-        SZA[ is.na(SZA) ] <- -999L
 
-        ## calculate zenith angles
-        lapzen <- vzen(yyyy,1:1440,doy)
-        if (any(is.na(lapzen))) {
-            stop("SZA should be always defined for TOT output files (", dateD,") \nHave to correct this!!")
-        }
+        ##  SZA if filed
+        stopifnot(all(!is.na(aday$lap_sza)))
 
+        ## _ Data to export  ---------------------------------------------------
+        output <- data.frame(TIME_UT = TIME_UT,
+                             SZA     = aday$lap_sza,  ## sza similar to other broadband
+                             Wm2     = round(aday$GLB_wpsm,    digits = 3),
+                             st.dev  = round(aday$GLB_SD_wpsm, digits = 3) )
 
-
-        ## data to export
-        output <- data.frame( TIME_UT = TIME_UT,
-                              # SZA     = SZA,   ## my sza calculation pysolar
-                              SZA     = lapzen,  ## sza similar to other broadband
-                              Wm2     = round(aday$wattGLB,    digits = 3),
-                              st.dev  = round(aday$wattGLB_SD, digits = 3) )
-
-
-        ## custom header of the daily file
+        ## _ Custom header of the daily file
         cat(" TIME_UT    SZA    [W.m-2]   st.dev",
             file = filename,
             eol  = "\r\n")
-        ## write formatted data to file
-        write.table(format( output,
-                            digits    = 3,
-                            width     = 8,
-                            row.names = FALSE,
-                            scietific = FALSE,
-                            nsmall    = 2 ),
+        ## _ write formatted data to file
+        write.table(format(output,
+                           digits    = 3,
+                           width     = 8,
+                           row.names = FALSE,
+                           scietific = FALSE,
+                           nsmall    = 2 ),
                     file      = filename,
                     append    = TRUE,
                     quote     = FALSE,
@@ -298,12 +255,13 @@ for (afile in input_files) {
                     row.names = FALSE,
                     eol = "\r\n")
 
-        # cat(paste("Written: ", basename(filename), "\r"))
         cat(paste0(dateD, ": ", basename(filename), " \\\\\n"))
-    } #END of days
 
+    } #END of days
     cat('\\end{multicols}')
-} #END of year loop
+} #END of years loop
+
+
 
 
 #' **END**
