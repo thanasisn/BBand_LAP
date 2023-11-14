@@ -34,11 +34,11 @@
            dplyr:     1.1.3
          foreach:     1.5.2
        lubridate:     1.9.3
+           knitr:      1.45
+          pander:     0.6.5
          arsenal:     3.6.3
        compareDF:     2.3.5
            Hmisc:     5.1.1
-           knitr:      1.45
-          pander:     0.6.5
            tools:     4.2.3
        rmarkdown:      2.25
           digest:    0.6.33
