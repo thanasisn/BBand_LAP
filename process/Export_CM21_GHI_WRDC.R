@@ -18,6 +18,8 @@
 #' - \usepackage{caption}
 #' - \usepackage{placeins}
 #' - \captionsetup{font=small}
+#' - \usepackage{multicol}
+#' - \setlength{\columnsep}{1cm}
 #'
 #' output:
 #'   bookdown::pdf_document2:
@@ -27,14 +29,12 @@
 #'     keep_md:          no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'     toc_depth:        4
-#'     fig_width:        8
-#'     fig_height:       5
+#'     fig_width:        7
+#'     fig_height:       4.5
 #'   html_document:
 #'     toc:        true
-#'     fig_width:  9
-#'     fig_height: 4
-#'
+#'     fig_width:  7.5
+#'     fig_height: 5
 #' date: "`r format(Sys.time(), '%F')`"
 #'
 #' ---
@@ -73,7 +73,6 @@
 
 
 
-
 #+ echo=F, include=T
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
@@ -104,7 +103,6 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 
 
-
 ##  Variables  -----------------------------------------------------------------
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
@@ -133,7 +131,7 @@ for (yyyy in yearstodo) {
 
     cat("\n\\FloatBarrier\n")
     cat("\n\\newpage\n\n")
-    cat("\n## Year:", yyyy, "\n\n" )
+    cat("\n## Year:", yyyy, "\n\n")
 
 
     ## _ Get data for the year -------------------------------------------------
@@ -293,13 +291,15 @@ for (yyyy in yearstodo) {
            legend = c("Quarterly", "Hourly"),
            col    = c(1, "red")
     )
+    cat(" \n \n")
 
+    hist(DATAquarter[, qGlobal], breaks = 50,
+         main = "Quarters", xlab = "Global quarter mean")
+    cat(" \n \n")
 
-    hist(DATAquarter[, qGlobal])
-
-    hist(DATAhour[, hGlobal])
-
-    stop()
+    hist(DATAhour[, hGlobal], breaks = 50,
+         main = "Hourly", xlab = "Global hour mean")
+    cat(" \n \n")
 
 }
 
@@ -309,3 +309,5 @@ for (yyyy in yearstodo) {
 #+ include=T, echo=F, results="asis"
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
+    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
