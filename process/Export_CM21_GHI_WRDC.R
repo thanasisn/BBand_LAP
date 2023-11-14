@@ -46,7 +46,33 @@
 #'
 #' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
 #'
+#'
+#' ## Info
+#'
+#' Apply data aggregation and export data for submission to WRDC.
+#'
+#' We calculate the mean global radiation for every quarter of the hour using all available data and ignoring missing values.
+#'
+#' The mean hourly values are produced only for the cases where all four of the quarters of each hour are present in the data set.
+#' If there is any missing quarterly value the hourly value is not exported.
+#'
+#'
+#'
+#' ## Aggregation method
+#'
+#' TODO: describe current method
+#'
+#' - Only positive global values
+#'      - Negatives are set to zero
+#' - Quarter of hours mean 'na.rm = TRUE'
+#' - Hours from quarters mean 'na.rm = FALSE'
+#'
+#' **WARNING: A different official method may exist!!**
+#'
 #+ echo=F, include=T
+
+
+stop("Have to allow low values!!")
 
 #+ echo=F, include=T
 ## __ Document options ---------------------------------------------------------
@@ -95,9 +121,11 @@ dir.create(EXPORT_DIR, showWarnings = FALSE, recursive = TRUE)
 ##  Set export range  ----------------------------------------------------------
 yearstodo <- seq(2022, 2023)
 
+#+ include=T, echo=F, results="asis"
 cat("\n",
     "Will export: ", yearstodo,
     "\n\n")
+
 
 ## Load data base
 BB <- opendata()
@@ -185,14 +213,14 @@ for (yyyy in yearstodo) {
     Export2 <- copy(Export)
 
     ##  Set NAs to -99 they are old school
-    Export[is.na(hGlobal) | is.nan(hGlobal), hGlobal := -99L]
+    # Export[is.na(hGlobal) | is.nan(hGlobal), hGlobal := -99L]
 
     ##  Create the format they like
-    WRDCoutput <- data.frame(year   = year( Export$Dates ),
-                             month  = month(Export$Dates ),
-                             day    = day(  Export$Dates ),
-                             time   = hour( Export$Dates ) + 0.5,
-                             global =       Export$hGlobal)
+    # WRDCoutput <- data.frame(year   = year( Export$Dates ),
+    #                          month  = month(Export$Dates ),
+    #                          day    = day(  Export$Dates ),
+    #                          time   = hour( Export$Dates ) + 0.5,
+    #                          global =       Export$hGlobal)
 
     WRDCoutput2 <- data.frame(year   = year( Export2$Dates ),
                               month  = month(Export2$Dates ),
@@ -202,104 +230,71 @@ for (yyyy in yearstodo) {
 
 
     ## _ Write WRDC submission file  -------------------------------------------
-    wrdc_fl <- paste0(EXPORT_DIR, "/sumbit_to_WRDC_", yyyy, ".dat")
+    # wrdc_fl <- paste0(EXPORT_DIR, "/sumbit_to_WRDC_", yyyy, ".dat")
+    wrdc_fl2 <- paste0(EXPORT_DIR, "/sumbit_to_WRDC_", yyyy, ".dat")
 
 
-    ## _ Add headers
+    # ##  Add headers
+    # cat("#Thessaloníki global radiation\r\n" ,
+    #     file = wrdc_fl)
+    # cat("#year month day time(UTC)   global radiation (W/m2)\r\n" ,
+    #     file = wrdc_fl, append = TRUE)
+    #
+    # ##  Write output line by line
+    # for (i in 1:nrow(WRDCoutput)) {
+    #     cat(
+    #         sprintf( "%4d  %2d  %2d  %4.1f %10.4f\r\n",
+    #                  WRDCoutput[i,1],
+    #                  WRDCoutput[i,2],
+    #                  WRDCoutput[i,3],
+    #                  WRDCoutput[i,4],
+    #                  WRDCoutput[i,5] ),
+    #         file = wrdc_fl,
+    #         append = TRUE )
+    # }
+    #
+    # ##  Replace -99.000 to -99
+    # system(paste("sed -i 's/   -99.0000/   -99/g' ", wrdc_fl))
+
+
+    ##  Add headers
     cat("#Thessaloníki global radiation\r\n" ,
-        file = wrdc_fl)
+        file = wrdc_fl2)
     cat("#year month day time(UTC)   global radiation (W/m2)\r\n" ,
-        file = wrdc_fl, append = TRUE)
+        file = wrdc_fl2, append = TRUE)
 
-    ## _ Write output line by line
-    for (i in 1:nrow(WRDCoutput)) {
-        cat(
-            sprintf( "%4d  %2d  %2d  %4.1f %10.4f\r\n",
-                     WRDCoutput[i,1],
-                     WRDCoutput[i,2],
-                     WRDCoutput[i,3],
-                     WRDCoutput[i,4],
-                     WRDCoutput[i,5] ),
-            file = wrdc_fl,
-            append = TRUE )
-    }
+    ##  Write all data at once
+    write.fwf(WRDCoutput2,
+              na       = "-99",
+              sep      = "  ",
+              digits   = 5,
+              colnames = FALSE,
+              append   = TRUE,
+              file  = wrdc_fl2)
 
-    ## replace -99.000 to -99
-    system(paste("sed -i 's/   -99.0000/   -99/g' ", wrdc_fl))
-
-
-    fwrite(WRDCoutput)
-
-
-
-write.ftable()
-write.fwf(WRDCoutput2, )
-
-}
-
-
-
-
-stop("FIXME")
-# there are changes to previous steps that should be implement here probably
-
-
-
-
-#'
-#' ## Info
-#'
-#' Apply data aggregation and export data for submission to WRDC.
-#'
-#' We calculate the mean global radiation for every quarter of the hour using all available data and ignoring missing values.
-#'
-#' The mean hourly values are produced only for the cases where all four of the quarters of each hour are present in the data set.
-#' If there is any missing quarterly value the hourly value is not exported.
-#'
-#'
-#+ echo=F, include=T
-
-
-#'
-#' ## Aggregation method
-#'
-#' TODO: describe current method
-#'
-#' **WARNING: A different method may exist!!**
-#'
-#+ echo=F, include=T
-
-
-
-
-#+ include=TRUE, echo=F, results="asis"
-for (afile in input_files) {
-
-
-
-
-    cat(paste("Data Exported to:", basename(wrdcfile),"\n"))
+    cat(paste("\nData Exported to:", basename(wrdc_fl2),"\n"))
 
     panderOptions('table.alignment.default', 'right')
     panderOptions('table.split.table',        120   )
 
 
-    cat('\\scriptsize\n')
-
-    cat(pander( summary(hourlyoutput) ))
-
-    cat('\\normalsize\n')
-
-    cat('\n')
+    cat('\n\\scriptsize\n\n')
+    cat(pander(summary(WRDCoutput2)))
+    cat('\n\\normalsize\n\n')
 
 
-    plot(test$Dates, test$Global, ylab = "Hourly GHI", xlab = "", main = "Quarterly aggregated hourly GHI")
+    plot(DATAquarter[, qGlobal, Dates],
+         ylab = "GHI", xlab = "",
+         main = "Aggregated GHI")
 
-    hist(test$Global, xlab = "Hourly GHI", main = "Histogram of quarterly aggregated hourly GHI" )
+    points(DATAhour[, hGlobal, Dates],
+         col = "red")
 
-
-} #END loop of years
-#+ echo=F, include=T
+    legend("topright",  pch = 1,
+           legend = c("Quarterly", "Hourly"),
+           col    = c(1, "red")
+    )
+}
 
 
 
@@ -411,5 +406,6 @@ for (afile in input_files) {
 
 
 #' **END**
+#+ include=T, echo=F, results="asis"
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
