@@ -1808,11 +1808,11 @@ if (QS$TEST_09) {
     dummy <- gc()
     if (!interactive()) dummy <- dev.off()
 }
-#+ echo=F, include=T
 
 
 
-
+#' **END**
+#+ include=T, echo=F, results="asis"
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
