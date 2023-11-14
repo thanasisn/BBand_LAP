@@ -139,7 +139,7 @@ for (yyyy in yearstodo) {
     DATA[GLB_wpsm < 0, GLB_wpsm := 0]
 
 
-    ## _ Aggregate on quarters of hour  ----------------------------------------
+    ## _ Quarters of hour aggregation  -----------------------------------------
 
     ## Mark each quarter of hour
     DATA[, Quarter  := (as.numeric(Date) %/% (3600/4))]
@@ -156,6 +156,57 @@ for (yyyy in yearstodo) {
         qGLstdSTD  = sd  (       GLB_SD_wpsm, na.rm = TRUE)
     ),
     by = Quarter]
+
+
+    ## _
+
+
+
+
+    ## _ Hours from quarters  --------------------------------------------------
+
+
+
+
+    ayearquarter$hourly <- as.numeric( ayearquarter$Dates ) %/% 3600
+    hposic              <- as.POSIXct( ayearquarter$hourly * 3600, origin = "1970-01-01" )
+
+    selecthour <- list(ayearquarter$hourly)
+
+    hDates     <- aggregate( ayearquarter$Dates,   by = selecthour, FUN = min )
+
+    hGlobal    <- aggregate( ayearquarter$qGlobal, by = selecthour, FUN = mean, na.rm = FALSE )  ## na.rm must be FALSE!
+    hGlobalCNT <- aggregate( ayearquarter$qGlobal, by = selecthour, FUN = function(x) sum(!is.na(x)))
+
+
+    ## check we don't want gaps in days
+    alloutput <- data.frame( Dates  = hDates$x - 30,
+                             Global = hGlobal$x  )
+    allhours  <- data.frame( Dates  = allhours - 30 )
+    stopifnot( dim(alloutput)[1] == dim(allhours)[1] )
+
+    ## output for all hours of the year
+    test <- merge( x = alloutput,
+                   y = allhours,
+                   all.y = TRUE  )
+
+    ## WRDC don't want negative values
+    test$Global[ test$Global < 0 ] <- 0
+
+    ## set NAs to -99 they are old school
+    test$Global[ is.na( test$Global) ] <- -99
+    test$Global[ is.nan(test$Global) ] <- -99
+
+    ## create the format they like
+
+    library(lubridate, quietly = T)
+    hourlyoutput <- data.frame( year   = year( test$Dates ),
+                                month  = month(test$Dates ),
+                                day    = day(  test$Dates ),
+                                time   = hour( test$Dates ) + 0.5,
+                                global = test$Global)
+
+    wrdcfile <- paste0(EXPORT_DIR, "sumbit_to_WRDC_", yyyy, ".dat")
 
 
 
@@ -206,7 +257,6 @@ for (afile in input_files) {
 
     #### run on 4 quarters of every hour ################################
     ayearquarter$hourly <- as.numeric( ayearquarter$Dates ) %/% 3600
-    hposic              <- as.POSIXct( ayearquarter$hourly * 3600, origin = "1970-01-01" )
 
     selecthour <- list(ayearquarter$hourly)
 
