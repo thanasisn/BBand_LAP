@@ -1,22 +1,57 @@
 # /* #!/opt/R/4.2.3/bin/Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+#' ---
+#' title: "CHP-1 export DNI data for Sirena."
+#' author: "Natsis Athanasios"
+#' documentclass: article
+#' classoption:   a4paper,oneside
+#' fontsize:      10pt
+#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
 #'
+#' link-citations:  yes
+#' colorlinks:      yes
+#'
+#' header-includes:
+#' - \usepackage{caption}
+#' - \usepackage{placeins}
+#' - \captionsetup{font=small}
+#' - \usepackage{multicol}
+#' - \setlength{\columnsep}{1cm}
+#'
+#' output:
+#'   bookdown::pdf_document2:
+#'     number_sections:  no
+#'     fig_caption:      no
+#'     keep_tex:         no
+#'     keep_md:          no
+#'     latex_engine:     xelatex
+#'     toc:              yes
+#'     fig_width:        7
+#'     fig_height:       4.5
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  7.5
+#'     fig_height: 5
+#' date: "`r format(Sys.time(), '%F')`"
+#' params:
+#'    ALL_YEARS: TRUE
+#' ---
 
-#'
-#' Read prepared clean data (level 1) of CHP1
-#' and output DIR files with direct beam irradiance for sirena repository
-#'
+#+ echo=F, include=T
 
+#+ echo=F, include=T
+## __ Document options ---------------------------------------------------------
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "./BBand_LAP/process/Export_CHP1_DIR.R"
-
-source("~/BBand_LAP/DEFINITIONS.R")
-source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
-source("~/BBand_LAP/functions/Functions_CHP1.R")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -27,6 +62,10 @@ library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+
+source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
+source("~/BBand_LAP/functions/Functions_CHP1.R")
 
 options(max.print = 1500)
 
@@ -41,16 +80,16 @@ MIN_DATE <- as.POSIXct("2016-01-01")
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 
-## sun position algorithm as the other broadband
+## Sun position algorithm as the other broadband
 zenangle <- function(YYYY,min,doy){
     as.numeric(
         system(
-            paste("~/CM_21_GLB/BINARY/zenangle64 ", YYYY ,min, doy, " 40.634 -22.956" ),
+            paste("~/CM_21_GLB/BINARY/zenangle64 ", YYYY ,min, doy, " 40.634 -22.956"),
             intern = T)
     )
 }
 
-## vectorize zenangle
+## Vectorize zenangle
 vzen <- Vectorize(zenangle, "min")
 
 ## parallelize zenangle
