@@ -39,8 +39,6 @@
 
 #+ echo=F, include=T
 
-
-
 #+ echo=F, include=T
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
@@ -61,8 +59,10 @@ if (!interactive()) {
 }
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
-library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+library(doMC,       warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(foreach,    warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 source("~/BBand_LAP/DEFINITIONS.R")
@@ -75,12 +75,26 @@ panderOptions('table.split.table',        120   )
 
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
+TOT_EXPORT <- "~/DATA/cm21_data_validation/AC21_lap.GLB_NEW_BB/"
 
-## compute SZA as other broadband
+## Sun position algorithm as the other broadband
 zenangle <- function(YYYY,min,doy){
-    as.numeric(system(paste("~/CM_21_GLB/BINARY/zenangle64 ", YYYY ,min, doy, " 40.634 -22.956" ), intern = T))
+    as.numeric(
+        system(
+            paste("~/CM_21_GLB/BINARY/zenangle64 ", YYYY ,min, doy, " 40.634 -22.956"),
+            intern = T)
+    )
 }
+
+## Vectorize zenangle
 vzen <- Vectorize(zenangle, "min")
+
+## Parallelize zenangle
+registerDoMC()
+
+pzen <- function(YYYY, min = 1:1440, doy) {
+    foreach(min = min, .combine = 'c') %dopar% zenangle(YYYY = YYYY, min = min ,doy = doy)
+}
 
 ##  Set export range  ----------------------------------------------------------
 yearstodo <- seq(2022, year(Sys.time()))
@@ -120,22 +134,75 @@ for (yyyy in yearstodo) {
     cat("\\newpage\n\n")
     cat("\n## Year:", yyyy, "\n\n")
 
-
     DATA <- data.table(BB |>
                            filter(year == yyyy) |>
                            select(
                                Date,
                                SZA,
+                               doy,
                                lap_sza,
-                               GLB_strict,
                                GLB_wpsm,
                                cm21_bad_data_flag,
                                GLB_SD_wpsm
                            ) |> collect()
                        )
 
+    ## _ Drop bad data  --------------------------------------------------------
+    DATA[!is.na(cm21_bad_data_flag), GLB_wpsm    := NA]
+    DATA[ is.na(GLB_wpsm),           GLB_SD_wpsm := NA]
 
-    DATA[is.na(lap_sza)]
+    ## _ Random SZA check  -----------------------------------------------------
+    ##   Check some days for SZA inconsistencies
+    reldiff1 <- c()
+    reldiff2 <- c()
+    reldiff3 <- c()
+    for (ad in sample(unique(DATA$doy), 10)) {
+        ## Calculate lap_sza
+        test_sza <- pzen(yyyy, 1:1440, ad)
+        ## Compare stored to calculated lap sza
+        reldiff1 <- c(reldiff1, 100 * (DATA[doy == ad, lap_sza] - test_sza) / test_sza)
+        ## Compare my SZA to calculated
+        reldiff2 <- c(reldiff2, 100 * (DATA[doy == ad, SZA] - test_sza)     / test_sza)
+        ## Compare my SZA to stored
+        reldiff3 <- c(reldiff3, 100 *  DATA[doy == ad, (SZA - lap_sza)      / lap_sza])
+    }
+    # plot(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
+    # plot(reldiff2, main = "Relat diff %  SZA ~ zenangle")
+    # plot(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
+
+    # hist(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
+    # hist(reldiff2, main = "Relat diff %  SZA ~ zenangle")
+    # hist(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
+
+    stopifnot(max(abs(reldiff1)) < 0.03)
+    stopifnot(max(abs(reldiff2)) < 0.81)
+    stopifnot(max(abs(reldiff3)) < 0.81)
+
+    ## _ Fill missing lap_sza  -------------------------------------------------
+    missza <- DATA[is.na(lap_sza), unique(doy)]
+    for (ad in missza) {
+        new_sza <- pzen(yyyy, 1:1440, ad)
+        DATA[doy == ad, lap_sza := new_sza]
+        cat("\n\nFilled LAP SZA for doy:", ad, "\n\n")
+    }
+
+    ## _ Convert NA to -9  -----------------------------------------------------
+    DATA[is.na(GLB_wpsm),    GLB_wpsm    := -9L]
+    DATA[is.na(GLB_SD_wpsm), GLB_SD_wpsm := -9L]
+    setorder(DATA, Date)
+
+
+    ## plot the whole year before output
+    plot(DATA[, GLB_wpsm   , Date], main = paste(yyyy, "GLOBAL"))
+    plot(DATA[, GLB_SD_wpsm, Date], main = paste(yyyy, "Global SD"))
+
+    ## create dir
+    outputdir <- paste0(TOT_EXPORT, "/", yyyy, "/")
+    dir.create( outputdir, showWarnings = FALSE, recursive = TRUE)
+
+
+
+
 
 
 
@@ -156,39 +223,10 @@ for (afile in input_files) {
                        as.POSIXct(paste0(yyyy, "-12-31 23:59:30")),
                        by = "mins" )
 
-    ## be sure to have all minutes
-    ayear <- merge( ayear,
-                    data.frame(Date = allminutes),
-                    by = "Date", all = T)
-
-    ayear$day <- as.Date(ayear$Date)
-
-
-    ## load SZA from first input
-    temp_sun <- readRDS(list.files(path       = SIGNAL_DIR,
-                                   pattern    = paste0("SIG_", yyyy,".Rds"),
-                                   full.names = T)[1])
-    temp_sun <- temp_sun[ , c("Date", "Azimuth", "Elevat") ]
-    ## drop old sun positions
-    ayear <- ayear[ , -c("Azimuth","Elevat")]
-    ## replace with new sun positions
-    ayear <- merge(ayear, temp_sun, by = "Date", all = T)
-
-
-
-    ## convert NA to -9
-    ayear$wattGLB[   is.na(ayear$wattGLB)    ] <- -9L
-    ayear$wattGLB_SD[is.na(ayear$wattGLB_SD) ] <- -9L
-
-    alldays <- sort(unique(ayear$day))
-
     ## create dir
     outputdir <- paste0(TOT_EXPORT, yyyy, "/")
     dir.create( outputdir, showWarnings = F )
 
-    ## plot the whole year before output
-    plot(ayear$Date, ayear$wattGLB,    main = paste(yyyy, "GLOBAL"))
-    plot(ayear$Date, ayear$wattGLB_SD, main = paste(yyyy, "Global SD"))
 
     cat('\\begin{multicols}{3}')
     cat('\\scriptsize\n')
