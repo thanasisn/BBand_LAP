@@ -71,6 +71,7 @@ library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(gdata,      warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 source("~/BBand_LAP/DEFINITIONS.R")
@@ -86,6 +87,9 @@ panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
 
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
+
+EXPORT_DIR <- "~/DATA/Broad_Band/CM21_H_WRDC_exports/"
+dir.create(EXPORT_DIR, showWarnings = FALSE, recursive = TRUE)
 
 
 ##  Set export range  ----------------------------------------------------------
@@ -140,11 +144,7 @@ for (yyyy in yearstodo) {
 
 
     ## _ Quarters of hour aggregation  -----------------------------------------
-
-    ## Mark each quarter of hour
-    DATA[, Quarter  := (as.numeric(Date) %/% (3600/4))]
-
-    ## Aggregate by quarters
+    ##    Missing leap seconds on one minute data is OK
     DATAquarter <- DATA[, .(
         Dates      = min(Date),
         qGlobal    = mean(       GLB_wpsm,    na.rm = TRUE),
@@ -155,61 +155,85 @@ for (yyyy in yearstodo) {
         qGLstdCNT  = sum (!is.na(GLB_SD_wpsm)),
         qGLstdSTD  = sd  (       GLB_SD_wpsm, na.rm = TRUE)
     ),
-    by = Quarter]
-
-
-    ## _
-
+    by = .(Quarter = as.numeric(Date) %/% (3600/4))]
 
 
 
     ## _ Hours from quarters  --------------------------------------------------
+    DATAhour <- DATAquarter[, .(
+        Dates      = min(Dates),
+        hGlobal    = mean(qGlobal, na.rm = FALSE),   ## na.rm must be FALSE!
+        hGlobalCNT = sum(!is.na(qGlobal))
+    ),
+    by = .(Hours = as.numeric(Dates) %/% 3600)]
+
+    ## _ Prepare data format  --------------------------------------------------
+
+    ##  Make Date stamp more conventional
+    DATAhour[, Dates := Dates - 30]
+    allhours <- allhours - 30
+
+    ##  Check we don't want gaps in days
+    stopifnot(all(DATAhour$Dates == allhours) == TRUE)
+
+    ##  Output for all hours of the year
+    Export <- DATAhour[, .(Dates, hGlobal)]
+    setorder(Export, Dates)
+
+    ##  WRDC don't want negative values
+    Export[hGlobal < 0, hGlobal := 0]
+    Export2 <- copy(Export)
+
+    ##  Set NAs to -99 they are old school
+    Export[is.na(hGlobal) | is.nan(hGlobal), hGlobal := -99L]
+
+    ##  Create the format they like
+    WRDCoutput <- data.frame(year   = year( Export$Dates ),
+                             month  = month(Export$Dates ),
+                             day    = day(  Export$Dates ),
+                             time   = hour( Export$Dates ) + 0.5,
+                             global =       Export$hGlobal)
+
+    WRDCoutput2 <- data.frame(year   = year( Export2$Dates ),
+                              month  = month(Export2$Dates ),
+                              day    = day(  Export2$Dates ),
+                              time   = hour( Export2$Dates ) + 0.5,
+                              global =       Export2$hGlobal)
+
+
+    ## _ Write WRDC submission file  -------------------------------------------
+    wrdc_fl <- paste0(EXPORT_DIR, "/sumbit_to_WRDC_", yyyy, ".dat")
+
+
+    ## _ Add headers
+    cat("#Thessaloníki global radiation\r\n" ,
+        file = wrdc_fl)
+    cat("#year month day time(UTC)   global radiation (W/m2)\r\n" ,
+        file = wrdc_fl, append = TRUE)
+
+    ## _ Write output line by line
+    for (i in 1:nrow(WRDCoutput)) {
+        cat(
+            sprintf( "%4d  %2d  %2d  %4.1f %10.4f\r\n",
+                     WRDCoutput[i,1],
+                     WRDCoutput[i,2],
+                     WRDCoutput[i,3],
+                     WRDCoutput[i,4],
+                     WRDCoutput[i,5] ),
+            file = wrdc_fl,
+            append = TRUE )
+    }
+
+    ## replace -99.000 to -99
+    system(paste("sed -i 's/   -99.0000/   -99/g' ", wrdc_fl))
+
+
+    fwrite(WRDCoutput)
 
 
 
-
-    ayearquarter$hourly <- as.numeric( ayearquarter$Dates ) %/% 3600
-    hposic              <- as.POSIXct( ayearquarter$hourly * 3600, origin = "1970-01-01" )
-
-    selecthour <- list(ayearquarter$hourly)
-
-    hDates     <- aggregate( ayearquarter$Dates,   by = selecthour, FUN = min )
-
-    hGlobal    <- aggregate( ayearquarter$qGlobal, by = selecthour, FUN = mean, na.rm = FALSE )  ## na.rm must be FALSE!
-    hGlobalCNT <- aggregate( ayearquarter$qGlobal, by = selecthour, FUN = function(x) sum(!is.na(x)))
-
-
-    ## check we don't want gaps in days
-    alloutput <- data.frame( Dates  = hDates$x - 30,
-                             Global = hGlobal$x  )
-    allhours  <- data.frame( Dates  = allhours - 30 )
-    stopifnot( dim(alloutput)[1] == dim(allhours)[1] )
-
-    ## output for all hours of the year
-    test <- merge( x = alloutput,
-                   y = allhours,
-                   all.y = TRUE  )
-
-    ## WRDC don't want negative values
-    test$Global[ test$Global < 0 ] <- 0
-
-    ## set NAs to -99 they are old school
-    test$Global[ is.na( test$Global) ] <- -99
-    test$Global[ is.nan(test$Global) ] <- -99
-
-    ## create the format they like
-
-    library(lubridate, quietly = T)
-    hourlyoutput <- data.frame( year   = year( test$Dates ),
-                                month  = month(test$Dates ),
-                                day    = day(  test$Dates ),
-                                time   = hour( test$Dates ) + 0.5,
-                                global = test$Global)
-
-    wrdcfile <- paste0(EXPORT_DIR, "sumbit_to_WRDC_", yyyy, ".dat")
-
-
-
+write.ftable()
+write.fwf(WRDCoutput2, )
 
 }
 
@@ -251,69 +275,7 @@ stop("FIXME")
 #+ include=TRUE, echo=F, results="asis"
 for (afile in input_files) {
 
-    #### Get raw data ####
-    ## create all minutes
-    #### run on all quarter of the hour #####################################
 
-    #### run on 4 quarters of every hour ################################
-    ayearquarter$hourly <- as.numeric( ayearquarter$Dates ) %/% 3600
-
-    selecthour <- list(ayearquarter$hourly)
-
-    hDates     <- aggregate( ayearquarter$Dates,   by = selecthour, FUN = min )
-
-    hGlobal    <- aggregate( ayearquarter$qGlobal, by = selecthour, FUN = mean, na.rm = FALSE )  ## na.rm must be FALSE!
-    hGlobalCNT <- aggregate( ayearquarter$qGlobal, by = selecthour, FUN = function(x) sum(!is.na(x)))
-
-
-    ## check we don't want gaps in days
-    alloutput <- data.frame( Dates  = hDates$x - 30,
-                             Global = hGlobal$x  )
-    allhours  <- data.frame( Dates  = allhours - 30 )
-    stopifnot( dim(alloutput)[1] == dim(allhours)[1] )
-
-    ## output for all hours of the year
-    test <- merge( x = alloutput,
-                   y = allhours,
-                   all.y = TRUE  )
-
-    ## WRDC don't want negative values
-    test$Global[ test$Global < 0 ] <- 0
-
-    ## set NAs to -99 they are old school
-    test$Global[ is.na( test$Global) ] <- -99
-    test$Global[ is.nan(test$Global) ] <- -99
-
-    ## create the format they like
-
-    library(lubridate, quietly = T)
-    hourlyoutput <- data.frame( year   = year( test$Dates ),
-                                month  = month(test$Dates ),
-                                day    = day(  test$Dates ),
-                                time   = hour( test$Dates ) + 0.5,
-                                global = test$Global)
-
-    wrdcfile <- paste0(EXPORT_DIR, "sumbit_to_WRDC_", yyyy, ".dat")
-
-    ## add headers
-    cat("#Thessaloníki global radiation\r\n" ,
-        file = wrdcfile)
-    cat("#year month day time(UTC)   global radiation (W/m2)\r\n" ,
-        file = wrdcfile, append = TRUE)
-
-    ## write output line by line
-    for (i in 1:length(hourlyoutput$year)){
-        cat(
-            sprintf( "%4d  %2d  %2d  %4.1f %10.4f\r\n", hourlyoutput[i,1],
-                     hourlyoutput[i,2],
-                     hourlyoutput[i,3],
-                     hourlyoutput[i,4],
-                     hourlyoutput[i,5] ),
-            file = wrdcfile,
-            append = TRUE )
-    }
-    ## replace -99.000 to -99
-    system(paste("sed -i 's/   -99.0000/   -99/g' ", wrdcfile))
 
 
     cat(paste("Data Exported to:", basename(wrdcfile),"\n"))
