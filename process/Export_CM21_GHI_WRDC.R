@@ -1,11 +1,11 @@
 # /* #!/opt/R/4.2.3/bin/Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Export Global from CM21 to a WRDC data submission"
+#' title:         "Export Global from CM21 for WRDC data submission."
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Export yearly submission of GHI in WRDC format and data preperation."
+#' abstract:      "Export yearly submission of GHI in WRDC format and data preparation."
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -72,7 +72,7 @@
 #+ echo=F, include=T
 
 
-stop("Have to allow low values!!")
+
 
 #+ echo=F, include=T
 ## __ Document options ---------------------------------------------------------
@@ -104,11 +104,8 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 
 
-# source("~/CM_21_GLB/Functions_write_data.R")
 
-
-
-####  Variables  ####
+##  Variables  -----------------------------------------------------------------
 panderOptions('table.alignment.default', 'right')
 panderOptions('table.split.table',        120   )
 
@@ -119,7 +116,7 @@ dir.create(EXPORT_DIR, showWarnings = FALSE, recursive = TRUE)
 
 
 ##  Set export range  ----------------------------------------------------------
-yearstodo <- seq(2022, 2023)
+yearstodo <- seq(2022, year(Sys.time()))
 
 #+ include=T, echo=F, results="asis"
 cat("\n",
@@ -143,7 +140,7 @@ for (yyyy in yearstodo) {
     DATA <- data.table(BB |>
                            filter(
                                year == yyyy,               ## Select year
-                               Elevat >=  0,               ## Drop night data
+                               Elevat >= -5,               ## Drop night but keep the whole quarter
                                is.na(cm21_bad_data_flag),  ## Ignore bad data
                            ) |>
                            select(Date,
@@ -267,16 +264,18 @@ for (yyyy in yearstodo) {
     write.fwf(WRDCoutput2,
               na       = "-99",
               sep      = "  ",
-              digits   = 5,
+              digits   = 4,
               colnames = FALSE,
               append   = TRUE,
               file  = wrdc_fl2)
 
     cat(paste("\nData Exported to:", basename(wrdc_fl2),"\n"))
 
+
+
+    ## _ Plots and Stats  ------------------------------------------------------
     panderOptions('table.alignment.default', 'right')
     panderOptions('table.split.table',        120   )
-
 
     cat('\n\\scriptsize\n\n')
     cat(pander(summary(WRDCoutput2)))
@@ -294,114 +293,15 @@ for (yyyy in yearstodo) {
            legend = c("Quarterly", "Hourly"),
            col    = c(1, "red")
     )
+
+
+    hist(DATAquarter[, qGlobal])
+
+    hist(DATAhour[, hGlobal])
+
+    stop()
+
 }
-
-
-
-
-
-# ooooo      <- read.table("output3.dat" )
-# ooooo$date <- as.POSIXct(paste0(ooooo$V1,"-",ooooo$V2,"-",ooooo$V3," ",ooooo$V4-0.5,":00") )
-#
-# kkkk       <- read.table("~/Aerosols/CM21datavalidation/fwdatasubmissionthessaloniki/wrdc_lap_2017.dat")
-# kkkk$date  <- as.POSIXct(paste0(kkkk$V1,"-",kkkk$V2,"-",kkkk$V3," ",kkkk$V4-0.5,":00") )
-#
-#
-# (kkkk$V5[kkkk$V5<0 & kkkk$V5>-99])
-#
-# ayearquarter$day     = as.Date(ayearquarter$Dates)
-#
-# ## sequence of all days to try
-# daystodo = unique( ayearquarter$day )
-#
-# #### PLOT NORMAL #########################
-# totals  = length(daystodo)
-# statist = data.frame()
-# pbcount = 0
-# stime = Sys.time()
-# par( mar = c(4,4,3,1) )
-# pdf( pdfgraphs, onefile = TRUE)
-# for (ddd in daystodo) {
-#
-#     theday      = as.POSIXct( as.Date(ddd), origin = "1970-01-01")
-#     test        = format( theday, format = "%d%m%y06" )
-#     dayCMCF     = cm21factor(theday)
-#
-#     pbcount     = pbcount + 1
-#     day         = data.frame()
-#     dailyselect = ayearquarter$day == as.Date(theday)
-#
-#     daydata = ayearquarter[dailyselect,]
-#
-#     names(daydata) <-  c("Date30", "Global","qGlobalCNT", "qGlobalSTD", "qElevaMEAN", "GLstd", "qGLstdCNT", "qGLstdSTD", "day")
-#
-#
-#
-#         ## Main data plot
-# dddd = min(daydata$Global, daydata$GLstd , na.rm = TRUE)
-# uuuu = max(daydata$Global, daydata$GLstd , na.rm = TRUE)
-# if (dddd > -5  ) { dddd = 0  }
-# if (uuuu < 190 ) { uuuu = 200}
-# ylim = c(dddd , uuuu)
-#
-# plot(daydata$Date30, daydata$Global,
-#      "l", xlab = "UTC", ylab = "W/m^2",
-#      col  = "blue", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim )
-# abline(h = 0, col = "gray60")
-# abline(v   = axis.POSIXct(1, at = pretty(daydata$Date30, n = 12, min.n = 8 ), format = "%H:%M" ),
-#        col = "lightgray", lty = "dotted", lwd = par("lwd"))
-# points(daydata$Date30, daydata$GLstd, pch = ".", cex = 2, col = "red" )
-# title( main = paste(test, format(daydata$Date30[1] , format = "  %F")))
-# text(daydata$Date30[1], uuuu, labels = tag, pos = 4, cex =.7 )
-#
-#
-# }
-# dev.off()
-#
-#
-#
-# suspecdates = suspecdates[is.element(suspecdates,as.POSIXct(daystodo))]
-#
-# totals  = length(suspecdates)
-# statist = data.frame()
-# pbcount = 0
-# stime = Sys.time()
-# par( mar = c(4,4,3,1) )
-# pdf( suspects, onefile = TRUE)
-# for (ddd in suspecdates) {
-#
-#     theday      = as.POSIXct( ddd, origin = "1970-01-01")
-#     test        = format( theday, format = "%d%m%y06" )
-#     dayCMCF     = cm21factor(theday)
-#
-#     pbcount     = pbcount + 1
-#     day         = data.frame()
-#     dailyselect = ayearquarter$day == as.Date(theday)
-#
-#     daydata = ayearquarter[dailyselect,]
-#
-#     names(daydata) <-  c("Date30", "Global","qGlobalCNT", "qGlobalSTD", "qElevaMEAN", "GLstd", "qGLstdCNT", "qGLstdSTD", "day")
-#
-#
-#     ## Main data plot
-# dddd = min(daydata$Global, daydata$GLstd , na.rm = TRUE)
-# uuuu = max(daydata$Global, daydata$GLstd , na.rm = TRUE)
-# if (dddd > -5  ) { dddd = 0  }
-# if (uuuu < 190 ) { uuuu = 200}
-# ylim = c(dddd , uuuu)
-#
-# plot(daydata$Date30, daydata$Global,
-#      "l", xlab = "UTC", ylab = "W/m^2",
-#      col  = "blue", lwd = 1.1, lty = 1, xaxt = "n", ylim = ylim )
-# abline(h = 0, col = "gray60")
-# abline(v   = axis.POSIXct(1, at = pretty(daydata$Date30, n = 12, min.n = 8 ), format = "%H:%M" ),
-#        col = "lightgray", lty = "dotted", lwd = par("lwd"))
-# points(daydata$Date30, daydata$GLstd, pch = ".", cex = 2, col = "red" )
-# title( main = paste(test, format(daydata$Date30[1] , format = "  %F")))
-# text(daydata$Date30[1], uuuu, labels = tag, pos = 4, cex =.7 )
-#
-# }
-# dev.off()
 
 
 
