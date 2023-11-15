@@ -197,13 +197,16 @@ pp <- gather
 pp$Size <- humanReadable(pp$Size)
 pp$Date <- NULL
 
-writeLines(
-    pander_return(
-        pp, justify = "lrrrr",
-        style = "rmarkdown"
-    ),
-    con = "~/BBand_LAP/.databasestats.md"
+##  Export table for Readme.md
+panderOptions('knitr.auto.asis', FALSE)
+temp <- pander_return(
+    pp,
+    justify = "lrrrr",
+    style   = "rmarkdown",
+    caption = paste("Data sizes on", Sys.Date())
 )
+capture.output(temp, file = "~/BBand_LAP/.databasestats.md")
+##  Table for rendering document
 pander(pp, justify = "lrrrr")
 cat(" \n \n")
 
