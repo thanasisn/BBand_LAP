@@ -284,23 +284,37 @@ for (yyyy in yearstodo) {
          ylab = "GHI", xlab = "",
          main = "Aggregated GHI")
 
-    points(DATAhour[, hGlobal, Dates],
-         col = "red")
+    ##  Use the exported file as input
+    exfile <- fread(wrdc_fl2,
+                    fill        = TRUE,
+                    header      = TRUE,
+                    skip        = 1,
+                    check.names = TRUE,
+                    na.strings  = "-99")
+    exfile$Dates <- as.POSIXct(
+        strptime(exfile[,
+                        paste(X.year, month, day,
+                              exfile$time.UTC. %/% 1, (exfile$time.UTC. %% 1) * 60)],
+                 "%Y %m %d %H %M"))
+
+    points(exfile[, global, Dates],
+           col = "red")
 
     legend("topright",  pch = 1,
-           legend = c("Quarterly", "Hourly"),
+           legend = c("Quarterly", "Exported Hourly"),
            col    = c(1, "red")
     )
     cat(" \n \n")
+
 
     hist(DATAquarter[, qGlobal], breaks = 50,
          main = "Quarters", xlab = "Global quarter mean")
     cat(" \n \n")
 
+
     hist(DATAhour[, hGlobal], breaks = 50,
          main = "Hourly", xlab = "Global hour mean")
     cat(" \n \n")
-
 }
 
 
