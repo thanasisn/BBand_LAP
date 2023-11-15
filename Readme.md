@@ -5,7 +5,7 @@ Developed in the Laboratory of Atmospheric Physics of Thessaloniki, Greece.
 
 To process the data from broadband instruments of LAP.
 
-This is partial used as operational procedures ([github.com/thanasisn/CM_21_GLB](https://github.com/thanasisn/CM_21_GLB) and [github.com/thanasisn/CS_id](https://github.com/thanasisn/CS_id) are still in use).
+This is partial used in operational procedures ([github.com/thanasisn/CS_id](https://github.com/thanasisn/CS_id) is still in use).
 
 Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](https://thanasisn.netlify.app/3-data_display)
 
@@ -27,7 +27,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-11-12T18:31:36 EET -->
+<!-- Added by: athan, at: 2023-11-15T10:14:48 EET -->
 
 <!--te-->
 
@@ -40,11 +40,19 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 
 
 
-[1] "\n\n| Name             |     Rows | Vars |      Size | Bytes/Value |\n|:-----------------|---------:|-----:|----------:|------------:|\n| BBDB             | 16233120 |   79 |   3.0 GiB |        2.51 |\n| BBDB meta        |    11273 |   82 |   3.0 MiB |        3.39 |\n| TrackerDB        |  7571253 |   23 | 145.6 MiB |        0.88 |\n| TrackerDB meta   |     2781 |    9 | 172.0 KiB |        7.04 |\n| Raw files hashes |   438142 |    4 |   4.5 MiB |        2.72 |\n| **Total**        | 24256569 |  197 |   3.1 GiB |        0.71 |\n\n"
-attr(,"class")
-[1] "knit_asis"
-attr(,"knit_cacheable")
-[1] NA
+
+
+| Name             |     Rows | Vars |      Size | Bytes/Value |
+|:-----------------|---------:|-----:|----------:|------------:|
+| BBDB             | 16236000 |   79 |   3.0 GiB |        2.53 |
+| BBDB meta        |    11276 |   82 |   3.0 MiB |        3.42 |
+| TrackerDB        |  7577508 |   23 | 146.8 MiB |        0.88 |
+| TrackerDB meta   |     2784 |    9 | 172.0 KiB |        7.03 |
+| Raw files hashes |   438154 |    4 |   4.0 MiB |        2.37 |
+| **Total**        | 24265722 |  197 |   3.2 GiB |        0.71 |
+
+Table: Datasets sizes on 2023-11-15
+
 
 
 
