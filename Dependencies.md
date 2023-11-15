@@ -33,8 +33,9 @@
             doMC:     1.3.8
            dplyr:     1.1.3
          foreach:     1.5.2
-       lubridate:     1.9.3
            knitr:      1.45
+       lubridate:     1.9.3
+           gdata:     3.0.0
           pander:     0.6.5
          arsenal:     3.6.3
        compareDF:     2.3.5
