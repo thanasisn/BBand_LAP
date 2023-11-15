@@ -203,9 +203,9 @@ temp <- pander_return(
     pp,
     justify = "lrrrr",
     style   = "rmarkdown",
-    caption = paste("Data sizes on", Sys.Date())
+    caption = paste("Datasets sizes on", Sys.Date())
 )
-capture.output(temp, file = "~/BBand_LAP/.databasestats.md")
+capture.output(cat(temp, sep = "\n"), file = "~/BBand_LAP/.databasestats.md")
 ##  Table for rendering document
 pander(pp, justify = "lrrrr")
 cat(" \n \n")
