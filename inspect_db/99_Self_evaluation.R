@@ -49,7 +49,7 @@
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
-knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(dev       = "pdf"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = "!h"    )
@@ -206,7 +206,10 @@ temp <- pander_return(
     caption = paste("Datasets sizes on", Sys.Date())
 )
 capture.output(cat(temp, sep = "\n"), file = "~/BBand_LAP/.databasestats.md")
+
+
 ##  Table for rendering document
+#+ echo=F, include=T, results="asis"
 pander(pp, justify = "lrrrr")
 cat(" \n \n")
 
@@ -307,12 +310,12 @@ xlim <- range(DATA$Date)
 #'
 #' ## Last run
 #'
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 last <- DATA[DATA[, .I[which.max(Date)], by = .(Script, Category)]$V1]
 last <- last[, .(Script, Category, Date, Minutes)]
 last$Minutes <- round(last$Minutes, 2)
 setorder(last, Date)
-pander(last, justify = "lllr")
+cat(pander(last, justify = "lllr"),"\n")
 cat(" \n \n")
 
 
@@ -320,7 +323,7 @@ cat(" \n \n")
 #' \newpage
 #' ## Executions times statistics
 #'
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 stats <-
     DATA[, .(
         Median = round(median(Minutes), 2),
@@ -356,8 +359,12 @@ total <- DATA[, .(Minutes = sum(Minutes),
                   .N),
               by = GID]
 
-plot(total[, Minutes, Date],
+plot(1,
      xlim = xlim,
+     ylim = range(total$Minutes, na.rm = T),
+     ylab = "Minutes",
+     xlab = "",
+     xaxt = "n",
      main = "Total execution")
 points(total[N == median(N), Minutes, Date],
        col = "green")
@@ -365,6 +372,7 @@ points(total[N > median(N),  Minutes, Date],
        col = "blue")
 points(total[N < median(N),  Minutes, Date],
        col = "red")
+axis.POSIXct(1, total$Date)
 
 
 partial <- DATA[, .(Minutes = sum(Minutes),
@@ -374,8 +382,12 @@ partial <- DATA[, .(Minutes = sum(Minutes),
 
 for (as in unique(partial$Category)) {
     pp <- partial[Category == as]
-    plot(pp[, Minutes, Date],
+    plot(1,
          xlim = xlim,
+         ylim = range(pp$Minutes, na.rm = TRUE),
+         ylab = "Minutes",
+         xlab = "",
+         xaxt = "n",
          main = paste("Total execution: ", as))
     points(pp[N == median(N), Minutes, Date],
            col = "green")
@@ -383,6 +395,7 @@ for (as in unique(partial$Category)) {
            col = "blue")
     points(pp[N < median(N),  Minutes, Date],
            col = "red")
+    axis.POSIXct(1, pp$Date)
 }
 
 
@@ -400,7 +413,8 @@ for (as in last$Script) {
 }
 
 
-
+## _ Update Readme.md  ---------------------------------------------------------
+system("~/BBand_LAP/.update_readme.sh")
 
 
 #' **END**
