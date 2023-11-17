@@ -38,6 +38,12 @@ try({
            output_format = " bookdown::pdf_document2",
            output_dir    = "~/BBand_LAP/REPORTS/REPORTS")
 })
+try({
+    render(input         = "~/BBand_LAP/inspect_db/80_Inspect_CM21_TOT_export.R",
+           output_format = " bookdown::pdf_document2",
+           output_dir    = "~/BBand_LAP/REPORTS/REPORTS")
+})
+
 
 
 
