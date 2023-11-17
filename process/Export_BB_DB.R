@@ -6,7 +6,7 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/process/Process_BB_DB.R"
+Script.Name <- "~/BBand_LAP/process/Export_BB_DB.R"
 
 
 library(rmarkdown)
@@ -20,36 +20,27 @@ if (!interactive()) {
 
 cat("\n\nCheck legacy export\n")
 
-# render(input      = "~/BBand_LAP/process/Legacy_CHP1_L0_export.R",
-#        output_dir = "~/BBand_LAP/REPORTS/REPORTS")
 
-try({
-    render(input      = "~/BBand_LAP/process/Legacy_CHP1_L1_export.R",
-           output_dir = "~/BBand_LAP/REPORTS/REPORTS")
-})
+# try({
+#     render(input      = "~/BBand_LAP/process/Export_CHP1_DIR.R",
+#            output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+# })
 
 
-try({
-    render(input      = "~/BBand_LAP/process/Legacy_CM21_R60_export.R",
-           output_dir = "~/BBand_LAP/REPORTS/REPORTS")
-})
+# try({
+#     render(input      = "~/BBand_LAP/process/Export_CM21_GHI_WRDC.R",
+#            output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+# })
 
 
 try({
-    render(input         = "~/BBand_LAP/process/QCRad_LongShi_v9.R",
-           output_format = " bookdown::pdf_document2",
-           output_dir    = "~/BBand_LAP/REPORTS/REPORTS")
-})
-
-## This should be the last thing to run on the data
-try({
-    render(input         = "~/BBand_LAP/inspect_db/99_Self_evaluation.R",
+    render(input         = "~/BBand_LAP/process/Export_CM21_TOT.R",
            output_format = " bookdown::pdf_document2",
            output_dir    = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
 
-system("$HOME/BBand_LAP/process/Upload_reports.sh")
+
 
 
 tac <- Sys.time()

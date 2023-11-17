@@ -1,8 +1,8 @@
 # /* #!/opt/R/4.2.3/bin/Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title: "CHP-1 export DNI data for Sirena."
-#' author: "Natsis Athanasios"
+#' title:         "CHP-1 export DNI data for Sirena."
+#' author:        "Natsis Athanasios"
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
@@ -74,8 +74,8 @@ options(max.print = 1500)
 DATOUT     <- "~/DATA/CHP1_LAP.DIR/"
 OTHEREXPOR <- "~/ZHOST/"
 
-MAX_DATE <- as.POSIXct("2023-04-01")
 MIN_DATE <- as.POSIXct("2016-01-01")
+MAX_DATE <- as.POSIXct("2023-04-01")
 
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
@@ -136,10 +136,10 @@ for (YYYY in yearstodo) {
 
     ## Make sure we have used the proper flags
     ## This should not be needed
-    year_data$DIR_wpsm   [!is.na(year_data$chp1_bad_data_flag)] <- NA
-    year_data$DIR_SD_wpsm[!is.na(year_data$chp1_bad_data_flag)] <- NA
-    year_data$DIR_wpsm   [year_data$Async_tracker_flag == TRUE] <- NA
-    year_data$DIR_SD_wpsm[year_data$Async_tracker_flag == TRUE] <- NA
+    year_data$DIR_wpsm   [!is.na(year_data$chp1_bad_data_flag)]      <- NA
+    year_data$DIR_SD_wpsm[!is.na(year_data$chp1_bad_data_flag)]      <- NA
+    year_data$DIR_wpsm   [year_data$Async_tracker_flag == TRUE]      <- NA
+    year_data$DIR_SD_wpsm[year_data$Async_tracker_flag == TRUE]      <- NA
     year_data$DIR_wpsm   [year_data$CHP1_sig > year_data$sig_upplim] <- NA
     year_data$DIR_SD_wpsm[year_data$CHP1_sig > year_data$sig_upplim] <- NA
     year_data$DIR_wpsm   [year_data$CHP1_sig < year_data$sig_lowlim] <- NA

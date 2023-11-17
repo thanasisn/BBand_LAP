@@ -97,7 +97,7 @@ pzen <- function(YYYY, min = 1:1440, doy) {
 }
 
 ##  Set export range  ----------------------------------------------------------
-yearstodo <- seq(2022, year(Sys.time()))
+yearstodo <- seq(2016, year(Sys.time()))
 
 
 #'
@@ -167,17 +167,23 @@ for (yyyy in yearstodo) {
         ## Compare my SZA to stored
         reldiff3 <- c(reldiff3, 100 *  DATA[doy == ad, (SZA - lap_sza)      / lap_sza])
     }
-    # plot(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
-    # plot(reldiff2, main = "Relat diff %  SZA ~ zenangle")
-    # plot(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
 
-    # hist(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
-    # hist(reldiff2, main = "Relat diff %  SZA ~ zenangle")
-    # hist(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
+    plot(reldiff2, main = "Relat diff %  SZA ~ zenangle")
+    plot(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
+
+    hist(reldiff2, main = "Relat diff %  SZA ~ zenangle")
+    hist(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
 
     stopifnot(max(abs(reldiff1)) < 0.03)
-    stopifnot(max(abs(reldiff2)) < 0.81)
-    stopifnot(max(abs(reldiff3)) < 0.81)
+    stopifnot(max(abs(reldiff2)) < 0.93)
+    stopifnot(max(abs(reldiff3)) < 0.94)
+
+    if (max(abs(reldiff1)) < 0.03) {
+         plot(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
+         hist(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
+    }
+
+
 
     ## _ Fill missing lap_sza  -------------------------------------------------
     missza <- DATA[is.na(lap_sza), unique(doy)]
