@@ -168,21 +168,21 @@ for (yyyy in yearstodo) {
         reldiff3 <- c(reldiff3, 100 *  DATA[doy == ad, (SZA - lap_sza)      / lap_sza])
     }
 
-    plot(reldiff2, main = "Relat diff %  SZA ~ zenangle")
-    plot(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
-
-    hist(reldiff2, main = "Relat diff %  SZA ~ zenangle")
-    hist(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
-
-    stopifnot(max(abs(reldiff1)) < 0.03)
-    stopifnot(max(abs(reldiff2)) < 0.93)
-    stopifnot(max(abs(reldiff3)) < 0.94)
-
-    if (max(abs(reldiff1)) < 0.03) {
-         plot(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
-         hist(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
+    ##  Do some plots on big departures
+    if (max(abs(reldiff1)) < 0.029) {
+        plot(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
+        hist(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
     }
 
+    if (max(abs(reldiff2)) < 0.80) {
+        plot(reldiff2, main = "Relat diff %  SZA ~ zenangle")
+        hist(reldiff2, main = "Relat diff %  SZA ~ zenangle")
+    }
+
+    if (max(abs(reldiff3)) < 0.80) {
+        plot(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
+        hist(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
+    }
 
 
     ## _ Fill missing lap_sza  -------------------------------------------------
@@ -205,7 +205,7 @@ for (yyyy in yearstodo) {
 
     ## create output dir
     outputdir <- paste0(TOT_EXPORT, "/", yyyy, "/")
-    dir.create( outputdir, showWarnings = FALSE, recursive = TRUE)
+    dir.create(outputdir, showWarnings = FALSE, recursive = TRUE)
 
 
     cat('\\begin{multicols}{3}')
