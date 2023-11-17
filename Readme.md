@@ -13,21 +13,21 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 ## Table of Contents
 
 <!--ts-->
-* [Broad Band LAP](#broad-band-lap)
-   * [Table of Contents](#table-of-contents)
-   * [Data status overview](#data-status-overview)
-   * [What it does](#what-it-does)
-      * [For CHP-1](#for-chp-1)
-      * [For CM-21](#for-cm-21)
-      * [Other processes](#other-processes)
-      * [Tools](#tools)
-   * [TODO](#todo)
-* [Details](#details)
-   * [Development and Design](#development-and-design)
-   * [Documentation and usage](#documentation-and-usage)
+* [](#broad-band-lap)
+   * [](#table-of-contents)
+   * [](#data-status-overview)
+   * [](#what-it-does)
+      * [](#for-chp-1)
+      * [](#for-cm-21)
+      * [](#other-processes)
+      * [](#tools)
+   * [](#todo)
+* [](#details)
+   * [](#development-and-design)
+   * [](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-11-15T10:14:48 EET -->
+<!-- Added by: athan, at: 2023-11-17T08:47:26 UTC -->
 
 <!--te-->
 
@@ -44,14 +44,14 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 
 | Name             |     Rows | Vars |      Size | Bytes/Value |
 |:-----------------|---------:|-----:|----------:|------------:|
-| BBDB             | 16236000 |   79 |   3.0 GiB |        2.53 |
-| BBDB meta        |    11276 |   82 |   3.0 MiB |        3.42 |
-| TrackerDB        |  7577508 |   23 | 146.8 MiB |        0.88 |
-| TrackerDB meta   |     2784 |    9 | 172.0 KiB |        7.03 |
-| Raw files hashes |   438154 |    4 |   4.0 MiB |        2.37 |
-| **Total**        | 24265722 |  197 |   3.2 GiB |        0.71 |
+| BBDB             | 16238880 |   79 |   3.0 GiB |        2.53 |
+| BBDB meta        |    11278 |   82 |   3.0 MiB |        3.42 |
+| TrackerDB        |  7581576 |   23 | 146.9 MiB |        0.88 |
+| TrackerDB meta   |     2786 |    9 | 172.0 KiB |        7.02 |
+| Raw files hashes |   438162 |    4 |   4.0 MiB |        2.37 |
+| **Total**        | 24272682 |  197 |   3.2 GiB |        0.71 |
 
-Table: Datasets sizes on 2023-11-15
+Table: Datasets sizes on 2023-11-17
 
 
 
