@@ -169,19 +169,19 @@ for (yyyy in yearstodo) {
     }
 
     ##  Do some plots on big departures
-    if (max(abs(reldiff1)) < 0.029) {
+    if (max(abs(reldiff1), na.rm = TRUE) < 0.029) {
         plot(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
         hist(reldiff1, main = "Relat diff % lap_sza ~ zenangle")
     }
 
-    if (max(abs(reldiff2)) < 0.80) {
-        plot(reldiff2, main = "Relat diff %  SZA ~ zenangle")
-        hist(reldiff2, main = "Relat diff %  SZA ~ zenangle")
+    if (max(abs(reldiff2), na.rm = TRUE) < 0.80) {
+        plot(reldiff2, main = "Relat diff % SZA ~ zenangle")
+        hist(reldiff2, main = "Relat diff % SZA ~ zenangle")
     }
 
-    if (max(abs(reldiff3)) < 0.80) {
-        plot(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
-        hist(reldiff3, main = "Relat diff %  SZA ~ lap_angle")
+    if (max(abs(reldiff3), na.rm = TRUE) < 0.80) {
+        plot(reldiff3, main = "Relat diff % SZA ~ lap_angle")
+        hist(reldiff3, main = "Relat diff % SZA ~ lap_angle")
     }
 
 
