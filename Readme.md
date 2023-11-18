@@ -13,21 +13,21 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 ## Table of Contents
 
 <!--ts-->
-* [](#broad-band-lap)
-   * [](#table-of-contents)
-   * [](#data-status-overview)
-   * [](#what-it-does)
-      * [](#for-chp-1)
-      * [](#for-cm-21)
-      * [](#other-processes)
-      * [](#tools)
-   * [](#todo)
-* [](#details)
-   * [](#development-and-design)
-   * [](#documentation-and-usage)
+* [Broad Band LAP](#broad-band-lap)
+   * [Table of Contents](#table-of-contents)
+   * [Data status overview](#data-status-overview)
+   * [What it does](#what-it-does)
+      * [For CHP-1](#for-chp-1)
+      * [For CM-21](#for-cm-21)
+      * [Other processes](#other-processes)
+      * [Tools](#tools)
+   * [TODO](#todo)
+* [Details](#details)
+   * [Development and Design](#development-and-design)
+   * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-11-18T18:07:27 EET -->
+<!-- Added by: athan, at: 2023-11-18T18:12:51 EET -->
 
 <!--te-->
 
