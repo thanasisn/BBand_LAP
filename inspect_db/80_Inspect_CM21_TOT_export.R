@@ -54,6 +54,7 @@ knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(echo      = FALSE   )
 
 
 ## __ Set environment  ---------------------------------------------------------
@@ -69,15 +70,9 @@ if (!interactive()) {
 
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
-# source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
-# source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
 
-# library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
-# library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
-# library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
-# library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 
@@ -150,11 +145,13 @@ missing <- DT[, .(Missing = sum(is.na(`[W.m-2]`))), by = as.Date(Date)]
 missing[ Missing == 0, Missing := NA]
 plot(missing$as.Date, missing$Missing,
      pch = 19, cex = 0.5, main = "Missing data by day")
+cat(" \n \n")
 
 missing <- DT[, .(Missing = sum(is.na(`[W.m-2]`))), by = .(year(Date), month(Date)) ]
 missing[, as.Date := as.Date(paste(year, month, "01"),"%Y %m %d")]
 plot(missing$as.Date, missing$Missing,
      pch = 19, cex = 0.5, main = "Missing data by month")
+cat(" \n \n")
 
 
 
@@ -173,6 +170,7 @@ pander(
 #' ## Data points by minute
 #'
 hist(round((DT$TIME_UT %% 1) * 60), breaks = -1:61)
+cat(" \n \n")
 
 #+ echo=F, include=F
 # DT[ TIME_UT %/% 1 == 24, unique(file)]
@@ -198,8 +196,11 @@ DT <- DT[`[W.m-2]` > -5   , ]
 #+ echo=F
 #' ## Inspect all data
 pander(summary(DT))
+cat(" \n \n")
 plot(DT$Date, DT$`[W.m-2]`)
+cat(" \n \n")
 hist(DT$`[W.m-2]`)
+cat(" \n \n")
 
 
 # ## apply exclusions this have been done for almost all data  me
@@ -231,9 +232,12 @@ temp$Date <- as.POSIXct(strptime( paste( temp$year, temp$month, "1"), "%Y %m %d"
 
 
 plot(temp$Date, temp$Mean,   "l", main = "Monthly Mean")
+cat(" \n \n")
 plot(temp$Date, temp$Max,    "l", main = "Monthly Max")
+cat(" \n \n")
 # plot(temp$Date, temp$Min,    "l", main = "Monthly Min")
 plot(temp$Date, temp$Median, "l", main = "Monthly Median")
+cat(" \n \n")
 
 
 #+ echo=F
@@ -247,14 +251,16 @@ uplim   <- quantile(DT$wattGLB, na.rm = T, probs = perc)
 datespp <- DT[wattGLB > uplim, unique(as.Date(Date)) ]
 
 
+#'
 #' ## Extreme values
+#'
 #+ echo=F, include=T, results='asis'
 options(digits = 6)
 cat(paste("There are", length(datespp),
     "days with more than", uplim,
     "watts, representing", (1 - perc) * 100,
     "% of the data.\n"))
-#'
+
 #'
 #' ## Plot all extreme days
 #'
@@ -263,14 +269,16 @@ for (ad in datespp ) {
     plot(  pp$Date, pp$wattGLB, "l", col = "green")
     points(pp$Date, pp$st.dev, col = "blue", pch=19, cex=.2)
     title(as.Date(ad, origin = "1970-01-01"))
+    cat(" \n \n")
 }
-#'
+
 #'
 #' ## Plot all extreme days in time series
 #'
 pp <- DT[as.Date(Date) %in% datespp]
 plot(pp$Date, pp$wattGLB, "l", col = "green")
 points(pp$Date, pp$st.dev, col = "blue", pch=19, cex=.2)
+cat(" \n \n")
 
 
 
@@ -286,4 +294,3 @@ tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
-
