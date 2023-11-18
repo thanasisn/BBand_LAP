@@ -288,6 +288,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
             sun_temp[, QCv9_02_glb_flag        := as.character(NA)]
             sun_temp[, QCv9_03_upp_flag        := as.character(NA)]
             sun_temp[, QCv9_03_low_flag        := as.character(NA)]
+            sun_temp[, QCv9_03_obs_flag        := as.character(NA)]
             sun_temp[, QCv9_04_dir_flag        := as.character(NA)]
             sun_temp[, QCv9_04_glb_flag        := as.character(NA)]
             sun_temp[, QCv9_05_dir_flag        := as.character(NA)]
