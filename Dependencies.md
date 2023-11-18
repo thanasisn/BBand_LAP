@@ -23,11 +23,13 @@
        lubridate:     1.9.3
            tidyr:     1.3.0
            tools:     4.2.3
+        myRtools:     0.3.0
            gdata:     3.0.0
        rmarkdown:      2.25
 
 ### `process`
 
+       rmarkdown:      2.25
            arrow:  13.0.0.1
       data.table:    1.14.8
             doMC:     1.3.8
@@ -41,7 +43,6 @@
        compareDF:     2.3.5
            Hmisc:     5.1.1
            tools:     4.2.3
-       rmarkdown:      2.25
           digest:    0.6.33
           scales:     1.2.1
 
