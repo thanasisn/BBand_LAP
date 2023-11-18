@@ -148,7 +148,7 @@ if (interactive()) {
 DO_PLOTS       <- TRUE
 # Ignore previous flagged points in plots (not fully implemented yet)
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
-# IGNORE_FLAGGED <- FALSE
+IGNORE_FLAGGED <- FALSE
 
 
 ## __ Select a part of data to plot  -------------------------------------------
@@ -174,8 +174,8 @@ PLOT_LAST  <- as_date("2024-03-31")
 #     DB_lock    <- test_DB_lock
 #     DB_META_fl <- test_DB_META_fl
 #     DB_HASH_fl <- test_DB_HASH_fl
-#     InitVariableBBmeta(paste0("QCv9_applied"  ), as.POSIXct(NA))
-#     OVERWRITEVariableBBmeta(paste0("QCv9_applied"  ), as.POSIXct(NA))
+#     InitVariableBBmeta(     "QCv9_applied", as.POSIXct(NA))
+#     OVERWRITEVariableBBmeta("QCv9_applied", as.POSIXct(NA))
 #     # warning("THIS IS FOR DEVELOPMENT")
 #     # OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
 # }
@@ -421,8 +421,8 @@ for (af in filelist$names) {
                      GLB_strict      > QS$dif_watt_lim,
                  (flagname_LOW) := "Diffuse ratio comp min (12)"]
 
-        ## __ This is good for systematic obstacle hightlight  -----------------
-        datapart[DiffuseFraction_kd  < QS$dif_rati_min  &
+        ## __ This is good for systematic obstacle highlight  ------------------
+        datapart[DiffuseFraction_kd  < QS$dif_rati_min  ,
                  (flagname_OBS) := "Diffuse ratio obst min (13)"]
 
         rm(list = ls(pattern = "flagname_.*"))
@@ -1019,7 +1019,7 @@ if (QS$TEST_03) {
         points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, SZA],
                cex = .2, col = "cyan")
         points(pp[!is.na(get(flagname_OBS)), DiffuseFraction_kd, SZA],
-               cex = .2, col = "#BFE46C")
+               cex = .3, col = "#BFE46C")
         cat(" \n \n")
 
 
@@ -1034,7 +1034,7 @@ if (QS$TEST_03) {
         points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, Date],
                cex = .2, col = "cyan")
         points(pp[!is.na(get(flagname_OBS)), DiffuseFraction_kd, Date],
-               cex = .2, col = "#BFE46C")
+               cex = .3, col = "#BFE46C")
         cat(" \n \n")
 
 
@@ -1050,8 +1050,24 @@ if (QS$TEST_03) {
         points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, Azimuth],
                cex = .2, col = "cyan")
         points(pp[!is.na(get(flagname_OBS)), DiffuseFraction_kd, Azimuth],
+               cex = .3, col = "#BFE46C")
+        cat(" \n \n")
+
+
+        ## plot by sky position
+        plot(pp$Azimuth, pp$Elevat,
+             ylab = "Elevation", xlab = "Azimuth",
+             cex = .1)
+        title(paste("#3", ay))
+
+        points(pp[!is.na(get(flagname_UPP)), Elevat, Azimuth],
+               cex = .2, col = "red")
+        points(pp[!is.na(get(flagname_LOW)), Elevat, Azimuth],
+               cex = .3, col = "cyan")
+        points(pp[!is.na(get(flagname_OBS)), Elevat, Azimuth],
                cex = .2, col = "#BFE46C")
         cat(" \n \n")
+
     }
 
     if (DO_PLOTS) {
@@ -1618,7 +1634,8 @@ if (QS$TEST_06) {
             if (IGNORE_FLAGGED) {
                 pp[
                     pp[, rowSums(!is.na(.SD)) > 0 &
-                           !is.na(get(flagname_BTH)), .SDcols = patterns("^QCv9_0[1-5]")],
+                           !is.na(get(flagname_BTH)),
+                       .SDcols = patterns(paste0("^QCv9_0[1-", testN - 1, "]"))],
                     Ignore := TRUE
                 ]
             }
@@ -1705,6 +1722,47 @@ if (QS$TEST_08) {
     hist(test[Relative_diffuse > QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, HOR_strict - GLB_strict], breaks = 100)
 
 
+
+    ## Info flags to ignore in plots
+    if (IGNORE_FLAGGED) {
+        ignore <- grep(paste0("QCv9_0[1-", testN - 1 ,"]"), names(BB), value = T)
+        cat("**Plots will ignore previoysly flaged points: ", ignore, "**\n")
+    }
+
+    ## Yearly plots for Diffuse
+    years <- (BB |> filter(!is.na(flagname_BTH)) |>
+                  select(year) |> unique() |> collect() |> pull())
+
+    for (ay in years) {
+        pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
+
+        ## Ignore previously flagged
+        pp[, Ignore := FALSE]
+        if (IGNORE_FLAGGED) {
+            pp[
+                pp[, rowSums(!is.na(.SD)) > 0 &
+                       !is.na(get(flagname_BTH)),
+                   .SDcols = patterns(paste0("^QCv9_0[1-", testN - 1, "]"))],
+                Ignore := TRUE
+            ]
+        }
+
+        ## skip if all points are ignored
+        if (pp[!is.na(get(flagname_BTH)) & !Ignore, .N] == 0) next()
+
+        ## plot by sky position
+        plot(pp$Azimuth, pp$Elevat,
+             ylab = "Elevation", xlab = "Azimuth",
+             cex = .1)
+        title(paste("#8", ay, flagname_BTH))
+
+        points(pp[!is.na(get(flagname_BTH)) & !Ignore, Elevat, Azimuth],
+               cex = .2, col = "red")
+        cat(" \n \n")
+    }
+
+
+
     if (DO_PLOTS) {
 
         if (!interactive()) {
@@ -1723,6 +1781,28 @@ if (QS$TEST_08) {
                                  Elevat > QS$sun_elev_min)   |>
                     collect()
             )
+
+            ## Ignore previously flagged
+            pp[, Ignore := FALSE]
+            if (IGNORE_FLAGGED) {
+                pp[
+                    pp[, rowSums(!is.na(.SD)) > 0 &
+                           !is.na(get(flagname_BTH)),
+                       .SDcols = patterns(paste0("^QCv9_0[1-", testN - 1, "]"))],
+                    Ignore := TRUE
+                ]
+            }
+
+            ## skip if all points are ignored
+            if (pp[!is.na(get(flagname_BTH)) & !Ignore, .N] == 0) next()
+
+            table(pp$QCv9_08_bth_flag)
+            table(pp$Ignore)
+
+            pp[!is.na(get(flagname_BTH)) & !Ignore, .N]
+
+            pp[!is.na(get(flagname_BTH))]
+
             ylim <- range(pp$GLB_strict, pp$HOR_strict, na.rm = T)
 
             plot( pp$Azimuth, pp$HOR_strict, "l",
@@ -1730,9 +1810,9 @@ if (QS$TEST_08) {
             lines(pp$Azimuth, pp$GLB_strict, col = "green")
             title(paste("#8", as.Date(ad, origin = "1970-01-01")))
 
-            points(pp[!is.na(get(flagname_BTH)), HOR_strict, Azimuth],
+            points(pp[!is.na(get(flagname_BTH)) & !Ignore, HOR_strict, Azimuth],
                    col = "red")
-            points(pp[!is.na(get(flagname_BTH)), GLB_strict, Azimuth],
+            points(pp[!is.na(get(flagname_BTH)) & !Ignore, GLB_strict, Azimuth],
                    col = "magenta")
             ## TODO plot flags separate
 
