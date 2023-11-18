@@ -87,17 +87,17 @@ ranges_CHP1$HourSpan <- (as.numeric(ranges_CHP1$Until) - as.numeric(ranges_CHP1$
 #'
 #+ include=T, echo=F
 hist(ranges_CHP1$HourSpan)
-cat('\n\n')
+cat("\n \n")
 
 temp <- ranges_CHP1[ ranges_CHP1$HourSpan > 20 , ]
 row.names(temp) <- NULL
-cat('\n\n\\footnotesize\n\n')
+cat("\n\n\\footnotesize\n\n")
 pander(temp)
-cat('\n\n\\normalsize\n\n')
+cat("\n\n\\normalsize\n\n")
 
-cat('\n\n\\footnotesize\n\n')
+cat("\n\n\\footnotesize\n\n")
 pander(data.table(table(ranges_CHP1$Comment)))
-cat('\n\n\\normalsize\n\n')
+cat("\n\n\\normalsize\n\n")
 
 
 
@@ -128,18 +128,18 @@ ranges_CHP1_temp$HourSpan <- (as.numeric(ranges_CHP1_temp$Until) - as.numeric(ra
 #'
 #+ include=T, echo=F
 hist(ranges_CHP1_temp$HourSpan)
-cat('\n\n')
+cat(" \n \n")
 
 temp <- ranges_CHP1_temp[ ranges_CHP1_temp$HourSpan > 20 , ]
 row.names(temp) <- NULL
-cat('\n\n\\footnotesize\n\n')
+cat("\n\n\\footnotesize\n\n")
 pander(temp)
-cat('\n\n\\normalsize\n\n')
+cat("\n\n\\normalsize\n\n")
 rm(temp)
 
-cat('\n\n\\footnotesize\n\n')
+cat("\n\n\\footnotesize\n\n")
 pander(data.table(table(ranges_CHP1_temp$Comment)))
-cat('\n\n\\normalsize\n\n')
+cat("\n\n\\normalsize\n\n")
 
 
 
@@ -171,19 +171,18 @@ ranges_CM21$HourSpan <- (as.numeric(ranges_CM21$Until) - as.numeric(ranges_CM21$
 #+ include=T, echo=F
 
 hist(ranges_CM21$HourSpan)
-cat('\n\n')
+cat(" \n \n")
 
 temp <- ranges_CM21[ ranges_CM21$HourSpan > 12 , ]
 row.names(temp) <- NULL
-cat('\n\n\\footnotesize\n\n')
-pander( temp )
-cat('\n\n\\normalsize\n\n')
+cat("\n\\footnotesize\n\n")
+pander(temp)
+cat("\n\\normalsize\n\n")
 rm(temp)
 
-cat('\n\n\\footnotesize\n\n')
+cat("\n\\footnotesize\n\n")
 pander(data.table(table(ranges_CM21$Comment)))
-cat('\n\n')
-cat('\n\n\\normalsize\n\n')
+cat("\n\n\\normalsize\n\n")
 
 
 
@@ -255,7 +254,7 @@ for (af in na.omit(filelist$names)) {
     datapart[["year"]]  <- as.integer(year( datapart$Date))
     datapart[["month"]] <- as.integer(month(datapart$Date))
 
-    cat(paste0(Script.ID, " Load: "), af, "\n")
+    # cat(paste0(Script.ID, " Load: "), af, "\n")
 
     ## _ CHP-1 flag bad data ---------------------------------------------------
     for (i in 1:nrow(ranges_CHP1)) {
@@ -338,7 +337,7 @@ for (af in na.omit(filelist$names)) {
     ## Store actual data
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
-    cat(paste0(Script.ID, " Save: "), af, "\n\n")
+    cat(paste0(Script.ID, " Save: "), af, "\n")
     rm(datapart)
 }
 
