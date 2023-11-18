@@ -27,17 +27,12 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Sat Nov 18 04:48:26 AM UTC 2023 -->
+<!-- Added by: athan, at: 2023-11-18T18:07:27 EET -->
 
 <!--te-->
 
 
-
-
 ## Data status overview
-
-
-
 
 
 
@@ -52,8 +47,6 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 | **Total**        | 24276123 |  197 |   3.1 GiB |        0.71 |
 
 Table: Datasets sizes on 2023-11-18
-
-
 
 
 
@@ -151,6 +144,5 @@ There is no centralized documentation for the project. Although you can refer to
 - Summary notes on the start of each script
 - Comments inside each script
 - Compiled reports from each script
-
 
 
