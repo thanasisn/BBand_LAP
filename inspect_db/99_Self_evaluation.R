@@ -226,12 +226,11 @@ vars <- grep("Name|Date", names(DATA), value = TRUE, invert = TRUE)
 for (av in vars) {
 
     types <- unique(DATA$Name)
+    ylim  <- range(DATA[, .(get(av))], na.rm = T)
+    xlim  <- range(DATA[, Date], na.rm = T)
 
-    DATA[, .(get(av), Date, Name)]
-    ylim <- range(DATA[, .(get(av))], na.rm = T)
-    xlim <- range(DATA[, Date], na.rm = T)
+    par("mar" = c(2, 5, 4, 0.1))
 
-    par("mar" = c(2,5,4,0.1))
 
     plot(1,
          xlab = "",
@@ -244,9 +243,15 @@ for (av in vars) {
     axis.POSIXct(1, pretty(DATA[, Date]))
 
     if (av == "Size") {
-        axis(2, at = pretty(DATA[[av]]),
-                labels = humanReadable(pretty(DATA[[av]])),
-             las = 2)
+        axis(2,
+             at     = pretty(DATA[[av]]),
+             labels = humanReadable(pretty(DATA[[av]])),
+             las    = 2)
+    } else if (av == "Rows") {
+        axis(2,
+             at     = pretty(DATA[[av]]),
+             labels = paste(pretty(DATA[[av]])/1000000, "M"),
+             las    = 2)
     } else {
         axis(2, pretty(DATA[[av]]), las = 2)
     }
@@ -260,15 +265,14 @@ for (av in vars) {
 
     par(xpd = TRUE)
     legend("topleft",
-           inset = c(-.2, -.17),
+           inset  = c(-.2, -.17),
            legend = types,
-           bty = "n", lty = 1,
-           col = 2:length(types),
-           ncol = 3)
+           bty    = "n",
+           lty    = 1,
+           col    = 2:(length(types) + 2),
+           ncol   = 3)
     par(xpd = FALSE)
-
     cat(" \n \n")
-
 }
 
 

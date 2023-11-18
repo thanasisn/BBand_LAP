@@ -183,7 +183,7 @@ plot(missingGLB$Day, missingGLB$N,
 plot(missingTOT$Day, missingTOT$N,
      pch  = 19,
      cex  = 0.3,
-     main = "Days with missing Global but not TOT")
+     main = "Days with missing TOT but not Global")
 
 
 
