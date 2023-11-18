@@ -146,9 +146,9 @@ if (interactive()) {
 
 # Daily plots
 DO_PLOTS       <- TRUE
-# Ignore previous flagged points in plots
+# Ignore previous flagged points in plots (not fully implemented yet)
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
-IGNORE_FLAGGED <- FALSE
+# IGNORE_FLAGGED <- FALSE
 
 
 ## __ Select a part of data to plot  -------------------------------------------
@@ -1514,9 +1514,9 @@ if (QS$TEST_06) {
     abline(v = QS$Rayleigh_upper_lim, lty = 3, col = "red")
     cat(" \n \n")
 
-    ## flags to ignore in plots
+    ## Info flags to ignore in plots
     if (IGNORE_FLAGGED) {
-        ignore <- grep(paste0("QCv9_0[1-", testN - 1 ,"]"), names(pp), value = T)
+        ignore <- grep(paste0("QCv9_0[1-", testN - 1 ,"]"), names(BB), value = T)
         cat("**Plots will ignore previoysly flaged points: ", ignore, "**\n")
     }
 
@@ -1733,8 +1733,8 @@ if (QS$TEST_08) {
             points(pp[!is.na(get(flagname_BTH)), HOR_strict, Azimuth],
                    col = "red")
             points(pp[!is.na(get(flagname_BTH)), GLB_strict, Azimuth],
-                   ylim = ylim, col = "magenta")
-            ## TODO plot flags seperate
+                   col = "magenta")
+            ## TODO plot flags separate
 
             cat(" \n \n")
         }
