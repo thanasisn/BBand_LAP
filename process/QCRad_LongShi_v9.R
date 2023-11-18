@@ -84,7 +84,6 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/process/QCRad_LongShi_v9.R"
-qc_ver      <- 9
 
 parameter_fl <- paste0("~/BBand_LAP/SIDE_DATA/", basename(sub("\\.R", "_parameters.Rds", Script.Name)))
 
@@ -175,8 +174,8 @@ PLOT_LAST  <- as_date("2024-03-31")
 #     DB_lock    <- test_DB_lock
 #     DB_META_fl <- test_DB_META_fl
 #     DB_HASH_fl <- test_DB_HASH_fl
-#     InitVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
-#     OVERWRITEVariableBBmeta(paste0("QCv", qc_ver, "_applied"  ), as.POSIXct(NA))
+#     InitVariableBBmeta(paste0("QCv9_applied"  ), as.POSIXct(NA))
+#     OVERWRITEVariableBBmeta(paste0("QCv9_applied"  ), as.POSIXct(NA))
 #     # warning("THIS IS FOR DEVELOPMENT")
 #     # OVERWRITEVariableBBDB("QCv9_06_bth_flag", as.character(NA))
 # }
@@ -307,8 +306,8 @@ for (af in filelist$names) {
 
     if (QS$TEST_01) {
         testN        <- 1
-        flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-        flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+        flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
+        flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
         cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
         ## __ Direct  ----------------------------------------------------------
@@ -353,8 +352,8 @@ for (af in filelist$names) {
 
     if (QS$TEST_02) {
         testN        <- 2
-        flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-        flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+        flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
+        flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
         cat(paste("\n2. Extremely Rare Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
         # Compute reference values
@@ -387,6 +386,7 @@ for (af in filelist$names) {
     #' ## 3. Comparison tests per BSRN “non-definitive”
     #'
 
+    QS$dif_rati_min  <-  0.001 # DiffuceFraction low limit this make obstacles stand out
     QS$dif_rati_po1  <-  0.03  # DiffuceFraction low limit
     QS$dif_rati_po2  <-  0.08  # My DiffuceFraction low limit
     QS$dif_sza_break <- 75     # SZA break point
@@ -396,8 +396,9 @@ for (af in filelist$names) {
 
     if (QS$TEST_03) {
         testN        <- 3
-        flagname_UPP <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_upp_flag")
-        flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
+        flagname_UPP <- paste0("QCv9_", sprintf("%02d", testN), "_upp_flag")
+        flagname_LOW <- paste0("QCv9_", sprintf("%02d", testN), "_low_flag")
+        flagname_OBS <- paste0("QCv9_", sprintf("%02d", testN), "_obs_flag")
         cat(paste("\n3. Comparison tests", flagname_UPP, flagname_LOW, "\n\n"))
 
         ## __ Proposed filter  -------------------------------------------------
@@ -419,6 +420,10 @@ for (af in filelist$names) {
                      SZA             > QS$dif_sza_break &
                      GLB_strict      > QS$dif_watt_lim,
                  (flagname_LOW) := "Diffuse ratio comp min (12)"]
+
+        ## __ This is good for systematic obstacle hightlight  -----------------
+        datapart[DiffuseFraction_kd  < QS$dif_rati_min  &
+                 (flagname_OBS) := "Diffuse ratio obst min (13)"]
 
         rm(list = ls(pattern = "flagname_.*"))
         dummy <- gc()
@@ -448,8 +453,8 @@ for (af in filelist$names) {
 
     if (QS$TEST_04) {
         testN        <- 4
-        flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-        flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+        flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
+        flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
         cat("\n4. Climatological (configurable) Limits", flagname_DIR, flagname_GLB, "\n\n")
 
         ## __ Direct -----------------------------------------------------------
@@ -492,7 +497,7 @@ for (af in filelist$names) {
 
     if (QS$TEST_05) {
         testN        <- 5
-        flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+        flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
         cat(paste("\n5. Tracking test", flagname_DIR, "\n\n"))
 
         ## Clear Sky Sort-Wave model
@@ -550,7 +555,7 @@ for (af in filelist$names) {
 
     if (QS$TEST_06) {
         testN        <- 6
-        flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
+        flagname_BTH <- paste0("QCv9_", sprintf("%02d", testN), "_bth_flag")
         cat(paste("\n6. Rayleigh Limit Diffuse Comparison", flagname_BTH, "\n\n"))
 
         datapart[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = Pressure)]
@@ -636,7 +641,7 @@ for (af in filelist$names) {
         cat(paste("\n8. Inversion test.\n\n"))
 
         testN        <- 8
-        flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
+        flagname_BTH <- paste0("QCv9_", sprintf("%02d", testN), "_bth_flag")
 
         ## __ Both  ------------------------------------------------------------
         datapart[, Relative_diffuse := 100 * (HOR_strict  - GLB_strict) / GLB_strict ]
@@ -646,7 +651,7 @@ for (af in filelist$names) {
                  GLB_strict       > QS$dir_glo_glo_off,
                  (flagname_BTH) := "Direct > global soft (14)"]
         datapart[Relative_diffuse > QS$dir_glo_invert,
-                 (flagname_BTH) := "Direct > global hard (15)" ]
+                 (flagname_BTH) := "Direct > global hard (15)"]
 
         rm(list = ls(pattern = "flagname_.*"))
         dummy <- gc()
@@ -673,7 +678,7 @@ for (af in filelist$names) {
         cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
 
         testN        <- 9
-        flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+        flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
 
         # InitVariableBBDB(flagname_GLB, as.character(NA))
 
@@ -703,7 +708,7 @@ for (af in filelist$names) {
         cat(paste("\n10. Erroneous sun position test.\n\n"))
 
         testN        <- 10
-        flagname_ALL <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_all_flag")
+        flagname_ALL <- paste0("QCv9_", sprintf("%02d", testN), "_all_flag")
 
         rm(list = ls(pattern = "flagname_.*"))
         dummy <- gc()
@@ -771,8 +776,8 @@ if (PARTIAL == TRUE) {
 #+ echo=F, include=T, results="asis"
 if (QS$TEST_01) {
     testN        <- 1
-    flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-    flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+    flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
+    flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
                caption = flagname_DIR))
@@ -811,7 +816,7 @@ if (QS$TEST_01) {
     if (DO_PLOTS) {
 
         if (!interactive()) {
-            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
         }
 
         test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
@@ -878,8 +883,8 @@ if (QS$TEST_01) {
 #+ echo=F, include=T, results="asis"
 if (QS$TEST_02) {
     testN        <- 2
-    flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-    flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+    flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
+    flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
                caption = flagname_DIR))
@@ -913,7 +918,7 @@ if (QS$TEST_02) {
     if (DO_PLOTS) {
 
         if (!interactive()) {
-            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
         }
 
         ## Direct
@@ -972,14 +977,19 @@ if (QS$TEST_02) {
 #+ echo=F, include=T, results="asis"
 if (QS$TEST_03) {
     testN        <- 3
-    flagname_UPP <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_upp_flag")
-    flagname_LOW <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_low_flag")
+    flagname_UPP <- paste0("QCv9_", sprintf("%02d", testN), "_upp_flag")
+    flagname_LOW <- paste0("QCv9_", sprintf("%02d", testN), "_low_flag")
+    flagname_OBS <- paste0("QCv9_", sprintf("%02d", testN), "_obs_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_UPP)), useNA = "always"),
                caption = flagname_UPP))
     cat(" \n \n")
 
     cat(pander(table(collect(select(BB, !!flagname_LOW)), useNA = "always"),
+               caption = flagname_LOW))
+    cat(" \n \n")
+
+    cat(pander(table(collect(select(BB, !!flagname_OBS)), useNA = "always"),
                caption = flagname_LOW))
     cat(" \n \n")
 
@@ -1001,14 +1011,17 @@ if (QS$TEST_03) {
         segments(               0, QS$dif_rati_pr1, QS$dif_sza_break, QS$dif_rati_pr1, col = "red" )
         segments(QS$dif_sza_break, QS$dif_rati_pr2,               93, QS$dif_rati_pr2, col = "red" )
 
-        segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue" )
-        segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue" )
+        segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue")
+        segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue")
 
         points(pp[!is.na(get(flagname_UPP)), DiffuseFraction_kd, SZA],
                cex = .2, col = "red")
         points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, SZA],
                cex = .2, col = "cyan")
+        points(pp[!is.na(get(flagname_OBS)), DiffuseFraction_kd, SZA],
+               cex = .2, col = "#BFE46C")
         cat(" \n \n")
+
 
         ## plot limits by date
         plot(pp$Date, pp$DiffuseFraction_kd,
@@ -1020,7 +1033,10 @@ if (QS$TEST_03) {
                cex = .2, col = "red")
         points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, Date],
                cex = .2, col = "cyan")
+        points(pp[!is.na(get(flagname_OBS)), DiffuseFraction_kd, Date],
+               cex = .2, col = "#BFE46C")
         cat(" \n \n")
+
 
         ## plot limits by Azimuth
         plot(pp$Azimuth, pp$DiffuseFraction_kd,
@@ -1033,16 +1049,20 @@ if (QS$TEST_03) {
                cex = .2, col = "red")
         points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, Azimuth],
                cex = .2, col = "cyan")
+        points(pp[!is.na(get(flagname_OBS)), DiffuseFraction_kd, Azimuth],
+               cex = .2, col = "#BFE46C")
         cat(" \n \n")
     }
 
     if (DO_PLOTS) {
 
         if (!interactive()) {
-            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
         }
 
-        tmp <- BB |> filter(!is.na(QCv9_03_upp_flag) | !is.na(QCv9_03_low_flag)) |> collect() |> as.data.table()
+        tmp <- BB |> filter(!is.na(QCv9_03_upp_flag)     |
+                                !is.na(QCv9_03_low_flag) |
+                                !is.na(QCv9_03_obs_flag)) |> collect() |> as.data.table()
 
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
 
@@ -1059,9 +1079,11 @@ if (QS$TEST_03) {
                  col = "cyan", ylab = "Not Diffuse Fraction", xlab = "")
 
             abline(h = QS$dif_rati_pr1, col = "red")
-            abline(h = QS$dif_rati_pr2, col = "red", lty = 2)
+            abline(h = QS$dif_rati_pr2, col = "red",     lty = 2)
             abline(h = QS$dif_rati_po1, col = "blue")
-            abline(h = QS$dif_rati_po2, col = "blue", lty = 2)
+            abline(h = QS$dif_rati_po2, col = "blue",    lty = 2)
+            abline(h = QS$dif_rati_min, col = "#BFE46C", lty = 2)
+
 
             title(paste("#3", as.Date(ad, origin = "1970-01-01")))
 
@@ -1083,6 +1105,13 @@ if (QS$TEST_03) {
             points(pp[!is.na(QCv9_03_low_flag), Date],
                    pp[!is.na(QCv9_03_low_flag), GLB_strict],
                    ylim = ylim, col = "magenta")
+            points(pp[!is.na(QCv9_03_obs_flag), Date],
+                   pp[!is.na(QCv9_03_obs_flag), DIR_strict],
+                   ylim = ylim, col = "#BFE46C")
+            points(pp[!is.na(QCv9_03_obs_flag), Date],
+                   pp[!is.na(QCv9_03_obs_flag), GLB_strict],
+                   ylim = ylim, col = "#BFE46C")
+
             ## reset layout
             layout(1)
         }
@@ -1103,8 +1132,8 @@ if (QS$TEST_03) {
 #+ echo=F, include=T, results="asis"
 if (QS$TEST_04) {
     testN        <- 4
-    flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
-    flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+    flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
+    flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
                caption = flagname_DIR))
@@ -1315,7 +1344,7 @@ if (QS$TEST_04) {
     if (DO_PLOTS) {
 
         if (!interactive()) {
-            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
         }
 
         ## test direct limits
@@ -1398,7 +1427,7 @@ if (QS$TEST_04) {
 #+ echo=F, include=T, results="asis"
 if (QS$TEST_05) {
     testN        <- 5
-    flagname_DIR <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_dir_flag")
+    flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
                caption = flagname_DIR))
@@ -1429,7 +1458,7 @@ if (QS$TEST_05) {
     if (DO_PLOTS) {
 
         if (!interactive()) {
-            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
         }
 
         tmp <- BB |>
@@ -1473,7 +1502,7 @@ if (QS$TEST_05) {
 #+ echo=F, include=T, results="asis"
 if (QS$TEST_06) {
     testN        <- 6
-    flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
+    flagname_BTH <- paste0("QCv9_", sprintf("%02d", testN), "_bth_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always"),
                caption = flagname_BTH))
@@ -1565,7 +1594,7 @@ if (QS$TEST_06) {
     if (DO_PLOTS) {
 
         if (!interactive()) {
-            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
         }
 
         ## plot on upper limit
@@ -1655,9 +1684,11 @@ if (QS$TEST_07) {
 #+ echo=F, include=T, results="asis"
 if (QS$TEST_08) {
     testN        <- 8
-    flagname_BTH <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_bth_flag")
+    flagname_BTH <- paste0("QCv9_", sprintf("%02d", testN), "_bth_flag")
 
-    cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always")))
+    cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always"),
+               caption = flagname_BTH))
+    cat(" \n \n")
 
     test <- BB |>
         filter(Elevat > 0) |>
@@ -1666,6 +1697,7 @@ if (QS$TEST_08) {
 
     hist(test[Relative_diffuse < 10, Relative_diffuse], breaks = 100)
     abline(v = QS$dir_glo_invert, lty = 3, col = "red")
+    cat(" \n \n")
 
     hist(test[Relative_diffuse > QS$dir_glo_invert & Elevat  > 3, Elevat], breaks = 100)
     hist(test[Relative_diffuse > QS$dir_glo_invert & Elevat  > 3, HOR_strict - GLB_strict], breaks = 100)
@@ -1676,7 +1708,7 @@ if (QS$TEST_08) {
     if (DO_PLOTS) {
 
         if (!interactive()) {
-            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
         }
 
         tmp <- BB |>
@@ -1702,6 +1734,9 @@ if (QS$TEST_08) {
                    col = "red")
             points(pp[!is.na(get(flagname_BTH)), GLB_strict, Azimuth],
                    ylim = ylim, col = "magenta")
+            ## TODO plot flags seperate
+
+            cat(" \n \n")
         }
     }
     rm(list = ls(pattern = "flagname_.*"))
@@ -1720,7 +1755,7 @@ if (QS$TEST_08) {
 #+ echo=F, include=T, results="asis"
 if (QS$TEST_09) {
     testN        <- 9
-    flagname_GLB <- paste0("QCv", qc_ver, "_", sprintf("%02d", testN), "_glb_flag")
+    flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
 
     cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always")))
     cat("\n\n")
@@ -1746,7 +1781,7 @@ if (QS$TEST_09) {
     if (DO_PLOTS) {
 
         if (!interactive()) {
-            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V", qc_ver, "_F", testN, ".pdf"))
+            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
         }
 
         tmp <- BB |>
