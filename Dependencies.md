@@ -5,9 +5,9 @@
 
 ### `build_db`
 
-           arrow:  13.0.0.1
+           arrow:    14.0.0
       data.table:    1.14.8
-           dplyr:     1.1.3
+           dplyr:     1.1.4
            knitr:      1.45
        lubridate:     1.9.3
            tools:     4.2.3
@@ -15,9 +15,9 @@
 
 ### `inspect_db`
 
-           arrow:  13.0.0.1
+           arrow:    14.0.0
       data.table:    1.14.8
-           dplyr:     1.1.3
+           dplyr:     1.1.4
            knitr:      1.45
           pander:     0.6.5
        lubridate:     1.9.3
