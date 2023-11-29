@@ -64,7 +64,7 @@
     },
     "Matrix": {
       "Package": "Matrix",
-      "Version": "1.6-2",
+      "Version": "1.6-3",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -77,7 +77,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "e4ea5684d8d52584681b7704132b5189"
+      "Hash": "1d1b6901cf9b6b1b446bc56a7d47efa4"
     },
     "R6": {
       "Package": "R6",
@@ -112,7 +112,7 @@
     },
     "arrow": {
       "Package": "arrow",
-      "Version": "13.0.0.1",
+      "Version": "14.0.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -130,7 +130,7 @@
         "utils",
         "vctrs"
       ],
-      "Hash": "5f5124b727a451be32d23dcd2c41ebe8"
+      "Hash": "daa5319da4e6fa5595647054dcbe7e8d"
     },
     "arsenal": {
       "Package": "arsenal",
@@ -289,19 +289,19 @@
     },
     "colorout": {
       "Package": "colorout",
-      "Version": "1.3-0",
+      "Version": "1.3-0.1",
       "Source": "GitHub",
       "OS_type": "unix",
       "RemoteType": "github",
-      "RemoteHost": "api.github.com",
       "RemoteUsername": "jalvesaq",
       "RemoteRepo": "colorout",
       "RemoteRef": "master",
-      "RemoteSha": "838488283bbc0dbbce0a716db48b90b1ac6ff857",
+      "RemoteSha": "deda341794db3b7a0b4a86d762852d158f1bca0f",
+      "RemoteHost": "api.github.com",
       "Requirements": [
         "utils"
       ],
-      "Hash": "32c151d2fdcc75ed91db8d7a58978d66"
+      "Hash": "0852b88f88b255358553a07b76de5f9c"
     },
     "colorspace": {
       "Package": "colorspace",
@@ -426,7 +426,7 @@
     },
     "dplyr": {
       "Package": "dplyr",
-      "Version": "1.1.3",
+      "Version": "1.1.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -445,7 +445,7 @@
         "utils",
         "vctrs"
       ],
-      "Hash": "e85ffbebaad5f70e1a2e2ef4302b4949"
+      "Hash": "fedd9d00c2944ff00a0e2696ccf048ec"
     },
     "ellipsis": {
       "Package": "ellipsis",
@@ -1228,7 +1228,7 @@
     },
     "shiny": {
       "Package": "shiny",
-      "Version": "1.7.5.1",
+      "Version": "1.8.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1258,7 +1258,7 @@
         "withr",
         "xtable"
       ],
-      "Hash": "5ec01cc255f2138fc2f0dc74d2b1a1a1"
+      "Hash": "3a1f41807d648a908e3c7f0334bf85e6"
     },
     "sourcetools": {
       "Package": "sourcetools",
@@ -1272,7 +1272,7 @@
     },
     "stringi": {
       "Package": "stringi",
-      "Version": "1.7.12",
+      "Version": "1.8.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1281,11 +1281,11 @@
         "tools",
         "utils"
       ],
-      "Hash": "ca8bd84263c77310739d2cf64d84d7c9"
+      "Hash": "12bf57fdcb9b7068bea39b32f87ecac9"
     },
     "stringr": {
       "Package": "stringr",
-      "Version": "1.5.0",
+      "Version": "1.5.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1298,7 +1298,7 @@
         "stringi",
         "vctrs"
       ],
-      "Hash": "671a4d384ae9d32fc47a14e98bfa3dc8"
+      "Hash": "960e2ae9e09656611e0b8214ad543207"
     },
     "sys": {
       "Package": "sys",
