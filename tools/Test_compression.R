@@ -8,7 +8,6 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/tools/Test_compression.R"
-
 renv::load("~/BBand_LAP")
 
 source("~/BBand_LAP/DEFINITIONS.R")
@@ -69,10 +68,11 @@ if (Sys.info()["nodename"] %in% nodes) {
     currentsize <- as.numeric(strsplit(system(paste("du -s", DB_DIR), intern = TRUE), "\t")[[1]][1])
     gatherDB    <- data.frame()
 
-    for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
+    for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo")) {
         if (codec_is_available(algo)) {
             targetdb <- paste0(DB_DIR, "_temp")
-            for (comLev in c(2, 3, 5, 7, 9, 10, 11, 20)) {
+            # for (comLev in c(2, 3, 5, 7, 9, 10, 11, 20)) {
+            for (comLev in c(2, 3, 5, 7, 9)) {
                 cat("Algo: ", algo, " Level:", comLev, "\n")
                 ## remove target dir
                 system(paste("rm -rf ", targetdb))
