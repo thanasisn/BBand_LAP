@@ -71,40 +71,42 @@ if (Sys.info()["nodename"] %in% nodes) {
         if (codec_is_available(algo)) {
             targetdb <- paste0(DB_DIR, "_temp")
             # for (comLev in c(2, 3, 5, 7, 9, 10, 11, 20)) {
-            for (comLev in c(2, 3, 5, 7, 9)) {
+            for (comLev in unique(c(1:11, 20, 50))) {
                 cat("Algo: ", algo, " Level:", comLev, "\n")
-                ## remove target dir
-                system(paste("rm -rf ", targetdb))
-                ## try compression
-                aa <- system.time(
-                    write_dataset(BB, path          = targetdb,
-                                  compression       = algo,
-                                  compression_level = comLev,
-                                  format            = "parquet",
-                                  partitioning      = c("year", "month"),
-                                  hive_style        = FALSE)
-                )
-                ## gather stats
-                temp <- data.frame(
-                    Date = Sys.time(),
-                    Host = Sys.info()["nodename"],
-                    User = aa[1],
-                    Syst = aa[2],
-                    Elap = aa[3],
-                    Algo = algo,
-                    Level = comLev,
-                    Size = as.numeric(strsplit(system(paste("du -s", targetdb), intern = TRUE), "\t")[[1]][1])
-                )
+                try({
+                    ## remove target dir
+                    system(paste("rm -rf ", targetdb))
+                    ## try compression
+                    aa <- system.time(
+                        write_dataset(BB, path          = targetdb,
+                                      compression       = algo,
+                                      compression_level = comLev,
+                                      format            = "parquet",
+                                      partitioning      = c("year", "month"),
+                                      hive_style        = FALSE)
+                    )
+                    ## gather stats
+                    temp <- data.frame(
+                        Date = Sys.time(),
+                        Host = Sys.info()["nodename"],
+                        User = aa[1],
+                        Syst = aa[2],
+                        Elap = aa[3],
+                        Algo = algo,
+                        Level = comLev,
+                        Size = as.numeric(strsplit(system(paste("du -s", targetdb), intern = TRUE), "\t")[[1]][1])
+                    )
 
-                cat(temp$Algo,
-                    "level:", temp$Level,
-                    "Elap:",  temp$Elap,
-                    "Size:",  temp$Size,
-                    "Ratio:", temp$Size/currentsize,
-                    "\n")
-                temp$Ratio   <- temp$Size / currentsize
-                temp$Current <- currentsize
-                gatherDB     <- data.table(rbind(gatherDB, temp))
+                    cat(temp$Algo,
+                        "level:", temp$Level,
+                        "Elap:",  temp$Elap,
+                        "Size:",  temp$Size,
+                        "Ratio:", temp$Size/currentsize,
+                        "\n")
+                    temp$Ratio   <- temp$Size / currentsize
+                    temp$Current <- currentsize
+                    gatherDB     <- data.table(rbind(gatherDB, temp))
+                })
             }
         }
     }
