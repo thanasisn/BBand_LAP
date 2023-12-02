@@ -9,6 +9,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/tools/Test_compression.R"
 
+renv::load("~/BBand_LAP")
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
