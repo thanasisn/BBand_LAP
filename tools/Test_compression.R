@@ -14,7 +14,6 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
 
 
 if (!interactive()) {
@@ -47,7 +46,7 @@ if (Sys.info()["nodename"] %in% nodes) {
         source("~/BBand_LAP/DEFINITIONS.R")
         cat("\n * * * Using a temp DB * * * \n\n")
         ## copy data to temp
-        tyear <- sample(1993:2023, 20)
+        tyear <- sample(1993:2023, 25)
         # tyear <- c(2015, 2007, 1999, 2021, 1993)
         # tyear <- c(2021)
         dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
@@ -120,19 +119,27 @@ if (Sys.info()["nodename"] %in% nodes) {
     }
 }
 
+DATA <- readRDS(results)
+
+DATA <- DATA[Host == "sagan"]
+DATA <- DATA[Current > 1611320, ]
+DATA[, col := 1 + as.numeric(factor(Algo))]
+ll <- unique(DATA[, col, Algo])
+
+
 setorder(DATA, -Ratio, -Elap)
 print(DATA)
 
 
-DATA <- readRDS(results)
-setorder(DATA, -Ratio, -Elap)
+plot(DATA$Ratio, DATA$Level, col = DATA$col)
+legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
 
-DATA <- DATA[Current > 443360, ]
-
-
-plot(DATA$Ratio, DATA$Level)
+plot(DATA[, User, Ratio], col = DATA$col)
+legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
 
 
+plot(DATA[, Current, Ratio], col = DATA$col)
+legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
 
 
 tac <- Sys.time()
