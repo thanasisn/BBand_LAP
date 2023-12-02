@@ -70,10 +70,9 @@ if (Sys.info()["nodename"] %in% nodes) {
 
     for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
         if (codec_is_available(algo)) {
-            cat("Algo ", algo, "\n")
             targetdb <- paste0(DB_DIR, "_temp")
-
             for (comLev in c(2, 3, 5, 7, 9, 10, 11, 20)) {
+                cat("Algo: ", algo, " Level:", comLev, "\n")
                 ## remove target dir
                 system(paste("rm -rf ", targetdb))
                 ## try compression
@@ -97,7 +96,12 @@ if (Sys.info()["nodename"] %in% nodes) {
                     Size = as.numeric(strsplit(system(paste("du -s", targetdb), intern = TRUE), "\t")[[1]][1])
                 )
 
-                cat(temp$Algo, "level:", temp$Level, "Elap:", temp$Elap, "Size:", temp$Size, temp$Size/currentsize, "\n")
+                cat(temp$Algo,
+                    "level:", temp$Level,
+                    "Elap:",  temp$Elap,
+                    "Size:",  temp$Size,
+                    "Ratio:", temp$Size/currentsize,
+                    "\n")
                 temp$Ratio   <- temp$Size / currentsize
                 temp$Current <- currentsize
                 gatherDB     <- data.table(rbind(gatherDB, temp))
