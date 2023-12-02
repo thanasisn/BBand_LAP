@@ -7,6 +7,7 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
+renv::load("~/BBand_LAP")
 
 
 
