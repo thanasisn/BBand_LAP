@@ -1,7 +1,7 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
-#### Test the compresion of the BB data base
+#### Test the compression of the BB data base
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
