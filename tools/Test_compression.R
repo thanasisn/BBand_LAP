@@ -25,6 +25,8 @@ library(arrow,      warn.conflicts = TRUE, quietly = TRUE)
 library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
+library(ggplot2,    warn.conflicts = TRUE, quietly = TRUE)
+library(plotly,     warn.conflicts = TRUE, quietly = TRUE)
 
 
 for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
@@ -126,6 +128,7 @@ DATA <- readRDS(results)
 
 DATA <- DATA[Host == "sagan"]
 DATA <- DATA[Current > 1611320, ]
+DATA <- DATA[User    < 300, ]
 DATA[, col := 1 + as.numeric(factor(Algo))]
 ll <- unique(DATA[, col, Algo])
 
@@ -134,15 +137,36 @@ setorder(DATA, -Ratio, -Elap)
 print(DATA)
 
 
-plot(DATA$Ratio, DATA$Level, col = DATA$col)
-legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
+# plot(DATA[, Level, Ratio], col = DATA$col)
+# legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
 
-plot(DATA[, User, Ratio], col = DATA$col)
-legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
+# plot(DATA[, Current, Ratio], col = DATA$col)
+# legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
+
+# plot(DATA[, User, Ratio], col = DATA$col)
+# legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
 
 
-plot(DATA[, Current, Ratio], col = DATA$col)
-legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
+p <- ggplot(DATA, aes(Level, Ratio, size = Current, color = Algo)) +
+    geom_point() +
+    theme_bw()
+print(p)
+ggplotly(p)
+
+
+ggplot(DATA, aes(Ratio, User,  size = Level, color = Algo)) +
+    geom_point() +
+    theme_bw()
+print(p)
+ggplotly(p)
+
+
+ggplot(DATA, aes(Ratio, Current, size = Level, color = Algo)) +
+    geom_point() +
+     theme_bw()
+print(p)
+ggplotly(p)
+
 
 
 tac <- Sys.time()
