@@ -83,7 +83,8 @@ if (Sys.info()["nodename"] %in% nodes) {
                                       compression_level = comLev,
                                       format            = "parquet",
                                       partitioning      = c("year", "month"),
-                                      hive_style        = FALSE)
+                                      hive_style        = FALSE),
+                        gcFirst = TRUE
                     )
                     ## gather stats
                     temp <- data.frame(
