@@ -48,12 +48,12 @@ if (Sys.info()["nodename"] %in% nodes) {
         source("~/BBand_LAP/DEFINITIONS.R")
         cat("\n * * * Using a temp DB * * * \n\n")
         ## copy data to temp
-        tyear <- sample(1993:2023, 25)
+        tyear <- sample(1993:2023, 27)
         # tyear <- c(2015, 2007, 1999, 2021, 1993)
         # tyear <- c(2021)
         dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
-        system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-        system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
+        system(paste("cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
+        system(paste("cp -rv --update ", DB_META_fl, test_DB_META_fl))
         for (ay in tyear) {
             system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", ay))
         }
@@ -104,7 +104,7 @@ if (Sys.info()["nodename"] %in% nodes) {
                         "level:", temp$Level,
                         "Elap:",  temp$Elap,
                         "Size:",  temp$Size,
-                        "Ratio:", temp$Size/currentsize,
+                        "Ratio:", temp$Size / currentsize,
                         "\n")
                     temp$Ratio   <- temp$Size / currentsize
                     temp$Current <- currentsize
@@ -119,7 +119,7 @@ if (Sys.info()["nodename"] %in% nodes) {
         saveRDS(gatherDB, results)
     } else {
         DATA <- readRDS(results)
-        DATA <- unique(rbind(DATA, gatherDB, fill = T))
+        DATA <- unique(rbind(DATA, gatherDB, fill = TRUE))
         saveRDS(DATA, results)
     }
 }
@@ -130,21 +130,10 @@ DATA <- DATA[Host == "sagan"]
 DATA <- DATA[Current > 1611320, ]
 DATA <- DATA[User    < 300, ]
 DATA[, col := 1 + as.numeric(factor(Algo))]
-ll <- unique(DATA[, col, Algo])
 
 
 setorder(DATA, -Ratio, -Elap)
 print(DATA)
-
-
-# plot(DATA[, Level, Ratio], col = DATA$col)
-# legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
-
-# plot(DATA[, Current, Ratio], col = DATA$col)
-# legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
-
-# plot(DATA[, User, Ratio], col = DATA$col)
-# legend("topright", legend = ll$Algo, col = ll$col, pch = 1, ncol = 2, bty = "n")
 
 
 p <- ggplot(DATA, aes(Level, Ratio, size = Current, color = Algo)) +
@@ -154,16 +143,16 @@ print(p)
 ggplotly(p)
 
 
-ggplot(DATA, aes(Ratio, User,  size = Level, color = Algo)) +
+p <- ggplot(DATA, aes(Ratio, User,  size = Level, color = Algo)) +
     geom_point() +
     theme_bw()
 print(p)
 ggplotly(p)
 
 
-ggplot(DATA, aes(Ratio, Current, size = Level, color = Algo)) +
+p <- ggplot(DATA, aes(Ratio, Current, size = Level, color = Algo)) +
     geom_point() +
-     theme_bw()
+    theme_bw()
 print(p)
 ggplotly(p)
 
