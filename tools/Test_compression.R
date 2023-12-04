@@ -49,6 +49,7 @@ if (Sys.info()["nodename"] %in% nodes) {
         cat("\n * * * Using a temp DB * * * \n\n")
         ## copy data to temp
         tyear <- sample(1993:2023, 27)
+        tyear <- 1993:2023
         # tyear <- c(2015, 2007, 1999, 2021, 1993)
         # tyear <- c(2021)
         dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
@@ -127,10 +128,13 @@ if (Sys.info()["nodename"] %in% nodes) {
 DATA <- readRDS(results)
 
 DATA <- DATA[Host == "sagan"]
-DATA <- DATA[Current > 1611320, ]
-DATA <- DATA[User    < 300, ]
-DATA[, col := 1 + as.numeric(factor(Algo))]
+DATA <- DATA[Current > 2688524, ]
+DATA <- DATA[User    < 400, ]
+DATA <- DATA[Ratio   < 1]
+# DATA[, col := 1 + as.numeric(factor(Algo))]
 
+
+table(DATA$Current)
 
 setorder(DATA, -Ratio, -Elap)
 print(DATA)
