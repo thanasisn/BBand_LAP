@@ -44,9 +44,10 @@ DB_lock             <- "~/DATA/Broad_Band/Broad_Band_DB.stopfile"
 DB_HASH_fl          <- "~/DATA_RAW/Bband/Broad_Band_DB_hash_table.parquet"  ## Always append to this file
 DB_start_date       <- as.Date("1993-01-01")   ## ~ start in 1993-04-19??
 DB_Steps_start_date <- as.Date("2016-04-01")
-DB_compress_codec   <- "lz4"
-DB_compress_level   <- 9
-
+# DB_compress_codec   <- "lz4"  ## available in minimal arrow
+# DB_compress_level   <- 9
+DB_compress_codec   <- "brotli"
+DB_compress_level   <- 5
 
 ## __ DB test paths  -----------------------------------------------------------
 test_DB_DIR     <- "~/ZHOST/Broad_Band_DB"

@@ -39,7 +39,7 @@ for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
 
 
 results <- "~/BBand_LAP/SIDE_DATA/DB_compression_test.Rds"
-nodes   <- c("sagan")
+nodes   <- c("sagan", "tyler")
 
 if (Sys.info()["nodename"] %in% nodes) {
 
@@ -50,6 +50,7 @@ if (Sys.info()["nodename"] %in% nodes) {
         ## copy data to temp
         tyear <- sample(1993:2023, 27)
         tyear <- 1993:2023
+        tyear <- 1993:1993
         # tyear <- c(2015, 2007, 1999, 2021, 1993)
         # tyear <- c(2021)
         dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
@@ -125,6 +126,7 @@ if (Sys.info()["nodename"] %in% nodes) {
                         saveRDS(DATA, results)
                         cat("Data saved again\n")
                     }
+                    stop()
                 })
             }
         }
@@ -133,10 +135,11 @@ if (Sys.info()["nodename"] %in% nodes) {
 
 DATA <- readRDS(results)
 
-DATA <- DATA[Host == "sagan"]
-DATA <- DATA[Current > 2688524, ]
-DATA <- DATA[User    < 400, ]
-DATA <- DATA[Ratio   < 1]
+DATA <- DATA[Host == "sagan",   ]
+DATA <- DATA[Current > 2000000, ]
+DATA <- DATA[User    < 300,     ]
+DATA <- DATA[Ratio   <   1,     ]
+DATA <- DATA[Date > "2023-12-01"]
 # DATA[, col := 1 + as.numeric(factor(Algo))]
 
 
