@@ -109,19 +109,25 @@ if (Sys.info()["nodename"] %in% nodes) {
                         "\n")
                     temp$Ratio   <- temp$Size / currentsize
                     temp$Current <- currentsize
-                    gatherDB     <- data.table(rbind(gatherDB, temp))
+                    gatherDB     <- data.table(
+                        rbind(gatherDB, temp)
+                    )
+
+                    ## Gather results
+                    if (!file.exists(results)) {
+                        saveRDS(gatherDB, results)
+                        cat("Data saved\n")
+                    } else {
+                        DATA <- readRDS(results)
+                        DATA <- unique(
+                            rbind(DATA, gatherDB, fill = TRUE)
+                        )
+                        saveRDS(DATA, results)
+                        cat("Data saved again\n")
+                    }
                 })
             }
         }
-    }
-
-    ## Gather results
-    if (!file.exists(results)) {
-        saveRDS(gatherDB, results)
-    } else {
-        DATA <- readRDS(results)
-        DATA <- unique(rbind(DATA, gatherDB, fill = TRUE))
-        saveRDS(DATA, results)
     }
 }
 
