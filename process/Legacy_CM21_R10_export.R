@@ -67,6 +67,7 @@ knitr::opts_chunk$set(fig.pos    = '!h'    )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/process/Legacy_CM21_R10_export.R"
+renv::load("~/BBand_LAP")
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
