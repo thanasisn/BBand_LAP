@@ -52,7 +52,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "./BBand_LAP/process/Export_CHP1_DIR.R"
-renv::load("~/BBand_LAP")
+# renv::load("~/BBand_LAP")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -65,6 +65,7 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 
 source("~/BBand_LAP/DEFINITIONS.R")
+source("~/CODE/R_myRtools/myRtools/R/write_.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
 
@@ -156,9 +157,9 @@ for (YYYY in yearstodo) {
     year_data <- year_data[!is.na(DIR_wpsm)]
 
     ## Simple export data for others -------------------------------------------
-    # myRtools::write_dat(object  = year_data,
-    #                     file    = paste0(OTHEREXPOR, "/", "CHP1_DIR_", YYYY),
-    #                     contact = "<natsisphysicist@gmail.com>")
+    # write_dat(object  = year_data,
+    #           file    = paste0(OTHEREXPOR, "/", "CHP1_DIR_", YYYY),
+    #           contact = "<natsisphysicist@gmail.com>")
 
 
     ## make sure we have all minutes

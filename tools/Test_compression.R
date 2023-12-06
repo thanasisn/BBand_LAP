@@ -8,7 +8,7 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/tools/Test_compression.R"
-renv::load("~/BBand_LAP")
+# renv::load("~/BBand_LAP")
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
@@ -39,7 +39,7 @@ for (algo in c("gzip", "brotli", "zstd", "lz4", "lzo", "bz2")) {
 
 
 results <- "~/BBand_LAP/SIDE_DATA/DB_compression_test.Rds"
-nodes   <- c("sagan", "tyler")
+nodes   <- c("sagan")
 
 if (Sys.info()["nodename"] %in% nodes) {
 
