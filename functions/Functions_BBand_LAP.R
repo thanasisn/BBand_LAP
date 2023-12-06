@@ -248,7 +248,7 @@ Relative_diffuse      = c("Relative Diffuse",          NA,                      
 
 
 
-#' Get nice name for a variable in DV
+#' Get nice name for a variable in BB DB
 #'
 #' @param x    Name of a column
 #' @param type What to return one of c("short", "long", "description", "data")

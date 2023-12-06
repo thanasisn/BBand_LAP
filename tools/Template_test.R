@@ -28,8 +28,7 @@ library(dplyr,      warn.conflicts = TRUE, quietly = TRUE)
 library(lubridate,  warn.conflicts = TRUE, quietly = TRUE)
 library(data.table, warn.conflicts = TRUE, quietly = TRUE)
 #library(tools,      warn.conflicts = TRUE, quietly = TRUE)
-library(shiny)
-library(plotly)
+
 
 
 ##  Create a test database  ----------------------------------------------------
@@ -42,11 +41,17 @@ if (TEST_DB) {
     source("~/BBand_LAP/DEFINITIONS.R")
     cat("\n * * * Using a temp DB * * * \n\n")
     ## copy data to temp
-    tyear <- 2017
-    dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
-    system(paste( "cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
-    system(paste( "cp -rv --update ", DB_META_fl, test_DB_META_fl))
-    system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", tyear))
+    # tyear <- sample(1993:2023, 27)
+    # tyear <- 1993:2023
+    # tyear <- 1993:1993
+    # tyear <- c(2015, 2007, 1999, 2021, 1993)
+    # # tyear <- c(2021)
+    # dir.create(test_DB_DIR, showWarnings = FALSE, recursive = TRUE)
+    # system(paste("cp -rv --update ", DB_HASH_fl, test_DB_HASH_fl))
+    # system(paste("cp -rv --update ", DB_META_fl, test_DB_META_fl))
+    # for (ay in tyear) {
+    #     system(paste0("rsync -avr ", DB_DIR, "/", tyear, "/ ", test_DB_DIR, "/", ay))
+    # }
     ## replace paths with test paths
     DB_DIR     <- test_DB_DIR
     DB_lock    <- test_DB_lock
@@ -68,6 +73,9 @@ min_elevation <- -5
 
 BB <- opendata()
 
+names(BB)
+dim(BB)
+
 Duration <- BB |> filter(Elevat >= min_elevation) |> select(Date, Elevat) |> group_by(as_date(Date)) |> count() |> collect()
 
 Duration <- data.table(Duration)
@@ -76,7 +84,11 @@ Duration[ n == max(n) ]
 
 Duration[, max(n)] / 60
 
-## max day duration is 960 minutes or 16 hours
+BB <- BB |> mutate(NTSI <- TSI_1au * cos(SZA)) |> compute()
+
+
+BB |> select(NTSI)
+
 
 stop()
 
