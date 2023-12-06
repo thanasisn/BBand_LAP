@@ -120,6 +120,8 @@ for (af in filelist$names) {
     cat("50 Save: ", af, "\n\n")
     ## clean
     rm(datapart)
+
+    stop("TEST")
 }
 
 
