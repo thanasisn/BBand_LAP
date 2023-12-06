@@ -64,6 +64,12 @@ names(TSI)[names(TSI) == "Source"          ] <- "TSI_source"
 TSI$measur_error_comb <- NULL
 dummy <- gc()
 
+
+# if (any(duplicated(TSI$Date))) {
+#     stop("Duplicate dates in TSI")
+# }
+
+
 ##  Find data set files to update  ---------------------------------------------
 
 ## list data base files
@@ -77,8 +83,9 @@ dd               <- tstrsplit(dd, "/")
 filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
-## list data set files possible to touch
+## list data set files we need to touch
 BB <- opendata()
+
 wewantlist <- BB                             |>
     select(Date, TSI_source)                 |>
     filter(TSI_source == "TSIS_adjusted" |
@@ -105,7 +112,7 @@ select     <- unique(tsilist[wewantlist, .(month, year), on = .(month, year)])
 ## touch these files only
 filelist <- filelist[select, on = .(flmonth = month, flyear = year)]
 rm(select, wewantlist, tsilist, BB)
-
+dummy <- gc()
 
 ##  Update TSI data in DB  -----------------------------------------------------
 for (af in filelist$names) {
