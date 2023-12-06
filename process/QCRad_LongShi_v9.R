@@ -84,7 +84,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/process/QCRad_LongShi_v9.R"
-renv::load("~/BBand_LAP")
+# renv::load("~/BBand_LAP")
 
 parameter_fl <- paste0("~/BBand_LAP/SIDE_DATA/", basename(sub("\\.R", "_parameters.Rds", Script.Name)))
 

@@ -61,7 +61,7 @@ knitr::opts_chunk$set(echo      = FALSE   )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_db/60_Inspect_CM21_sig.R"
-renv::load("~/BBand_LAP")
+# renv::load("~/BBand_LAP")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -71,6 +71,7 @@ if (!interactive()) {
 
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
+source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
@@ -101,7 +102,7 @@ if (!file.exists(rdsfile) |  max(file.mtime(files)) > file.mtime(rdsfile)) {
         cat(print(date),"\r")
     }
     cat("Cache data\n")
-    myRtools::writeDATA(DT, rdsfile)
+    writeDATA(DT, rdsfile)
 } else {
     cat("Load cached data\n")
     DT <- readRDS(rdsfile)
@@ -120,7 +121,7 @@ temp$Date <- as.POSIXct( strptime(dateess, "%F %H %M") )
 temp[, file    := NULL]
 temp[, TIME_UT := NULL]
 names(temp)[names(temp) == "[W.m-2]"] <- "WATTTOT"
-myRtools::write_RDS(temp, "~/DATA/Broad_Band/CM21_TOT_2")
+write_RDS(temp, "~/DATA/Broad_Band/CM21_TOT_2")
 rm(temp)
 
 
@@ -283,10 +284,10 @@ cat(" \n \n")
 
 
 
-# myRtools::writeDATA(data,
-#                     datfile,
-#                     contact = "natsisphysicist@gmail.com",
-#                     type = "dat")
+# writeDATA(data,
+#           datfile,
+#           contact = "natsisphysicist@gmail.com",
+#           type = "dat")
 
 
 #' **END**
