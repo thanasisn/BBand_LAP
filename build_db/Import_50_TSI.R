@@ -89,11 +89,13 @@ wewantlist <- BB                             |>
     unique() |> collect()
 
 ## list available TSI data
-tsilist <- TSI |> select(Date, TSI_source) |>
+tsilist <- TSI                       |>
+    select(Date, TSI_source)         |>
     mutate(month = month(Date),
-           year  = year(Date))             |>
-    select(TSI_source, month, year)        |>
-    unique() |> collect()
+           year  = year(Date))       |>
+    select(TSI_source, month, year)  |>
+    unique()                         |>
+    collect()
 
 ## list which data set to touch
 tsilist    <- data.table(tsilist)
@@ -121,12 +123,12 @@ for (af in filelist$names) {
     ## clean
     rm(datapart)
 
-    stop("TEST")
 }
 
 
 ##  Show some info  ------------------------------------------------------------
 BB <- opendata()
+
 wehavelist <- BB                    |>
     select(Date, TSI_source)        |>
     mutate(month = month(Date),
@@ -144,6 +146,8 @@ cat("\n\n")
 
 
 myunlock(DB_lock)
+
+
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
