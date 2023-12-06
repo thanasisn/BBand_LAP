@@ -56,13 +56,13 @@ mylock(DB_lock)
 ##  Load all TSI data  ---------------------------------------------------------
 if (!file.exists(COMP_TSI)) { stop("Missing TSI file:", COMP_TSI) }
 TSI <- readRDS(COMP_TSI)
-TSI <- TSI[ !is.na(TSIextEARTH_comb) ]
+TSI <- TSI[!is.na(TSIextEARTH_comb)]
 names(TSI)[names(TSI) == "sun_dist"        ] <- "Sun_Dist_Astropy"
 names(TSI)[names(TSI) == "TSIextEARTH_comb"] <- "TSI_TOA"
 names(TSI)[names(TSI) == "tsi_1au_comb"    ] <- "TSI_1au"
 names(TSI)[names(TSI) == "Source"          ] <- "TSI_source"
 TSI$measur_error_comb <- NULL
-
+dummy <- gc()
 
 ##  Find data set files to update  ---------------------------------------------
 
@@ -125,11 +125,11 @@ for (af in filelist$names) {
 
 ##  Show some info  ------------------------------------------------------------
 BB <- opendata()
-wehavelist <- BB                                   |>
-    select(Date, TSI_source)                       |>
+wehavelist <- BB                    |>
+    select(Date, TSI_source)        |>
     mutate(month = month(Date),
-           year  = year(Date))                     |>
-    select(TSI_source, month, year)                |>
+           year  = year(Date))      |>
+    select(TSI_source, month, year) |>
     unique() |> collect()
 
 wehavelist <- data.table(wehavelist)
