@@ -9,7 +9,7 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/Plot_test.R"
-renv::load("~/BBand_LAP")
+# renv::load("~/BBand_LAP")
 
 
 source("~/BBand_LAP/DEFINITIONS.R")
@@ -61,7 +61,15 @@ if (TEST_DB) {
 #### ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ####
 
 stop()
+##  Create a new variable to the whole database  -------------------------------
 
+# InitVariableBBDB("somevar", as.numeric(NA))
+
+
+## Find duration of day ligth
+
+## Tracker start at -5
+min_elevation <- -5
 
 BB <- opendata()
 
@@ -69,13 +77,11 @@ names(BB)
 dim(BB)
 
 
-
-BB |> mutate(NTSI = TSI_1au * cos(SZA)) |> collect() |> writedata()
-
+BB |> mutate(NTSI <- TSI_1au * cos(SZA)) |> compute()
 
 
-dd <- data.table( BB |> select(NTSI) |> collect())
-mean(dd$NTSI, na.rm = )
+BB |> select(NTSI)
+
 
 stop()
 
