@@ -60,35 +60,22 @@ if (TEST_DB) {
 }
 #### ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ####
 
+stop()
 
-##  Create a new variable to the whole database  -------------------------------
-
-# InitVariableBBDB("somevar", as.numeric(NA))
-
-
-## Find duration of day ligth
-
-## Tracker start at -5
-min_elevation <- -5
 
 BB <- opendata()
 
 names(BB)
 dim(BB)
 
-Duration <- BB |> filter(Elevat >= min_elevation) |> select(Date, Elevat) |> group_by(as_date(Date)) |> count() |> collect()
-
-Duration <- data.table(Duration)
-
-Duration[ n == max(n) ]
-
-Duration[, max(n)] / 60
-
-BB <- BB |> mutate(NTSI <- TSI_1au * cos(SZA)) |> compute()
 
 
-BB |> select(NTSI)
+BB |> mutate(NTSI = TSI_1au * cos(SZA)) |> collect() |> writedata()
 
+
+
+dd <- data.table( BB |> select(NTSI) |> collect())
+mean(dd$NTSI, na.rm = )
 
 stop()
 
