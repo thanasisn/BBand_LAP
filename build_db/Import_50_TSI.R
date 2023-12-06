@@ -50,7 +50,7 @@ library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 
 ##  Load all TSI data  ---------------------------------------------------------
@@ -87,7 +87,7 @@ filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 if (filelist[,sum(!is.na(names))] < 300) {
     stop("Not enough input files found!")
 } else {
-    (print(filelist))
+    cat("Files in the DB:", nrow(filelist), "\n")
 }
 
 ## find data set files we need to touch
@@ -114,19 +114,20 @@ tsilist <- TSI                       |>
 ## list which data set to touch
 tsilist    <- data.table(tsilist)
 wewantlist <- data.table(wewantlist)
-select     <- unique(tsilist[wewantlist, .(month, year), on = .(month, year)]) ## this breaks
+select     <- semi_join(tsilist, wewantlist, by = c("month", "year"))
+# select     <- unique(tsilist[wewantlist, .(month, year), on = .(month, year)]) ## this breaks
+cat("Months to touch:", nrow(select), "\n")
 
-tsilist[wewantlist, .(month, year), on = .(month, year)]
-
-
-stop()
 ## touch these files only
-filelist <- filelist[select, on = .(flmonth = month, flyear = year)]
+filelist <- semi_join(filelist, select,
+                      by = join_by(flmonth == month, flyear == year )) |>
+    select(names)
+# filelist <- filelist[select, on = .(flmonth = month, flyear = year)]
 rm(select, wewantlist, tsilist, BB)
 dummy <- gc()
+cat("Files to do:    ", nrow(filelist), "\n")
 
 
-stop()
 ##  Update TSI data in DB  -----------------------------------------------------
 for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
