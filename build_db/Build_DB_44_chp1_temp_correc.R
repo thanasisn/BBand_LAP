@@ -116,7 +116,6 @@ filelist <- filelist[temp_to_do, on = .(flmonth = month, flyear = year)]
 rm(temp_to_do)
 
 
-
 ## loop data base files computing black for CHP-1
 for (af in filelist$names) {
     datapart <- data.table(read_parquet(af))
@@ -170,8 +169,9 @@ for (af in filelist$names) {
 }
 
 
-
 myunlock(DB_lock)
+
+
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
