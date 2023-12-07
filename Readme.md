@@ -13,6 +13,21 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 ## Table of Contents
 
 <!--ts-->
+* [Broad Band LAP](#broad-band-lap)
+   * [Table of Contents](#table-of-contents)
+   * [Data status overview](#data-status-overview)
+   * [What it does](#what-it-does)
+      * [For CHP-1](#for-chp-1)
+      * [For CM-21](#for-cm-21)
+      * [Other processes](#other-processes)
+      * [Tools](#tools)
+   * [TODO](#todo)
+* [Details](#details)
+   * [Development and Design](#development-and-design)
+   * [Documentation and usage](#documentation-and-usage)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+<!-- Added by: athan, at: 2023-12-07T15:28:01 EET -->
 
 <!--te-->
 
@@ -24,12 +39,12 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 
 | Name             |     Rows | Vars |      Size | Bytes/Value |
 |:-----------------|---------:|-----:|----------:|------------:|
-| BBDB             | 16267680 |   82 |   2.1 GiB |        1.67 |
+| BBDB             | 16269120 |   80 |   2.5 GiB |        2.08 |
 | BBDB meta        |    11298 |   82 |   2.1 MiB |         2.4 |
 | TrackerDB        |  7620049 |   23 | 146.4 MiB |        0.88 |
-| TrackerDB meta   |     2806 |    9 | 172.0 KiB |        6.97 |
-| Raw files hashes |   536194 |    4 |   3.0 MiB |        1.46 |
-| **Total**        | 24438027 |  200 |   2.2 GiB |        0.49 |
+| TrackerDB meta   |     2807 |    9 | 172.0 KiB |        6.97 |
+| Raw files hashes |   560705 |    4 |   3.1 MiB |        1.44 |
+| **Total**        | 24463979 |  198 |   2.7 GiB |        0.59 |
 
 Table: Datasets sizes on 2023-12-07
 
