@@ -52,7 +52,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/process/Export_CM21_TOT.R"
-# renv::load("~/BBand_LAP")
+renv::load("~/BBand_LAP")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))

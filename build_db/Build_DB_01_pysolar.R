@@ -36,7 +36,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB_01_pysolar.R"
 Script.ID   <- "01"
-# renv::load("~/BBand_LAP")
+renv::load("~/BBand_LAP")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))

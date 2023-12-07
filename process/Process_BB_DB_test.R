@@ -7,7 +7,7 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/process/Process_BB_DB_test.R"
-# renv::load("~/BBand_LAP")
+renv::load("~/BBand_LAP")
 
 
 library(rmarkdown)
