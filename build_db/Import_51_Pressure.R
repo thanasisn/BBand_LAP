@@ -61,8 +61,8 @@ if (second(PRESSURE$Date[1]) == 0) {
 }
 names(PRESSURE)[names(PRESSURE) == "pressure"] <- "Pressure"
 names(PRESSURE)[names(PRESSURE) == "Source"  ] <- "Pressure_source"
-InitVariableBBDB("Pressure",        as.numeric(NA))
-InitVariableBBDB("Pressure_source", as.character(NA))
+# InitVariableBBDB("Pressure",        as.numeric(NA))
+# InitVariableBBDB("Pressure_source", as.character(NA))
 
 ## clean some duplicate value
 PRESSURE[duplicated(PRESSURE$Date) & Pressure_source == "iama_corrected" ]
@@ -85,19 +85,19 @@ filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
 ## list data set files possible to touch
 BB <- opendata()
-wewantlist <- BB                           |>
-    select(Date, Pressure)                 |>
+wewantlist <- BB                         |>
+    select(Date, Pressure)               |>
     filter(is.na(Pressure) &
-           Date >= min(PRESSURE$Date))     |>
+           Date >= min(PRESSURE$Date))   |>
      mutate(month = month(Date),
-            year  = year(Date))            |>
-     select(month, year)                  |>
+            year  = year(Date))          |>
+     select(month, year)                 |>
      unique() |> collect()
 
 ## list which data set to touch
 wewantlist <- data.table(wewantlist)
 
-
+## TODO get implementation from 50!
 ## touch these files only
 filelist <- filelist[wewantlist, on = .(flmonth = month, flyear = year)]
 rm(wewantlist, BB, dd)
@@ -125,11 +125,8 @@ for (af in filelist$names) {
     rm(datapart)
 }
 
-
-
-
-
 myunlock(DB_lock)
+
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
