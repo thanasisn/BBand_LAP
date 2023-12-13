@@ -27,7 +27,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Tue Dec 12 05:07:46 AM UTC 2023 -->
+<!-- Added by: athan, at: Wed Dec 13 05:12:08 AM UTC 2023 -->
 
 <!--te-->
 
@@ -39,14 +39,14 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 
 | Name             |     Rows | Vars |      Size | Bytes/Value |
 |:-----------------|---------:|-----:|----------:|------------:|
-| BBDB             | 16274880 |   80 |   2.5 GiB |        2.08 |
-| BBDB meta        |    11303 |   82 |   2.1 MiB |         2.4 |
-| TrackerDB        |  7629127 |   23 | 146.6 MiB |        0.88 |
-| TrackerDB meta   |     2811 |    9 | 172.0 KiB |        6.96 |
-| Raw files hashes |   560725 |    4 |   3.1 MiB |        1.44 |
-| **Total**        | 24478846 |  198 |   2.7 GiB |        0.59 |
+| BBDB             | 16276320 |   80 |   2.5 GiB |        2.08 |
+| BBDB meta        |    11304 |   82 |   2.1 MiB |         2.4 |
+| TrackerDB        |  7630935 |   23 | 146.6 MiB |        0.88 |
+| TrackerDB meta   |     2812 |    9 | 172.0 KiB |        6.96 |
+| Raw files hashes |   560729 |    4 |   3.1 MiB |        1.44 |
+| **Total**        | 24482100 |  198 |   2.7 GiB |        0.59 |
 
-Table: Datasets sizes on 2023-12-12
+Table: Datasets sizes on 2023-12-13
 
 
 
