@@ -204,14 +204,14 @@ for (ap in daystodo) {
     fig <- add_trace(fig, x = gather$Date, y = gather$DIR_otf,
                      name = "Direct beam on-the-fly",
                      line = list(color = "blue"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","DBI F:",round(gather$DIR_otf,4)),
+                     text = paste(format(gather$Date, "%F %R"), "\n", "DBI F:", round(gather$DIR_otf, 1), " SZ:", round(gather$SZA, 1), "AZ:", round(gather$Azimuth, 1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
     ## Direct final product
     fig <- add_trace(fig, x = gather$Date, y = gather$DIR_wpsm,
                      name = "Direct beam Clean",
                      line = list(color = "darkblue"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","DBI C:",round(gather$DIR_wpsm,4)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","DBI C:",round(gather$DIR_wpsm, 1), " SZ:", round(gather$SZA, 1), "AZ:", round(gather$Azimuth, 1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
@@ -219,7 +219,7 @@ for (ap in daystodo) {
     fig <- add_trace(fig, x = gather$Date, y = gather$GLB_otf,
                      name = "Global on-the-fly",
                      line = list(color = "green"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI F:",round(gather$GLB_otf,4)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI F:",round(gather$GLB_otf, 1), " SZ:", round(gather$SZA, 1), "AZ:", round(gather$Azimuth, 1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
@@ -227,7 +227,7 @@ for (ap in daystodo) {
     fig <- add_trace(fig, x = gather$Date, y = gather$GLB_wpsm,
                      name = "Global clean",
                      line = list(color = "darkgreen"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI C:",round(gather$GLB_wpsm,4)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI C:",round(gather$GLB_wpsm, 1), " SZ:", round(gather$SZA, 1), "AZ:", round(gather$Azimuth, 1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
@@ -235,7 +235,7 @@ for (ap in daystodo) {
     fig <- add_trace(fig, x = gather$Date, y = gather$tot_glb,
                      name = "Global Sirena",
                      line = list(color = "lightgreen"),
-                     text = paste(format(gather$Date, "%F %R"),"\n","GHI S:",round(gather$tot_glb,4)),
+                     text = paste(format(gather$Date, "%F %R"),"\n","GHI S:",round(gather$tot_glb, 1), " SZ:", round(gather$SZA, 1), "AZ:", round(gather$Azimuth, 1)),
                      hoverinfo = 'text',
                      mode = "lines", type = "scatter")
 
