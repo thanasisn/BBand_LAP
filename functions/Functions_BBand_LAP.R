@@ -265,8 +265,7 @@ tr_var <- function(x, type = "short") {
         return(NA)
     }
 
-    ty <- which(type == types)
-    cat(ty,"\n")
+    ty  <- which(type == types)
     res <- c()
     for (ax in x) {
         res <- c(res,
