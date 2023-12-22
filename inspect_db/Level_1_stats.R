@@ -5,14 +5,11 @@
 #' author:
 #' - Natsis Athanasios^[Laboratory of Atmospheric Physics, Physics Department, Aristotle University of Thessaloniki, Greece.]
 #' - Fountoulakis Ilias^[Laboratory of Atmospheric Physics, Physics Department, Aristotle University of Thessaloniki, Greece.]
-#' thanks: "Replication files are available on the  (http://gitub.com/smle).
-#'          **Current version**: `r format(Sys.time(), '%B %d, %Y')`;
-#'          ."
 #' abstract:
 #'     " Create meta statistics for the broadband measurements, looking at daily statistics, gathered
 #'       on level 1 process.
 #'     "
-#' keywords:      "AOD, Brewer, Cimel, Lidar, Thessaloniki"
+#' keywords:      "Thessaloniki"
 #' date:          "`r format(Sys.time(), '%B %d, %Y')`"
 #' documentclass: article
 #' classoption:   a4paper,oneside
@@ -92,19 +89,47 @@ panderOptions("table.split.table",        120   )
 
 
 
-library(lubridate)
+
+
+## Date range to run
+START_day <- as.POSIXct("2016-01-01")
+UNTIL_day <- as.POSIXct(Sys.Date())
 
 
 
-## date range to run
-# project_start = PROJECT_START
-project_start <- as.POSIXct("2016-01-01")
-today         <- as.POSIXct(Sys.Date())
+vars <- c()
 
-## get year range
-yearSTA <- as.numeric( format(project_start, format = "%Y") )
-yearEND <- as.numeric( format(x = today, format = "%Y")     )
 
+BB <- opendata()
+
+
+
+BB |>
+    filter(Elevat > 0) |>
+    group_by(year) |>
+    summarise(
+        across(c(GLB_wpsm, DIR_wpsm, GLB_SD_wpsm, DIR_SD_wpsm),
+               list(mean   = ~ mean(  .x, na.rm = TRUE),
+                    median = ~ median(.x, na.rm = TRUE),
+                    min    = ~ min(   .x, na.rm = TRUE),
+                    max    = ~ max(   .x, na.rm = TRUE),
+                    N      = ~ sum(!is.na(.x))
+                    ),
+               .names = "{.col}.{.fn}")
+        ) |>
+    collect() |> data.table()
+
+
+BB |> filter(GLB_wpsm < -100) |> select(Date, GLB_wpsm) |> collect()
+
+
+grep("GLB" ,names(BB), value = T)
+
+tr_var("DIR_wpsm")
+
+
+
+stop()
 
 
 ## INPUTS
@@ -112,8 +137,6 @@ CHP1_BASE    <- "/home/athan/DATA/Broad_Band/LAP_CHP1_L1_stats_"
 CM21_BASE    <- "/home/athan/DATA/Broad_Band/LAP_CM21_H_L1_stats_"
 CHP1_L0FL    <- "/home/athan/DATA/Broad_Band/LAP_CHP1_L0_"
 CM21_L0FL    <- "/home/athan/DATA/Broad_Band/LAP_CM21_H_L0_"
-
-
 ## OUTPUTS
 aggr_years   <- "/home/athan/DATA/Broad_Band/aggregated_years.Rda"
 aggr_logbook <- "/home/athan/DATA/Broad_Band/aggregated_logbook.Rda"
@@ -166,7 +189,7 @@ LBcm_Ysum      <- RAerosols::aggregate_CF2(LBcm[1], dates_vec = LBcm$lower, FUN 
 LBcm_Ysum$Date <- as.numeric(strftime(LBcm_Ysum$Group.1, "%Y"))
 LBcm_Ysum      <- subset(LBcm_Ysum, select = -Group.1)
 
-
+sum()
 
 ST <- data.frame()
 ## loop years and gather data
@@ -266,10 +289,13 @@ title("CM21 data count")
 save( ST_Ymax, ST_Ymin, ST_Ysum, ST_Ymean,  file = aggr_years   )
 save( LBch_Ysum, LBtm_Ysum, LBcm_Ysum,      file = aggr_logbook )
 
+
+
+
 #' **END**
 #+ include=T, echo=F
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+# cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
+#     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
 
