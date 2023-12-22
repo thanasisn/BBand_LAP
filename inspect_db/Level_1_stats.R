@@ -79,13 +79,9 @@ source("~/CODE/FUNCTIONS/R/execlock.R")
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
-library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
-library(tools,      warn.conflicts = FALSE, quietly = TRUE)
-library(pander,     warn.conflicts = FALSE, quietly = TRUE)
+library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
-panderOptions("table.alignment.default", "right")
-panderOptions("table.split.table",        120   )
 
 
 ## Date range to run
@@ -124,6 +120,8 @@ stats_yearly <- BB            |>
     arrange(year)             |>
     collect()                 |>
     data.table()
+## create proper date
+stats_yearly[, Date := as.Date(paste(year, "0", "0"), format = "%Y %m %d")]
 
 
 ##  Daily statistics  ----------------------------------------------------------
@@ -186,13 +184,37 @@ save(list = ls(pattern = "stats_"),
 
 
 
-## Find some days
-BB |> filter(GLB_wpsm < -18) |> select(Date) |> mutate(Date = as.Date(Date)) |>  collect() |> unique()
+## Find some negative days
+BB |> filter(GLB_wpsm < -17) |> select(Date) |> mutate(Date = as.Date(Date)) |> collect() |> unique()
 
 
 
 
 
+## some plots
+
+datas <- ls(pattern = "stats_")
+
+for (dbn in datas) {
+    DB     <- get(dbn)
+    wecare <- grep("year|month|Date", names(DB), value = T, invert = T)
+    for (avar in wecare) {
+        ## skip empty
+        if (all(!DB[[avar]] %in% c(NA, NaN, 0))) next()
+
+
+
+
+       p <- ggplot() +
+           aes(x = DB$Date, y = DB[[avar]]) +
+           geom_point() +
+           theme_bw()
+       print(p)
+       # ggplotly(p)
+
+
+    }
+}
 
 
 
