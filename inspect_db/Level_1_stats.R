@@ -88,16 +88,14 @@ panderOptions("table.alignment.default", "right")
 panderOptions("table.split.table",        120   )
 
 
-
-
-
 ## Date range to run
 START_day <- as.POSIXct("2016-01-01")
 UNTIL_day <- as.POSIXct(Sys.Date())
 
 
+## Variables for stats
+vars <- c("GLB_wpsm", "DIR_wpsm", "GLB_SD_wpsm", "DIR_SD_wpsm")
 
-vars <- c()
 
 
 BB <- opendata()
@@ -105,33 +103,23 @@ BB <- opendata()
 
 ##  Yearly statistics  ---------------------------------------------------------
 
-stats_yearly <- BB |>
+stats_yearly <- BB     |>
     filter(Elevat > 0) |>
-    group_by(year) |>
+    group_by(year)     |>
     summarise(
-        across(c(GLB_wpsm, DIR_wpsm, GLB_SD_wpsm, DIR_SD_wpsm),
-               list(mean   = ~ mean(  .x, na.rm = TRUE),
-                    median = ~ median(.x, na.rm = TRUE),
-                    min    = ~ min(   .x, na.rm = TRUE),
-                    max    = ~ max(   .x, na.rm = TRUE),
-                    N      = ~ sum(!is.na(.x))
-               ),
-               .names = "{.col}.{.fn}")
+        across(
+            all_of(vars),
+            list(mean   = ~ mean(  .x, na.rm = TRUE),
+                 median = ~ median(.x, na.rm = TRUE),
+                 min    = ~ min(   .x, na.rm = TRUE),
+                 max    = ~ max(   .x, na.rm = TRUE),
+                 N      = ~ sum(!is.na(.x))
+            ),
+            .names = "{.col}.{.fn}"
+        )
     ) |>
     arrange(year) |>
     collect() |> data.table()
-
-
-
-
-
-BB |> filter(GLB_wpsm < -19) |> select(Date) |> mutate(Date = as.Date(Date)) |>  collect() |> unique()
-
-
-grep("date", names(BB), value = T, ignore.case = T)
-
-
-
 
 
 
@@ -140,20 +128,58 @@ grep("date", names(BB), value = T, ignore.case = T)
 
 stats_daily <- BB |>
     filter(Elevat > 0)          |>
-    mutate(Day = as.Date(Date)) |>
-    group_by(Day)               |>
+    mutate(Date = as.Date(Date)) |>
+    group_by(Date)               |>
     summarise(
-        across(c(GLB_wpsm, DIR_wpsm, GLB_SD_wpsm, DIR_SD_wpsm),
+        across(
+            all_of(vars),
+            list(mean   = ~ mean(  .x, na.rm = TRUE),
+                 median = ~ median(.x, na.rm = TRUE),
+                 min    = ~ min(   .x, na.rm = TRUE),
+                 max    = ~ max(   .x, na.rm = TRUE),
+                 N      = ~ sum(!is.na(.x))
+            ),
+            .names = "{.col}.{.fn}"
+        )
+    ) |>
+    arrange(Date) |>
+    collect()     |> data.table()
+
+
+
+##  Monthly statistics  --------------------------------------------------------
+
+
+stats_monthly <- BB |>
+    filter(Elevat > 0)          |>
+    group_by(year, month)       |>
+    summarise(
+        across(
+            all_of(vars),
                list(mean   = ~ mean(  .x, na.rm = TRUE),
                     median = ~ median(.x, na.rm = TRUE),
                     min    = ~ min(   .x, na.rm = TRUE),
                     max    = ~ max(   .x, na.rm = TRUE),
                     N      = ~ sum(!is.na(.x))
                ),
-               .names = "{.col}.{.fn}")
+               .names = "{.col}.{.fn}"
+            )
     ) |>
-    arrange(Day) |>
+    arrange(year, month) |>
     collect() |> data.table()
+
+stats_monthly[, Date := as.Date(paste(year, month, "15"), format = "%Y %m %d")]
+
+
+
+save(list = ls(pattern = "stats_"),
+     file = "~/BBand_LAP/SIDE_DATA/BB_Statistics.Rda")
+
+
+## Find days
+BB |> filter(GLB_wpsm < -18) |> select(Date) |> mutate(Date = as.Date(Date)) |>  collect() |> unique()
+
+
 
 
 
@@ -163,11 +189,6 @@ stats_daily <- BB |>
 stop()
 
 
-## INPUTS
-CHP1_BASE    <- "/home/athan/DATA/Broad_Band/LAP_CHP1_L1_stats_"
-CM21_BASE    <- "/home/athan/DATA/Broad_Band/LAP_CM21_H_L1_stats_"
-CHP1_L0FL    <- "/home/athan/DATA/Broad_Band/LAP_CHP1_L0_"
-CM21_L0FL    <- "/home/athan/DATA/Broad_Band/LAP_CM21_H_L0_"
 ## OUTPUTS
 aggr_years   <- "/home/athan/DATA/Broad_Band/aggregated_years.Rda"
 aggr_logbook <- "/home/athan/DATA/Broad_Band/aggregated_logbook.Rda"
@@ -214,10 +235,6 @@ sum()
 
 
 
-
-#### SAVE DATA OBJECTS ####
-save( ST_Ymax, ST_Ymin, ST_Ysum, ST_Ymean,  file = aggr_years   )
-save( LBch_Ysum, LBtm_Ysum, LBcm_Ysum,      file = aggr_logbook )
 
 
 
