@@ -46,12 +46,10 @@
 #'
 #' ---
 
-#
-# Do some aggregation over the daily stats and export data object to be used on reports
-#
 
 
-#+ echo=F, include=F
+
+#+ echo=F, include=T
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -83,6 +81,10 @@ library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
 
+#'
+#' Do some aggregation over the daily stats and export data object to be used on reports
+#'
+#+ echo=F, include=T
 
 ## Date range to run
 START_day <- as.POSIXct("1993-04-12") ## start of cm21
@@ -121,7 +123,7 @@ stats_yearly <- BB            |>
     collect()                 |>
     data.table()
 ## create proper date
-stats_yearly[, Date := as.Date(paste(year, "0", "0"), format = "%Y %m %d")]
+stats_yearly[, Date := as.Date(paste(year, "1", "1"), format = "%Y %m %d")]
 
 
 ##  Daily statistics  ----------------------------------------------------------
@@ -185,8 +187,19 @@ save(list = ls(pattern = "stats_"),
 
 
 ## Find some negative days
+
+#'
+#' Days with negative global
+#'
+#+ echo=F, include=T
 BB |> filter(GLB_wpsm < -17) |> select(Date) |> mutate(Date = as.Date(Date)) |> collect() |> unique()
 
+
+#'
+#' Days with negative direct
+#'
+#+ echo=F, include=T
+BB |> filter(DIR_wpsm < -3) |> select(Date) |> mutate(Date = as.Date(Date)) |> collect() |> unique()
 
 
 
@@ -202,68 +215,32 @@ for (dbn in datas) {
         ## skip empty
         if (all(!DB[[avar]] %in% c(NA, NaN, 0))) next()
 
-
-
-
-       p <- ggplot() +
-           aes(x = DB$Date, y = DB[[avar]]) +
-           geom_point() +
-           theme_bw()
-       print(p)
-       # ggplotly(p)
-
-
+        ## basic plot
+        p <- ggplot() +
+            aes(x = DB$Date, y = DB[[avar]]) +
+            geom_point() +
+            labs(title = paste(tr_var(avar),  sub(".*\\.", "", avar), sub(".*\\_", "", dbn)),
+                 x = "",
+                 y = avar) +
+            theme_bw()
+        suppressWarnings(print(p))
+        # theme(
+        #     panel.background = element_rect(fill='transparent'), #transparent panel bg
+        #     plot.background = element_rect(fill='transparent', color=NA), #transparent plot bg
+        #     panel.grid.major = element_blank(), #remove major gridlines
+        #     panel.grid.minor = element_blank(), #remove minor gridlines
+        #     legend.background = element_rect(fill='transparent'), #transparent legend bg
+        #     legend.box.background = element_rect(fill='transparent') #transparent legend panel
+        # )
+        cat(" \n \n")
     }
 }
 
 
 
-stop()
-
-
 ## OUTPUTS
 aggr_years   <- "/home/athan/DATA/Broad_Band/aggregated_years.Rda"
 aggr_logbook <- "/home/athan/DATA/Broad_Band/aggregated_logbook.Rda"
-
-
-## VARIABLES
-elevation_limit  <-       -2
-cleaness_idx_lim <- c( -4, 4   )
-diffuse_frac_lim <- c(  0, 1.1 )
-
-tag <- paste0("Natsis Athanasios LAP AUTH ",
-              strftime(Sys.time(), format = "%b %Y" ))
-
-LBch <- data.frame()
-LBtm <- data.frame()
-LBcm <- data.frame()
-## loop years and gather data
-for (YY in yearSTA:yearEND) {
-
-    cat( paste("Year", YY, " \n" ) )
-
-    ####  CHP-1 data  ####
-    year_file <- paste0(CHP1_L0FL, YY, "_logbook", ".Rds")
-    stopifnot( file.exists(year_file) )
-    CHP1_L0   <- readRDS(year_file)
-    LBch      <- rbind(LBch, CHP1_L0[ CHP1_L0$removed_count > 0, ])
-    ####  CHP-1 temperature  ####
-    year_file <- paste0(CHP1_L0FL, YY, "_logbook_temp", ".Rds")
-    stopifnot( file.exists(year_file) )
-    CHP1_L0   <- readRDS(year_file)
-    LBtm      <- rbind(LBtm, CHP1_L0[ CHP1_L0$removed_count > 0, ])
-    ####  CM-21 data  ####
-    year_file <- paste0(CM21_L0FL, YY, "_logbook", ".Rds")
-    stopifnot( file.exists(year_file) )
-    CM21_L0   <- readRDS(year_file)
-    LBcm      <- rbind(LBcm, CM21_L0[CM21_L0$removed_count > 0, ] )
-
-    rm(CHP1_L0, CM21_L0)
-}
-
-
-sum()
-
 
 
 
