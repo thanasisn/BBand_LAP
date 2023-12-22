@@ -89,7 +89,7 @@ panderOptions("table.split.table",        120   )
 
 
 ## Date range to run
-START_day <- as.POSIXct("2016-01-01")
+START_day <- as.POSIXct("1993-04-12") ## start of cm21
 UNTIL_day <- as.POSIXct(Sys.Date())
 
 
@@ -101,11 +101,14 @@ vars <- c("GLB_wpsm", "DIR_wpsm", "GLB_SD_wpsm", "DIR_SD_wpsm")
 BB <- opendata()
 
 
-##  Yearly statistics  ---------------------------------------------------------
+# BB |> filter(!is.na(GLB_SD_wpsm)) |> summarise(min(Date)) |> collect()
 
-stats_yearly <- BB     |>
-    filter(Elevat > 0) |>
-    group_by(year)     |>
+##  Yearly statistics  ---------------------------------------------------------
+stats_yearly <- BB            |>
+    filter(Elevat > 0)        |>
+    filter(Date >= START_day) |>
+    filter(Date <= UNTIL_day) |>
+    group_by(year)            |>
     summarise(
         across(
             all_of(vars),
@@ -117,17 +120,17 @@ stats_yearly <- BB     |>
             ),
             .names = "{.col}.{.fn}"
         )
-    ) |>
-    arrange(year) |>
-    collect() |> data.table()
-
-
+    )                         |>
+    arrange(year)             |>
+    collect()                 |>
+    data.table()
 
 
 ##  Daily statistics  ----------------------------------------------------------
-
 stats_daily <- BB |>
-    filter(Elevat > 0)          |>
+    filter(Elevat > 0)           |>
+    filter(Date >= START_day)    |>
+    filter(Date <= UNTIL_day)    |>
     mutate(Date = as.Date(Date)) |>
     group_by(Date)               |>
     summarise(
@@ -141,18 +144,18 @@ stats_daily <- BB |>
             ),
             .names = "{.col}.{.fn}"
         )
-    ) |>
-    arrange(Date) |>
-    collect()     |> data.table()
-
+    )                            |>
+    arrange(Date)                |>
+    collect()                    |>
+    data.table()
 
 
 ##  Monthly statistics  --------------------------------------------------------
-
-
-stats_monthly <- BB |>
-    filter(Elevat > 0)          |>
-    group_by(year, month)       |>
+stats_monthly <- BB           |>
+    filter(Elevat > 0)        |>
+    filter(Date >= START_day) |>
+    filter(Date <= UNTIL_day) |>
+    group_by(year, month)     |>
     summarise(
         across(
             all_of(vars),
@@ -165,9 +168,10 @@ stats_monthly <- BB |>
                .names = "{.col}.{.fn}"
             )
     ) |>
-    arrange(year, month) |>
-    collect() |> data.table()
-
+    arrange(year, month)      |>
+    collect()                 |>
+    data.table()
+## create proper date
 stats_monthly[, Date := as.Date(paste(year, month, "15"), format = "%Y %m %d")]
 
 
@@ -176,7 +180,13 @@ save(list = ls(pattern = "stats_"),
      file = "~/BBand_LAP/SIDE_DATA/BB_Statistics.Rda")
 
 
-## Find days
+
+
+
+
+
+
+## Find some days
 BB |> filter(GLB_wpsm < -18) |> select(Date) |> mutate(Date = as.Date(Date)) |>  collect() |> unique()
 
 
