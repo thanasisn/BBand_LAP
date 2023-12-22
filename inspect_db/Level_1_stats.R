@@ -103,8 +103,9 @@ vars <- c()
 BB <- opendata()
 
 
+##  Yearly statistics  ---------------------------------------------------------
 
-BB |>
+stats_yearly <- BB |>
     filter(Elevat > 0) |>
     group_by(year) |>
     summarise(
@@ -114,18 +115,48 @@ BB |>
                     min    = ~ min(   .x, na.rm = TRUE),
                     max    = ~ max(   .x, na.rm = TRUE),
                     N      = ~ sum(!is.na(.x))
-                    ),
+               ),
                .names = "{.col}.{.fn}")
-        ) |>
+    ) |>
+    arrange(year) |>
     collect() |> data.table()
 
 
-BB |> filter(GLB_wpsm < -100) |> select(Date) |> mutate(Date = as.Date(Date)) |>  collect() |> unique()
 
 
-grep("GLB" ,names(BB), value = T)
 
-tr_var("DIR_wpsm")
+BB |> filter(GLB_wpsm < -19) |> select(Date) |> mutate(Date = as.Date(Date)) |>  collect() |> unique()
+
+
+grep("date", names(BB), value = T, ignore.case = T)
+
+
+
+
+
+
+
+##  Daily statistics  ----------------------------------------------------------
+
+stats_daily <- BB |>
+    filter(Elevat > 0)          |>
+    mutate(Day = as.Date(Date)) |>
+    group_by(Day)               |>
+    summarise(
+        across(c(GLB_wpsm, DIR_wpsm, GLB_SD_wpsm, DIR_SD_wpsm),
+               list(mean   = ~ mean(  .x, na.rm = TRUE),
+                    median = ~ median(.x, na.rm = TRUE),
+                    min    = ~ min(   .x, na.rm = TRUE),
+                    max    = ~ max(   .x, na.rm = TRUE),
+                    N      = ~ sum(!is.na(.x))
+               ),
+               .names = "{.col}.{.fn}")
+    ) |>
+    arrange(Day) |>
+    collect() |> data.table()
+
+
+
 
 
 
@@ -177,111 +208,10 @@ for (YY in yearSTA:yearEND) {
     rm(CHP1_L0, CM21_L0)
 }
 
-LBch_Ysum      <- RAerosols::aggregate_CF2(LBch[1], dates_vec = LBch$lower, FUN = sum, unit = "year" )
-LBch_Ysum$Date <- as.numeric(strftime(LBch_Ysum$Group.1, "%Y"))
-LBch_Ysum      <- subset(LBch_Ysum, select = -Group.1)
-
-LBtm_Ysum      <- RAerosols::aggregate_CF2(LBtm[1], dates_vec = LBtm$lower, FUN = sum, unit = "year" )
-LBtm_Ysum$Date <- as.numeric(strftime(LBtm_Ysum$Group.1, "%Y"))
-LBtm_Ysum      <- subset(LBtm_Ysum, select = -Group.1)
-
-LBcm_Ysum      <- RAerosols::aggregate_CF2(LBcm[1], dates_vec = LBcm$lower, FUN = sum, unit = "year" )
-LBcm_Ysum$Date <- as.numeric(strftime(LBcm_Ysum$Group.1, "%Y"))
-LBcm_Ysum      <- subset(LBcm_Ysum, select = -Group.1)
 
 sum()
 
-ST <- data.frame()
-## loop years and gather data
-for (YY in yearSTA:yearEND) {
 
-    cat( paste("Year", YY, "\n" ) )
-
-    ####  Load CHP-1 data  ####
-    year_file <- paste0(CHP1_BASE, YY, ".Rds")
-    stopifnot( file.exists(year_file) )
-    CHP1_L1   <- readRDS(year_file)
-
-    ####  Load CM-21 data  ####
-    year_file <- paste0(CM21_BASE, YY, ".Rds")
-    stopifnot( file.exists(year_file))
-    CM21_L1   <- readRDS(year_file)
-
-    ## mark days with data
-    CHP1_L1$chp1_act <- CHP1_L1$cCHP1_meas > 0
-    CM21_L1$cm21_act <- CM21_L1$cCM21_meas > 0
-
-    ## merge all data to plot
-    STp <- merge(CM21_L1, CHP1_L1, all = T )
-    ST  <- rbind(ST,STp)
-
-    ### yearly data availability
-    CHP1_L1$chp1_nar <- CHP1_L1$cCHP1_NA - CHP1_L1$async
-    CHP1_L1$chp1_nar[ CHP1_L1$chp1_nar == 0 ] <- NA
-
-    plot(CHP1_L1$Date,CHP1_L1$cSun, ylim = range(CHP1_L1$cSun,CHP1_L1$async))
-    points(CHP1_L1$Date,CHP1_L1$cCHP1_meas, col = "blue")
-    points(CHP1_L1$Date,CHP1_L1$async,      col = "red")
-    points(CHP1_L1$Date,CHP1_L1$chp1_nar,   col = "magenta")
-
-    plot(  CM21_L1$Date, CM21_L1$cSun)
-    points(CM21_L1$Date, CM21_L1$cCM21_meas, col = "green")
-    points(CM21_L1$Date, CM21_L1$cCM21_NA,   col = "red")
-
-    # stop()
-    rm(CM21_L1,CHP1_L1,STp)
-}
-
-
-
-## yearly aggregation
-ST_Ysum       <- RAerosols::aggregate_CF2(ST[,!unlist(lapply(ST[1,], is.POSIXct))], dates_vec = ST$Date,
-                                          FUN = sum, unit = "year", na.rm = T)
-ST_Ysum$Date  <- as.numeric(strftime(ST_Ysum$Group.1, "%Y"))
-ST_Ysum       <- subset(ST_Ysum, select = -Group.1)
-
-ST_Ymax       <- RAerosols::aggregate_CF2(ST, dates_vec = ST$Date, FUN = max , unit = "year", na.rm = T)
-ST_Ymax$Date  <- as.numeric(strftime(ST_Ymax$Group.1, "%Y"))
-ST_Ymax       <- subset(ST_Ymax, select = -Group.1)
-
-ST_Ymin       <- RAerosols::aggregate_CF2(ST, dates_vec = ST$Date, FUN = min , unit = "year", na.rm = T)
-ST_Ymin$Date  <- as.numeric(strftime(ST_Ymin$Group.1, "%Y"))
-ST_Ymin       <- subset(ST_Ymin, select = -Group.1)
-
-ST_Ymean      <- RAerosols::aggregate_CF2(ST, dates_vec = ST$Date, FUN = mean , unit = "year", na.rm = T)
-ST_Ymean$Date <- as.numeric(strftime(ST_Ymean$Group.1, "%Y"))
-ST_Ymean      <- subset(ST_Ymean, select = -Group.1)
-
-
-
-#'
-#' ## CHP 1 async stats
-#'
-
-chp1_nar <- ST$cCHP1_NA - ST$async
-chp1_nar[ chp1_nar == 0 ] <- NA
-
-plot(  ST$Date, ST$cSun,
-       ylim = range(ST$cSun,0, na.rm = T),
-       pch = 19, cex = 0.8, xlab = "", ylab = "Number of data points" )
-points(ST$Date, ST$cCHP1_meas, col = "blue",    pch = 19, cex = 0.6)
-points(ST$Date, ST$async,      col = "red",     pch = 19, cex = 0.6)
-points(ST$Date, chp1_nar,      col = "magenta", pch = 19, cex = 0.6)
-title("CHP1 data count")
-
-
-plot(  ST$Date, ST$cSun,
-       ylim = range(ST$cSun,0, na.rm = T),
-       pch=19, cex=0.8, xlab = "", ylab = "Number of data points" )
-points(ST$Date, ST$cCM21_meas, col = "green", pch = 19, cex = 0.6)
-points(ST$Date, ST$cCM21_NA,   col = "red",   pch = 19, cex = 0.6)
-title("CM21 data count")
-
-
-##TODO plot consecutive async!!
-
-
-##TODO plot consecutive NA!!
 
 
 
