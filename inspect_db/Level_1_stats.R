@@ -120,7 +120,7 @@ BB |>
     collect() |> data.table()
 
 
-BB |> filter(GLB_wpsm < -100) |> select(Date, GLB_wpsm) |> collect()
+BB |> filter(GLB_wpsm < -100) |> select(Date) |> mutate(Date = as.Date(Date)) |>  collect() |> unique()
 
 
 grep("GLB" ,names(BB), value = T)
