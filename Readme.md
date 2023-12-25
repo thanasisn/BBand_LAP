@@ -27,7 +27,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Sun Dec 24 04:45:43 AM UTC 2023 -->
+<!-- Added by: athan, at: Mon Dec 25 04:49:33 AM UTC 2023 -->
 
 <!--te-->
 
@@ -41,12 +41,12 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 |:-----------------|---------:|-----:|----------:|------------:|
 | BBDB             | 16290720 |   80 |   2.5 GiB |        2.08 |
 | BBDB meta        |    11313 |   82 |   2.1 MiB |         2.4 |
-| TrackerDB        |  7650672 |   23 | 146.9 MiB |        0.88 |
-| TrackerDB meta   |     2823 |    9 | 172.0 KiB |        6.93 |
+| TrackerDB        |  7652454 |   23 | 146.9 MiB |        0.88 |
+| TrackerDB meta   |     2824 |    9 | 172.0 KiB |        6.93 |
 | Raw files hashes |   609907 |    4 |   3.3 MiB |        1.41 |
-| **Total**        | 24565435 |  198 |   2.7 GiB |        0.59 |
+| **Total**        | 24567218 |  198 |   2.7 GiB |        0.59 |
 
-Table: Datasets sizes on 2023-12-24
+Table: Datasets sizes on 2023-12-25
 
 
 
