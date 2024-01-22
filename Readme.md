@@ -27,7 +27,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Sun Jan 21 04:46:01 AM UTC 2024 -->
+<!-- Added by: athan, at: Mon Jan 22 04:50:52 AM UTC 2024 -->
 
 <!--te-->
 
@@ -46,7 +46,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 | Raw files hashes |   609907 |    4 |   3.3 MiB |        1.41 |
 | **Total**        | 24617147 |  198 |   2.7 GiB |        0.59 |
 
-Table: Datasets sizes on 2024-01-21
+Table: Datasets sizes on 2024-01-22
 
 
 
