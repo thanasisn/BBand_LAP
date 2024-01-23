@@ -92,7 +92,7 @@ UNTIL_day <- as.POSIXct(Sys.Date())
 
 
 ## Variables for stats
-vars <- c("GLB_wpsm", "DIR_wpsm", "GLB_SD_wpsm", "DIR_SD_wpsm")
+vars <- c("GLB_wpsm", "DIR_wpsm", "GLB_SD_wpsm", "DIR_SD_wpsm", "SZA")
 
 
 
