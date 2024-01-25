@@ -131,6 +131,8 @@ Other journals and log exist, but are not included here.
    * [2023-11-02 11:13 [ThanasisN]](#2023-11-02-1113-thanasisn)
    * [2023-11-06 12:30 [ThanasisN]](#2023-11-06-1230-thanasisn)
    * [2023-11-07 11:00 [ThanasisN]](#2023-11-07-1100-thanasisn)
+* [2024](#2024)
+   * [2024-01-25 13:05 EET [ThanasisN]](#2024-01-25-1305-eet-thanasisn)
 * [Journal instructions](#journal-instructions)
    * [Format for entries](#format-for-entries)
       * [Filenames should be numerical sorted](#filenames-should-be-numerical-sorted)
@@ -139,7 +141,7 @@ Other journals and log exist, but are not included here.
 * [List of tags](#list-of-tags)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2023-11-07T15:28:27 EET -->
+<!-- Added by: athan, at: Thu Jan 25 01:20:04 PM EET 2024 -->
 
 <!--te-->
 
@@ -1613,6 +1615,33 @@ The instrument was taken to a metal workshop where the threads of the body and t
 It was installed, with new silica gel.
 
 The tracker was checked and was level.
+
+
+
+:::
+
+
+\newpage
+
+# 2024
+
+::: {.columns columngap=4em column-rule="1px solid black"}
+
+---
+tags:      [ cleaning ]
+created:   2024-01-25 13:05:23 EET
+cunixtime: 1706180723
+UTC:       2024-01-25 11:05:23 UTC
+---
+
+## 2024-01-25 13:05 EET [ThanasisN]
+
+Cleaning of broadband and brewers windows at :
+
+13:02 - 13:03 LT
+
+11:02 - 11:03 LT
+
 
 
 
