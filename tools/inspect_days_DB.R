@@ -71,7 +71,7 @@ if (!all((ranges_CM21$Until - ranges_CM21$From) >= 1)) {
 
 ## For Brave ----
 ## use a user-data-dir to avoid load my custom colors
-BROWSER_CMD <- "brave-browser --window-size=1240,720 --user-data-dir=/tmp/bravetmp --incognito -app=file://"
+BROWSER_CMD <- "brave-browser  --password-store=basic --window-size=1240,720 --user-data-dir=/tmp/bravetmp --incognito -app=file://"
 ## --
 
 
