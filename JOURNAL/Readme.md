@@ -116,9 +116,16 @@ Other journals and log exist, but are not included here.
    * [2022-06-16 00:00 [BA]](#2022-06-16-0000-ba)
    * [2022-06-27 11:40 [ThanasisN]](#2022-06-27-1140-thanasisn)
 * [2023](#2023)
-   * [2023-09-11 06:10 EEST](#2023-09-11-0610-eest)
+   * [2023-09-11 06:10 UTC [ThanasisN]](#2023-09-11-0610-utc-thanasisn)
+   * [tags:      [ chp1 tracker ]](#tags-------chp1-tracker-)
+   * [2023-11-06 12:30 [ThanasisN]](#2023-11-06-1230-thanasisn)
+   * [tags:      [ chp1 problem ]](#tags-------chp1-problem-)
+   * [2023-11-07 11:00 [ThanasisN]](#2023-11-07-1100-thanasisn)
+   * [tags: [ cm21 ]](#tags--cm21-)
    * [2023-03-28 15:48 [ThanasisN]](#2023-03-28-1548-thanasisn)
+   * [tags: [ cm21 ]](#tags--cm21--1)
    * [2023-03-28 17:31 [ThanasisN]](#2023-03-28-1731-thanasisn)
+   * [tags: [  problem radmon ]](#tags---problem-radmon-)
    * [2023-04-03 09:14 [ThanasisN]](#2023-04-03-0914-thanasisn)
    * [2023-04-04 12:59 [ThanasisN]](#2023-04-04-1259-thanasisn)
    * [2023-04-19 09:19 [ThanasisN]](#2023-04-19-0919-thanasisn)
@@ -130,10 +137,6 @@ Other journals and log exist, but are not included here.
    * [2023-10-30 13:54 [ThanasisN]](#2023-10-30-1354-thanasisn)
    * [2023-10-31 09:59 [ThanasisN]](#2023-10-31-0959-thanasisn)
    * [2023-11-02 11:13 [ThanasisN]](#2023-11-02-1113-thanasisn)
-   * [tags:      [ chp1 tracker ]](#tags-------chp1-tracker-)
-   * [2023-11-06 12:30 [ThanasisN]](#2023-11-06-1230-thanasisn)
-   * [tags:      [ chp1 problem ]](#tags-------chp1-problem-)
-   * [2023-11-07 11:00 [ThanasisN]](#2023-11-07-1100-thanasisn)
 * [2024](#2024)
    * [2024-01-25 13:05 EET [ThanasisN]](#2024-01-25-1305-eet-thanasisn)
    * [2024-01-26 [ThanasisN]](#2024-01-26-thanasisn)
@@ -146,7 +149,7 @@ Other journals and log exist, but are not included here.
 * [New List of tags](#new-list-of-tags)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Fri Jan 26 08:00:05 PM EET 2024 -->
+<!-- Added by: athan, at: Fri Jan 26 08:40:05 PM EET 2024 -->
 
 <!--te-->
 
@@ -1436,23 +1439,53 @@ Last data in horizontal position is at
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
 ---
-tags:      [  ]
-scope:     
+tags:      [ chp1 error problem data_loss cleaning suspicious_data ]
 created:   2023-09-11 06:10:00 EEST
 cunixtime: 1694401800
 UTC:       2023-09-11 03:10:00 UTC
 ---
 
-## 2023-09-11 06:10 EEST
+## 2023-09-11 06:10 UTC [ThanasisN]
+
+CHP-1 was cleaned!
+
+Window was very dirty, and that created a jump in the measurements!!
 
 
 
+---
+tags:      [ chp1 tracker ]
+---
+
+## 2023-11-06 12:30 [ThanasisN]
+
+Tracker was installed, measurement have started!
+
+Leveling, sighting, window cleaning and replacing of silica gel was done.
+
+The tracker had a burned out microcontroller.
 
 
 
+---
+tags:      [ chp1 problem ]
+---
+
+## 2023-11-07 11:00 [ThanasisN]
+
+The CHP-1 was removed to fix a problem with the silica gel compartment.
+
+The instrument was taken to a metal workshop where the threads of the body and the silica gel compartment were altered.
+
+It was installed, with new silica gel.
+
+The tracker was checked and was level.
+
+
+---
+tags: [ cm21 ]
+---
 ## 2023-03-28 15:48 [ThanasisN]
-
-[//]: # (Keywords: #cm21)
 
 We removed some Global radiation data output constrains.
 
@@ -1465,10 +1498,10 @@ Will update all sirena data for years 2006-2022, previous exported by us.
 
 
 
-
+---
+tags: [ cm21 ]
+---
 ## 2023-03-28 17:31 [ThanasisN]
-
-[//]: # (Keywords: #cm21)
 
 Sirena TOT files updated for 2006-2022.
 
@@ -1476,12 +1509,12 @@ With the new output scheme.
 
 
 
-
+---
+tags: [  problem radmon ]
+---
 ## 2023-04-03 09:14 [ThanasisN]
 
-[//]: # (Keywords: #problem, #radmon)
-
-Radmon found freezed with different system errors.
+Radmon found frizzed with different system errors.
 
 No tracking with CHP-1 at start of the day. Day is cloudy.
 
@@ -1609,35 +1642,6 @@ Tracker is still down.
 Send for service.
 
 
----
-tags:      [ chp1 tracker ]
----
-
-## 2023-11-06 12:30 [ThanasisN]
-
-Tracker was installed, measurement have started!
-
-Leveling, sighting, window cleaning and replacing of silica gel was done.
-
-The tracker had a burned out microcontroller.
-
-
-
----
-tags:      [ chp1 problem ]
----
-
-## 2023-11-07 11:00 [ThanasisN]
-
-The CHP-1 was removed to fix a problem with the silica gel compartment.
-
-The instrument was taken to a metal workshop where the threads of the body and the silica gel compartment were altered.
-
-It was installed, with new silica gel.
-
-The tracker was checked and was level.
-
-
 
 :::
 
@@ -1744,7 +1748,7 @@ List of tags
      58 #chp1
       1 #cleaned
      16 #cleaning
-     12 #cm21
+     10 #cm21
       2 #codding
       3 #data_corruption_certain
       1 #data_format_change
@@ -1758,9 +1762,9 @@ List of tags
       5 #leveling
       1 #mounting
       2 #panic
-      9 #problem
+      8 #problem
       2 #pysolar
-      2 #radmon
+      1 #radmon
       1 #radmon_reboot
       6 #silica
       2 #sun_vector
@@ -1775,8 +1779,12 @@ List of tags
 New List of tags
 ============
       1 broadband
-      2 chp1
-      1 cleaning
-      2 problem
-      1 radmon
+      3 chp1
+      2 cleaning
+      2 cm21
+      1 data_loss
+      1 error
+      4 problem
+      2 radmon
+      1 suspicious_data
       1 tracker
