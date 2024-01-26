@@ -8,7 +8,7 @@ List of tags
      58 #chp1
       1 #cleaned
      16 #cleaning
-     12 #cm21
+     10 #cm21
       2 #codding
       3 #data_corruption_certain
       1 #data_format_change
@@ -22,9 +22,9 @@ List of tags
       5 #leveling
       1 #mounting
       2 #panic
-      9 #problem
+      8 #problem
       2 #pysolar
-      2 #radmon
+      1 #radmon
       1 #radmon_reboot
       6 #silica
       2 #sun_vector
@@ -39,8 +39,12 @@ List of tags
 New List of tags
 ============
       1 broadband
-      2 chp1
-      1 cleaning
-      2 problem
-      1 radmon
+      3 chp1
+      2 cleaning
+      2 cm21
+      1 data_loss
+      1 error
+      4 problem
+      2 radmon
+      1 suspicious_data
       1 tracker
