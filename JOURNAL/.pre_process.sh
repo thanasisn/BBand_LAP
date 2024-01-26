@@ -88,6 +88,18 @@ grep "\[//\]" **/*.md |\
     sed -e 's/^[ ]\+//' -e 's|[ ]\+$||' |\
     sort |\
     uniq -c
+
+echo ""
+echo "New List of tags"
+echo "============"
+grep -h "[ ]*tags:.*" ./**/*.md |\
+    sed 's/tags:[ ]*\[//g' |\
+    sed 's/\]//g'          |\
+    tr " " "\n"            |\
+    sed '/^$/d'            |\
+    sort                   |\
+    uniq -c
+
 ) > "$taglist"
 
 cat "$taglist" >> "$targetfile"
