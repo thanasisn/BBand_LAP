@@ -133,6 +133,7 @@ Other journals and log exist, but are not included here.
    * [2023-11-07 11:00 [ThanasisN]](#2023-11-07-1100-thanasisn)
 * [2024](#2024)
    * [2024-01-25 13:05 EET [ThanasisN]](#2024-01-25-1305-eet-thanasisn)
+   * [2024-01-26 [ThanasisN]](#2024-01-26-thanasisn)
 * [Journal instructions](#journal-instructions)
    * [Format for entries](#format-for-entries)
       * [Filenames should be numerical sorted](#filenames-should-be-numerical-sorted)
@@ -141,7 +142,7 @@ Other journals and log exist, but are not included here.
 * [List of tags](#list-of-tags)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Thu Jan 25 01:20:04 PM EET 2024 -->
+<!-- Added by: athan, at: Fri Jan 26 06:00:05 PM EET 2024 -->
 
 <!--te-->
 
@@ -1641,6 +1642,24 @@ Cleaning of broadband and brewers windows at :
 13:02 - 13:03 LT
 
 11:02 - 11:03 LT
+
+
+
+---
+tags:      [ problem broadband radmon ]
+created:   2024-01-26 17:29:47 EET
+cunixtime: 1706282987
+UTC:       2024-01-26 15:29:47 UTC
+---
+
+## 2024-01-26 [ThanasisN]
+
+Today morning the radmon was found stacked on on startup screen
+with a message that prevent it to run normally.
+
+After the message was cleared, it start operation.
+
+Probably was frozen fro yesterday.
 
 
 
