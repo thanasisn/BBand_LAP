@@ -42,7 +42,8 @@ try({
            output_dir    = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
-## This should be the last thing to run on the data
+
+## This should be the last thing to run on the BBand_LAP
 try({
     render(input         = "~/BBand_LAP/inspect_db/99_Self_evaluation.R",
            output_format = " bookdown::pdf_document2",

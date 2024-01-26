@@ -116,6 +116,7 @@ Other journals and log exist, but are not included here.
    * [2022-06-16 00:00 [BA]](#2022-06-16-0000-ba)
    * [2022-06-27 11:40 [ThanasisN]](#2022-06-27-1140-thanasisn)
 * [2023](#2023)
+   * [2023-09-11 06:10 EEST](#2023-09-11-0610-eest)
    * [2023-03-28 15:48 [ThanasisN]](#2023-03-28-1548-thanasisn)
    * [2023-03-28 17:31 [ThanasisN]](#2023-03-28-1731-thanasisn)
    * [2023-04-03 09:14 [ThanasisN]](#2023-04-03-0914-thanasisn)
@@ -129,7 +130,9 @@ Other journals and log exist, but are not included here.
    * [2023-10-30 13:54 [ThanasisN]](#2023-10-30-1354-thanasisn)
    * [2023-10-31 09:59 [ThanasisN]](#2023-10-31-0959-thanasisn)
    * [2023-11-02 11:13 [ThanasisN]](#2023-11-02-1113-thanasisn)
+   * [tags:      [ chp1 tracker ]](#tags-------chp1-tracker-)
    * [2023-11-06 12:30 [ThanasisN]](#2023-11-06-1230-thanasisn)
+   * [tags:      [ chp1 problem ]](#tags-------chp1-problem-)
    * [2023-11-07 11:00 [ThanasisN]](#2023-11-07-1100-thanasisn)
 * [2024](#2024)
    * [2024-01-25 13:05 EET [ThanasisN]](#2024-01-25-1305-eet-thanasisn)
@@ -140,9 +143,10 @@ Other journals and log exist, but are not included here.
       * [File template](#file-template)
    * [Build a journal document entries files](#build-a-journal-document-entries-files)
 * [List of tags](#list-of-tags)
+* [New List of tags](#new-list-of-tags)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Fri Jan 26 06:00:05 PM EET 2024 -->
+<!-- Added by: athan, at: Fri Jan 26 08:00:05 PM EET 2024 -->
 
 <!--te-->
 
@@ -1431,6 +1435,20 @@ Last data in horizontal position is at
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
+---
+tags:      [  ]
+scope:     
+created:   2023-09-11 06:10:00 EEST
+cunixtime: 1694401800
+UTC:       2023-09-11 03:10:00 UTC
+---
+
+## 2023-09-11 06:10 EEST
+
+
+
+
+
 
 ## 2023-03-28 15:48 [ThanasisN]
 
@@ -1591,10 +1609,11 @@ Tracker is still down.
 Send for service.
 
 
+---
+tags:      [ chp1 tracker ]
+---
 
 ## 2023-11-06 12:30 [ThanasisN]
-
-[//]: # (Keywords: #chp1, #tracker)
 
 Tracker was installed, measurement have started!
 
@@ -1604,10 +1623,11 @@ The tracker had a burned out microcontroller.
 
 
 
+---
+tags:      [ chp1 problem ]
+---
 
 ## 2023-11-07 11:00 [ThanasisN]
-
-[//]: # (Keywords: #chp1, #problem)
 
 The CHP-1 was removed to fix a problem with the silica gel compartment.
 
@@ -1659,7 +1679,7 @@ with a message that prevent it to run normally.
 
 After the message was cleared, it start operation.
 
-Probably was frozen fro yesterday.
+Probably was frozen from yesterday.
 
 
 
@@ -1721,7 +1741,7 @@ List of tags
       1 #brewers
       2 #broadband
       1 #ccd
-     60 #chp1
+     58 #chp1
       1 #cleaned
      16 #cleaning
      12 #cm21
@@ -1738,7 +1758,7 @@ List of tags
       5 #leveling
       1 #mounting
       2 #panic
-     10 #problem
+      9 #problem
       2 #pysolar
       2 #radmon
       1 #radmon_reboot
@@ -1748,6 +1768,15 @@ List of tags
       1 #sync
       1 #temp
       1 #test
-     13 #tracker
+     12 #tracker
      20 #tracker2
       1 #works
+
+New List of tags
+============
+      1 broadband
+      2 chp1
+      1 cleaning
+      2 problem
+      1 radmon
+      1 tracker
