@@ -115,6 +115,8 @@ gather <- rbind(gather,
                     Name = "BBDB meta",
                     Rows = BB |> nrow(),
                     Vars = BB |> ncol(),
+                    Valu = BB |> summarise(across(everything(), ~ sum(!is.na(.)))) |>
+                        collect() |> rowwise() |> sum(),
                     Size = strsplit(
                         system(
                             paste("du -s", DB_META_fl),
@@ -125,16 +127,6 @@ gather <- rbind(gather,
 rm(BB)
 
 
-BB <- opendata()
-ss <- BB |>
-    summarise(across(everything(), ~ sum(!is.na(.)))) |>
-    collect() |> rowwise() |> sum()
-
-ss |> rowwise() |> sum()
-
-
-
-stop()
 
 ## Tracker data base
 BB <- open_dataset(DB_Steps_DIR)
@@ -143,6 +135,8 @@ gather <- rbind(gather,
                     Name = "TrackerDB",
                     Rows = BB |> nrow(),
                     Vars = BB |> ncol(),
+                    Valu = BB |> summarise(across(everything(), ~ sum(!is.na(.)))) |>
+                        collect() |> rowwise() |> sum(),
                     Size = strsplit(
                         system(
                             paste("du -s", DB_Steps_DIR),
@@ -159,6 +153,8 @@ gather <- rbind(gather,
                     Name = "TrackerDB meta",
                     Rows = BB |> nrow(),
                     Vars = BB |> ncol(),
+                    Valu = BB |> summarise(across(everything(), ~ sum(!is.na(.)))) |>
+                        collect() |> rowwise() |> sum(),
                     Size = strsplit(
                         system(
                             paste("du -s", DB_Steps_META_fl),
@@ -175,6 +171,8 @@ gather <- rbind(gather,
                     Name = "Raw files hashes",
                     Rows = BB |> nrow(),
                     Vars = BB |> ncol(),
+                    Valu = BB |> summarise(across(everything(), ~ sum(!is.na(.)))) |>
+                        collect() |> rowwise() |> sum(),
                     Size = strsplit(
                         system(
                             paste("du -s", DB_HASH_fl),
@@ -184,17 +182,23 @@ gather <- rbind(gather,
 )
 rm(BB)
 
+gather <- data.table(gather)
+gather[, Fill := round(100 * as.double(Valu) / (as.double(Rows) * as.double(Vars)),2 ) ]
+
+
 gather$Size <- as.numeric(gather$Size) * 1024
 gather <- rbind(gather,
                 data.frame(
                     Name = "**Total**",
                            Rows = sum(gather$Rows),
                            Vars = sum(gather$Vars),
-                           Size = sum(gather$Size)
+                           Valu = sum(gather$Valu),
+                           Size = sum(gather$Size),
+                           Fill = NA
                     )
 )
 gather <- data.table(gather)
-gather[, "Bytes/Value" := round(Size / (as.double(Rows) * as.double(Vars)), 2)]
+gather[, "Bytes/Value" := round(Size / as.double(Valu), 2)]
 
 
 
@@ -208,15 +212,19 @@ if (!file.exists(overview_data)) {
     saveRDS(DATA, overview_data)
 }
 
-pp <- gather
+
+pp      <- gather
+pp      <- rename(pp, Values = "Valu")
 pp$Size <- humanReadable(pp$Size)
 pp$Date <- NULL
+pp$Fill <- paste0(pp$Fill, "%" )
+
 
 ##  Export table for Readme.md
 panderOptions('knitr.auto.asis', FALSE)
 temp <- pander_return(
     pp,
-    justify = "lrrrr",
+    justify = "lrrrrrr",
     style   = "rmarkdown",
     caption = paste("Datasets sizes on", Sys.Date())
 )
@@ -225,8 +233,9 @@ capture.output(cat(temp, sep = "\n"), file = "~/BBand_LAP/.databasestats.md")
 
 ##  Table for rendering document
 #+ echo=F, include=T, results="asis"
-pander(pp, justify = "lrrrr")
+pander(pp, justify = "lrrrrrr")
 cat(" \n \n")
+
 
 
 
@@ -245,7 +254,6 @@ for (av in vars) {
     xlim  <- range(DATA[, Date], na.rm = T)
 
     par("mar" = c(2, 5, 4, 0.1))
-
 
     plot(1,
          xlab = "",
