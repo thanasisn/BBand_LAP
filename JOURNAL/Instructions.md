@@ -7,20 +7,23 @@
 
 ### Filenames should be numerical sorted
 
-- `./YYYY/YYYYMMDD_0000.md`
-- `./YYYY/YYYYMMDD.md`
+- `./YYYY/YYYY-MM-DD_0000.md`
+- `./YYYY/YYYY-MM-DD.md`
 
 
 ### File template
 
 ```
-## 2022-02-21 00:00 [USERNAME]
+---
+tags: [ key_1 key_2 ]
+---
 
-[//]: # (Keywords: #key_1, #key_2)
+## 2022-02-21 00:00 [USERNAME]
 
 Text for this entry.
 Use simple text, it will parsed as
 markdown.
+Tags and other meta data go to yaml header.
 
 ```
 
