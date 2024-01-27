@@ -24,6 +24,8 @@ Text for this entry.
 Use simple text, it will parsed as
 markdown.
 Tags and other meta data go to yaml header.
+Use "UTC" or "LT" to denote
+Universal Coordinated Time or local political time. 
 
 ```
 
