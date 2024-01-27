@@ -88,12 +88,24 @@ Other journals and log exist, but are not included here.
    * [2018-05-18 [ThanasisN]](#2018-05-18-thanasisn)
    * [2018-12-07 [ThanasisN]](#2018-12-07-thanasisn)
 * [2019](#2019)
+   * [tags: [ cleaning ]](#tags--cleaning-)
    * [2019-04-11 09:27 [ThanasisN]](#2019-04-11-0927-thanasisn)
+   * [tags: [ data_loss error chp1 ]](#tags--data_loss-error-chp1-)
    * [2019-05-06 [ThanasisN]](#2019-05-06-thanasisn)
+   * [tags: [ cleaning chp1 ]](#tags--cleaning-chp1-)
    * [2019-05-10 09:22 [ThanasisN]](#2019-05-10-0922-thanasisn)
+   * [tags: [ problem data_loss error ]](#tags--problem-data_loss-error-)
    * [2019-05-13 [ThanasisN]](#2019-05-13-thanasisn)
+   * [tags: [ cleaning chp1 cm21 ]](#tags--cleaning-chp1-cm21-)
    * [2019-05-18 09:10 [ThanasisN]](#2019-05-18-0910-thanasisn)
+   * [tags: [ cleaning broadband ]](#tags--cleaning-broadband-)
    * [2019-05-30 10:13 [ThanasisN]](#2019-05-30-1013-thanasisn)
+   * [2019-04-11 09:27 [ThanasisN]](#2019-04-11-0927-thanasisn-1)
+   * [2019-05-06 [ThanasisN]](#2019-05-06-thanasisn-1)
+   * [2019-05-10 09:22 [ThanasisN]](#2019-05-10-0922-thanasisn-1)
+   * [2019-05-13 [ThanasisN]](#2019-05-13-thanasisn-1)
+   * [2019-05-18 09:10 [ThanasisN]](#2019-05-18-0910-thanasisn-1)
+   * [2019-05-30 10:13 [ThanasisN]](#2019-05-30-1013-thanasisn-1)
    * [2019-06-12 10:54 [ThanasisN]](#2019-06-12-1054-thanasisn)
    * [2019-06-17 09:35 [ThanasisN]](#2019-06-17-0935-thanasisn)
    * [2019-06-27 08:33 [ThanasisN]](#2019-06-27-0833-thanasisn)
@@ -102,23 +114,49 @@ Other journals and log exist, but are not included here.
    * [2019-07-26 08:59 [ThanasisN]](#2019-07-26-0859-thanasisn)
    * [2019-12-16 11:00 [ThanasisN]](#2019-12-16-1100-thanasisn)
 * [2020](#2020)
+   * [tags: [ radmon problem data_loss sighting chp1 ]](#tags--radmon-problem-data_loss-sighting-chp1-)
    * [2020-01-03 [ThanasisN]](#2020-01-03-thanasisn)
+   * [tags: [ cleaning ]](#tags--cleaning--1)
    * [2020-04-29 09:05 [ThanasisN]](#2020-04-29-0905-thanasisn)
+   * [tags: [ silica chp1 cm21 ]](#tags--silica-chp1-cm21-)
    * [2020-04-30 12:12 [ThanasisN]](#2020-04-30-1212-thanasisn)
+   * [tags; [ cleaning ]](#tags--cleaning--2)
    * [2020-05-07 10:31 [ThanasisN]](#2020-05-07-1031-thanasisn)
+   * [tags: [ cleaning ]](#tags--cleaning--3)
    * [2020-06-10 10:59 [ThanasisN]](#2020-06-10-1059-thanasisn)
+   * [2020-01-03 [ThanasisN]](#2020-01-03-thanasisn-1)
+   * [2020-04-29 09:05 [ThanasisN]](#2020-04-29-0905-thanasisn-1)
+   * [2020-04-30 12:12 [ThanasisN]](#2020-04-30-1212-thanasisn-1)
+   * [2020-05-07 10:31 [ThanasisN]](#2020-05-07-1031-thanasisn-1)
+   * [2020-06-10 10:59 [ThanasisN]](#2020-06-10-1059-thanasisn-1)
 * [2022](#2022)
+   * [tags: [ chp1 works broadband ccd ]](#tags--chp1-works-broadband-ccd-)
    * [2022-02-17 00:00 [ThanasisN]](#2022-02-17-0000-thanasisn)
+   * [tags: [ chp1 ]](#tags--chp1-)
    * [2022-02-21 00:00 [ThanasisN]](#2022-02-21-0000-thanasisn)
+   * [tags: [ cm21 inclined chp1 ]](#tags--cm21-inclined-chp1-)
    * [2022-02-21 13:50 [ThanasisN]](#2022-02-21-1350-thanasisn)
-   * [2022-05-23 [ThanasisN]](#2022-05-23-thanasisn)
-   * [2022-06-03 [ThanasisN]](#2022-06-03-thanasisn)
-   * [2022-06-16 00:00 [BA]](#2022-06-16-0000-ba)
-   * [2022-06-27 11:40 [ThanasisN]](#2022-06-27-1140-thanasisn)
-* [2023](#2023)
    * [tags: [ cm21 ]](#tags--cm21-)
-   * [2023-03-28 15:48 [ThanasisN]](#2023-03-28-1548-thanasisn)
+   * [2022-05-23 [ThanasisN]](#2022-05-23-thanasisn)
+   * [tags: [ cm21 leveling ]](#tags--cm21-leveling-)
+   * [2022-06-03 [ThanasisN]](#2022-06-03-thanasisn)
+   * [tags: [ cm21 problem ]](#tags--cm21-problem-)
+   * [2022-06-16 00:00 [BA]](#2022-06-16-0000-ba)
+   * [tags: [ inclined INCcm21 ]](#tags--inclined-inccm21-)
+   * [2022-06-27 11:40 [ThanasisN]](#2022-06-27-1140-thanasisn)
+   * [tags: [ chp1 works broadband ccd ]](#tags--chp1-works-broadband-ccd--1)
+   * [2022-02-17 00:00 [ThanasisN]](#2022-02-17-0000-thanasisn-1)
+   * [tags: [ chp1 ]](#tags--chp1--1)
+   * [2022-02-21 00:00 [ThanasisN]](#2022-02-21-0000-thanasisn-1)
+   * [2022-02-21 13:50 [ThanasisN]](#2022-02-21-1350-thanasisn-1)
+   * [2022-05-23 [ThanasisN]](#2022-05-23-thanasisn-1)
+   * [2022-06-03 [ThanasisN]](#2022-06-03-thanasisn-1)
+   * [2022-06-16 00:00 [BA]](#2022-06-16-0000-ba-1)
+   * [2022-06-27 11:40 [ThanasisN]](#2022-06-27-1140-thanasisn-1)
+* [2023](#2023)
    * [tags: [ cm21 ]](#tags--cm21--1)
+   * [2023-03-28 15:48 [ThanasisN]](#2023-03-28-1548-thanasisn)
+   * [tags: [ cm21 ]](#tags--cm21--2)
    * [2023-03-28 17:31 [ThanasisN]](#2023-03-28-1731-thanasisn)
    * [tags: [  problem radmon ]](#tags---problem-radmon-)
    * [2023-04-03 09:14 [ThanasisN]](#2023-04-03-0914-thanasisn)
@@ -128,9 +166,9 @@ Other journals and log exist, but are not included here.
    * [2023-04-19 09:19 [ThanasisN]](#2023-04-19-0919-thanasisn)
    * [tags: [ cleaning broadband brewers ]](#tags--cleaning-broadband-brewers-)
    * [2023-05-18 09:15 [ThanasisN]](#2023-05-18-0915-thanasisn)
-   * [tags: [ chp1 ]](#tags--chp1-)
+   * [tags: [ chp1 ]](#tags--chp1--2)
    * [2023-05-25 08:52 [ThanasisN]](#2023-05-25-0852-thanasisn)
-   * [tags: [ chp1 ]](#tags--chp1--1)
+   * [tags: [ chp1 ]](#tags--chp1--3)
    * [2023-06-26 11:26 [ThanasisN]](#2023-06-26-1126-thanasisn)
    * [2023-09-11 06:10 UTC [ThanasisN]](#2023-09-11-0610-utc-thanasisn)
    * [tags: [ tracker chp1 problem ]](#tags--tracker-chp1-problem-)
@@ -159,7 +197,7 @@ Other journals and log exist, but are not included here.
 * [New List of tags](#new-list-of-tags)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Fri Jan 26 09:20:04 PM EET 2024 -->
+<!-- Added by: athan, at: Sat Jan 27 12:00:05 PM EET 2024 -->
 
 <!--te-->
 
@@ -1071,6 +1109,94 @@ Was completed at
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
+---
+tags: [ cleaning ]
+---
+
+## 2019-04-11 09:27 [ThanasisN]
+
+Instrument Cleaning 
+
+09:27 - 09:29 local time
+
+06:27 - 06:29 UTC
+
+
+
+---
+tags: [ data_loss error chp1 ]
+---
+
+## 2019-05-06 [ThanasisN]
+
+Dimitris Karag. reported tracker misalignment!
+
+Mostly corrected after reset!
+
+
+
+---
+tags: [ cleaning chp1 ]
+---
+
+## 2019-05-10 09:22 [ThanasisN]
+
+Spider webs on the instrument window cleaned! at
+
+~09:22 LT
+
+~06:22 UTC
+
+Don't know how long affected measurements.
+
+
+
+---
+tags: [ problem data_loss error ]
+---
+
+## 2019-05-13 [ThanasisN]
+
+Daylight time was enabled on broadband computer!!!!
+
+Time was changed to correct format
+
+2019-05-13 11:20 -> 10:21  !! UTC 
+
+Probably the time of measurement is wrong.
+
+Will be evident on Clear Sky identification data.
+
+
+
+---
+tags: [ cleaning chp1 cm21 ]
+---
+
+## 2019-05-18 09:10 [ThanasisN]
+
+Only CHP-1 and CM-21 cleaned domes at
+
+09:10 LT
+
+06:10 UTC
+
+
+
+---
+tags: [ cleaning broadband ]
+---
+
+## 2019-05-30 10:13 [ThanasisN]
+
+Domes cleaned at
+
+10:13 - 10:15 LT
+
+07:13 - 07:15 UTC
+
+
+
 
 ## 2019-04-11 09:27 [ThanasisN]
 
@@ -1259,6 +1385,79 @@ Possibly bad data until
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
+---
+tags: [ radmon problem data_loss sighting chp1 ]
+---
+
+## 2020-01-03 [ThanasisN]
+
+There was a ransom-ware discovered on 2019-12-25
+
+Sighting is Good after 2020-03-01 10:41 LT or 8:41 UTC
+
+
+
+
+---
+tags: [ cleaning ]
+---
+
+## 2020-04-29 09:05 [ThanasisN]
+
+Clean domes at
+
+09:05 - 09:07 local time
+
+06:05 - 06:07 UTC
+
+
+
+---
+tags: [ silica chp1 cm21 ]
+---
+
+## 2020-04-30 12:12 [ThanasisN]
+
+New silica gel to 
+
+- CHP-1
+- CM-21 Horizontal
+- UVB diffuse metal cylinder.
+
+12:12 - 13:25 LT
+
+09:12 - 09:25 UTC
+
+
+
+---
+tags; [ cleaning ]
+---
+
+## 2020-05-07 10:31 [ThanasisN]
+
+Dome clean at 
+
+10:31 - 10:33 LT
+
+07:31 - 07:33 UTC
+
+
+
+---
+tags: [ cleaning ]
+---
+
+## 2020-06-10 10:59 [ThanasisN]
+
+Domes cleaned
+
+10:59 - 11:02 LT
+
+07:59 - 08:02 UTC
+
+
+
 
 ## 2020-01-03 [ThanasisN]
 
@@ -1339,10 +1538,11 @@ Domes cleaned
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
+---
+tags: [ chp1 works broadband ccd ]
+---
 
 ## 2022-02-17 00:00 [ThanasisN]
-
-[//]: # (Keywords: #chp1, #works, #broadband, #ccd)
 
 Broadband instruments were installed? after they have been removed from the instruments tables.
 
@@ -1357,10 +1557,118 @@ There are photos.
 
 
 
+---
+tags: [ chp1 ]
+---
 
 ## 2022-02-21 00:00 [ThanasisN]
 
-[//]: # (Keywords: #chp1)
+The CHP-1 was moved!
+
+It was west of the brewers and moved east of the brewers.
+
+The inclined CM-21 was leveled, for comparison to the horizontal one, before calibration of the horizontal.
+
+There are photos
+
+
+
+---
+tags: [ cm21 inclined chp1 ]
+---
+
+## 2022-02-21 13:50 [ThanasisN]
+
+We consider that after
+
+~ 11:50 UTC
+
+the inclined CM-21 to have been set to horizontal position.
+
+This is reflected on the measurements.
+
+There are photos.
+
+
+
+---
+tags: [ cm21 ]
+---
+
+## 2022-05-23 [ThanasisN]
+
+Installation of the horizontal CM-21
+
+ ~ 07:55 - 08:17 UTC
+
+There are photos.
+
+
+
+---
+tags: [ cm21 leveling ]
+---
+
+## 2022-06-03 [ThanasisN]
+
+The horizontal Global CM-21 was
+
+- installed 
+- leveled 
+- start measuring **without sun shield**
+
+Photos exist.
+
+
+
+---
+tags: [ cm21 problem ]
+---
+
+## 2022-06-16 00:00 [BA]
+
+Τελικά έβαλα το σπασμένο shield (το κόλλησα πρόχειρα) σήμερα στις 7.00 UTC.
+
+
+
+---
+tags: [ inclined INCcm21 ]
+---
+
+## 2022-06-27 11:40 [ThanasisN]
+
+The inclined CM-21 is returned to the inclined position from the horizontal.
+
+Last data in horizontal position is at 
+
+~ 08:40 UTC
+
+
+
+---
+tags: [ chp1 works broadband ccd ]
+---
+
+## 2022-02-17 00:00 [ThanasisN]
+
+Broadband instruments were installed? after they have been removed from the instruments tables.
+
+Work on instruments table was performed.
+
+
+New instrument table was installed for CCD spectrometers.
+
+CHP-1 was between brewers and the new CCD table, may be affected.
+
+There are photos.
+
+
+
+---
+tags: [ chp1 ]
+---
+
+## 2022-02-21 00:00 [ThanasisN]
 
 The CHP-1 was moved!
 
@@ -1727,20 +2035,25 @@ Probably was frozen from yesterday.
 
 ### Filenames should be numerical sorted
 
-- `./YYYY/YYYYMMDD_0000.md`
-- `./YYYY/YYYYMMDD.md`
+- `./YYYY/YYYY-MM-DD_0000.md`
+- `./YYYY/YYYY-MM-DD.md`
 
 
 ### File template
 
 ```
-## 2022-02-21 00:00 [USERNAME]
+---
+tags: [ key_1 key_2 ]
+---
 
-[//]: # (Keywords: #key_1, #key_2)
+## 2022-02-21 00:00 [USERNAME]
 
 Text for this entry.
 Use simple text, it will parsed as
 markdown.
+Tags and other meta data go to yaml header.
+Use "UTC" or "LT" to denote
+Universal Coordinated Time or local political time. 
 
 ```
 
@@ -1767,9 +2080,7 @@ At least you need `pandoc` installed.
 List of tags
 ============
       5 #async
-      1 #broadband
-      1 #ccd
-     50 #chp1
+     48 #chp1
       1 #cleaned
      15 #cleaning
      10 #cm21
@@ -1796,18 +2107,24 @@ List of tags
       1 #test
       6 #tracker
      20 #tracker2
-      1 #works
 
 New List of tags
 ============
       1 brewers
-      2 broadband
-     12 chp1
-      3 cleaning
-      2 cm21
-      2 data_loss
-      1 error
-      9 problem
-      2 radmon
+      5 broadband
+      2 ccd
+     22 chp1
+      9 cleaning
+      8 cm21
+      5 data_loss
+      3 error
+      1 INCcm21
+      2 inclined
+      1 leveling
+     12 problem
+      3 radmon
+      1 sighting
+      1 silica
       1 suspicious_data
       8 tracker
+      2 works
