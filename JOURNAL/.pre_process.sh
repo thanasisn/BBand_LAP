@@ -50,6 +50,7 @@ for ay in "${years[@]}"; do
     for af in "${args[@]}"; do
         infile="$(echo "$af" | grep "/$ay/")"
         ## append the appropriate files only
+        #TODO skip yaml header
         if [[ -n "$infile" ]]; then
             echo " - $infile"
             (

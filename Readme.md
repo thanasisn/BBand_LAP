@@ -27,7 +27,7 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2024-01-27T13:36:09 EET -->
+<!-- Added by: athan, at: 2024-01-27T16:36:22 UTC -->
 
 <!--te-->
 
@@ -37,16 +37,27 @@ Latest plots and reports should be here: [thanasisn.netlify.app/3-data_display](
 
 
 
-| Name             |     Rows | Vars |      Size | Bytes/Value |
-|:-----------------|---------:|-----:|----------:|------------:|
-| BBDB             | 16342560 |   80 |   2.5 GiB |        2.08 |
-| BBDB meta        |    11349 |   82 |   2.1 MiB |         2.4 |
-| TrackerDB        |  7713009 |   23 | 148.4 MiB |        0.88 |
-| TrackerDB meta   |     2858 |    9 | 176.0 KiB |        7.01 |
-| Raw files hashes |   609907 |    4 |   3.3 MiB |        1.41 |
-| **Total**        | 24679683 |  198 |   2.7 GiB |        0.59 |
+| Name             |     Rows | Vars |    Values |      Size |   Fill |
+|:-----------------|---------:|-----:|----------:|----------:|-------:|
+| BBDB             | 16342560 |   80 | 498851305 |   3.6 GiB | 38.16% |
+| BBDB meta        |    11349 |   82 |    483824 |   2.1 MiB | 51.99% |
+| TrackerDB        |  7713009 |   23 |  69411551 | 149.6 MiB | 39.13% |
+| TrackerDB meta   |     2858 |    9 |     13922 | 176.0 KiB | 54.12% |
+| Raw files hashes |   609907 |    4 |   2439628 |   3.3 MiB |   100% |
+| **Total**        | 24679683 |  198 | 571200230 |   3.7 GiB |    NA% |
 
-Table: Datasets sizes on 2024-01-27
+Table: Datasets sizes on 2024-01-27 (continued below)
+
+ 
+
+| Bytes/Value |
+|------------:|
+|        7.67 |
+|        4.66 |
+|        2.26 |
+|       12.95 |
+|        1.42 |
+|        6.98 |
 
 
 
