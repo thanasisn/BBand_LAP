@@ -81,9 +81,9 @@ library(gdata,      warn.conflicts = FALSE, quietly = TRUE)
 
 
 
-##  Evaluate data sizes  ------------------------------------------------------------
+##  Evaluate data sizes  -------------------------------------------------------
 
-## _ Gather data size -----------------------------------------------------------------
+## _ Gather data size ----------------------------------------------------------
 #'
 #' # Data size overview
 #'
@@ -98,6 +98,8 @@ gather <- data.frame(
     Name = "BBDB",
     Rows = BB |> nrow(),
     Vars = BB |> ncol(),
+    Valu = BB |> summarise(across(everything(), ~ sum(!is.na(.)))) |>
+        collect() |> rowwise() |> sum(),
     Size = strsplit(
         system(
             paste("du -s", DB_DIR),
@@ -121,6 +123,18 @@ gather <- rbind(gather,
                 )
 )
 rm(BB)
+
+
+BB <- opendata()
+ss <- BB |>
+    summarise(across(everything(), ~ sum(!is.na(.)))) |>
+    collect() |> rowwise() |> sum()
+
+ss |> rowwise() |> sum()
+
+
+
+stop()
 
 ## Tracker data base
 BB <- open_dataset(DB_Steps_DIR)
