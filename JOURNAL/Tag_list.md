@@ -2,9 +2,7 @@
 List of tags
 ============
       5 #async
-      1 #broadband
-      1 #ccd
-     50 #chp1
+     48 #chp1
       1 #cleaned
      15 #cleaning
      10 #cm21
@@ -31,18 +29,24 @@ List of tags
       1 #test
       6 #tracker
      20 #tracker2
-      1 #works
 
 New List of tags
 ============
       1 brewers
-      2 broadband
-     12 chp1
-      3 cleaning
-      2 cm21
-      2 data_loss
-      1 error
-      9 problem
-      2 radmon
+      5 broadband
+      2 ccd
+     22 chp1
+      9 cleaning
+      8 cm21
+      5 data_loss
+      3 error
+      1 INCcm21
+      2 inclined
+      1 leveling
+     12 problem
+      3 radmon
+      1 sighting
+      1 silica
       1 suspicious_data
       8 tracker
+      2 works
