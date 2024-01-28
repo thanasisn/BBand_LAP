@@ -55,9 +55,3 @@
       data.table:   1.14.10
            dplyr:     1.1.4
      htmlwidgets:     1.6.4
-        optparse:     1.7.3
-          plotly:    4.10.4
-            renv:     1.0.3
-            funr:     0.3.2
-       lubridate:     1.9.3
-         ggplot2:     3.4.4
