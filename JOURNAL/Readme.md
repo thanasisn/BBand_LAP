@@ -88,17 +88,11 @@ Other journals and log exist, but are not included here.
    * [2018-05-18 [ThanasisN]](#2018-05-18-thanasisn)
    * [2018-12-07 [ThanasisN]](#2018-12-07-thanasisn)
 * [2019](#2019)
-   * [tags: [ cleaning ]](#tags--cleaning-)
    * [2019-04-11 09:27 [ThanasisN]](#2019-04-11-0927-thanasisn)
-   * [tags: [ data_loss error chp1 ]](#tags--data_loss-error-chp1-)
    * [2019-05-06 [ThanasisN]](#2019-05-06-thanasisn)
-   * [tags: [ cleaning chp1 ]](#tags--cleaning-chp1-)
    * [2019-05-10 09:22 [ThanasisN]](#2019-05-10-0922-thanasisn)
-   * [tags: [ problem data_loss error ]](#tags--problem-data_loss-error-)
    * [2019-05-13 [ThanasisN]](#2019-05-13-thanasisn)
-   * [tags: [ cleaning chp1 cm21 ]](#tags--cleaning-chp1-cm21-)
    * [2019-05-18 09:10 [ThanasisN]](#2019-05-18-0910-thanasisn)
-   * [tags: [ cleaning broadband ]](#tags--cleaning-broadband-)
    * [2019-05-30 10:13 [ThanasisN]](#2019-05-30-1013-thanasisn)
    * [2019-06-12 10:54 [ThanasisN]](#2019-06-12-1054-thanasisn)
    * [2019-06-17 09:35 [ThanasisN]](#2019-06-17-0935-thanasisn)
@@ -108,62 +102,35 @@ Other journals and log exist, but are not included here.
    * [2019-07-26 08:59 [ThanasisN]](#2019-07-26-0859-thanasisn)
    * [2019-12-16 11:00 [ThanasisN]](#2019-12-16-1100-thanasisn)
 * [2020](#2020)
-   * [tags: [ radmon problem data_loss sighting chp1 ]](#tags--radmon-problem-data_loss-sighting-chp1-)
    * [2020-01-03 [ThanasisN]](#2020-01-03-thanasisn)
-   * [tags: [ cleaning ]](#tags--cleaning--1)
    * [2020-04-29 09:05 [ThanasisN]](#2020-04-29-0905-thanasisn)
-   * [tags: [ silica chp1 cm21 ]](#tags--silica-chp1-cm21-)
    * [2020-04-30 12:12 [ThanasisN]](#2020-04-30-1212-thanasisn)
-   * [tags; [ cleaning ]](#tags--cleaning--2)
    * [2020-05-07 10:31 [ThanasisN]](#2020-05-07-1031-thanasisn)
-   * [tags: [ cleaning ]](#tags--cleaning--3)
    * [2020-06-10 10:59 [ThanasisN]](#2020-06-10-1059-thanasisn)
 * [2022](#2022)
-   * [tags: [ chp1 works broadband ccd ]](#tags--chp1-works-broadband-ccd-)
    * [2022-02-17 00:00 [ThanasisN]](#2022-02-17-0000-thanasisn)
-   * [tags: [ chp1 ]](#tags--chp1-)
    * [2022-02-21 00:00 [ThanasisN]](#2022-02-21-0000-thanasisn)
-   * [tags: [ cm21 inclined chp1 ]](#tags--cm21-inclined-chp1-)
    * [2022-02-21 13:50 [ThanasisN]](#2022-02-21-1350-thanasisn)
-   * [tags: [ cm21 ]](#tags--cm21-)
    * [2022-05-23 [ThanasisN]](#2022-05-23-thanasisn)
-   * [tags: [ cm21 leveling ]](#tags--cm21-leveling-)
    * [2022-06-03 [ThanasisN]](#2022-06-03-thanasisn)
-   * [tags: [ cm21 problem ]](#tags--cm21-problem-)
    * [2022-06-16 00:00 [BA]](#2022-06-16-0000-ba)
-   * [tags: [ inclined INCcm21 ]](#tags--inclined-inccm21-)
    * [2022-06-27 11:40 [ThanasisN]](#2022-06-27-1140-thanasisn)
 * [2023](#2023)
-   * [tags: [ cm21 ]](#tags--cm21--1)
    * [2023-03-28 15:48 [ThanasisN]](#2023-03-28-1548-thanasisn)
-   * [tags: [ cm21 ]](#tags--cm21--2)
    * [2023-03-28 17:31 [ThanasisN]](#2023-03-28-1731-thanasisn)
-   * [tags: [  problem radmon ]](#tags---problem-radmon-)
    * [2023-04-03 09:14 [ThanasisN]](#2023-04-03-0914-thanasisn)
-   * [tags: [ chp1 tracker ]](#tags--chp1-tracker-)
    * [2023-04-04 12:59 [ThanasisN]](#2023-04-04-1259-thanasisn)
-   * [tags: [ tracker chp1 data_loss ]](#tags--tracker-chp1-data_loss-)
    * [2023-04-19 09:19 [ThanasisN]](#2023-04-19-0919-thanasisn)
-   * [tags: [ cleaning broadband brewers ]](#tags--cleaning-broadband-brewers-)
    * [2023-05-18 09:15 [ThanasisN]](#2023-05-18-0915-thanasisn)
-   * [tags: [ chp1 ]](#tags--chp1--1)
    * [2023-05-25 08:52 [ThanasisN]](#2023-05-25-0852-thanasisn)
-   * [tags: [ chp1 ]](#tags--chp1--2)
    * [2023-06-26 11:26 [ThanasisN]](#2023-06-26-1126-thanasisn)
    * [2023-09-11 06:10 UTC [ThanasisN]](#2023-09-11-0610-utc-thanasisn)
-   * [tags: [ tracker chp1 problem ]](#tags--tracker-chp1-problem-)
    * [2023-10-25 09:22 [ThanasisN]](#2023-10-25-0922-thanasisn)
-   * [tags: [ problem tracker chp1 ]](#tags--problem-tracker-chp1-)
    * [2023-10-26 11:20 [ThanasisN]](#2023-10-26-1120-thanasisn)
-   * [tags: [ tracker chp1 problem ]](#tags--tracker-chp1-problem--1)
    * [2023-10-30 13:54 [ThanasisN]](#2023-10-30-1354-thanasisn)
-   * [tags: [ chp1 tracker problem ]](#tags--chp1-tracker-problem-)
    * [2023-10-31 09:59 [ThanasisN]](#2023-10-31-0959-thanasisn)
-   * [tags: [ tracker chp1 problem ]](#tags--tracker-chp1-problem--2)
    * [2023-11-02 11:13 [ThanasisN]](#2023-11-02-1113-thanasisn)
-   * [tags:      [ chp1 tracker ]](#tags-------chp1-tracker-)
    * [2023-11-06 12:30 [ThanasisN]](#2023-11-06-1230-thanasisn)
-   * [tags:      [ chp1 problem ]](#tags-------chp1-problem-)
    * [2023-11-07 11:00 [ThanasisN]](#2023-11-07-1100-thanasisn)
 * [2024](#2024)
    * [2024-01-25 13:05 EET [ThanasisN]](#2024-01-25-1305-eet-thanasisn)
@@ -177,7 +144,7 @@ Other journals and log exist, but are not included here.
 * [New List of tags](#new-list-of-tags)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2024-01-29T11:03:15 EET -->
+<!-- Added by: athan, at: 2024-01-29T11:23:00 EET -->
 
 <!--te-->
 
@@ -1089,9 +1056,6 @@ Was completed at
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
----
-tags: [ cleaning ]
----
 
 ## 2019-04-11 09:27 [ThanasisN]
 
@@ -1103,9 +1067,6 @@ Instrument Cleaning
 
 
 
----
-tags: [ data_loss error chp1 ]
----
 
 ## 2019-05-06 [ThanasisN]
 
@@ -1115,9 +1076,6 @@ Mostly corrected after reset!
 
 
 
----
-tags: [ cleaning chp1 ]
----
 
 ## 2019-05-10 09:22 [ThanasisN]
 
@@ -1131,9 +1089,6 @@ Don't know how long affected measurements.
 
 
 
----
-tags: [ problem data_loss error ]
----
 
 ## 2019-05-13 [ThanasisN]
 
@@ -1149,9 +1104,6 @@ Will be evident on Clear Sky identification data.
 
 
 
----
-tags: [ cleaning chp1 cm21 ]
----
 
 ## 2019-05-18 09:10 [ThanasisN]
 
@@ -1163,9 +1115,6 @@ Only CHP-1 and CM-21 cleaned domes at
 
 
 
----
-tags: [ cleaning broadband ]
----
 
 ## 2019-05-30 10:13 [ThanasisN]
 
@@ -1284,9 +1233,6 @@ Possibly bad data until
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
----
-tags: [ radmon problem data_loss sighting chp1 ]
----
 
 ## 2020-01-03 [ThanasisN]
 
@@ -1297,9 +1243,6 @@ Sighting is Good after 2020-03-01 10:41 LT or 8:41 UTC
 
 
 
----
-tags: [ cleaning ]
----
 
 ## 2020-04-29 09:05 [ThanasisN]
 
@@ -1311,9 +1254,6 @@ Clean domes at
 
 
 
----
-tags: [ silica chp1 cm21 ]
----
 
 ## 2020-04-30 12:12 [ThanasisN]
 
@@ -1329,9 +1269,6 @@ New silica gel to
 
 
 
----
-tags; [ cleaning ]
----
 
 ## 2020-05-07 10:31 [ThanasisN]
 
@@ -1343,9 +1280,6 @@ Dome clean at
 
 
 
----
-tags: [ cleaning ]
----
 
 ## 2020-06-10 10:59 [ThanasisN]
 
@@ -1367,9 +1301,6 @@ Domes cleaned
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
----
-tags: [ chp1 works broadband ccd ]
----
 
 ## 2022-02-17 00:00 [ThanasisN]
 
@@ -1386,9 +1317,6 @@ There are photos.
 
 
 
----
-tags: [ chp1 ]
----
 
 ## 2022-02-21 00:00 [ThanasisN]
 
@@ -1402,9 +1330,6 @@ There are photos
 
 
 
----
-tags: [ cm21 inclined chp1 ]
----
 
 ## 2022-02-21 13:50 [ThanasisN]
 
@@ -1420,9 +1345,6 @@ There are photos.
 
 
 
----
-tags: [ cm21 ]
----
 
 ## 2022-05-23 [ThanasisN]
 
@@ -1434,9 +1356,6 @@ There are photos.
 
 
 
----
-tags: [ cm21 leveling ]
----
 
 ## 2022-06-03 [ThanasisN]
 
@@ -1450,9 +1369,6 @@ Photos exist.
 
 
 
----
-tags: [ cm21 problem ]
----
 
 ## 2022-06-16 00:00 [BA]
 
@@ -1460,9 +1376,6 @@ tags: [ cm21 problem ]
 
 
 
----
-tags: [ inclined INCcm21 ]
----
 
 ## 2022-06-27 11:40 [ThanasisN]
 
@@ -1484,9 +1397,6 @@ Last data in horizontal position is at
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
----
-tags: [ cm21 ]
----
 ## 2023-03-28 15:48 [ThanasisN]
 
 We removed some Global radiation data output constrains.
@@ -1500,9 +1410,6 @@ Will update all sirena data for years 2006-2022, previous exported by us.
 
 
 
----
-tags: [ cm21 ]
----
 ## 2023-03-28 17:31 [ThanasisN]
 
 Sirena TOT files updated for 2006-2022.
@@ -1511,9 +1418,6 @@ With the new output scheme.
 
 
 
----
-tags: [  problem radmon ]
----
 ## 2023-04-03 09:14 [ThanasisN]
 
 Radmon found frozen with different system errors.
@@ -1524,9 +1428,6 @@ Reboot seems to fixed the problem.
 
 
 
----
-tags: [ chp1 tracker ]
----
 
 ## 2023-04-04 12:59 [ThanasisN]
 
@@ -1536,9 +1437,6 @@ Tracker program was restarted manual.
 
 
 
----
-tags: [ tracker chp1 data_loss ]
----
 
 ## 2023-04-19 09:19 [ThanasisN]
 
@@ -1551,9 +1449,6 @@ I restart it manual at
 
 
 
----
-tags: [ cleaning broadband brewers ]
----
 
 ## 2023-05-18 09:15 [ThanasisN]
 
@@ -1565,9 +1460,6 @@ A lot of dust from previous rain.
 
 
 
----
-tags: [ chp1 ]
----
 
 ## 2023-05-25 08:52 [ThanasisN]
 
@@ -1577,9 +1469,6 @@ Clean spider web from inside of CHP-1 sun shader at
 
 
 
----
-tags: [ chp1 ]
----
 
 ## 2023-06-26 11:26 [ThanasisN]
 
@@ -1591,12 +1480,6 @@ Also, instrument enclosure was sprayed with penetrating oil to deter insects.
 
 
 
----
-tags:      [ chp1 error problem data_loss cleaning suspicious_data ]
-created:   2023-09-11 06:10:00 EEST
-cunixtime: 1694401800
-UTC:       2023-09-11 03:10:00 UTC
----
 
 ## 2023-09-11 06:10 UTC [ThanasisN]
 
@@ -1606,9 +1489,6 @@ Window was very dirty, and that created a jump in the measurements!!
 
 
 
----
-tags: [ tracker chp1 problem ]
----
 
 ## 2023-10-25 09:22 [ThanasisN]
 
@@ -1620,9 +1500,6 @@ Stop it reconnected, and now can not communicate with the control unit
 
 
 
----
-tags: [ problem tracker chp1 ]
----
 
 ## 2023-10-26 11:20 [ThanasisN]
 
@@ -1634,9 +1511,6 @@ But still there is no communication with the tracker
 
 
 
----
-tags: [ tracker chp1 problem ]
----
 
 ## 2023-10-30 13:54 [ThanasisN]
 
@@ -1648,9 +1522,6 @@ Will replace tomorrow.
 
 
 
----
-tags: [ chp1 tracker problem ]
----
 
 ## 2023-10-31 09:59 [ThanasisN]
 
@@ -1662,9 +1533,6 @@ Although, the Azimuth channel is not working.
 
 
 
----
-tags: [ tracker chp1 problem ]
----
 
 ## 2023-11-02 11:13 [ThanasisN]
 
@@ -1674,9 +1542,6 @@ Send for service.
 
 
 
----
-tags:      [ chp1 tracker ]
----
 
 ## 2023-11-06 12:30 [ThanasisN]
 
@@ -1688,9 +1553,6 @@ The tracker had a burned out microcontroller.
 
 
 
----
-tags:      [ chp1 problem ]
----
 
 ## 2023-11-07 11:00 [ThanasisN]
 
@@ -1713,12 +1575,6 @@ The tracker was checked and was level.
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
----
-tags:      [ cleaning ]
-created:   2024-01-25 13:05:23 EET
-cunixtime: 1706180723
-UTC:       2024-01-25 11:05:23 UTC
----
 
 ## 2024-01-25 13:05 EET [ThanasisN]
 
@@ -1730,12 +1586,6 @@ Cleaning of broadband and brewers windows at :
 
 
 
----
-tags:      [ problem broadband radmon ]
-created:   2024-01-26 17:29:47 EET
-cunixtime: 1706282987
-UTC:       2024-01-26 15:29:47 UTC
----
 
 ## 2024-01-26 [ThanasisN]
 

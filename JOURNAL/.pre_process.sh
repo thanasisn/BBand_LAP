@@ -54,7 +54,8 @@ for ay in "${years[@]}"; do
         if [[ -n "$infile" ]]; then
             echo " - $infile"
             (
-            cat "$infile"
+            cat "$infile" |\
+                sed '1 { /^---/ { :a N; /\n---/! ba; d} }'
             echo ""
             # echo "------"
             echo ""
