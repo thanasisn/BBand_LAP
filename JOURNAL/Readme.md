@@ -144,7 +144,7 @@ Other journals and log exist, but are not included here.
 * [New List of tags](#new-list-of-tags)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Mon Jan 29 12:20:04 PM EET 2024 -->
+<!-- Added by: athan, at: Δευ 29 Ιαν 2024 01:17:10 μμ EET -->
 
 <!--te-->
 
@@ -932,8 +932,6 @@ Tracker start working by itself probably!
 
 ## 2018-01-18 [ThanasisN]
 
-[//]: # (Keywords: #chp1, #data_loss, #down_time, #suspicious_data)
-
 Early morning no main power
 
 Late morning no main power and instruments shutdown.
@@ -945,8 +943,6 @@ Possible problem with all broadband data!!
 
 ## 2018-03-20 [ThanasisN]
 
-[//]: # (Keywords: #cleaning, #suspicious_data, #chp1)
-
 Visible signal step after cleaning!
 On CHP-1.
 
@@ -955,8 +951,6 @@ On CHP-1.
 
 ## 2018-03-23 11:36 [ThanasisN]
 
-[//]: # (Keywords: #cleaning, #suspicious_data)
-
 From previous days until now,
 rain with a lot of dust is occurring.
 
@@ -964,7 +958,7 @@ Instruments domes are regular covered with thick dust.
 
 Dome Cleaning
 
-11:36 - 11:39 local time
+11:36 - 11:39 LT
 
 09:36 - 09:39 UTC
 
@@ -972,8 +966,6 @@ Dome Cleaning
 
 
 ## 2018-04-12 08:35 [ThanasisN]
-
-[//]: # (Keywords: #cleaning)
 
 Domes cleaned at 
 
@@ -983,8 +975,6 @@ Domes cleaned at
 
 
 ## 2018-04-17 08:34 [ThanasisN]
-
-[//]: # (Keywords: #cleaning)
 
 Domes cleaned at
 
@@ -997,9 +987,6 @@ There was excessive mud from rain yesterday.
 
 ## 2018-05-16 10:35 [ThanasisN]
 
-[//]: # (Keywords: #leveling, #chp1)
-
-
 Leveling of CHP-1
 
 7:35 - 7:51 UTC
@@ -1009,8 +996,6 @@ Leveling of CHP-1
 
 
 ## 2018-05-18 [ThanasisN]
-
-[//]: # (Keywords: #data_corruption_certain)
 
 While sighting, I did an accidental reset to zero offset.
 
@@ -1022,8 +1007,6 @@ This happened close to disconnection.
 
 
 ## 2018-12-07 [ThanasisN]
-
-[//]: # (Keywords: #katastroph, #leveling, #silica, #down_time)
 
 **Radmon was down**
 
@@ -1040,9 +1023,9 @@ The system probably is in good order now.
 
 Was completed at 
 
-10:56 local time 
+10:56 LT
 
-8:56 UTC
+08:56 UTC
 
 
 
@@ -1644,25 +1627,25 @@ At least you need `pandoc` installed.
 List of tags
 ============
       5 #async
-     43 #chp1
-      5 #cleaning
+     40 #chp1
+      1 #cleaning
       5 #cm21
       2 #codding
-      3 #data_corruption_certain
+      2 #data_corruption_certain
       1 #data_format_change
-     28 #data_loss
-      3 #down_time
+     27 #data_loss
+      1 #down_time
       3 #error
-      5 #katastroph
-      4 #leveling
+      4 #katastroph
+      2 #leveling
       1 #mounting
       2 #panic
       4 #problem
       2 #pysolar
       1 #radmon_reboot
-      5 #silica
+      4 #silica
       2 #sun_vector
-     10 #suspicious_data
+      7 #suspicious_data
       1 #sync
       1 #temp
       6 #tracker
@@ -1673,19 +1656,21 @@ New List of tags
       1 brewers
       4 broadband
       1 ccd
-     22 chp1
-     13 cleaning
+     27 chp1
+     17 cleaning
       9 cm21
-      8 data_loss
+      1 data_corruption_certain
+      9 data_loss
+      2 down_time
       4 error
       1 INCcm21
       2 inclined
-      2 leveling
-     12 problem
-      4 radmon
-      2 sighting
-      2 silica
-      1 suspicious_data
+      4 leveling
+     13 problem
+      6 radmon
+      3 sighting
+      3 silica
+      4 suspicious_data
       1 test
       8 tracker
       1 works
