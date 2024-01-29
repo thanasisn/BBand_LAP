@@ -177,7 +177,7 @@ Other journals and log exist, but are not included here.
 * [New List of tags](#new-list-of-tags)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Σαβ 27 Ιαν 2024 12:17:33 μμ EET -->
+<!-- Added by: athan, at: 2024-01-29T11:03:15 EET -->
 
 <!--te-->
 
@@ -1516,7 +1516,7 @@ tags: [  problem radmon ]
 ---
 ## 2023-04-03 09:14 [ThanasisN]
 
-Radmon found frizzed with different system errors.
+Radmon found frozen with different system errors.
 
 No tracking with CHP-1 at start of the day. Day is cloudy.
 
