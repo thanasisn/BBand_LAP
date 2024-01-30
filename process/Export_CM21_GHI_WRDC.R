@@ -115,7 +115,7 @@ dir.create(EXPORT_DIR, showWarnings = FALSE, recursive = TRUE)
 
 
 ##  Set export range  ----------------------------------------------------------
-yearstodo <- seq(2022, year(Sys.time()))
+yearstodo <- seq(2023, year(Sys.time()))
 
 #+ include=T, echo=F, results="asis"
 cat("\n",
