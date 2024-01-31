@@ -7,7 +7,7 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_days_DB.R"
-renv::load("~/BBand_LAP")
+# renv::load("~/BBand_LAP")
 
 sink(file   = paste0("~/BBand_LAP/REPORTS/LOGs/", basename(sub("\\.R$", ".log", Script.Name))),
      split  = TRUE,
