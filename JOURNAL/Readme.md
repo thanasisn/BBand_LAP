@@ -144,7 +144,7 @@ Other journals and log exist, but are not included here.
 * [New List of tags](#new-list-of-tags)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Δευ 29 Ιαν 2024 01:17:10 μμ EET -->
+<!-- Added by: athan, at: Wed Jan 31 12:00:08 PM EET 2024 -->
 
 <!--te-->
 
@@ -1551,7 +1551,7 @@ Cleaning of broadband and brewers windows at :
 
 13:02 - 13:03 LT
 
-11:02 - 11:03 LT
+11:02 - 11:03 UTC
 
 
 
