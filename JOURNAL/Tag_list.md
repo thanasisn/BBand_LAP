@@ -2,13 +2,13 @@
 List of tags
 ============
       5 #async
-     40 #chp1
+     37 #chp1
       1 #cleaning
-      5 #cm21
+      4 #cm21
       2 #codding
       2 #data_corruption_certain
       1 #data_format_change
-     27 #data_loss
+     25 #data_loss
       1 #down_time
       3 #error
       4 #katastroph
@@ -20,7 +20,7 @@ List of tags
       1 #radmon_reboot
       4 #silica
       2 #sun_vector
-      7 #suspicious_data
+      5 #suspicious_data
       1 #sync
       1 #temp
       6 #tracker
@@ -29,23 +29,24 @@ List of tags
 New List of tags
 ============
       1 brewers
-      4 broadband
+      5 broadband
       1 ccd
-     27 chp1
+     30 chp1
      17 cleaning
-      9 cm21
+     10 cm21
       1 data_corruption_certain
-      9 data_loss
+     12 data_loss
       2 down_time
       4 error
       1 INCcm21
       2 inclined
       4 leveling
-     13 problem
+     14 problem
       6 radmon
+      1 roof
       3 sighting
       3 silica
-      4 suspicious_data
+      6 suspicious_data
       1 test
       8 tracker
       1 works
