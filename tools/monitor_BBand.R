@@ -112,6 +112,9 @@ if (active_channels > 6) {
 ## received data
 print(val)
 
+# TEST
+NOTIFY <- 1
+
 if (NOTIFY == 1) {
     system(
         paste0("notify-send",
