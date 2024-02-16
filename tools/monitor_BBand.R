@@ -113,7 +113,7 @@ if (active_channels > 6) {
 print(val)
 
 # TEST
-NOTIFY <- 1
+# NOTIFY <- 1
 
 if (NOTIFY == 1) {
     system(
