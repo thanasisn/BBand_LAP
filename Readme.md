@@ -25,7 +25,7 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2024-02-16T17:12:09 EET -->
+<!-- Added by: athan, at: 2024-02-16T19:59:32 UTC -->
 
 <!--te-->
 
@@ -41,8 +41,8 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 | BBDB meta        |    11369 |   82 |    485104 |   2.1 MiB | 52.04% |        4.62 |
 | TrackerDB        |  7755701 |   23 |  69795739 | 149.4 MiB | 39.13% |        2.24 |
 | TrackerDB meta   |     2877 |    9 |     14021 | 176.0 KiB | 54.15% |       12.85 |
-| Raw files hashes |   659381 |    4 |   2637524 |   3.5 MiB |   100% |        1.38 |
-| **Total**        | 24800688 |  198 | 572818274 |   2.7 GiB |    NA% |        5.04 |
+| Raw files hashes |   684160 |    4 |   2736640 |   3.6 MiB |   100% |        1.36 |
+| **Total**        | 24825467 |  198 | 572917390 |   2.7 GiB |    NA% |        5.04 |
 
 Table: Datasets sizes on 2024-02-16
 
