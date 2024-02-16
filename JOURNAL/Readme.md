@@ -55,6 +55,8 @@ Other journals and log exist, but are not included here.
    * [2016-10-31 [ThanasisN]](#2016-10-31-thanasisn)
 * [2017](#2017)
    * [2017-01-10 [ThanasisN]](#2017-01-10-thanasisn)
+   * [2017-12-25 [ThanasisN]](#2017-12-25-thanasisn)
+   * [2017-12-26 [ThanasisN]](#2017-12-26-thanasisn)
    * [2017-01-11 [ThanasisN]](#2017-01-11-thanasisn)
    * [2017-01-12 [ThanasisN]](#2017-01-12-thanasisn)
    * [2017-01-19 [ThanasisN]](#2017-01-19-thanasisn)
@@ -76,8 +78,6 @@ Other journals and log exist, but are not included here.
    * [2017-12-13 [ThanasisN]](#2017-12-13-thanasisn)
    * [2017-12-15 [ThanasisN]](#2017-12-15-thanasisn)
    * [2017-12-18 10:04 [ThanasisN]](#2017-12-18-1004-thanasisn)
-   * [2017-12-25 [ThanasisN]](#2017-12-25-thanasisn)
-   * [2017-12-26 [ThanasisN]](#2017-12-26-thanasisn)
 * [2018](#2018)
    * [2018-01-18 [ThanasisN]](#2018-01-18-thanasisn)
    * [2018-03-20 [ThanasisN]](#2018-03-20-thanasisn)
@@ -145,7 +145,7 @@ Other journals and log exist, but are not included here.
 * [New List of tags](#new-list-of-tags)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Fri Feb  2 04:40:04 PM EET 2024 -->
+<!-- Added by: athan, at: Fri Feb 16 07:40:04 PM EET 2024 -->
 
 <!--te-->
 
@@ -581,9 +581,25 @@ Done:
 
 ## 2017-01-10 [ThanasisN]
 
-[//]: # (Keywords: #chp1, #cm21)
-
 Snowfall, instruments probably covered by the snow.
+
+
+
+
+## 2017-12-25 [ThanasisN]
+
+Async and step data shows that tracker is not working.
+
+The signal from CHP-1 is zero!!
+
+Will exclude direct data from analysis.
+
+
+
+
+## 2017-12-26 [ThanasisN]
+
+Tracker start working by itself probably!
 
 
 
@@ -895,28 +911,6 @@ Reboot was done
 After reboot all measurements seems correct.
 
 It is possible to have been stacked **more than one day**
-
-
-
-
-## 2017-12-25 [ThanasisN]
-
-[//]: # (Keywords: #chp1, #data_loss, #suspicious_data)
-
-Async and step data shows that tracker is not working.
-
-The signal from CHP-1 is zero!!
-
-Will exclude direct data from analysis.
-
-
-
-
-## 2017-12-26 [ThanasisN]
-
-[//]: # (Keywords: #data_loss, #suspicious_data, #chp1)
-
-Tracker start working by itself probably!
 
 
 
@@ -1571,6 +1565,9 @@ Probably was frozen from yesterday.
 
 ## 2024-02-02 16:28 EET
 
+Today morning the main roof door was found broken.
+
+Later in the noon we see through the camera people walking among the instruments.
 
 
 
@@ -1635,13 +1632,13 @@ At least you need `pandoc` installed.
 List of tags
 ============
       5 #async
-     40 #chp1
+     37 #chp1
       1 #cleaning
-      5 #cm21
+      4 #cm21
       2 #codding
       2 #data_corruption_certain
       1 #data_format_change
-     27 #data_loss
+     25 #data_loss
       1 #down_time
       3 #error
       4 #katastroph
@@ -1653,7 +1650,7 @@ List of tags
       1 #radmon_reboot
       4 #silica
       2 #sun_vector
-      7 #suspicious_data
+      5 #suspicious_data
       1 #sync
       1 #temp
       6 #tracker
@@ -1662,23 +1659,24 @@ List of tags
 New List of tags
 ============
       1 brewers
-      4 broadband
+      5 broadband
       1 ccd
-     27 chp1
+     30 chp1
      17 cleaning
-      9 cm21
+     10 cm21
       1 data_corruption_certain
-      9 data_loss
+     12 data_loss
       2 down_time
       4 error
       1 INCcm21
       2 inclined
       4 leveling
-     13 problem
+     14 problem
       6 radmon
+      1 roof
       3 sighting
       3 silica
-      4 suspicious_data
+      6 suspicious_data
       1 test
       8 tracker
       1 works
