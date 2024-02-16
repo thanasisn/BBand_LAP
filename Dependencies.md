@@ -7,7 +7,7 @@
 
             renv:     1.0.3
            arrow:  14.0.0.2
-      data.table:   1.14.10
+      data.table:    1.15.0
            dplyr:     1.1.4
            knitr:      1.45
        lubridate:     1.9.3
@@ -17,7 +17,7 @@
 ### `inspect_db`
 
            arrow:  14.0.0.2
-      data.table:   1.14.10
+      data.table:    1.15.0
            dplyr:     1.1.4
            knitr:      1.45
           pander:     0.6.5
@@ -34,7 +34,7 @@
             renv:     1.0.3
        rmarkdown:      2.25
            arrow:  14.0.0.2
-      data.table:   1.14.10
+      data.table:    1.15.0
             doMC:     1.3.8
            dplyr:     1.1.4
          foreach:     1.5.2
@@ -52,6 +52,10 @@
 ### `tools`
 
            arrow:  14.0.0.2
-      data.table:   1.14.10
+      data.table:    1.15.0
            dplyr:     1.1.4
      htmlwidgets:     1.6.4
+        optparse:     1.7.4
+          plotly:    4.10.4
+            funr:     0.3.2
+            renv:     1.0.3
