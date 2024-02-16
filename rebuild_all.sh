@@ -39,15 +39,15 @@ else
     echo "DO NOT REMOVED!"
 fi
 
-  
+
 info "Get data from Sirena"
 "$HOME/BBand_LAP/tools/Get_data_from_sirena.sh"
 
 info "Build the main database"
 "$HOME/BBand_LAP/build_db/Build_BB_DB.R"
 
-# info "Create plots and reports"
-# "$HOME/BBand_LAP/inspect_db/Inspect_BB_DB.R"
+info "Create plots and reports"
+"$HOME/BBand_LAP/inspect_db/Inspect_BB_DB.R"
 
 info "Run other processes"
 "$HOME/BBand_LAP/process/Process_BB_DB.R"
@@ -55,4 +55,4 @@ info "Run other processes"
 info "Update Readme.md file"
 "$HOME/BBand_LAP/.update_readme.sh"
 
-exit 0 
+exit 0
