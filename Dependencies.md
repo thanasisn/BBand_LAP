@@ -59,3 +59,4 @@
           plotly:    4.10.4
             funr:     0.3.2
             renv:     1.0.3
+        filelock:     1.0.3
