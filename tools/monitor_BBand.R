@@ -6,7 +6,11 @@
 ## Depends on "~/CODE/conky/scripts/broadband_data_sub.py"
 
 rm(list = (ls()[ls() != ""]))
+.libPaths(c(.libPaths(), "/home/athan/.R/x86_64-pc-linux-gnu-library/4.2.3/"))
+
 Script.Name <- "~/BBand_LAP/tools/monitor_BBand.R"
+
+
 
 d <- filelock::lock(paste0("/dev/shm/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 Sys.setenv(TZ = "UTC")
