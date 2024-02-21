@@ -5,6 +5,8 @@ Developed in the Laboratory of Atmospheric Physics of Thessaloniki, Greece.
 
 To process the data from broadband instruments of LAP.
 
+Some plots and reports should be found [here](https://thanasisn.github.io/).
+
 This is partial used in operational procedures ([github.com/thanasisn/CS_id](https://github.com/thanasisn/CS_id) is still in use).
 
 
@@ -25,7 +27,7 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
    * [Documentation and usage](#documentation-and-usage)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Tue Feb 20 04:49:22 AM UTC 2024 -->
+<!-- Added by: athan, at: Wed Feb 21 04:49:52 AM UTC 2024 -->
 
 <!--te-->
 
@@ -37,14 +39,14 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 
 | Name             |     Rows | Vars |    Values |      Size |   Fill | Bytes/Value |
 |:-----------------|---------:|-----:|----------:|----------:|-------:|------------:|
-| BBDB             | 16375680 |   80 | 500070910 |   2.5 GiB | 38.17% |        5.45 |
-| BBDB meta        |    11373 |   82 |    485351 |   2.1 MiB | 52.04% |        4.62 |
-| TrackerDB        |  7764903 |   23 |  69878549 | 149.6 MiB | 39.13% |        2.25 |
-| TrackerDB meta   |     2881 |    9 |     14041 | 176.0 KiB | 54.15% |       12.84 |
-| Raw files hashes |   684176 |    4 |   2736704 |   3.6 MiB |   100% |        1.36 |
-| **Total**        | 24839013 |  198 | 573185555 |   2.7 GiB |    NA% |        5.04 |
+| BBDB             | 16377120 |   80 | 500123346 |   2.5 GiB | 38.17% |        5.45 |
+| BBDB meta        |    11374 |   82 |    485415 |   2.1 MiB | 52.05% |        4.62 |
+| TrackerDB        |  7767250 |   23 |  69899670 | 149.7 MiB | 39.13% |        2.25 |
+| TrackerDB meta   |     2882 |    9 |     14046 | 176.0 KiB | 54.15% |       12.83 |
+| Raw files hashes |   684180 |    4 |   2736720 |   3.6 MiB |   100% |        1.36 |
+| **Total**        | 24842806 |  198 | 573259197 |   2.7 GiB |    NA% |        5.04 |
 
-Table: Datasets sizes on 2024-02-20
+Table: Datasets sizes on 2024-02-21
 
 
 
