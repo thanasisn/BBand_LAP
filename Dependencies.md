@@ -5,7 +5,7 @@
 
 ### `build_db`
 
-            renv:     1.0.3
+            renv:     1.0.4
            arrow:  14.0.0.2
       data.table:    1.15.0
            dplyr:     1.1.4
@@ -21,7 +21,7 @@
            dplyr:     1.1.4
            knitr:      1.45
           pander:     0.6.5
-            renv:     1.0.3
+            renv:     1.0.4
        lubridate:     1.9.3
            tidyr:     1.3.1
            tools:     4.2.3
@@ -31,7 +31,7 @@
 
 ### `process`
 
-            renv:     1.0.3
+            renv:     1.0.4
        rmarkdown:      2.25
            arrow:  14.0.0.2
       data.table:    1.15.0
@@ -58,5 +58,5 @@
         optparse:     1.7.4
           plotly:    4.10.4
             funr:     0.3.2
-            renv:     1.0.3
+            renv:     1.0.4
         filelock:     1.0.3
