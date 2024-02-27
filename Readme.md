@@ -13,21 +13,10 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 ## Table of Contents
 
 <!--ts-->
-* [Broad Band LAP](#broad-band-lap)
-   * [Table of Contents](#table-of-contents)
-   * [Data status overview](#data-status-overview)
-   * [What it does](#what-it-does)
-      * [For CHP-1](#for-chp-1)
-      * [For CM-21](#for-cm-21)
-      * [Other processes](#other-processes)
-      * [Tools](#tools)
-   * [TODO](#todo)
-* [Details](#details)
-   * [Development and Design](#development-and-design)
-   * [Documentation and usage](#documentation-and-usage)
+
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Mon Feb 26 04:50:28 UTC 2024 -->
+<!-- Added by: athan, at: Tue Feb 27 04:49:35 UTC 2024 -->
 
 <!--te-->
 
@@ -39,14 +28,14 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 
 | Name             |     Rows | Vars |    Values |      Size |   Fill | Bytes/Value |
 |:-----------------|---------:|-----:|----------:|----------:|-------:|------------:|
-| BBDB             | 16384320 |   80 | 500385424 |   2.5 GiB | 38.18% |        5.45 |
-| BBDB meta        |    11379 |   82 |    485735 |   2.1 MiB | 52.06% |        4.62 |
-| TrackerDB        |  7779250 |   23 |  70007660 | 150.0 MiB | 39.13% |        2.25 |
-| TrackerDB meta   |     2887 |    9 |     14071 | 176.0 KiB | 54.15% |       12.81 |
-| Raw files hashes |   684200 |    4 |   2736800 |   3.6 MiB |   100% |        1.36 |
-| **Total**        | 24862036 |  198 | 573629690 |   2.7 GiB |    NA% |        5.04 |
+| BBDB             | 16385760 |   80 | 500438124 |   2.5 GiB | 38.18% |        5.45 |
+| BBDB meta        |    11380 |   82 |    485799 |   2.1 MiB | 52.06% |        4.62 |
+| TrackerDB        |  7781702 |   23 |  70029726 | 150.0 MiB | 39.13% |        2.25 |
+| TrackerDB meta   |     2888 |    9 |     14076 | 176.0 KiB | 54.16% |        12.8 |
+| Raw files hashes |   684204 |    4 |   2736816 |   3.6 MiB |   100% |        1.36 |
+| **Total**        | 24865934 |  198 | 573704541 |   2.7 GiB |    NA% |        5.04 |
 
-Table: Datasets sizes on 2024-02-26
+Table: Datasets sizes on 2024-02-27
 
 
 
