@@ -8,33 +8,27 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/tools/List_dependencies.R"
 
+source("~/CODE/FUNCTIONS/R/listDependencies.R")
 
 ## __ Describe environment -----------------------------------------------------
-env_info <- "~/BBand_LAP/Dependencies.md"
 
-cat("\n## BBand_LAP Current Running Environment\n", file = env_info)
-cat("\n", R.version.string, "\n", file = env_info, append = TRUE)
+folders <- c(
+  "~/BBand_LAP/",
+  "~/BBand_LAP/build_db/",
+  "~/BBand_LAP/inspect_db/",
+  "~/BBand_LAP/process/",
+  "~/BBand_LAP/tools/"
+)
 
-cat("\n### `build_db`\n\n", file = env_info, append = TRUE)
-pkgs <- renv::dependencies("~/BBand_LAP/build_db/")
-for (ap in unique(pkgs$Package)) {
-    cat(sprintf("%16s:  %8s\n", ap, packageVersion(ap)), file = env_info, append = TRUE)
+for (af in folders) {
+  listDependencies(af,
+                   output = paste0(af, "/Dependencies.md"),
+                   output_overwrite = TRUE)
+
 }
-cat("\n### `inspect_db`\n\n", file = env_info, append = TRUE)
-pkgs <- renv::dependencies("~/BBand_LAP/inspect_db/")
-for (ap in unique(pkgs$Package)) {
-    cat(sprintf("%16s:  %8s\n", ap, packageVersion(ap)), file = env_info, append = TRUE)
-}
-cat("\n### `process`\n\n", file = env_info, append = TRUE)
-pkgs <- renv::dependencies("~/BBand_LAP/process/")
-for (ap in unique(pkgs$Package)) {
-    cat(sprintf("%16s:  %8s\n", ap, packageVersion(ap)), file = env_info, append = TRUE)
-}
-cat("\n### `tools`\n\n", file = env_info, append = TRUE)
-pkgs <- renv::dependencies("~/BBand_LAP/tools/")
-for (ap in unique(pkgs$Package)) {
-    cat(sprintf("%16s:  %8s\n", ap, packageVersion(ap)), file = env_info, append = TRUE)
-}
+
+
+
 
 
 tac <- Sys.time()
