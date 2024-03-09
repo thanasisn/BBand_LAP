@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2024-03-08 
+At: 2024-03-09 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -18,7 +18,7 @@ At: 2024-03-08
              zoo:  1.8.12  
            tidyr:  1.3.1   
            gdata:  3.0.0   
-       rmarkdown:  2.25    
+       rmarkdown:  2.26    
          ggplot2:  3.5.0   
             doMC:  1.3.8   
          foreach:  1.5.2   

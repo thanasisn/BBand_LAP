@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/inspect_db/ 
-At: 2024-03-08 
+At: 2024-03-09 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -14,5 +14,5 @@ At: 2024-03-08
            tidyr:  1.3.1   
            tools:  4.2.3   
            gdata:  3.0.0   
-       rmarkdown:  2.25    
+       rmarkdown:  2.26    
          ggplot2:  3.5.0   
