@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/process/ 
-At: 2024-03-12 
+At: 2024-03-13 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -17,7 +17,7 @@ At: 2024-03-12
           pander:  0.6.5   
          arsenal:  3.6.3   
        compareDF:  2.3.5   
-           Hmisc:  5.1.1   
+           Hmisc:  5.1.2   
            tools:  4.2.3   
-          digest:  0.6.34  
+          digest:  0.6.35  
           scales:  1.3.0   
