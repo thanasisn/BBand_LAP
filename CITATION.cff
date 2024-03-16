@@ -17,6 +17,7 @@ repository-code: 'https://github.com/thanasisn/BBand_LAP'
 abstract: Process data from pyranometers and pyheliometers
 keywords:
   - sun radiation
+  - broadband radiation
   - CM21
   - CHP1
   - quality control
