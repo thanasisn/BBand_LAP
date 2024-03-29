@@ -1,12 +1,12 @@
 
 Dependencies for: ~/BBand_LAP/process/ 
-At: 2024-03-28 
+At: 2024-03-29 
 
  R version 4.2.3 (2023-03-15) 
 
             renv:  1.0.5   
        rmarkdown:  2.26    
-           arrow:  14.0.2.1
+           arrow:  15.0.1  
       data.table:  1.15.2  
             doMC:  1.3.8   
            dplyr:  1.1.4   
