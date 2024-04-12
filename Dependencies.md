@@ -1,10 +1,10 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2024-04-11 
+At: 2024-04-12 
 
  R version 4.2.3 (2023-03-15) 
 
-        colorout:  1.3.0.1 
+        colorout:  1.3.0.2 
            utils:  4.2.3   
             renv:  1.0.5   
            arrow:  15.0.1  
