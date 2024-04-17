@@ -274,8 +274,11 @@ for (af in filelist$names) {
     ## DHI = GHI – DNI cos(z)
     datapart[, DIFF_strict := GLB_strict - HOR_strict]
 
-    ## __ Clearness Index  -----------------------------------------------------
+    ## __ Transmittance  -------------------------------------------------------
+    ## ClearnessIndex_kt -> Transmittance_GLB rename to proper
+    ## or Solar insolation ratio, Solar insolation factor
     datapart[, ClearnessIndex_kt := GLB_strict / (cosde(SZA) * TSI_TOA)]
+    # datapart[, Transmittance_GLB := GLB_strict / (cosde(SZA) * TSI_TOA)]
 
     ## __ Diffuse fraction  ----------------------------------------------------
     datapart[, DiffuseFraction_kd := DIFF_strict / GLB_strict]
@@ -660,23 +663,23 @@ for (af in filelist$names) {
 
 
 
-    ## 9. Clearness index test  ------------------------------------------------
+    ## 9. Transmittance test  ------------------------------------------------
     #'
-    #' ## 9. Clearness index test
+    #' ## 9. Transmittance test
     #'
     #' This filter is mine, and is applied on GHI data.
     #'
     #' Data near elevation 0 are caused by the cos(SZA) while calculating
-    #' kt = GLB / (cos(sza) * TSI).
+    #' T = GLB / (cos(sza) * TSI).
     #'
     #' For larger elevation angles manual inspection is needed.
 
-    QS$CL_idx_max <-  1.13   # Upper Clearness index accepted level
-    QS$CL_idx_min <- -0.001  # Lower Clearness index accepted level
+    QS$CL_idx_max <-  1.13   # Upper Transmittance accepted level
+    QS$CL_idx_min <- -0.001  # Lower Transmittance accepted level
     QS$CL_idx_ele <-  8      # Apply for elevations above this angle
 
     if (QS$TEST_09) {
-        cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
+        cat(paste("\n9. Transmittance (global/TSI) test.\n\n"))
 
         testN        <- 9
         flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
