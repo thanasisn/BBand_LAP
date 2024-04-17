@@ -216,6 +216,7 @@ HOR_wpsm_temp_cor     = c("DHI temp. cor.",            "Direct Horizontal Irradi
 DIFF_strict           = c("Diffuse Ir.",               "Diffuse Irradiance",                                 "Diffuse Irradiance",                                                          "float"),
 DiffuseFraction_kd    = c("Diff. Frac.",               "Diffuse Fraction",                                   "Diffuse Fraction kd",                                                         "float"),
 ClearnessIndex_kt     = c("Clear. In.",                "Clearness Index",                                    "Clearness Index kt",                                                          "float"),
+Transmittance_GLB     = c("Transmit.",                 "Atmospheric Transmittance",                          "Atmospheric Transmittance of Global irradiance",                              "float"),
 Sun_Dist_Astropy      = c("Sun Dist.",                 "Sun Distance",                                       "Sun Distance from Thessaloniki",                                              "float"),
 TSI_TOA               = c("TSI at TOA",                "Total Solar Irradiance at TOA",                      "Total Solar Irradiance at Top Of Atmosphere",                                 "float"),
 TSI_1au               = c("TSI at 1au",                "Total Solar Irradiance at 1au",                      "Total Solar Irradiance at 1au",                                               "float"),
