@@ -273,7 +273,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
             ## Computed
             sun_temp[, DIFF_strict             := as.numeric(NA)  ]
             sun_temp[, DiffuseFraction_kd      := as.numeric(NA)  ]
-            sun_temp[, ClearnessIndex_kt       := as.numeric(NA)  ]
+            sun_temp[, ClearnessIndex_kt       := as.numeric(NA)  ] ## replaced with transmittance
+            sun_temp[, Transmittance_GLB       := as.numeric(NA)  ]
             ## Sun
             sun_temp[, Sun_Dist_Astropy        := as.numeric(NA)  ]
             sun_temp[, TSI_TOA                 := as.numeric(NA)  ]
