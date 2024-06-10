@@ -16,7 +16,7 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Sun Jun  9 09:49:31 UTC 2024 -->
+<!-- Added by: athan, at: Mon Jun 10 11:20:42 UTC 2024 -->
 
 <!--te-->
 
@@ -30,12 +30,12 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 |:-----------------|---------:|-----:|----------:|----------:|-------:|------------:|
 | BBDB             | 16457760 |   80 |  5.03e+08 |   2.6 GiB |  38.2% |        5.45 |
 | BBDB meta        |    11430 |   82 |    488883 |   2.2 MiB | 52.16% |        4.62 |
-| TrackerDB        |  8114879 |   23 |  73028113 | 156.4 MiB | 39.13% |        2.25 |
-| TrackerDB meta   |     2991 |    9 |     14591 | 184.0 KiB |  54.2% |       12.91 |
+| TrackerDB        |  8118735 |   23 |  73062815 | 156.5 MiB | 39.13% |        2.25 |
+| TrackerDB meta   |     2992 |    9 |     14596 | 184.0 KiB |  54.2% |       12.91 |
 | Raw files hashes |   709231 |    4 |   2836924 |   3.7 MiB |   100% |        1.35 |
-| **Total**        | 25296291 |  198 | 579372584 |   2.7 GiB |    NA% |        5.03 |
+| **Total**        | 25300148 |  198 | 579407291 |   2.7 GiB |    NA% |        5.03 |
 
-Table: Datasets sizes on 2024-06-09
+Table: Datasets sizes on 2024-06-10
 
 
 
