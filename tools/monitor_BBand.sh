@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
 ## created on 2024-08-24
 
-#### ..enter description here..
+#### Run tests of normal operation
 
-## start coding
+## check acquisition
+/home/athan/BBand_LAP/tools/monitor_CHP1_tracker.R
 
-
-sleep 1
-
-
-
+## check recent files
+/home/athan/BBand_LAP/tools/monitor_BBand_files.R
 
 ##  END  ##
 exit 0 
