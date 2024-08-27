@@ -1,16 +1,16 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2024-04-17 
+At: 2024-08-27 
 
  R version 4.2.3 (2023-03-15) 
 
         colorout:  1.3.0.2 
            utils:  4.2.3   
-            renv:  1.0.5   
+            renv:  1.0.7   
            arrow:  15.0.1  
-      data.table:  1.15.2  
+      data.table:  1.15.4  
            dplyr:  1.1.4   
-           knitr:  1.45    
+           knitr:  1.46    
        lubridate:  1.9.3   
            tools:  4.2.3   
           pander:  0.6.5   
@@ -28,8 +28,7 @@ At: 2024-04-17
           digest:  0.6.35  
           scales:  1.3.0   
      htmlwidgets:  1.6.4   
-        optparse:  1.7.4   
+        optparse:  1.7.5   
           plotly:  4.10.4  
             funr:  0.3.2   
-        filelock:  1.0.3   
-      reticulate:  1.35.0  
+      reticulate:  1.36.1  
