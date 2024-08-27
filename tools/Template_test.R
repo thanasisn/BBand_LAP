@@ -77,6 +77,20 @@ names(BB)
 dim(BB)
 
 
+## Export dates and sun
+saveRDS(
+    BB |> filter(Elevat > 0) |>
+        select(Date, SZA) |>
+        collect()  |>
+        data.table(),
+    file = "~/DATA/Broad_Band/Date_SZA_Azimuth.Rds"
+)
+
+## test all dates are there
+test <- readRDS("~/DATA/Broad_Band/Date_SZA_Azimuth.Rds")
+length(seq.Date(min(as.Date(test$Date)), max(as.Date(test$Date)), by = "day")) - test[, length(unique(as.Date(Date)))]
+
+
 BB |> mutate(NTSI <- TSI_1au * cos(SZA)) |> compute()
 
 
