@@ -62,18 +62,16 @@ if (!all((ranges_CM21$Until - ranges_CM21$From) >= 1)) {
 }
 
 
-
-
-## For qutebrowser ----
+##  For qutebrowser  -----------------------------------------------------------
 ## Not so nice but works
 # BROWSER_CMD <- "qutebrowser --backend webengine "
 ## --
 
-## For Brave ----
+## For Brave  ------------------------------------------------------------------
 ## use a user-data-dir to avoid load my custom colors
 BROWSER_CMD <- "brave-browser  --password-store=basic --window-size=1240,720 --user-data-dir=/tmp/bravetmp --incognito -app=file://"
+BROWSER_CMD <- "firefox  --password-store=basic --window-size=1240,720 --user-data-dir=/tmp/bravetmp --incognito -app=file://"
 ## --
-
 
 
 ####   Get input    ############################################################
