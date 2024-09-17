@@ -10,8 +10,8 @@ is.POSIXct <- function(x) inherits(x, "POSIXct")
 ##  Calibration values for CHP1
 chp1_calibration_data <- matrix(
 ##        Date,         Sensitivity [μV/W/m^2], Acquisition Gain []
-       c("2016-04-01",  8.08,                   2000,
-         "2016-04-02",  8.08,                   2000,  ## <- fake, just for interpolation
+       c("2016-04-01",  8.02,                   2000,
+         "2016-04-02",  8.02,                   2000,  ## <- fake, just for interpolation
           NULL),
        byrow = TRUE,
        ncol  = 3)
