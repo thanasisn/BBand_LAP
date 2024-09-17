@@ -117,6 +117,16 @@ max(test1$Elevat)
 range(test1$Date, test2$Date)
 
 
+DT <- read_parquet(DB_META_fl)
+
+
+## export dark data
+DT |> select(contains("dark"), day)
+
+
+saveRDS(DT |> select(contains("dark"), day), "~/MANUSCRIPTS/03_thesis/MAIN_el/data/dark_signal.Rds")
+
+
 
 #' **END**
 #+ include=T, echo=F, results="asis"
