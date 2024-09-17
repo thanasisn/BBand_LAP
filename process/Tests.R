@@ -65,6 +65,8 @@ renv::load("~/BBand_LAP")
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
+source("~/BBand_LAP/functions/Functions_CM21.R")
+source("~/BBand_LAP/functions/Functions_CHP1.R")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -120,11 +122,14 @@ range(test1$Date, test2$Date)
 DT <- read_parquet(DB_META_fl)
 
 
-## export dark data
-DT |> select(contains("dark"), day)
+# ## export dark data for thesis
+# DARK <- DT |> select(contains("dark"), day)
+# DARK$cm21_Daily_dark_watt <- cm21factor(as.POSIXct(DARK$day)) * DARK$cm21_Daily_dark
+# DARK$chp1_Daily_dark_watt <- chp1factor(as.POSIXct(DARK$day)) * DARK$chp1_Daily_dark
+# saveRDS(DARK, "~/MANUSCRIPTS/03_thesis/MAIN_el/data/dark_signal.Rds")
 
 
-saveRDS(DT |> select(contains("dark"), day), "~/MANUSCRIPTS/03_thesis/MAIN_el/data/dark_signal.Rds")
+
 
 
 
