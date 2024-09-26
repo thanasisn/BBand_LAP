@@ -19,7 +19,7 @@ SIRENA_TOT   <- "~/DATA/cm21_data_validation/AC21_lap.GLB_TOT/"
 RADMON_DIR   <- "~/DATA_RAW/Raddata/3/"
 RADMON_GLB   <- "~/DATA_RAW/Raddata/6/"
 RADMON_INC   <- "~/DATA_RAW/Raddata/1/"
-
+ASTROPY_DR   <- "~/DATA_RAW/SUN/Astropy_LAP/"
 
 
 ##  Other data input  ----------------------------------------------------------
@@ -35,6 +35,7 @@ CHP1_TEMP_EX <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CHP1_Temp.dat"
 
 
 ##  DB specifications  ---------------------------------------------------------
+DB_DUCK             <- "~/DATA/Broad_Band/Broad_Band_LAP.duckdb"
 DB_DIR              <- "~/DATA/Broad_Band/Broad_Band_DB"
 DB_META_fl          <- "~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
 DB_Steps_DIR        <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB/"
