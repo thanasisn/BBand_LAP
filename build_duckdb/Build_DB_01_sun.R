@@ -47,31 +47,44 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
-require(duckdb,     quietly = TRUE, warn.conflicts = FALSE)
+library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
+require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
-stop()
 
-cat("\n Initialize DB or import  PySolar  Sun data\n\n")
+cat("\n Initialize DB or import Sun data\n\n")
 
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 
-##  Get Astrtopy files  --------------------------------------------------------
-inp_filelist <- list.files(path       = ASTROPY_DR,
-                           # pattern    = "sun_path_.*.dat.gz",
-                           recursive  = TRUE,
-                           full.names = TRUE)
+##  Get Astropy files  ---------------------------------------------------------
+SUN <- readRDS(ASTROPY_FL)
+names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
 
 
+
+stop()
+
+if (!dbExistsTable(con, "LAP")) {
+  cat("\n Create emtpy table LAP")
+  dbCreateTable(con, "LAP", SUN)
+}
+
+
+tbl(con, "LAP") |> select(SUN)
+
+dbDataType(SUN$Azimuth)
+
+
+stop()
 
 ##  Get PySolar files  ---------------------------------------------------------
 inp_filelist <- list.files(path       = SUN_FOLDER,
