@@ -76,21 +76,32 @@ SUN <- SUN[as.Date(Date) >= DB_start_date, ]
 
 
 ### FIXME TEST
-SUN <- SUN[Date > "2024-01-01"]
+# SUN <- SUN[Date < "2024-01-01" & Date > "2023-01-01"]
+SUN <- SUN[Date > "2023-01-01"]
 
 ## Use epoch as key
-SUN$Epoch <- as.integer(SUN$Date)
-SUN$Date <- NULL
+# SUN$Epoch <- as.integer(SUN$Date)
+# SUN$Date <- NULL
 
+
+## drop existing dates
+# if (dbExistsTable(con, "LAP")) {
+#   SUN <- anti_join(SUN,
+#             tbl(con, "LAP") |>
+#               select(Date) |>
+#               filter(!is.na(Epoch)) |>
+#               collect(),
+#             by = "Epoch")
+# }
 
 ## drop existing dates
 if (dbExistsTable(con, "LAP")) {
   SUN <- anti_join(SUN,
             tbl(con, "LAP") |>
               select(Date) |>
-              filter(!is.na(Epoch)) |>
+              filter(!is.na(Date)) |>
               collect(),
-            by = "Epoch")
+            by = "Date")
 }
 
 # SUN <- first(SUN, 10000)
@@ -98,10 +109,17 @@ if (dbExistsTable(con, "LAP")) {
 ## create some nice vars
 names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
 SUN <- SUN |> relocate(Epoch) |> data.table()
-SUN[, month := month(as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
-SUN[, year  := year( as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
-SUN[, doy   := yday( as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
-SUN[, Day   := as.Date(as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
+# SUN[, month := month(  as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
+# SUN[, year  := year(   as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
+# SUN[, doy   := yday(   as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
+# SUN[, Day   := as.Date(as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
+SUN[, month := month(  Date)]
+SUN[, year  := year(   Date)]
+SUN[, doy   := yday(   Date)]
+SUN[, Day   := as.Date(Date)]
+
+
+
 SUN[, SZA   := 90 - Elevat]
 SUN[Azimuth <= 180, preNoon := TRUE ]
 SUN[Azimuth >  180, preNoon := FALSE]
