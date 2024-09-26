@@ -2,7 +2,7 @@
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #'
-#' Read PySolar files `sun_path_.*.dat.gz`
+#' Read Astropy
 #'
 #' This also initializes a lot of columns in the dataset and meta data.
 #'
@@ -17,7 +17,6 @@
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
 #' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
-#'
 #'
 #+ echo=F, include=T
 
@@ -34,7 +33,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/build_db/Build_DB_01_pysolar.R"
+Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_01_sun.R"
 Script.ID   <- "01"
 # renv::load("~/BBand_LAP")
 
@@ -65,60 +64,64 @@ cat("\n Initialize DB or import Sun data\n\n")
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 
-##  Get Astropy files  ---------------------------------------------------------
-SUN <- readRDS(ASTROPY_FL)
-names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
-SUN <- SUN |> relocate(Date)
 
-stop()
+
+##  Get Astropy files  ---------------------------------------------------------
+SUN <- data.table(readRDS(ASTROPY_FL))
+names(SUN)[names(SUN) == "Dist"]      <- "Sun_Dist_Astropy"
+names(SUN)[names(SUN) == "Elevation"] <- "Elevat"
+setorder(SUN, Date)
+stopifnot(length(unique(SUN$Date)) == nrow(SUN))
+
+## drop existing dates
+if (dbExistsTable(con, "LAP")) {
+  SUN <- anti_join(SUN,
+            tbl(con, "LAP") |>
+              select(Date) |>
+              filter(!is.na(Date)) |>
+              collect(),
+            by = "Date")
+}
+
+# SUN <- first(SUN, 10000)
+
+names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
+SUN <- SUN |> relocate(Date) |> data.table()
+SUN[, month := month(Date)]
+SUN[, year  := year( Date)]
+SUN[, doy   := yday( Date)]
+SUN[, SZA   := 90 - Elevat]
+SUN[Azimuth <= 180, preNoon := TRUE ]
+SUN[Azimuth >  180, preNoon := FALSE]
+
 
 if (!dbExistsTable(con, "LAP")) {
-  cat("\n Init table 'LAP' \n")
+  cat("\n Init table 'LAP' \n\n")
   dbWriteTable(con, "LAP", SUN)
-  db_create_index(con, "LAP", columns = "Date", unique = T)
+  db_create_index(con, "LAP", columns = "Date", unique = TRUE)
 }
 
 if (dbExistsTable(con, "LAP")) {
-  cat("find data to append")
+  cat("\n Add data to 'LAP' \n\n")
+  dbWriteTable(con, "LAP", SUN, append = TRUE)
 }
 
-duckdb::dbListFields(con, "LAP")
+
+
+tbl(con, "LAP") |> tally()
 tbl(con, "LAP") |> glimpse()
+SUN             |> tally()
+SUN             |> glimpse()
 
 
-DBI::dbListObjects(con, "LAP")
-
-dbListTables(con)
-
-dbDataType(SUN$Azimuth)
 dbDisconnect(con)
-dbReadTable(con, "LAP")
-tbl(con, dbId("some_schema", "LAP"))
-dbExecute(con, "SHOW LAP")
 
-stop()
 
-##  Get PySolar files  ---------------------------------------------------------
-inp_filelist <- list.files(path       = SUN_FOLDER,
-                           pattern    = "sun_path_.*.dat.gz",
-                           recursive  = TRUE,
-                           full.names = TRUE)
-inp_filelist <- data.table(fullname = inp_filelist)
-inp_filelist[, basename := basename(fullname)]
-inp_filelist$day <- as.Date(
-    strptime(
-        sub("\\.dat\\.gz", "",
-            sub("sun_path_", "",
-                inp_filelist$basename)),
-        format = "%F"))
-setorder(inp_filelist, day)
-cat("\n**Found:",paste(nrow(inp_filelist), "PySolar files**\n"))
 
-## only new files in the date range
-inp_filelist <- inp_filelist[!inp_filelist$basename %in% BB_meta$pysolar_basename]
-inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
+stop("DONE")
+test <- tbl(con, "LAP") |> collect() |> data.table()
 
-cat("\n**Parse:", paste(nrow(inp_filelist), "PySolar files**\n\n"))
+plot(test[Elevat > 0, SZA, Azimuth ])
 
 
 
@@ -127,48 +130,17 @@ for (YYYY in unique(year(inp_filelist$day))) {
     subyear <- inp_filelist[year(day) == YYYY]
     ## Months to do
     for (mm in subyear[, unique(month(day))]) {
-        submonth <- subyear[month(day) == mm]
-        ## Export file name and hive dir
-        filedir <- paste0(DB_DIR, "/", YYYY, "/", mm, "/" )
-        dir.create(filedir, recursive = TRUE, showWarnings = FALSE)
-        partfile <- paste0(filedir, "/part-0.parquet")
-        ## Init data collector
-        if (file.exists(partfile)) {
-            cat("01 Load: ", partfile, "\n")
-            gather <- read_parquet(partfile)
-            ## Columns may be missing while repacking dataset
-            gather$year  <- year(gather$Date)
-            gather$month <- month(gather$Date)
-        } else {
-            cat("01  NEW: ", partfile, "\n")
-            gather <- data.table()
-        }
 
         ##  Read this month set files
         gathermeta <- data.table()
         for (ad in submonth$day) {
             ss <- submonth[day == ad]
             ## Read sun data file  ---------------------------------------------
-            sun_temp <- fread(ss$fullname, na.strings = "None")
-            names(sun_temp)[names(sun_temp) == "DATE"] <- "Date"
-            names(sun_temp)[names(sun_temp) == "AZIM"] <- "Azimuth"
-            names(sun_temp)[names(sun_temp) == "ELEV"] <- "Elevat"
             sun_temp[, DIST  := NULL]
             sun_temp[, SZA   := 90 - Elevat]
             sun_temp[, year  := year( Date)]
             sun_temp[, month := month(Date)]
             sun_temp[, doy   := yday( Date)]
-
-            ## Get metadata for each sun file ----------------------------------
-            sun_meta <- data.table(day              = as_date(ad),
-                                   pysolar_basename = basename(ss$fullname),
-                                   pysolar_mtime    = file.mtime(ss$fullname),
-                                   pysolar_parsed   = Sys.time(),
-                                   daylength        = sun_temp[Elevat >= 0, .N])
-
-            ## Here we can init more variables of the database -----------------
-            sun_temp[Azimuth <= 180, preNoon := TRUE ]
-            sun_temp[Azimuth >  180, preNoon := FALSE]
 
             ## Init DB variables for next processes ----------------------------
             ## For CM-21
@@ -257,20 +229,11 @@ for (YYYY in unique(year(inp_filelist$day))) {
 
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
 
-        setorder(gather, Date)
-
-        ## Store this month / set data
-        write_parquet(gather,  partfile)
-        write_parquet(BB_meta, DB_META_fl)
-        rm(gather, gathermeta, submonth)
     }
-    rm(subyear)
 }
-rm(inp_filelist)
 
 
 
-myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
