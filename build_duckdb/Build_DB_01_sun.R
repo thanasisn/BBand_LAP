@@ -74,7 +74,13 @@ setorder(SUN, Date)
 stopifnot(length(unique(SUN$Date)) == nrow(SUN))
 SUN <- SUN[as.Date(Date) >= DB_start_date, ]
 
-class(SUN$Date)
+
+### FIXME TEST
+SUN <- SUN[Date > "2024-01-01"]
+
+## Use epoch as key
+SUN$Epoch <- as.integer(SUN$Date)
+SUN$Date <- NULL
 
 
 ## drop existing dates
@@ -82,20 +88,20 @@ if (dbExistsTable(con, "LAP")) {
   SUN <- anti_join(SUN,
             tbl(con, "LAP") |>
               select(Date) |>
-              filter(!is.na(Date)) |>
+              filter(!is.na(Epoch)) |>
               collect(),
-            by = "Date")
+            by = "Epoch")
 }
 
 # SUN <- first(SUN, 10000)
 
 ## create some nice vars
 names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
-SUN <- SUN |> relocate(Date) |> data.table()
-SUN[, month := month(Date)]
-SUN[, year  := year( Date)]
-SUN[, doy   := yday( Date)]
-SUN[, Day   := as.Date(Date)]
+SUN <- SUN |> relocate(Epoch) |> data.table()
+SUN[, month := month(as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
+SUN[, year  := year( as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
+SUN[, doy   := yday( as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
+SUN[, Day   := as.Date(as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
 SUN[, SZA   := 90 - Elevat]
 SUN[Azimuth <= 180, preNoon := TRUE ]
 SUN[Azimuth >  180, preNoon := FALSE]
@@ -105,7 +111,7 @@ if (!dbExistsTable(con, "LAP")) {
   ## Create new table
   cat("\n Initialize table 'LAP' \n\n")
   dbWriteTable(con, "LAP", SUN)
-  db_create_index(con, "LAP", columns = "Date", unique = TRUE)
+  db_create_index(con, "LAP", columns = "Epoch", unique = TRUE)
 } else {
   ## Append new data
   cat("\n Add data to 'LAP' \n\n")
@@ -121,7 +127,7 @@ SUN             |> glimpse()
 
 
 dbDisconnect(con)
-
+rm(con)
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
