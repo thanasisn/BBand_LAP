@@ -36,7 +36,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Build_DB_01_pysolar.R"
 Script.ID   <- "01"
-renv::load("~/BBand_LAP")
+# renv::load("~/BBand_LAP")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -68,21 +68,33 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 ##  Get Astropy files  ---------------------------------------------------------
 SUN <- readRDS(ASTROPY_FL)
 names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
-
-
+SUN <- SUN |> relocate(Date)
 
 stop()
 
 if (!dbExistsTable(con, "LAP")) {
-  cat("\n Create emtpy table LAP")
-  dbCreateTable(con, "LAP", SUN)
+  cat("\n Init table 'LAP' \n")
+  dbWriteTable(con, "LAP", SUN)
+  db_create_index(con, "LAP", columns = "Date", unique = T)
 }
 
+if (dbExistsTable(con, "LAP")) {
+  cat("find data to append")
+}
 
-tbl(con, "LAP") |> select(SUN)
+duckdb::dbListFields(con, "LAP")
+tbl(con, "LAP") |> glimpse()
+
+
+DBI::dbListObjects(con, "LAP")
+
+dbListTables(con)
 
 dbDataType(SUN$Azimuth)
-
+dbDisconnect(con)
+dbReadTable(con, "LAP")
+tbl(con, dbId("some_schema", "LAP"))
+dbExecute(con, "SHOW LAP")
 
 stop()
 
