@@ -9,6 +9,17 @@
     ]
   },
   "Packages": {
+    "DBI": {
+      "Package": "DBI",
+      "Version": "1.2.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "methods"
+      ],
+      "Hash": "065ae649b05f1ff66bb0c793107508f5"
+    },
     "Formula": {
       "Package": "Formula",
       "Version": "1.2-5",
@@ -221,6 +232,18 @@
       ],
       "Hash": "e84984bf5f12a18628d9a02322128dfd"
     },
+    "blob": {
+      "Package": "blob",
+      "Version": "1.2.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "methods",
+        "rlang",
+        "vctrs"
+      ],
+      "Hash": "40415719b5a479b87949f3aa0aee737c"
+    },
     "bslib": {
       "Package": "bslib",
       "Version": "0.8.0",
@@ -309,7 +332,6 @@
       "RemoteType": "github",
       "RemoteUsername": "jalvesaq",
       "RemoteRepo": "colorout",
-      "RemoteRef": "HEAD",
       "RemoteSha": "910592d576b4c9b43b323b8514c0428b27a29f00",
       "RemoteHost": "api.github.com",
       "Requirements": [
@@ -393,6 +415,34 @@
       ],
       "Hash": "fb24e05d4a91d8b1c7ff8e284bde834a"
     },
+    "dbplyr": {
+      "Package": "dbplyr",
+      "Version": "2.5.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "DBI",
+        "R",
+        "R6",
+        "blob",
+        "cli",
+        "dplyr",
+        "glue",
+        "lifecycle",
+        "magrittr",
+        "methods",
+        "pillar",
+        "purrr",
+        "rlang",
+        "tibble",
+        "tidyr",
+        "tidyselect",
+        "utils",
+        "vctrs",
+        "withr"
+      ],
+      "Hash": "39b2e002522bfd258039ee4e889e0fd1"
+    },
     "digest": {
       "Package": "digest",
       "Version": "0.6.37",
@@ -441,6 +491,19 @@
         "vctrs"
       ],
       "Hash": "fedd9d00c2944ff00a0e2696ccf048ec"
+    },
+    "duckdb": {
+      "Package": "duckdb",
+      "Version": "1.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "DBI",
+        "R",
+        "methods",
+        "utils"
+      ],
+      "Hash": "ac14e3bdcaab23293129b451fee02910"
     },
     "evaluate": {
       "Package": "evaluate",
