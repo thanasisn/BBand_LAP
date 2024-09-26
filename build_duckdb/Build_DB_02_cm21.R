@@ -58,9 +58,6 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 
 
-
-stop()
-
 # create meta data table for files
 
 
@@ -95,97 +92,161 @@ inp_filelist <- data.table(fullname = inp_filelist)
 inp_filelist[, cm21_basename := basename(fullname)]
 stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$cm21_basename))) == FALSE )
 
-inp_filelist$day <- as.Date(parse_date_time(
+inp_filelist$Day <- as.Date(parse_date_time(
     sub("06\\..*", "", inp_filelist$cm21_basename),
     "dmy"))
-setorder(inp_filelist, day)
+setorder(inp_filelist, Day)
 cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 
 ## only new files in the date range
-inp_filelist <- inp_filelist[!inp_filelist$cm21_basename %in% BB_meta$cm21_basename]
-inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
-cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
+# inp_filelist <- inp_filelist[!inp_filelist$cm21_basename %in% BB_meta$cm21_basename]
+# inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
+# cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
+
+### FIXME test
+inp_filelist <- inp_filelist[Day > "2024-01-01"]
 
 
 
-BB <- tbl(con, "LAP")
-
-
-
-ll <- inp_filelist[10000, ]
-
-fread(ll$fullname)
-D_minutes <- seq(from       = as.POSIXct(paste(as_date(ll$day), "00:00:30"), tz = ""),
-                 length.out = 1440,
-                 by         = "min" )
-
-
-as.POSIXlt(D_minutes, tz = "")
-
-lap    <- fread(ll$fullname, na.strings = "-9")
-lap$V1 <- as.numeric(lap$V1)
-lap$V2 <- as.numeric(lap$V2)
-stopifnot(is.numeric(lap$V1))
-stopifnot(is.numeric(lap$V2))
-stopifnot(dim(lap)[1] == 1440)
-lap[V1 < -8, V1 := NA]
-lap[V2 < -8, V2 := NA]
-
-## get data
-day_data <- data.table(Date        = as.POSIXct(D_minutes),      # Date of the data point
-                       CM21_sig    = lap$V1,         # Raw value for CM21
-                       CM21_sig_sd = lap$V2)         # Raw SD value for CM21
-day_data  |> to_duckdb()
-
-
-rows_upsert(BB, day_data, by = "Date")
-rows_update(tbl(con, "LAP"),
-            day_data,
-            by = "Date",
-            copy = TRUE,
-            unmatched = "ignore", in_place = T)
-
-
-dbSendQuery(con, paste("UPDATE LAP SET hp = 'MAX' WHERE Date IN (",
-                        paste0(shQuote(day_data$Date), collapse=","), ")" ))
-
-
-
-## detect data types
-tt1 <- data.table(names = colnames(BB),
-                  types = BB |> head(1) |> collect() |> sapply(class))
-dd1 <- data.table(names = colnames(day_data),
-                  types = day_data |> head(1) |> collect() |> sapply(class))
-
-table <- "LAP"
-
-if (!all(dd1$names %in% tt1$names)) {
-  ## get new variables
-  new_vars <- dd1[!names %in% tt1$names, ]
-  cat("New", new_vars$names)
-
-  for (i in 1:nrow(new_vars)) {
-
-    ## translate data types to duckdb
-    ctype <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
-                    POSIXctPOSIXt = "datetime",
-                    unlist(new_vars$types[i]))
-
-    cat("\nNEW VAR:", paste(new_vars[i, ]), "\n")
-
-    ## create new columns with a query
-    qq <- paste("ALTER TABLE", table,
-                "ADD COLUMN",  new_vars$names[i], ctype, "DEFAULT null")
-    dbSendQuery(con, qq)
-  }
+## drop existing dates
+if (dbExistsTable(con, "META")) {
+  inp_filelist <- anti_join(inp_filelist,
+                            tbl(con, "META") |>
+                              select(Day) |>
+                              filter(!is.na(Day)) |>
+                              collect(),
+                            by = "Day")
 }
 
 
-dbSendStatement(con,
-                "UPDATE LAP
-                (CM21_sig, CM21_sig_sd) VALUES (?,?)")
+
+update_table <- function(con,  new_data, table, matchvar) {
+  ## detect data types
+  tt1 <- data.table(names = colnames(tbl(con, "LAP")),
+                    types = tbl(con, "LAP") |> head(1) |> collect() |> sapply(class))
+  dd1 <- data.table(names = colnames(new_data),
+                    types = new_data |> head(1) |> collect() |> sapply(class))
+
+
+  if (!all(dd1$names %in% tt1$names)) {
+    ## get new variables
+    new_vars <- dd1[!names %in% tt1$names, ]
+    cat("New", new_vars$names)
+
+    for (i in 1:nrow(new_vars)) {
+
+      ## translate data types to duckdb
+      ctype <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
+                      POSIXctPOSIXt = "datetime",
+                      unlist(new_vars$types[i]))
+
+      cat("\nNEW VAR:", paste(new_vars[i, ]), "\n")
+
+      ## create new columns with a query
+      qq <- paste("ALTER TABLE", table,
+                  "ADD COLUMN",  new_vars$names[i], ctype, "DEFAULT null")
+      dbSendQuery(con, qq)
+    }
+  }
+
+
+  rows_update(tbl(con, table),
+              new_data,
+              by   = matchvar,
+              unmatched = "ignore",
+              copy = TRUE)
+}
+
+
+for (ll in 1:nrow(inp_filelist)) {
+  ff <- inp_filelist[ll, ]
+
+  cat("02 : ", basename(ff$fullname), ll,"/",nrow(inp_filelist),"\n")
+
+  ## prepare input file data
+  suppressWarnings(rm(D_minutes))
+  D_minutes <- seq(from       = as.POSIXct(paste(as_date(ff$Day), "00:00:30"), tz = ""),
+                   length.out = 1440,
+                   by         = "min")
+
+  lap    <- fread(ff$fullname, na.strings = "-9")
+  lap$V1 <- as.numeric(lap$V1)
+  lap$V2 <- as.numeric(lap$V2)
+  stopifnot(is.numeric(lap$V1))
+  stopifnot(is.numeric(lap$V2))
+  stopifnot(dim(lap)[1] == 1440)
+  lap[V1 < -8, V1 := NA]
+  lap[V2 < -8, V2 := NA]
+
+  day_data <- data.table(Date        = as.POSIXct(D_minutes),      # Date of the data point
+                         CM21_sig    = lap$V1,         # Raw value for CM21
+                         CM21_sig_sd = lap$V2)         # Raw SD value for CM21
+  day_data$Epoch <- as.integer(day_data$Date)
+  day_data$Date <- NULL
+
+
+  ## meta data for file
+  file_meta <- data.table(Day             = ff$Day,
+                          cm21_basename   = basename(ff$fullname),
+                          cm21_mtime      = file.mtime(ff$fullname),
+                          cm21_parsed     = Sys.time(),
+                          cm21_md5sum     = as.vector(md5sum(ff$fullname)))
+
+  ## Add data
+  update_table(con      = con,
+               new_data = day_data,
+               table    = "LAP",
+               matchvar = "Epoch")
+
+
+  ## Add metadata
+  if (!dbExistsTable(con, "META")) {
+    ## Create new table
+    cat("\n Initialize table 'META' \n\n")
+    dbWriteTable(con, "META", file_meta)
+    db_create_index(con, "META", columns = "Day", unique = TRUE)
+  } else {
+    ## Append new data
+    cat("\n Add data to 'META' \n\n")
+
+    update_table(con      = con,
+                 new_data = file_meta,
+                 table    = "META",
+                 matchvar = "Day")
+  }
+
+
+
+
+stop()
+
+}
+
+
+
+
+stop()
+
+
+
+
+
+
+
+
+
+# unmatched = "ignore",
+# in_place = T)
+
+
+
 
 tbl(con, "LAP") |> colnames()
+
+
+tbl(con, "LAP") |> filter(!is.na(CM21_sig)) |> glimpse()
+tbl(con, "LAP") |> filter(!is.na(CM21_sig)) |> tally()
+
 stop()
 ##  Import CM-21 files  --------------------------------------------------------
 for (YYYY in unique(year(inp_filelist$day))) {
@@ -193,29 +254,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
     ## months to do
     for (mm in subyear[, unique(month(day))]) {
         submonth <- subyear[month(day) == mm]
-        ## export file name and hive dir
-        filedir <- paste0(DB_DIR, "/", YYYY, "/", mm, "/" )
-        dir.create(filedir, recursive = TRUE, showWarnings = FALSE)
-        partfile <- paste0(filedir, "/part-0.parquet")
-        ## init data collector
-        if (file.exists(partfile)) {
-            cat("02 Load: ", partfile, "\n")
-            gather <- read_parquet(partfile)
-            ## add columns for this set
-            var <- "year"
-            if (!any(names(gather) == var)) {
-                gather[[var]] <- NA
-                gather[[var]] <- as.integer(gather[[var]])
-            }
-            var <- "month"
-            if (!any(names(gather) == var)) {
-                gather[[var]] <- NA
-                gather[[var]] <- as.integer(gather[[var]])
-            }
-        } else {
-            cat("Skipping new rows data inport", partfile, "\n")
-            next()
-        }
+
 
         ##  read this month set files
         gathermeta <- data.table()
@@ -250,29 +289,18 @@ for (YYYY in unique(year(inp_filelist$day))) {
                                     cm21_basename   = basename(ss$fullname),
                                     cm21_mtime      = file.mtime(ss$fullname),
                                     cm21_parsed     = Sys.time(),
-                                    cm21_sig_NAs    = sum(is.na(day_data$CM21_sig)),
-                                    cm21_sig_sd_NAs = sum(is.na(day_data$CM21_sig)),
                                     cm21_md5sum     = as.vector(md5sum(ss$fullname)))
 
             # gather <- rows_patch(gather, day_data, by = "Date")
             # gather     <- rows_update(gather, day_data, by = "Date")
             gather     <- rows_upsert(gather, day_data, by = "Date")
             gathermeta <- rbind(gathermeta, file_meta)
-            rm(day_data, file_meta, ss, lap)
         }
         ## insert new meta data
         BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
 
-        setorder(gather, Date)
-
-        ## store this month / set data
-        write_parquet(gather,  partfile)
-        write_parquet(BB_meta, DB_META_fl)
-        rm(gather, gathermeta, submonth)
     }
-    rm(subyear)
 }
-rm(inp_filelist)
 
 
 
