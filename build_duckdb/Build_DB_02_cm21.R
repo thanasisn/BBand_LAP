@@ -56,6 +56,11 @@ cat("\n Import  CM-21  data\n\n")
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
+
+
+tbl(con, "LAP") |> select(Date) |> to_arrow() |> distinct(Date) |> tally()
+tbl(con, "LAP") |> select(Date) |> to_arrow() |> tally() |> collect()
+
 stop()
 
 # create meta data table for files
