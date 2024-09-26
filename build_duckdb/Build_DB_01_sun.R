@@ -11,6 +11,9 @@
 #'  - Azimuth
 #'  - Elevat
 #'  - SZA
+#'  - year
+#'  - month
+#'  - doy
 #'  - preNoon
 #'
 #'
@@ -71,6 +74,7 @@ setorder(SUN, Date)
 stopifnot(length(unique(SUN$Date)) == nrow(SUN))
 SUN <- SUN[as.Date(Date) >= DB_start_date, ]
 
+
 ## drop existing dates
 if (dbExistsTable(con, "LAP")) {
   SUN <- anti_join(SUN,
@@ -95,19 +99,17 @@ SUN[Azimuth <= 180, preNoon := TRUE ]
 SUN[Azimuth >  180, preNoon := FALSE]
 
 
-## Create new table
 if (!dbExistsTable(con, "LAP")) {
+  ## Create new table
   cat("\n Initialize table 'LAP' \n\n")
   dbWriteTable(con, "LAP", SUN)
-  # Duplicate key "Date: 1993-01-01 00:00:30" violates unique constraint
-  # db_create_index(con, "LAP", columns = "Date", unique = TRUE)
-}
-
-## Append new data
-if (dbExistsTable(con, "LAP")) {
+  db_create_index(con, "LAP", columns = "Date", unique = TRUE)
+} else {
+  ## Append new data
   cat("\n Add data to 'LAP' \n\n")
   dbWriteTable(con, "LAP", SUN, append = TRUE)
 }
+
 
 ## Info
 tbl(con, "LAP") |> tally()
