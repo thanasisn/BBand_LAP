@@ -220,13 +220,49 @@ rows_insert(x = tbl(con, "META"),
 
 stop()
 
-
+### TODO cast EPOCH to "datetime" see function
 
 
 tbl(con, "META") |> filter(is.na(cm21_basename))
 
 
+ranges_CM21$HourSpan <- NULL
 
+apply(ranges_CM21, 1, function(x){  data.table(date = seq(as.nux[1] + 30, x[2] - 60 + 30, by = "min"), chp1_bad_data_flag =  x[3]) })
+
+tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+                     chp1_bad_data_flag = comme)
+
+
+
+## _ CM-21 flag data -------------------------------------------------------
+temp_flag <- data.table()
+for (i in 1:nrow(ranges_CM21)) {
+  lower  <- ranges_CM21$From[   i]
+  upper  <- ranges_CM21$Until[  i]
+  comme  <- ranges_CM21$Comment[i]
+  tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+                       cm21_bad_data_flag = comme)
+  temp_flag <- rbind(temp_flag, tempex)
+  rm(tempex)
+}
+
+## FIXME test
+temp_flag[Date >= "2023-01-01"]
+
+temp_flag$Epoch <- as.integer(temp_flag$Date)
+temp_flag$Date  <- NULL
+
+class(temp_flag$cm21_bad_data_flag)
+
+## create new columns with a query
+qq <- paste("ALTER TABLE", "LAP",
+            "ADD COLUMN",  "cm21_bad_data_flag",  "character", "DEFAULT null")
+dbSendQuery(con, qq)
+
+update_table(con, temp_flag, "LAP", "Epoch")
+
+tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag))
 
 
 

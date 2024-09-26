@@ -85,7 +85,7 @@ cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 # cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
 
 ### FIXME test
-inp_filelist <- inp_filelist[Day > "2024-01-01"]
+inp_filelist <- inp_filelist[Day > "2023-01-01" & Day < "2024-01-01"]
 
 
 
