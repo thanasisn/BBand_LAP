@@ -58,25 +58,6 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 
 
-# create meta data table for files
-
-
-
-
-# ##  Initialize meta data file  -------------------------------------------------
-# if (file.exists(DB_META_fl)) {
-#     BB_meta <- read_parquet(DB_META_fl)
-#     BB_meta <- merge(BB_meta,
-#                      data.table(day = seq(max(BB_meta$day), Sys.Date(),
-#                                           by = "day")),
-#                      by = "day",
-#                      all = TRUE)
-#     stopifnot(sum(duplicated(BB_meta$day)) == 0)
-# } else {
-#     stop("STAR A NEW DB!!")
-# }
-
-
 
 ##  Get CM-21 files  -----------------------------------------------------------
 inp_filelist <- list.files(path        = SIRENA_GLB,
@@ -98,7 +79,6 @@ inp_filelist$Day <- as.Date(parse_date_time(
 setorder(inp_filelist, Day)
 cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 
-## only new files in the date range
 # inp_filelist <- inp_filelist[!inp_filelist$cm21_basename %in% BB_meta$cm21_basename]
 # inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 # cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
@@ -108,7 +88,7 @@ inp_filelist <- inp_filelist[Day > "2024-01-01"]
 
 
 
-## drop existing dates
+## only new files in the date range
 if (dbExistsTable(con, "META")) {
   inp_filelist <- anti_join(inp_filelist,
                             tbl(con, "META") |>
@@ -153,14 +133,16 @@ update_table <- function(con,  new_data, table, matchvar) {
               new_data,
               by   = matchvar,
               unmatched = "ignore",
+              in_place = TRUE,
               copy = TRUE)
 }
 
+inp_filelist <- data.table::first(inp_filelist, n = 20)
 
 for (ll in 1:nrow(inp_filelist)) {
   ff <- inp_filelist[ll, ]
 
-  cat("02 : ", basename(ff$fullname), ll,"/",nrow(inp_filelist),"\n")
+  cat("02 : ", basename(ff$fullname), ff$Day, ll,"/",nrow(inp_filelist),"\n")
 
   ## prepare input file data
   suppressWarnings(rm(D_minutes))
@@ -215,13 +197,9 @@ for (ll in 1:nrow(inp_filelist)) {
   }
 
 
-
-
-stop()
-
 }
 
-
+dbDisconnect(con)
 
 
 stop()
@@ -265,38 +243,13 @@ for (YYYY in unique(year(inp_filelist$day))) {
                              length.out = 1440,
                              by         = "min" )
 
-            ## __  Read LAP file  --------------------------------------------------
-            if (nrow(ss)>1) {stop("Multiple input files!!")}
-            lap    <- fread(ss$fullname, na.strings = "-9")
-            lap$V1 <- as.numeric(lap$V1)
-            lap$V2 <- as.numeric(lap$V2)
-            stopifnot(is.numeric(lap$V1))
-            stopifnot(is.numeric(lap$V2))
-            stopifnot(dim(lap)[1] == 1440)
-            lap[V1 < -8, V1 := NA]
-            lap[V2 < -8, V2 := NA]
 
-            ## get data
-            day_data <- data.table(Date        = D_minutes,      # Date of the data point
-                                   year        = year(D_minutes),
-                                   month       = month(D_minutes),
-                                   CM21_sig    = lap$V1,         # Raw value for CM21
-                                   CM21_sig_sd = lap$V2)         # Raw SD value for CM21
-
-            ## get metadata
-            file_meta <- data.table(day             = as_date(ad),
-                                    cm21_basename   = basename(ss$fullname),
-                                    cm21_mtime      = file.mtime(ss$fullname),
-                                    cm21_parsed     = Sys.time(),
-                                    cm21_md5sum     = as.vector(md5sum(ss$fullname)))
 
             # gather <- rows_patch(gather, day_data, by = "Date")
             # gather     <- rows_update(gather, day_data, by = "Date")
             gather     <- rows_upsert(gather, day_data, by = "Date")
             gathermeta <- rbind(gathermeta, file_meta)
         }
-        ## insert new meta data
-        BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
 
     }
 }
