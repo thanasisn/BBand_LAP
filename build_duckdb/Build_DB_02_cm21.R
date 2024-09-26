@@ -112,7 +112,80 @@ BB <- tbl(con, "LAP")
 
 
 
+ll <- inp_filelist[10000, ]
 
+fread(ll$fullname)
+D_minutes <- seq(from       = as.POSIXct(paste(as_date(ll$day), "00:00:30"), tz = ""),
+                 length.out = 1440,
+                 by         = "min" )
+
+
+as.POSIXlt(D_minutes, tz = "")
+
+lap    <- fread(ll$fullname, na.strings = "-9")
+lap$V1 <- as.numeric(lap$V1)
+lap$V2 <- as.numeric(lap$V2)
+stopifnot(is.numeric(lap$V1))
+stopifnot(is.numeric(lap$V2))
+stopifnot(dim(lap)[1] == 1440)
+lap[V1 < -8, V1 := NA]
+lap[V2 < -8, V2 := NA]
+
+## get data
+day_data <- data.table(Date        = as.POSIXct(D_minutes),      # Date of the data point
+                       CM21_sig    = lap$V1,         # Raw value for CM21
+                       CM21_sig_sd = lap$V2)         # Raw SD value for CM21
+day_data  |> to_duckdb()
+
+
+rows_upsert(BB, day_data, by = "Date")
+rows_update(tbl(con, "LAP"),
+            day_data,
+            by = "Date",
+            copy = TRUE,
+            unmatched = "ignore", in_place = T)
+
+
+dbSendQuery(con, paste("UPDATE LAP SET hp = 'MAX' WHERE Date IN (",
+                        paste0(shQuote(day_data$Date), collapse=","), ")" ))
+
+
+
+## detect data types
+tt1 <- data.table(names = colnames(BB),
+                  types = BB |> head(1) |> collect() |> sapply(class))
+dd1 <- data.table(names = colnames(day_data),
+                  types = day_data |> head(1) |> collect() |> sapply(class))
+
+table <- "LAP"
+
+if (!all(dd1$names %in% tt1$names)) {
+  ## get new variables
+  new_vars <- dd1[!names %in% tt1$names, ]
+  cat("New", new_vars$names)
+
+  for (i in 1:nrow(new_vars)) {
+
+    ## translate data types to duckdb
+    ctype <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
+                    POSIXctPOSIXt = "datetime",
+                    unlist(new_vars$types[i]))
+
+    cat("\nNEW VAR:", paste(new_vars[i, ]), "\n")
+
+    ## create new columns with a query
+    qq <- paste("ALTER TABLE", table,
+                "ADD COLUMN",  new_vars$names[i], ctype, "DEFAULT null")
+    dbSendQuery(con, qq)
+  }
+}
+
+
+dbSendStatement(con,
+                "UPDATE LAP
+                (CM21_sig, CM21_sig_sd) VALUES (?,?)")
+
+tbl(con, "LAP") |> colnames()
 stop()
 ##  Import CM-21 files  --------------------------------------------------------
 for (YYYY in unique(year(inp_filelist$day))) {
@@ -129,11 +202,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
             cat("02 Load: ", partfile, "\n")
             gather <- read_parquet(partfile)
             ## add columns for this set
-            # var <- "CM21_sig"
-            # if (!any(names(gather) == var)) {
-            #     gather[[var]] <- NA
-            #     gather[[var]] <- as.numeric(gather[[var]])
-            # }
             var <- "year"
             if (!any(names(gather) == var)) {
                 gather[[var]] <- NA
@@ -147,7 +215,6 @@ for (YYYY in unique(year(inp_filelist$day))) {
         } else {
             cat("Skipping new rows data inport", partfile, "\n")
             next()
-            ## Sun script should initialize the DB rows.
         }
 
         ##  read this month set files
@@ -162,7 +229,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
 
             ## __  Read LAP file  --------------------------------------------------
             if (nrow(ss)>1) {stop("Multiple input files!!")}
-            lap   <- fread(ss$fullname, na.strings = "-9")
+            lap    <- fread(ss$fullname, na.strings = "-9")
             lap$V1 <- as.numeric(lap$V1)
             lap$V2 <- as.numeric(lap$V2)
             stopifnot(is.numeric(lap$V1))
