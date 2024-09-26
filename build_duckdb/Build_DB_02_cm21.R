@@ -58,8 +58,6 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 
 
-tbl(con, "LAP") |> select(Date) |> to_arrow() |> distinct(Date) |> tally()
-tbl(con, "LAP") |> select(Date) |> to_arrow() |> tally() |> collect()
 
 stop()
 
@@ -107,6 +105,10 @@ cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 inp_filelist <- inp_filelist[!inp_filelist$cm21_basename %in% BB_meta$cm21_basename]
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
+
+
+
+BB <- tbl(con, "LAP")
 
 
 
