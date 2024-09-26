@@ -74,6 +74,8 @@ setorder(SUN, Date)
 stopifnot(length(unique(SUN$Date)) == nrow(SUN))
 SUN <- SUN[as.Date(Date) >= DB_start_date, ]
 
+class(SUN$Date)
+
 
 ## drop existing dates
 if (dbExistsTable(con, "LAP")) {
