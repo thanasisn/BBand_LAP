@@ -122,8 +122,8 @@ if (dbExistsTable(con, "META")) {
 
 update_table <- function(con,  new_data, table, matchvar) {
   ## detect data types
-  tt1 <- data.table(names = colnames(tbl(con, "LAP")),
-                    types = tbl(con, "LAP") |> head(1) |> collect() |> sapply(class))
+  tt1 <- data.table(names = colnames(tbl(con, table)),
+                    types = tbl(con, table) |> head(1) |> collect() |> sapply(class))
   dd1 <- data.table(names = colnames(new_data),
                     types = new_data |> head(1) |> collect() |> sapply(class))
 
@@ -148,7 +148,6 @@ update_table <- function(con,  new_data, table, matchvar) {
       dbSendQuery(con, qq)
     }
   }
-
 
   rows_update(tbl(con, table),
               new_data,
