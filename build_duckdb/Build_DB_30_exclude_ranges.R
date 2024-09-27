@@ -381,12 +381,14 @@ for (acol in wecare) {
 }
 
 acol <- "cm21_bad_data_flag"
+bcol <- "cm21_sig_limit_flag"
 tbl(con, "LAP") |>
-  filter(!!acol == 0)   |>
-  filter(!is.na(cm21_bad_data_flag)) |>
-  group_by(cm21_bad_data_flag)       |> tally()
+  filter(!!as.symbol(bcol) == 0)    |>
+  filter(!is.na(!!as.symbol(acol))) |>
+  group_by(!!as.symbol(acol))       |> tally()
 
-  select(all_of("cm21_bad_data_flag")) |> collect() |> tally()
+tbl(con, "LAP") |> filter(!is.na(CM21_sig)) |> tally()
+tbl(con, "LAP") |> tally()
 
 
 ## __ Execution Unlock __ ------------------------------------------------------
