@@ -222,7 +222,7 @@ stop()
 
 
 
-tbl(con, "META") |> filter(is.na(cm21_basename))
+tbl(con, "META") |> filter(!is.na(cm21_basename))
 
 
 ranges_CM21$HourSpan <- NULL
@@ -255,7 +255,7 @@ for (i in 1:nrow(ranges_CM21)) {
 
 
 ## FIXME test
-temp_flag[Date >= "2023-01-01"]
+temp_flag <- temp_flag[Date >= "2023-01-01"]
 
 temp_flag$Epoch <- as.integer(temp_flag$Date)
 temp_flag$Date  <- NULL
@@ -269,32 +269,31 @@ acolname <- "cm21_bad_data_flag"
 acoltype <- "character"
 table    <- "LAP"
 
-if (any(dbListFields(con, "LAP") %in% acolname)) {
-  ## remove existing data??
-  qq <- paste0("INSERT INTO ", table,
-              " (",  acolname,  ") VALUES (null)")
-  res <- dbSendQuery(con, qq)
 
-  qq <- paste0("ALTER TABLE ", table,
-               " DROP ",  acolname)
-  dbSendQuery(con, qq)
 
-  dbExecute(con, qq)
+make_empy_column <- function(con, table, acolname, acoltype) {
 
-  } else {
+  if (any(dbListFields(con, "LAP") %in% acolname)) {
+    qq <- paste0("ALTER TABLE ", table,
+                 " DROP ",  acolname)
+    res <- dbSendQuery(con, qq)
+  }
   ## create new columns with a query
   qq <- paste("ALTER TABLE", table,
               "ADD COLUMN",  acolname,  acoltype, "DEFAULT null")
   res <- dbSendQuery(con, qq)
+
 }
 
 
+
+make_empy_column(con, "LAP", "cm21_bad_data_flag", "character")
 
 update_table(con, temp_flag, "LAP", "Epoch")
 
 tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag)) |> select(cm21_bad_data_flag)
 
-
+dbDisconnect(con)
 
 ##  Flag exclusions file by file  ----------------------------------------------
 ##
