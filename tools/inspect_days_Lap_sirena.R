@@ -6,9 +6,7 @@
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({ funr::sys.script() },
-                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("inspect_days_sirena_") })
+Script.Name <- "~/BBand_LAP/tools/inspect_days_DB.R"
 sink(file   = paste0("~/BBand_LAP/REPORTS/LOGs/", basename(sub("\\.R$", ".log", Script.Name))),
      split  = TRUE,
      append = TRUE)
