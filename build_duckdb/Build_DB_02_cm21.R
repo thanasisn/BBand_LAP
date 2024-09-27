@@ -42,6 +42,8 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
+source("~/BBand_LAP/functions/Functions_CM21.R")
+source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
@@ -89,8 +91,7 @@ cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 inp_filelist <- inp_filelist[Day > "2023-01-01"]
 
 
-
-## only new files in the date range
+## add only new files in the date range
 if (dbExistsTable(con, "META")) {
   inp_filelist <- anti_join(inp_filelist,
                             tbl(con, "META") |>
@@ -100,81 +101,6 @@ if (dbExistsTable(con, "META")) {
                             by = "Day")
 }
 
-
-
-update_table <- function(con, new_data, table, matchvar) {
-  ## detect data types
-  tt1 <- data.table(names = colnames(tbl(con, table)),
-                    types = tbl(con, table) |> head(1) |> collect() |> sapply(class))
-  dd1 <- data.table(names = colnames(new_data),
-                    types = new_data |> head(1) |> collect() |> sapply(class))
-
-  if (!all(dd1$names %in% tt1$names)) {
-    ## get new variables
-    new_vars <- dd1[!names %in% tt1$names, ]
-    cat("New", new_vars$names)
-
-    for (i in 1:nrow(new_vars)) {
-
-      ## translate data types to duckdb
-      ctype <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
-                      POSIXctPOSIXt = "datetime",
-                      unlist(new_vars$types[i]))
-
-      cat("\nNEW VAR:", paste(new_vars[i, ]), "\n")
-
-      ## create new columns with a query
-      qq <- paste("ALTER TABLE", table,
-                  "ADD COLUMN",  new_vars$names[i], ctype, "DEFAULT null")
-      dbSendQuery(con, qq)
-    }
-  }
-
-  rows_update(x  = tbl(con, table),
-              y  = new_data,
-              by = matchvar,
-              unmatched = "ignore",
-              in_place = TRUE,
-              copy = TRUE)
-}
-
-
-
-insert_table <- function(con,  new_data, table, matchvar) {
-  ## detect data types
-  tt1 <- data.table(names = colnames(tbl(con, table)),
-                    types = tbl(con, table) |> head(1) |> collect() |> sapply(class))
-  dd1 <- data.table(names = colnames(new_data),
-                    types = new_data |> head(1) |> collect() |> sapply(class))
-
-  if (!all(dd1$names %in% tt1$names)) {
-    ## get new variables
-    new_vars <- dd1[!names %in% tt1$names, ]
-    cat("New", new_vars$names)
-
-    for (i in 1:nrow(new_vars)) {
-
-      ## translate data types to duckdb
-      ctype <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
-                      POSIXctPOSIXt = "datetime",
-                      unlist(new_vars$types[i]))
-
-      cat("\nNEW VAR:", paste(new_vars[i, ]), "\n")
-
-      ## create new columns with a query
-      qq <- paste("ALTER TABLE", table,
-                  "ADD COLUMN",  new_vars$names[i], ctype, "DEFAULT null")
-      dbSendQuery(con, qq)
-    }
-  }
-
-  rows_insert(x  = tbl(con, table),
-              y  = new_data,
-              by = matchvar,
-              conflict = "ignore",
-              in_place = TRUE,
-              copy     = TRUE)
-}
 
 
 
@@ -206,16 +132,27 @@ if (nrow(inp_filelist) > 0) {
                            CM21_sig    = lap$V1,         # Raw value for CM21
                            CM21_sig_sd = lap$V2)         # Raw SD value for CM21
 
-    ## use epoch
+    ## normal signal
+    day_data[, cm21_sig_limit_flag := 0L ]
+
+    ## "Abnormal LOW signal"
+    day_data[CM21_sig < cm21_signal_lower_limit(Date),
+              cm21_sig_limit_flag := 1L ]
+
+    ## "Abnormal HIGH signal"
+    day_data[CM21_sig > cm21_signal_upper_limit(Date),
+              cm21_sig_limit_flag := 2L ]
+
+    ## use epoch only
     day_data$Epoch <- as.integer(day_data$Date)
-    day_data$Date <- NULL
+    day_data$Date  <- NULL
 
     ## meta data for file
-    file_meta <- data.table(Day             = ff$Day,
-                            cm21_basename   = basename(ff$fullname),
-                            cm21_mtime      = file.mtime(ff$fullname),
-                            cm21_parsed     = Sys.time(),
-                            cm21_md5sum     = as.vector(md5sum(ff$fullname)))
+    file_meta <- data.table(Day           = ff$Day,
+                            cm21_basename = basename(ff$fullname),
+                            cm21_mtime    = file.mtime(ff$fullname),
+                            cm21_parsed   = Sys.time(),
+                            cm21_md5sum   = as.vector(md5sum(ff$fullname)))
 
     ## Add data
     update_table(con      = con,

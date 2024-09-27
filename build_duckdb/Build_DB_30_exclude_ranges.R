@@ -47,6 +47,7 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
+source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 
 ## __ Execution lock __ --------------------------------------------------------
@@ -218,12 +219,6 @@ rows_insert(x = tbl(con, "META"),
 
 
 
-stop()
-
-
-
-tbl(con, "META") |> filter(!is.na(cm21_basename))
-
 
 ranges_CM21$HourSpan <- NULL
 
@@ -240,6 +235,8 @@ ranges_CM21$HourSpan <- NULL
 
 
 ## _ CM-21 flag data -------------------------------------------------------
+
+##  create exclusion table
 temp_flag <- data.table()
 for (i in 1:nrow(ranges_CM21)) {
   lower  <- ranges_CM21$From[   i]
@@ -251,8 +248,6 @@ for (i in 1:nrow(ranges_CM21)) {
   rm(tempex)
 }
 
-# temp_flag$gg <- as_datetime(as.integer(temp_flag$Date))
-
 
 ## FIXME test
 temp_flag <- temp_flag[Date >= "2023-01-01"]
@@ -261,37 +256,21 @@ temp_flag$Epoch <- as.integer(temp_flag$Date)
 temp_flag$Date  <- NULL
 
 
-
-
-## create empty columng
-
-acolname <- "cm21_bad_data_flag"
-acoltype <- "character"
-table    <- "LAP"
-
-
-
-make_empy_column <- function(con, table, acolname, acoltype) {
-
-  if (any(dbListFields(con, "LAP") %in% acolname)) {
-    qq <- paste0("ALTER TABLE ", table,
-                 " DROP ",  acolname)
-    res <- dbSendQuery(con, qq)
-  }
-  ## create new columns with a query
-  qq <- paste("ALTER TABLE", table,
-              "ADD COLUMN",  acolname,  acoltype, "DEFAULT null")
-  res <- dbSendQuery(con, qq)
-
-}
-
-
-
-make_empy_column(con, "LAP", "cm21_bad_data_flag", "character")
-
+## apply bad data ranges
+make_empty_column(con, "LAP", "cm21_bad_data_flag", "character")
 update_table(con, temp_flag, "LAP", "Epoch")
 
+
+
+
 tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag)) |> select(cm21_bad_data_flag)
+
+
+
+
+
+stop()
+
 
 dbDisconnect(con)
 
@@ -381,61 +360,33 @@ for (af in na.omit(filelist$names)) {
 
 
 
-    ## _ CM-21 flag data -------------------------------------------------------
-    for (i in 1:nrow(ranges_CM21)) {
-        lower  <- ranges_CM21$From[   i]
-        upper  <- ranges_CM21$Until[  i]
-        comme  <- ranges_CM21$Comment[i]
-        tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                             cm21_bad_data_flag = comme)
 
-        ## mark bad regions of data
-        datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
-        # datapart[Date >= lower & Date < upper, cm21_bad_data_flag := comme]
-        rm(tempex)
-    }
-
-    ## _ CM-21 flag physical limits anomalies  ---------------------------------
-    datapart <- data.table(datapart)
-    datapart[CM21_sig < cm21_signal_lower_limit(Date) & !is.na(cm21_bad_data_flag),
-             cm21_bad_data_flag := "Abnormal LOW signal"]
-    datapart[CM21_sig > cm21_signal_upper_limit(Date) & !is.na(cm21_bad_data_flag),
-             cm21_bad_data_flag := "Abnormal HIGH signal"]
-    datapart <- as_tibble(datapart)
-
-
-
-    ## _ Store data ------------------------------------------------------------
-    chg_days <- unique(as.Date(datapart$Date))
 
     ## Save flagged metadata
     BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime     ]
     BB_meta[day %in% chg_days, chp1_bad_temp_flagged := chp1_temp_exclude_mtime]
     BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime     ]
 
-    ## Store actual data
-    write_parquet(x = datapart, sink = af)
-    write_parquet(BB_meta, DB_META_fl)
-    cat(paste0(Script.ID, " Save: "), af, "\n")
-    rm(datapart)
 }
 
-## Clean
-rm(BB_meta)
-rm(filelist)
-rm(ranges_CHP1)
-rm(ranges_CM21)
 
 
 ## __ Show some info for the flags __ ------------------------------------------
-BB <- opendata()
 
 wecare <- c("cm21_bad_data_flag", "chp1_bad_data_flag", "chp1_bad_temp_flag")
 
 for (acol in wecare) {
-    stats <- BB |> select(all_of(acol)) |> collect() |> table(useNA = "always")
+    stats <- tbl(con, "LAP") |> select(all_of(acol)) |> collect() |> table(useNA = "always")
     pander(data.frame(stats))
 }
+
+acol <- "cm21_bad_data_flag"
+tbl(con, "LAP") |>
+  filter(!!acol == 0)   |>
+  filter(!is.na(cm21_bad_data_flag)) |>
+  group_by(cm21_bad_data_flag)       |> tally()
+
+  select(all_of("cm21_bad_data_flag")) |> collect() |> tally()
 
 
 ## __ Execution Unlock __ ------------------------------------------------------
