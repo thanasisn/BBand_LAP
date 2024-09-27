@@ -85,7 +85,8 @@ cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 # cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
 
 ### FIXME test
-inp_filelist <- inp_filelist[Day > "2023-01-01" & Day < "2024-01-01"]
+# inp_filelist <- inp_filelist[Day > "2023-01-01" & Day < "2024-01-01"]
+inp_filelist <- inp_filelist[Day > "2023-01-01"]
 
 
 
@@ -245,32 +246,26 @@ if (nrow(inp_filelist) > 0) {
 dbDisconnect(con)
 
 
-stop()
+
+
+if (FALSE) {
+
+  con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+
+  tbl(con, "LAP")  |> colnames()
+  tbl(con, "META") |> colnames()
+
+
+  tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> glimpse()
+
+  tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> tally()
+  tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> distinct(Day) |> tally()
+
+  tbl(con, "META") |> tally()
+}
 
 
 
-
-
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
-
-
-tbl(con, "LAP") |> colnames()
-tbl(con, "META") |> colnames()
-
-
-tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> glimpse()
-
-tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> tally()
-tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> distinct(Day) |> tally()
-
-tbl(con, "META") |> tally()
-
-
-
-
-
-
-# myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
