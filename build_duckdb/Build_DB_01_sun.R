@@ -108,11 +108,12 @@ if (dbExistsTable(con, "LAP")) {
 
 ## create some nice vars
 names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
-SUN <- SUN |> relocate(Epoch) |> data.table()
+# SUN <- SUN |> relocate(Epoch) |> data.table()
 # SUN[, month := month(  as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
 # SUN[, year  := year(   as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
 # SUN[, doy   := yday(   as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
 # SUN[, Day   := as.Date(as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
+SUN <- SUN |> relocate(Date) |> data.table()
 SUN[, month := month(  Date)]
 SUN[, year  := year(   Date)]
 SUN[, doy   := yday(   Date)]
@@ -129,7 +130,8 @@ if (!dbExistsTable(con, "LAP")) {
   ## Create new table
   cat("\n Initialize table 'LAP' \n\n")
   dbWriteTable(con, "LAP", SUN)
-  db_create_index(con, "LAP", columns = "Epoch", unique = TRUE)
+  # db_create_index(con, "LAP", columns = "Epoch", unique = TRUE)
+  db_create_index(con, "LAP", columns = "Date", unique = TRUE)
 } else {
   ## Append new data
   cat("\n Add data to 'LAP' \n\n")

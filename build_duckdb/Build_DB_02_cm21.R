@@ -129,9 +129,9 @@ update_table <- function(con,  new_data, table, matchvar) {
     }
   }
 
-  rows_update(x = tbl(con, table),
-              y = new_data,
-              by   = matchvar,
+  rows_update(x  = tbl(con, table),
+              y  = new_data,
+              by = matchvar,
               unmatched = "ignore",
               in_place = TRUE,
               copy = TRUE)
@@ -201,8 +201,9 @@ if (nrow(inp_filelist) > 0) {
     day_data <- data.table(Date        = as.POSIXct(D_minutes),      # Date of the data point
                            CM21_sig    = lap$V1,         # Raw value for CM21
                            CM21_sig_sd = lap$V2)         # Raw SD value for CM21
-    day_data$Epoch <- as.integer(day_data$Date)
-    day_data$Date <- NULL
+
+    # day_data$Epoch <- as.integer(day_data$Date)
+    # day_data$Date <- NULL
 
     ## meta data for file
     file_meta <- data.table(Day             = ff$Day,
@@ -211,11 +212,13 @@ if (nrow(inp_filelist) > 0) {
                             cm21_parsed     = Sys.time(),
                             cm21_md5sum     = as.vector(md5sum(ff$fullname)))
 
+
+
     ## Add data
     update_table(con      = con,
                  new_data = day_data,
                  table    = "LAP",
-                 matchvar = "Epoch")
+                 matchvar = "Date")
 
     ## Add metadata
     if (!dbExistsTable(con, "META")) {
