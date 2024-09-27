@@ -113,7 +113,8 @@ if (!dbExistsTable(con, "LAP")) {
   ## Create new table
   cat("\n Initialize table 'LAP' \n\n")
   dbWriteTable(con, "LAP", SUN)
-  db_create_index(con, "LAP", columns = "Epoch", unique = TRUE)
+  ## index will block drop of columns for now!!
+  # db_create_index(con, "LAP", columns = "Epoch", unique = TRUE)
   # db_create_index(con, "LAP", columns = "Date", unique = TRUE)
 } else {
   ## Append new data
