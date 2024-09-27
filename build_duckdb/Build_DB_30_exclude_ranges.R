@@ -32,7 +32,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 ## __ Set environment __ -------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/build_duckdb//Build_DB_30_exclude_ranges.R"
+Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R"
 Script.ID   <- "30"
 # renv::load("~/BBand_LAP")
 
@@ -193,7 +193,7 @@ cat("\n\n\\normalsize\n\n")
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 
-## add missing days in meta data
+## add all missing days in meta data
 minday <- tbl(con, "META") |>
   select(Day) |>
   to_arrow() |>
@@ -220,7 +220,6 @@ rows_insert(x = tbl(con, "META"),
 
 stop()
 
-### TODO cast EPOCH to "datetime" see function
 
 
 tbl(con, "META") |> filter(is.na(cm21_basename))
@@ -228,10 +227,16 @@ tbl(con, "META") |> filter(is.na(cm21_basename))
 
 ranges_CM21$HourSpan <- NULL
 
-apply(ranges_CM21, 1, function(x){  data.table(date = seq(as.nux[1] + 30, x[2] - 60 + 30, by = "min"), chp1_bad_data_flag =  x[3]) })
+apply(ranges_CM21, 1,
+      function(x){
+        data.table(
+          Date = seq(
+            from = x[1] + 30,
+            to   = x[2] - 60 + 30,
+            by   = "min"),
+          chp1_bad_data_flag =  x[3]) }
+)
 
-tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                     chp1_bad_data_flag = comme)
 
 
 
