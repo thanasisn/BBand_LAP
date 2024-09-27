@@ -227,15 +227,14 @@ tbl(con, "META") |> filter(is.na(cm21_basename))
 
 ranges_CM21$HourSpan <- NULL
 
-apply(ranges_CM21, 1,
-      function(x){
-        data.table(
-          Date = seq(
-            from = x[1] + 30,
-            to   = x[2] - 60 + 30,
-            by   = "min"),
-          chp1_bad_data_flag =  x[3]) }
-)
+# apply(ranges_CM21, 1,
+#       function(x){
+#         data.table(
+#           Date = seq.POSIXt(
+#             from = x[1] + 30,
+#             to   = x[2] - 60 + 30,
+#             by   = "min")) }
+# )
 
 
 
@@ -252,22 +251,48 @@ for (i in 1:nrow(ranges_CM21)) {
   rm(tempex)
 }
 
+# temp_flag$gg <- as_datetime(as.integer(temp_flag$Date))
+
+
 ## FIXME test
 temp_flag[Date >= "2023-01-01"]
 
 temp_flag$Epoch <- as.integer(temp_flag$Date)
 temp_flag$Date  <- NULL
 
-class(temp_flag$cm21_bad_data_flag)
 
-## create new columns with a query
-qq <- paste("ALTER TABLE", "LAP",
-            "ADD COLUMN",  "cm21_bad_data_flag",  "character", "DEFAULT null")
-dbSendQuery(con, qq)
+
+
+## create empty columng
+
+acolname <- "cm21_bad_data_flag"
+acoltype <- "character"
+table    <- "LAP"
+
+if (any(dbListFields(con, "LAP") %in% acolname)) {
+  ## remove existing data??
+  qq <- paste0("INSERT INTO ", table,
+              " (",  acolname,  ") VALUES (null)")
+  res <- dbSendQuery(con, qq)
+
+  qq <- paste0("ALTER TABLE ", table,
+               " DROP ",  acolname)
+  dbSendQuery(con, qq)
+
+  dbExecute(con, qq)
+
+  } else {
+  ## create new columns with a query
+  qq <- paste("ALTER TABLE", table,
+              "ADD COLUMN",  acolname,  acoltype, "DEFAULT null")
+  res <- dbSendQuery(con, qq)
+}
+
+
 
 update_table(con, temp_flag, "LAP", "Epoch")
 
-tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag))
+tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag)) |> select(cm21_bad_data_flag)
 
 
 
