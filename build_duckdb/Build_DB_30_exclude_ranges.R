@@ -263,7 +263,9 @@ update_table(con, temp_flag, "LAP", "Epoch")
 
 
 
-tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag)) |> select(cm21_bad_data_flag)
+tbl(con, "LAP") |>
+  group_by(cm21_bad_data_flag) |>
+  tally()
 
 
 
@@ -274,34 +276,13 @@ stop()
 
 dbDisconnect(con)
 
+## TODO
+
 ##  Flag exclusions file by file  ----------------------------------------------
 ##
 ##  FIXME should find a better method through arrow dataset to mark everything
 ##  at once and update files as needed.
 ##
-
-
-## _ List data set to be touched  ----------------------------------------------
-##
-##
-##  Allow some wiggle room in the comparison (1sec). Either wise it always
-##  update everything.
-##
-todosets <- unique(rbind(
-    BB_meta[is.na(chp1_bad_data_flagged)                            |
-                chp1_bad_data_flagged < chp1_exclude_mtime      - 1 |
-                chp1_bad_temp_flagged < chp1_temp_exclude_mtime - 1 ,
-            .(month = month(day), year = year(day))],
-    BB_meta[is.na(cm21_bad_data_flagged) |
-                cm21_bad_data_flagged < cm21_exclude_mtime - 1 ,
-            .(month = month(day), year = year(day))]
-))
-
-## Select files to touch
-filelist <- filelist[todosets, on = .(flmonth = month, flyear = year)]
-rm(todosets, dd)
-
-
 
 
 
