@@ -60,7 +60,7 @@ library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 
-cat("\n Initialize DB or import Sun data\n\n")
+cat("\n Initialize DB and/or import Sun data\n\n")
 
 
 ##  Open dataset  --------------------------------------------------------------
@@ -81,7 +81,7 @@ SUN <- SUN[Date < "2024-01-01" & Date > "2023-01-01"]
 
 ## Use epoch as key
 SUN$Epoch <- as.integer(SUN$Date)
-SUN$Date <- NULL
+SUN$Date  <- NULL
 
 
 ## drop existing dates
@@ -95,7 +95,6 @@ if (dbExistsTable(con, "LAP")) {
 }
 
 
-# SUN <- first(SUN, 10000)
 
 ## create some nice vars
 names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
