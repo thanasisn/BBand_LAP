@@ -49,7 +49,6 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
