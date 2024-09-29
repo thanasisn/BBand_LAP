@@ -1,9 +1,11 @@
 
 
 
+
+
 make_empty_column <- function(con, table, acolname, acoltype) {
 
-  if (any(dbListFields(con, "LAP") %in% acolname)) {
+  if (any(dbListFields(con, table) %in% acolname)) {
     qq <- paste0("ALTER TABLE ", table,
                  " DROP ",  acolname)
     res <- dbSendQuery(con, qq)

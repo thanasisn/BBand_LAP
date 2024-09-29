@@ -95,12 +95,11 @@ inp_filelist <- inp_filelist[Day > "2023-01-01"]
 if (dbExistsTable(con, "META")) {
   inp_filelist <- anti_join(inp_filelist,
                             tbl(con, "META") |>
+                              filter(!is.na(cm21_basename)) |>
                               select(Day) |>
-                              filter(!is.na(Day)) |>
                               collect(),
                             by = "Day")
 }
-
 
 
 
@@ -165,7 +164,7 @@ if (nrow(inp_filelist) > 0) {
       ## Create new table
       cat("\n Initialize table 'META' \n\n")
       dbWriteTable(con, "META", file_meta)
-      db_create_index(con, "META", columns = "Day", unique = TRUE)
+      # db_create_index(con, "META", columns = "Day", unique = TRUE)
     } else {
       ## Append new data
       insert_table(con      = con,
@@ -203,6 +202,8 @@ if (FALSE) {
   tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> distinct(Day) |> tally()
   tbl(con, "META") |> distinct(Day) |> tally()
   tbl(con, "META") |> tally()
+
+  dd <- tbl(con, "META") |> collect() |> data.table()
 }
 
 
