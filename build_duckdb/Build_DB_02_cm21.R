@@ -187,6 +187,8 @@ dbDisconnect(con)
 
 if (FALSE) {
 
+  fs::file_size(DB_DUCK)
+
   con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
   tbl(con, "LAP")  |> colnames()
@@ -196,8 +198,10 @@ if (FALSE) {
   tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> glimpse()
 
   tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> tally()
-  tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> distinct(Day) |> tally()
 
+  ## FIXME
+  tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> distinct(Day) |> tally()
+  tbl(con, "META") |> distinct(Day) |> tally()
   tbl(con, "META") |> tally()
 }
 
