@@ -31,7 +31,6 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_02_cm21.R"
 Script.ID   <- "02"
-# renv::load("~/BBand_LAP")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))

@@ -274,7 +274,7 @@ tbl(con, "LAP") |>
 stop()
 
 
-dbDisconnect(con)
+dbDisconnect(con); rm(con)
 
 ## TODO
 
