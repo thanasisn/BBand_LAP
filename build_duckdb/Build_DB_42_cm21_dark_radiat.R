@@ -84,9 +84,6 @@ make_new_column(con, "META", "cm21_dark_flag", "DATE")
 make_empty_column(con, "META", "cm21_dark_flag", "character")
 
 
-qq <- paste0("ALTER TABLE ", "META",
-             " DROP ",  "cm21_dark_flag")
-res <- dbSendQuery(con, qq)
 
 tbl(con, "META")
 tbl(con, "LAP")
