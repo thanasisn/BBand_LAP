@@ -590,16 +590,6 @@
       ],
       "Hash": "15aeb8c27f5ea5161f9f6a641fafd93a"
     },
-    "funr": {
-      "Package": "funr",
-      "Version": "0.3.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "utils"
-      ],
-      "Hash": "a4ab8c91e32321f23aed7d3bf3721f36"
-    },
     "gdata": {
       "Package": "gdata",
       "Version": "3.0.0",
