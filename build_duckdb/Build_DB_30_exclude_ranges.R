@@ -188,7 +188,7 @@ cat("\n\\footnotesize\n\n")
 pander(data.table(table(ranges_CM21$Comment)))
 cat("\n\n\\normalsize\n\n")
 
-
+stop()
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
