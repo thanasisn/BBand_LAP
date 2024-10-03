@@ -85,7 +85,7 @@ if (!file.exists(test_cnt)) {
   sscn <- readRDS(test_cnt) + 1
   saveRDS(sscn, test_cnt)
 }
-end_test   <- start_test + 30 + sscn * 3
+end_test   <- start_test + 30 + sscn * 10
 
 SUN <- SUN[Date < end_test & Date > start_test]
 
@@ -165,8 +165,7 @@ tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> range()
 
 
 ## clean exit
-dbDisconnect(con)
-rm(con)
+dbDisconnect(con); rm(con); closeAllConnections()
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
