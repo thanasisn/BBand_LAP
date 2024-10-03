@@ -126,11 +126,14 @@ if (nrow(inp_filelist) > 0) {
     lap[V1 < -8, V1 := NA]
     lap[V2 < -8, V2 := NA]
 
-    day_data <- data.table(Date        = as.POSIXct(D_minutes),      # Date of the data point
+    day_data <- data.table(Date        = D_minutes,      # Date of the data point
                            CM21_sig    = lap$V1,         # Raw value for CM21
                            CM21_sig_sd = lap$V2)         # Raw SD value for CM21
 
-    ## normal signal
+    ## try to fix dates
+    day_data[, Date := round_date(Date, unit = "second")]
+
+    ## normal signal flag
     day_data[, cm21_sig_limit_flag := 0L ]
 
     ## "Abnormal LOW signal"
@@ -141,9 +144,9 @@ if (nrow(inp_filelist) > 0) {
     day_data[CM21_sig > cm21_signal_upper_limit(Date),
               cm21_sig_limit_flag := 2L ]
 
-    ## use epoch only
-    day_data$Epoch <- as.integer(day_data$Date)
-    day_data$Date  <- NULL
+    # ## use epoch only
+    # day_data$Epoch <- as.integer(day_data$Date)
+    # day_data$Date  <- NULL
 
     ## meta data for file
     file_meta <- data.table(Day           = ff$Day,
@@ -156,7 +159,7 @@ if (nrow(inp_filelist) > 0) {
     update_table(con      = con,
                  new_data = day_data,
                  table    = "LAP",
-                 matchvar = "Epoch")
+                 matchvar = "Date")
 
     ## Add metadata
     if (!dbExistsTable(con, "META")) {
@@ -179,7 +182,7 @@ if (nrow(inp_filelist) > 0) {
 
 
 dbDisconnect(con)
-
+rm(con)
 
 
 

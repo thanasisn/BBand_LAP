@@ -79,39 +79,47 @@ SUN <- SUN[Date < "2024-01-01" & Date > "2023-01-01"]
 # SUN <- SUN[Date > "2023-01-01"]
 
 ## Use epoch as key
-SUN$Epoch <- as.integer(SUN$Date)
-SUN$Date  <- NULL
+# SUN$Epoch <- as.integer(SUN$Date)
+# SUN$Date  <- NULL
 
+## Use date
+SUN[, Date := round_date(Date, unit = "second")]
 
 ## drop existing dates
+# if (dbExistsTable(con, "LAP")) {
+#   SUN <- anti_join(SUN,
+#             tbl(con, "LAP") |>
+#               select(Epoch) |>
+#               filter(!is.na(Epoch)) |>
+#               collect(),
+#             by = "Epoch")
+# }
+
 if (dbExistsTable(con, "LAP")) {
   SUN <- anti_join(SUN,
-            tbl(con, "LAP") |>
-              select(Epoch) |>
-              filter(!is.na(Epoch)) |>
-              collect(),
-            by = "Epoch")
+                   tbl(con, "LAP")        |>
+                     select(Date)         |>
+                     filter(!is.na(Date)) |>
+                     collect(),
+                   by = "Date")
 }
-
-
 
 ## create some nice vars
 names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
-SUN <- SUN |> relocate(Epoch) |> data.table()
-SUN[, month := month(  as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
-SUN[, year  := year(   as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
-SUN[, doy   := yday(   as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
-SUN[, Day   := as.Date(as.POSIXct(SUN$Epoch, origin = "1970-01-01"))]
+SUN <- SUN |> relocate(Date) |> data.table()
+SUN[, month := month(  as.POSIXct(SUN$Date, origin = "1970-01-01"))]
+SUN[, year  := year(   as.POSIXct(SUN$Date, origin = "1970-01-01"))]
+SUN[, doy   := yday(   as.POSIXct(SUN$Date, origin = "1970-01-01"))]
+SUN[, Day   := as.Date(as.POSIXct(SUN$Date, origin = "1970-01-01"))]
 SUN[, SZA   := 90 - Elevat]
 SUN[Azimuth <= 180, preNoon := TRUE ]
 SUN[Azimuth >  180, preNoon := FALSE]
-
 
 if (!dbExistsTable(con, "LAP")) {
   ## Create new table
   cat("\n Initialize table 'LAP' \n\n")
   dbWriteTable(con, "LAP", SUN)
-  ## index will block drop of columns for now!!
+  ## indexing will block drop of columns for now!!
   # db_create_index(con, "LAP", columns = "Epoch", unique = TRUE)
   # db_create_index(con, "LAP", columns = "Date", unique = TRUE)
 } else {
@@ -120,14 +128,24 @@ if (!dbExistsTable(con, "LAP")) {
   dbWriteTable(con, "LAP", SUN, append = TRUE)
 }
 
+## Checks
+## TODO check for empty vars
 
+range(SUN$Date)
+names(SUN)
+tbl(con, "LAP") |> filter(is.na(Date))    |> collect() |> nrow()
+tbl(con, "LAP") |> filter(is.na(Elevat))  |> collect() |> nrow()
+tbl(con, "LAP") |> filter(is.na(Azimuth)) |> collect() |> nrow()
+tbl(con, "LAP") |> filter(is.na(Date))
+
+stop()
 ## Info
 tbl(con, "LAP") |> tally()
 tbl(con, "LAP") |> glimpse()
 SUN             |> tally()
 SUN             |> glimpse()
 
-
+## clean exit
 dbDisconnect(con)
 rm(con)
 
