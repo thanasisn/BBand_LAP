@@ -129,21 +129,27 @@ if (!dbExistsTable(con, "LAP")) {
 }
 
 ## Checks
-## TODO check for empty vars
-
 range(SUN$Date)
 names(SUN)
-tbl(con, "LAP") |> filter(is.na(Date))    |> collect() |> nrow()
-tbl(con, "LAP") |> filter(is.na(Elevat))  |> collect() |> nrow()
-tbl(con, "LAP") |> filter(is.na(Azimuth)) |> collect() |> nrow()
-tbl(con, "LAP") |> filter(is.na(Date))
+stopifnot(tbl(con, "LAP") |> filter(is.na(Date))    |> collect() |> nrow() == 0)
+stopifnot(tbl(con, "LAP") |> filter(is.na(Elevat))  |> collect() |> nrow() == 0)
+stopifnot(tbl(con, "LAP") |> filter(is.na(Azimuth)) |> collect() |> nrow() == 0)
 
-stop()
+if (all(tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> diff() == 1)) {
+  cat("Dates are sorted and regular\n\n")
+} else {
+  stop("DATES NOT SORTED OR NOT REGULAR\n\n")
+}
+
+tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> range()
+
+
 ## Info
 tbl(con, "LAP") |> tally()
 tbl(con, "LAP") |> glimpse()
 SUN             |> tally()
 SUN             |> glimpse()
+
 
 ## clean exit
 dbDisconnect(con)
