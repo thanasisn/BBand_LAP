@@ -11,7 +11,7 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
+#' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
 #'
 #+ echo=F, include=T
@@ -87,7 +87,7 @@ cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 
 ### FIXME test
 # inp_filelist <- inp_filelist[Day > "2023-01-01" & Day < "2024-01-01"]
-inp_filelist <- inp_filelist[Day > "2023-01-01"]
+# inp_filelist <- inp_filelist[Day > "2023-01-01"]
 
 
 
@@ -198,9 +198,20 @@ dbDisconnect(con)
 rm(con)
 
 ##  Checks  --------------------------------------------------------------------
-## all days matching
-tbl(con, "LAP")  |> filter(!is.na(CM21_sig))      |> distinct(Day)
-tbl(con, "META") |> filter(!is.na(cm21_basename)) |> distinct(Day)
+con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+
+## all days should match
+stopifnot(
+  setequal(
+    tbl(con, "LAP")  |> filter(!is.na(CM21_sig))      |> distinct(Day) |> pull(),
+    tbl(con, "META") |> filter(!is.na(cm21_basename)) |> distinct(Day) |> pull()
+  )
+)
+
+
+
+dbDisconnect(con)
+rm(con)
 
 
 if (FALSE) {
@@ -216,14 +227,8 @@ if (FALSE) {
 
   tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> tally()
 
-  ## FIXME
-  tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> distinct(Day) |> tally()
-  tbl(con, "META") |> distinct(Day) |> tally()
-  tbl(con, "META") |> tally()
-
   # dd <- tbl(con, "META") |> collect() |> data.table()
 }
-
 
 
 tac <- Sys.time()
