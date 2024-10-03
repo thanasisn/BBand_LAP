@@ -75,8 +75,20 @@ SUN <- SUN[as.Date(Date) >= DB_start_date, ]
 
 
 ### FIXME TEST
-SUN <- SUN[Date < "2024-01-01" & Date > "2023-08-01"]
-# SUN <- SUN[Date > "2023-01-01"]
+start_test <- as.Date("2020-01-01")
+end_test   <- start_test + 30
+test_cnt   <- "~/ZHOST/.test_counter.Rds"
+if (!file.exists(test_cnt)) {
+  sscn <- 1
+  saveRDS(sscn, test_cnt)
+} else {
+  sscn <- readRDS(test_cnt) + 1
+  saveRDS(sscn, test_cnt)
+}
+end_test   <- start_test + 30 + sscn * 3
+
+SUN <- SUN[Date < end_test & Date > start_test]
+
 
 ## Use epoch as key
 # SUN$Epoch <- as.integer(SUN$Date)
