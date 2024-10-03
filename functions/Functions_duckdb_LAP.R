@@ -29,7 +29,7 @@ update_table <- function(con, new_data, table, matchvar) {
   if (!all(dd1$names %in% tt1$names)) {
     ## get new variables
     new_vars <- dd1[!names %in% tt1$names, ]
-    cat("New", new_vars$names)
+    # cat("New", new_vars$names)
 
     for (i in 1:nrow(new_vars)) {
 
@@ -67,7 +67,7 @@ insert_table <- function(con,  new_data, table, matchvar) {
   if (!all(dd1$names %in% tt1$names)) {
     ## get new variables
     new_vars <- dd1[!names %in% tt1$names, ]
-    cat("New", new_vars$names)
+    # cat("New", new_vars$names)
 
     for (i in 1:nrow(new_vars)) {
 
