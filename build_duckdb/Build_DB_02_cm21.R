@@ -100,7 +100,7 @@ if (dbExistsTable(con, "META")) {
                             by = "Day")
 }
 
-
+stop()
 
 if (nrow(inp_filelist) > 0) {
   for (ll in 1:nrow(inp_filelist)) {
@@ -183,6 +183,8 @@ if (nrow(inp_filelist) > 0) {
 
 dbDisconnect(con)
 rm(con)
+
+
 
 
 
