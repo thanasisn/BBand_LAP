@@ -188,36 +188,34 @@ cat("\n\\footnotesize\n\n")
 pander(data.table(table(ranges_CM21$Comment)))
 cat("\n\n\\normalsize\n\n")
 
-stop()
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 
-## add all missing days in meta data
-minday <- tbl(con, "META") |>
-  select(Day) |>
-  to_arrow() |>
-  summarise(min(Day)) |>
-  collect() |>
-  pull()
-alldays <- data.table(Day = seq(minday, Sys.Date(),
-                                by = "day"))
+## fill all days in meta data until today
+{
+  minday <- tbl(con, "META") |>
+    select(Day) |>
+    to_arrow() |>
+    summarise(min(Day)) |>
+    collect() |>
+    pull()
+  alldays <- data.table(Day = seq(minday, Sys.Date(), by = "day"))
 
-missingdays <- anti_join(
-  alldays,
-  tbl(con, "META") |> select(Day),
-  by   = "Day",
-  copy = TRUE
-)
+  missingdays <- anti_join(
+    alldays,
+    tbl(con, "META") |> select(Day),
+    by   = "Day",
+    copy = TRUE
+  )
 
-rows_insert(x = tbl(con, "META"),
-            y = missingdays,
-            copy = TRUE,
-            conflict = "ignore",
-            in_place = T)
-
-
+  rows_insert(x        = tbl(con, "META"),
+              y        = missingdays,
+              copy     = TRUE,
+              conflict = "ignore",
+              in_place = T)
+}
 
 
 ranges_CM21$HourSpan <- NULL
@@ -237,6 +235,7 @@ ranges_CM21$HourSpan <- NULL
 ## _ CM-21 flag data -------------------------------------------------------
 
 ##  create exclusion table
+##  FIXME make it vectorized somehow
 temp_flag <- data.table()
 for (i in 1:nrow(ranges_CM21)) {
   lower  <- ranges_CM21$From[   i]
@@ -249,21 +248,14 @@ for (i in 1:nrow(ranges_CM21)) {
 }
 
 
-## FIXME test
-temp_flag <- temp_flag[Date >= "2023-01-01"]
-
-# temp_flag$Epoch <- as.integer(temp_flag$Date)
-# temp_flag$Date  <- NULL
 
 
 ## apply bad data ranges
-##
+
 ##  Remove any previous flags
 make_empty_column(con, "LAP", "cm21_bad_data_flag", "character")
 ##  Apply flags
 update_table(con, temp_flag, "LAP", "Date")
-
-
 
 
 tbl(con, "LAP") |>
@@ -271,13 +263,13 @@ tbl(con, "LAP") |>
   tally()
 
 
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 
 
 stop()
 
 
-dbDisconnect(con); rm(con)
 
 ## TODO
 
