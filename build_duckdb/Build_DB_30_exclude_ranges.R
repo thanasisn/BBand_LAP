@@ -252,13 +252,16 @@ for (i in 1:nrow(ranges_CM21)) {
 ## FIXME test
 temp_flag <- temp_flag[Date >= "2023-01-01"]
 
-temp_flag$Epoch <- as.integer(temp_flag$Date)
-temp_flag$Date  <- NULL
+# temp_flag$Epoch <- as.integer(temp_flag$Date)
+# temp_flag$Date  <- NULL
 
 
 ## apply bad data ranges
+##
+##  Remove any previous flags
 make_empty_column(con, "LAP", "cm21_bad_data_flag", "character")
-update_table(con, temp_flag, "LAP", "Epoch")
+##  Apply flags
+update_table(con, temp_flag, "LAP", "Date")
 
 
 

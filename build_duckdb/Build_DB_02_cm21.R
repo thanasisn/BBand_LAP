@@ -197,8 +197,10 @@ if (nrow(inp_filelist) > 0) {
 dbDisconnect(con)
 rm(con)
 
-
-
+##  Checks  --------------------------------------------------------------------
+## all days matching
+tbl(con, "LAP")  |> filter(!is.na(CM21_sig))      |> distinct(Day)
+tbl(con, "META") |> filter(!is.na(cm21_basename)) |> distinct(Day)
 
 
 if (FALSE) {
@@ -219,7 +221,7 @@ if (FALSE) {
   tbl(con, "META") |> distinct(Day) |> tally()
   tbl(con, "META") |> tally()
 
-  dd <- tbl(con, "META") |> collect() |> data.table()
+  # dd <- tbl(con, "META") |> collect() |> data.table()
 }
 
 

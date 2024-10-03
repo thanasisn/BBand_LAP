@@ -128,9 +128,7 @@ if (!dbExistsTable(con, "LAP")) {
   dbWriteTable(con, "LAP", SUN, append = TRUE)
 }
 
-## Checks
-range(SUN$Date)
-names(SUN)
+##  Checks  --------------------------------------------------------------------
 stopifnot(tbl(con, "LAP") |> filter(is.na(Date))    |> collect() |> nrow() == 0)
 stopifnot(tbl(con, "LAP") |> filter(is.na(Elevat))  |> collect() |> nrow() == 0)
 stopifnot(tbl(con, "LAP") |> filter(is.na(Azimuth)) |> collect() |> nrow() == 0)
@@ -141,7 +139,6 @@ if (all(tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> diff() == 1)) 
   stop("DATES NOT SORTED OR NOT REGULAR\n\n")
 }
 
-tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> range()
 
 
 ## Info
@@ -149,6 +146,10 @@ tbl(con, "LAP") |> tally()
 tbl(con, "LAP") |> glimpse()
 SUN             |> tally()
 SUN             |> glimpse()
+tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> range()
+
+
+
 
 
 ## clean exit
