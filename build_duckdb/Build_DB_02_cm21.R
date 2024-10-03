@@ -193,9 +193,8 @@ if (nrow(inp_filelist) > 0) {
   cat(Script.ID, ": ", "No new files to add\n\n")
 }
 
-
-dbDisconnect(con)
-rm(con)
+## clean exit
+dbDisconnect(con); rm(con); closeAllConnections()
 
 ##  Checks  --------------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
@@ -209,9 +208,21 @@ stopifnot(
 )
 
 
+A <- tbl(con, "LAP")  |> filter(!is.na(CM21_sig))      |> distinct(Day) |> pull()
+B <- tbl(con, "META") |> filter(!is.na(cm21_basename)) |> distinct(Day) |> pull()
 
-dbDisconnect(con)
-rm(con)
+
+test <- A[!A %in% B]
+B[!B %in% A]
+
+tbl(con, "LAP")  |> filter(Day %in% test)
+tbl(con, "META") |> filter(Day %in% test)
+
+
+
+
+## clean exit
+dbDisconnect(con); rm(con); closeAllConnections()
 
 
 if (FALSE) {
