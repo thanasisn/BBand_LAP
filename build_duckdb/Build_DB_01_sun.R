@@ -75,7 +75,7 @@ SUN <- SUN[as.Date(Date) >= DB_start_date, ]
 
 
 ### FIXME TEST
-SUN <- SUN[Date < "2024-01-01" & Date > "2023-01-01"]
+SUN <- SUN[Date < "2024-01-01" & Date > "2023-08-01"]
 # SUN <- SUN[Date > "2023-01-01"]
 
 ## Use epoch as key

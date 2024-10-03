@@ -2,7 +2,6 @@
 
 
 
-
 make_empty_column <- function(con, table, acolname, acoltype) {
 
   if (any(dbListFields(con, table) %in% acolname)) {
@@ -47,12 +46,13 @@ update_table <- function(con, new_data, table, matchvar) {
     }
   }
 
-  rows_update(x  = tbl(con, table),
-              y  = new_data,
-              by = matchvar,
-              unmatched = "ignore",
-              in_place = TRUE,
-              copy = TRUE)
+  res <- rows_update(x         = tbl(con, table),
+                     y         = new_data,
+                     by        = matchvar,
+                     unmatched = "ignore",
+                     in_place  = TRUE,
+                     copy      = TRUE)
+  return(res)
 }
 
 
@@ -85,11 +85,12 @@ insert_table <- function(con,  new_data, table, matchvar) {
     }
   }
 
-  rows_insert(x  = tbl(con, table),
-              y  = new_data,
-              by = matchvar,
+  res <- rows_insert(x        = tbl(con, table),
+              y        = new_data,
+              by       = matchvar,
               conflict = "ignore",
               in_place = TRUE,
               copy     = TRUE)
+  return(res)
 }
 
