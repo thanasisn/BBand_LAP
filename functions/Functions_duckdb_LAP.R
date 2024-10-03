@@ -86,11 +86,11 @@ insert_table <- function(con,  new_data, table, matchvar) {
   }
 
   res <- rows_insert(x        = tbl(con, table),
-              y        = new_data,
-              by       = matchvar,
-              conflict = "ignore",
-              in_place = TRUE,
-              copy     = TRUE)
+                     y        = new_data,
+                     by       = matchvar,
+                     conflict = "ignore",
+                     in_place = TRUE,
+                     copy     = TRUE)
   return(res)
 }
 
