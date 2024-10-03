@@ -76,8 +76,8 @@ inp_filelist[, cm21_basename := basename(fullname)]
 stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$cm21_basename))) == FALSE )
 
 inp_filelist$Day <- as.Date(parse_date_time(
-    sub("06\\..*", "", inp_filelist$cm21_basename),
-    "dmy"))
+  sub("06\\..*", "", inp_filelist$cm21_basename),
+  "dmy"))
 setorder(inp_filelist, Day)
 cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 
@@ -90,18 +90,31 @@ cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 inp_filelist <- inp_filelist[Day > "2023-01-01"]
 
 
-## add only new files in the date range
+
+## keep only files which correspond to existing dates
+inp_filelist <- right_join(inp_filelist,
+                           tbl(con, "LAP") |>
+                             select(Day)   |>
+                             distinct()    |>
+                             collect(),
+                           by = "Day") |>
+  filter(!is.na(cm21_basename))
+
+
+
+## add only files not in the metadata
 if (dbExistsTable(con, "META")) {
   inp_filelist <- anti_join(inp_filelist,
                             tbl(con, "META") |>
                               filter(!is.na(cm21_basename)) |>
                               select(Day) |>
                               collect(),
-                            by = "Day")
+                            by = "Day") |>
+    filter(!is.na(cm21_basename))
 }
 
-stop()
 
+## parse all files
 if (nrow(inp_filelist) > 0) {
   for (ll in 1:nrow(inp_filelist)) {
     ff <- inp_filelist[ll, ]
@@ -138,11 +151,11 @@ if (nrow(inp_filelist) > 0) {
 
     ## "Abnormal LOW signal"
     day_data[CM21_sig < cm21_signal_lower_limit(Date),
-              cm21_sig_limit_flag := 1L ]
+             cm21_sig_limit_flag := 1L ]
 
     ## "Abnormal HIGH signal"
     day_data[CM21_sig > cm21_signal_upper_limit(Date),
-              cm21_sig_limit_flag := 2L ]
+             cm21_sig_limit_flag := 2L ]
 
     # ## use epoch only
     # day_data$Epoch <- as.integer(day_data$Date)
@@ -196,7 +209,6 @@ if (FALSE) {
 
   tbl(con, "LAP")  |> colnames()
   tbl(con, "META") |> colnames()
-
 
   tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> glimpse()
 
