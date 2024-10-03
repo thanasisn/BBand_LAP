@@ -182,10 +182,19 @@ if (nrow(inp_filelist) > 0) {
       # db_create_index(con, "META", columns = "Day", unique = TRUE)
     } else {
       ## Append new data
-      insert_table(con      = con,
+      update_table(con      = con,
                    new_data = file_meta,
                    table    = "META",
                    matchvar = "Day")
+
+
+      # res <- rows_update(x         = tbl(con, "META"),
+      #                    y         = file_meta,
+      #                    by        = "Day",
+      #                    unmatched = "ignore",
+      #                    in_place  = TRUE,
+      #                    copy      = TRUE)
+
     }
 
   }
