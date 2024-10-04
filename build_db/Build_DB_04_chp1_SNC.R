@@ -122,7 +122,7 @@ cat("\n**Parse:",paste(nrow(inp_filelist), "tracker sync files**\n\n"))
 
 
 
-##  Import CHP-1 files  --------------------------------------------------------
+##  Import CHP-1 sync files  ---------------------------------------------------
 for (YYYY in unique(year(inp_filelist$day))) {
     subyear <- inp_filelist[year(day) == YYYY]
     ## months to do
