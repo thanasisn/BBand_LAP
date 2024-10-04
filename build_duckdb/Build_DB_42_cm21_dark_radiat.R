@@ -52,6 +52,7 @@ library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
+library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 
@@ -59,18 +60,41 @@ library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 
+##
+make_new_column(con, "META", "cm21_dark_flag", "character")
+
+
+## days to loop
+dayslist <- tbl(con, "META") |> filter(is.na(cm21_dark_flag) & !is.na(cm21_basename)) |> select(Day) |> pull()
+
+## go find dark and radiation
+for (ad in dayslist) {
+  ad <- as.Date(ad, origin = origin)
+  tbl(con, "LAP") |>
+    filter(Day == ad)                 |>  ## this day only
+    filter(!is.na(CM21_sig))          |>  ## valid measurements
+    filter(is.na(cm21_bad_data_flag)) |>  ## not bad data
+    collect() |> data.table()
+
+
+  ## use only valid data for dark
+  data_use <- datapart[is.na(cm21_bad_data_flag) &
+                         !is.na(CM21_sig) &
+                         is.na(CM21_sig_wo_dark)]
+
+}
 
 
 
-make_new_column(con, "META", "cm21_dark_flag", "DATE")
+
+# remove_column(con, "META", "cm21_dark_flag")
 
 
+tbl(con, "META") |> glimpse()
+tbl(con, "LAP")  |> glimpse()
 
-
-tbl(con, "META")
-tbl(con, "LAP")
-
-
+tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag))
+tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag))
 
 stop()
 
