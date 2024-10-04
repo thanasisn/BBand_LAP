@@ -91,7 +91,6 @@ SUN <- SUN[as.Date(Date) >= DB_start_date, ]
   SUN <- SUN[Date < end_test & Date > start_test]
 }
 
-
 ## Use epoch as key
 # SUN$Epoch <- as.integer(SUN$Date)
 # SUN$Date  <- NULL
@@ -151,6 +150,28 @@ if (!dbExistsTable(con, "LAP")) {
   dbWriteTable(con, "LAP", SUN, append = TRUE)
 }
 
+##  Create all corresponding metadata days
+if (!dbExistsTable(con, "META")) {
+  ## Create new table
+  cat("\n Initialize table 'META' \n\n")
+
+  ## FIXME should be done in pure SQL
+  init <- tbl(con, "LAP") |> select(Day) |> distinct() |> collect() |> data.table()
+
+  dbWriteTable(con, "META",
+               init)
+} else {
+  ## Add new dates
+  rows_insert(
+    tbl(con, "META"),
+    tbl(con, "LAP") |> select(Day) |> distinct(),
+    by = "Day",
+    conflict = "ignore",
+    in_place = TRUE
+  )
+}
+
+
 ##  Checks  --------------------------------------------------------------------
 stopifnot(tbl(con, "LAP") |> filter(is.na(Date))    |> collect() |> nrow() == 0)
 stopifnot(tbl(con, "LAP") |> filter(is.na(Elevat))  |> collect() |> nrow() == 0)
@@ -162,16 +183,15 @@ if (all(tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> diff() == 1)) 
   stop("DATES NOT SORTED OR NOT REGULAR\n\n")
 }
 
-
-
 ## Info
 tbl(con, "LAP") |> tally()
 tbl(con, "LAP") |> glimpse()
-SUN             |> tally()
-SUN             |> glimpse()
-tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> range()
 
+tbl(con, "LAP")  |> select(Date) |> collect() |> pull() |> range()
+tbl(con, "META") |> select(Day)  |> collect() |> pull() |> range()
 
+tbl(con, "LAP")  |> select(Day) |> distinct() |> tally()
+tbl(con, "META") |> select(Day) |> distinct() |> tally()
 
 
 ## clean exit
