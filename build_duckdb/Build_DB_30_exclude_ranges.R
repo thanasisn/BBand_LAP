@@ -269,7 +269,29 @@ update_table(con, temp_flag, "LAP", "Date")
 rm(temp_flag)
 
 
+## _ CHP-1 flag temperature data -----------------------------------------------
 
+##  create exclusion table
+##  FIXME make it vectorized somehow
+temp_flag <- data.table()
+for (i in 1:nrow(ranges_CHP1_temp)) {
+  lower  <- ranges_CHP1_temp$From[   i]
+  upper  <- ranges_CHP1_temp$Until[  i]
+  comme  <- ranges_CHP1_temp$Comment[i]
+  tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+                       chp1_bad_temp_flag = comme)
+  temp_flag <- rbind(temp_flag, tempex)
+  rm(tempex)
+}
+
+
+## apply bad data ranges
+
+##  Remove any previous flags
+make_empty_column(con, "LAP", "chp1_bad_temp_flag", "character")
+##  Apply flags
+update_table(con, temp_flag, "LAP", "Date")
+rm(temp_flag)
 
 
 
@@ -310,117 +332,27 @@ tbl(con, "LAP") |>
   tally()
 
 
-# test <- tbl(con, "LAP") |>
-#   filter(is.na(cm21_sig_limit_flag)) |> collect()
+
+
+
+
+
+
+
+
+
+# ## Save flagged metadata
+# BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime     ]
+# BB_meta[day %in% chg_days, chp1_bad_temp_flagged := chp1_temp_exclude_mtime]
+# BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime     ]
 #
-# dd <- tbl(con, "LAP")  |> select(Date) |> collect() |> pull() |> range()
-#
-# temp_flag[Date > dd[1] & Date < dd[2]]
+
 
 
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 
-
-stop()
-
-
-
-## TODO
-
-##  Flag exclusions file by file  ----------------------------------------------
-##
-##  FIXME should find a better method through arrow dataset to mark everything
-##  at once and update files as needed.
-##
-
-
-
-##  Apply exclusion ranges to DB  ----------------------------------------------
-for (af in na.omit(filelist$names)) {
-    datapart <- read_parquet(af)
-
-    # cat(paste0(Script.ID, " Load: "), af, "\n")
-
-    ## _ CHP-1 flag bad data ---------------------------------------------------
-    for (i in 1:nrow(ranges_CHP1)) {
-        lower  <- ranges_CHP1$From[   i]
-        upper  <- ranges_CHP1$Until[  i]
-        comme  <- ranges_CHP1$Comment[i]
-        tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                             chp1_bad_data_flag = comme)
-
-        ## mark bad regions of data
-        datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
-        rm(tempex)
-    }
-
-    ## _ CHP-1 flag physical limits anomalies  ---------------------------------
-    datapart <- data.table(datapart)
-    datapart[CHP1_sig < chp1_signal_lower_limit(Date) & !is.na(chp1_bad_data_flag),
-             chp1_bad_data_flag := "Abnormal LOW signal"]
-    datapart[CHP1_sig > chp1_signal_upper_limit(Date) & !is.na(chp1_bad_data_flag),
-             chp1_bad_data_flag := "Abnormal HIGH signal"]
-    datapart <- as_tibble(datapart)
-
-    ## _ CHP-1 flag temperature ------------------------------------------------
-    for (i in 1:nrow(ranges_CHP1_temp)) {
-        lower  <- ranges_CHP1_temp$From[   i]
-        upper  <- ranges_CHP1_temp$Until[  i]
-        comme  <- ranges_CHP1_temp$Comment[i]
-        tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
-                             chp1_bad_temp_flag = comme)
-
-        ## mark bad regions of data
-        datapart <- rows_update(datapart, tempex, by = "Date", unmatched = "ignore")
-        rm(tempex)
-    }
-
-    ## _ CHP-1 flag temperature physical limits --------------------------------
-    datapart <- data.table(datapart)
-    datapart[chp1_temperature > CHP1_TEMP_MAX        & !is.na(chp1_bad_temp_flag),
-             chp1_bad_temp_flag := "Abnormal HIGH temperature"]
-    datapart[chp1_temperature < CHP1_TEMP_MIN        & !is.na(chp1_bad_temp_flag),
-             chp1_bad_temp_flag := "Abnormal LOW temperature"]
-    datapart[chp1_temperature_SD > CHP1_TEMP_STD_LIM & !is.na(chp1_bad_temp_flag),
-             chp1_bad_temp_flag := "Abnormal temperature SD"]
-    datapart <- as_tibble(datapart)
-
-
-
-
-
-    ## Save flagged metadata
-    BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime     ]
-    BB_meta[day %in% chg_days, chp1_bad_temp_flagged := chp1_temp_exclude_mtime]
-    BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime     ]
-
-}
-
-
-
-## __ Show some info for the flags __ ------------------------------------------
-
-wecare <- c("cm21_bad_data_flag", "chp1_bad_data_flag", "chp1_bad_temp_flag")
-
-for (acol in wecare) {
-    stats <- tbl(con, "LAP") |> select(all_of(acol)) |> collect() |> table(useNA = "always")
-    pander(data.frame(stats))
-}
-
-acol <- "cm21_bad_data_flag"
-bcol <- "cm21_sig_limit_flag"
-tbl(con, "LAP") |>
-  filter(!!as.symbol(bcol) == 0)    |>
-  filter(!is.na(!!as.symbol(acol))) |>
-  group_by(!!as.symbol(acol))       |> tally()
-
-tbl(con, "LAP") |> filter(!is.na(CM21_sig)) |> tally()
-tbl(con, "LAP") |> tally()
-
-
 ## __ Execution Unlock __ ------------------------------------------------------
-myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
