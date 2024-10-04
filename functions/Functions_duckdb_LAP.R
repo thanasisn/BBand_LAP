@@ -48,10 +48,23 @@ make_empty_column <- function(con, table, acolname, acoltype) {
 
 
 
+#' Create a new column with a data type in a duckdb table
+#'
+#' @param con      Connection to the database
+#' @param table    Name of the table in the database
+#' @param acolname Name of the new column
+#' @param acoltype Databse data type for the new column
+#'
+#' @details
+#' Create a column or do nothing if already exist
+#'
+#' @return Nothing create the column with an SQL query
+#' @export
+#'
 make_new_column <- function(con, table, acolname, acoltype) {
 
   if (any(dbListFields(con, table) %in% acolname)) {
-    warning("Column ", acolname, " already exist!")
+    cat(" Column ", acolname, " already exist!\n Do nothing!!")
     return()
   } else {
     ## create new columns with a query
@@ -60,6 +73,8 @@ make_new_column <- function(con, table, acolname, acoltype) {
     res <- dbSendQuery(con, qq)
   }
 }
+
+
 
 remove_column <- function(con, table, acolname) {
   if (any(dbListFields(con, table) %in% acolname)) {
