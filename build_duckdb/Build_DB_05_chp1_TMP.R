@@ -1,12 +1,10 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Reads tracker synchronization data form `sun_tracker_.*.snc$`
+#' Reads temperature data for CHP-1 into the database
 #'
-#' Populates:
-#'  - Async_tracker_flag
-#'
-#' There are more data but are parsed here
+#'  - Reads raw resistance data
+#'  - Converts resistance to temperature
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -27,8 +25,8 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_04_chp1_SNC.R"
-Script.ID   <- "04"
+Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_05_chp1_TMP.R"
+Script.ID   <- "05"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -36,6 +34,7 @@ if (!interactive()) {
 }
 
 ## __ Load libraries  ----------------------------------------------------------
+source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
@@ -46,32 +45,28 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
-cat("\n Import  CHP-1 tracker async  data\n\n")
+cat("\n Import  CHP-1 temperature data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-##  Get tracker sync files  ----------------------------------------------------
-inp_filelist <- list.files(path        = trSYNC_DIR,
+##  Get tracker sync files  --------------------------------------------------------
+inp_filelist <- list.files(path        = CHPTMP_DIR,
                            recursive   = TRUE,
-                           pattern     = "sun_tracker_.*.snc$",
+                           pattern     = "sun_tracker_.*.therm$",,
                            ignore.case = TRUE,
                            full.names  = TRUE )
-cat("\n**Found:", length(inp_filelist), "tracker sync files**\n")
+cat("\n**Found:", length(inp_filelist), "CHP-1 temperature files**\n")
 
 inp_filelist <- data.table(fullname = inp_filelist)
-inp_filelist[, chp1_sync_basename := basename(fullname)]
-stopifnot(all(duplicated(sub("\\..*", "", inp_filelist$chp1_sync_basename))) == FALSE)
+inp_filelist[, chp1_temp_basename := basename(fullname)]
+stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$chp1_temp_basename))) == FALSE )
 
-inp_filelist$Day <- as.Date(
-  sub("sun_tracker_", "",
-      sub("\\.snc", "",
-          inp_filelist$chp1_sync_basename
-          )
-      )
-  )
+inp_filelist$Day <- as.Date(parse_date_time(
+    sub("\\.therm", "", sub("sun_tracker_", "", inp_filelist$chp1_temp_basename)),
+    "Ymd"))
 setorder(inp_filelist, Day)
-cat("\n**Found:", nrow(inp_filelist), "tracker sync files**\n")
+cat("\n**Found:",paste(nrow(inp_filelist), "CHP-1 temperature files**\n"))
 
 ## keep only files which correspond to existing dates
 inp_filelist <- right_join(inp_filelist,
@@ -80,24 +75,16 @@ inp_filelist <- right_join(inp_filelist,
                              distinct()    |>
                              collect(),
                            by = "Day") |>
-  filter(!is.na(chp1_sync_basename))
+  filter(!is.na(chp1_temp_basename))
 
-## add only files not in the metadata
-if (dbExistsTable(con, "META") &
-    any(dbListFields(con, "META") %in% "chp1_sync_basename")) {
-  inp_filelist <- anti_join(inp_filelist,
-                            tbl(con, "META") |>
-                              filter(!is.na(chp1_sync_basename)) |>
-                              select(Day) |>
-                              collect(),
-                            by = "Day") |>
-    filter(!is.na(chp1_sync_basename))
-}
-setorder(inp_filelist, Day)
+
+
+
+
 
 ## ignore current and future dates
-inp_filelist <- inp_filelist[Day < as.Date(Sys.Date())]
-cat("\n**Parse:", nrow(inp_filelist), "tracker sync files**\n\n")
+inp_filelist <- inp_filelist[ day < as.Date(Sys.Date())]
+cat("\n**Parse:", nrow(inp_filelist), "CHP-1 temperature files**\n\n")
 
 ## parse all files
 if (nrow(inp_filelist) > 0) {
@@ -109,6 +96,8 @@ if (nrow(inp_filelist) > 0) {
         paste(ff$Day),
         ll,"/",nrow(inp_filelist), "\n")
 
+
+    stop()
     async    <- rep(FALSE, 1440)  # The snc file exist, so start with all not async
     asyncstp <- rep(NA,    1440)  # Async magnitude (steps missed)
 
@@ -147,7 +136,7 @@ if (nrow(inp_filelist) > 0) {
     ## create vector of asyncs
     for (ik in 1:nrow(syc_temp)) {
       async[ which( D_minutes <= syc_temp$async_end[   ik ] &
-                    D_minutes >= syc_temp$async_start[ ik ]  ) ] <- TRUE   ## !!
+                      D_minutes >= syc_temp$async_start[ ik ]  ) ] <- TRUE   ## !!
     }
 
     ## Move dates to the centre of each minute, as the rest of DB
@@ -192,35 +181,87 @@ if (nrow(inp_filelist) > 0) {
 }
 
 
-if (interactive()) {
 
-  tbl(con, "LAP")  |> glimpse()
-  tbl(con, "META") |> glimpse()
 
-  tbl(con, "LAP") |>
-    group_by(Async_tracker_flag) |>
-    tally()
 
-  tbl(con, "LAP") |>
-    group_by(Async_step_count) |>
-    tally()
 
-  fs::file_size(DB_DUCK)
 
-  tbl(con, "LAP")  |> colnames()
-  tbl(con, "META") |> colnames()
 
-  tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> glimpse()
 
-  tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> tally()
 
-  # dd <- tbl(con, "META") |> collect() |> data.table()
+
+stop()
+
+##  Import CHP-1 files  ------------------------------------------------------
+for (YYYY in unique(year(inp_filelist$day))) {
+    subyear <- inp_filelist[year(day) == YYYY]
+    ## months to do
+    for (mm in subyear[, unique(month(day))]) {
+
+        ##  read this month set files
+        gathermeta <- data.table()
+        for (ad in submonth$day) {
+            ss <- submonth[day == ad]
+
+            ## __  Read CHP-1 temperature file  --------------------------------
+            temp_temp    <- read.table(ss$fullname, sep = "\t", as.is = TRUE)
+            temp_temp$V1 <- as.POSIXct( temp_temp$V1 )
+            temp_temp$V1 <- as.POSIXct( format( temp_temp$V1, format = "%F %R" ) )
+            temp_temp$V1 <- temp_temp$V1 + 30
+            temp_temp$V3[temp_temp$V3 == 0] <- NA
+
+            temp_temp    <- data.table(temp_temp)
+            temp_temp    <- temp_temp[, .( V2 = mean(V2, na.rm = T),
+                                           V3 = mean(V3, na.rm = T) ), by = V1 ]
+
+            temp_temp[V2 < 0, V2 := NA]
+            temp_temp[V2 < 0, V3 := NA]
+
+            day_data <- data.frame(Date                = temp_temp$V1,
+                                   year                = year(temp_temp$V1),
+                                   month               = month(temp_temp$V1),
+                                   chp1_R_therm        = temp_temp$V2,
+                                   chp1_R_SD_therm     = temp_temp$V3,
+                                   chp1_R_meas_ERR     = Protek_506_R_error(    temp_temp$V2),
+                                   chp1_temperature    = CHP_thermistor_R_to_T( temp_temp$V2),
+                                   chp1_temperature_SD = CHP_thermistor_ResUnc_to_TempUnc(temp_temp$V2, temp_temp$V3))
+            day_data$chp1_temp_UNC <- CHP_thermistor_ResUnc_to_TempUnc(temp_temp$V2, day_data$chp1_R_meas_ERR)
+
+            ## get file metadata
+            file_meta <- data.table(day                = as_date(ad),
+                                    chp1_temp_basename = basename(ss$fullname),
+                                    chp1_temp_mtime    = file.mtime(ss$fullname),
+                                    chp1_temp_parsed   = Sys.time(),
+                                    chp1_temp_md5sum   = as.vector(md5sum(ss$fullname)))
+
+            # gather <- rows_patch(gather, day_data, by = "Date")
+            gather     <- rows_upsert(gather, day_data, by = "Date")
+            gathermeta <- rbind(gathermeta, file_meta)
+            rm(day_data, file_meta, ss)
+            rm(temp_temp)
+        }
+
+        BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
+        # BBdaily <- rows_patch(BBdaily, gathermeta, by = "day", unmatched = "ignore")
+
+        setorder(gather, Date)
+
+        ## store this month / set data
+        write_parquet(gather,  partfile)
+        cat("05 Save: ", partfile, "\n")
+        write_parquet(BB_meta, DB_META_fl)
+        rm(gather, gathermeta, submonth)
+    }
+    rm(subyear)
 }
+rm(inp_filelist)
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
+
+
+myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+

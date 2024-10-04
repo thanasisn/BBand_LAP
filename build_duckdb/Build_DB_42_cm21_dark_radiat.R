@@ -1,6 +1,5 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
-
 #'
 #' Compute or construct dark signal offset for CM-21.
 #'
@@ -12,12 +11,9 @@
 #' TODO
 #' - print dark type on graphs from metadata
 #'
-#'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#'
 #+ echo=F, include=T
-
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
@@ -27,7 +23,6 @@ knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
-
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
@@ -35,31 +30,26 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_42_cm21_dark_radiat.R"
 Script.ID   <- "42"
 
-
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
     sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_dark_calculation.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
-source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
-source("~/CODE/FUNCTIONS/R/execlock.R")
 
-library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
-library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+# library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
-library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
-
+library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 ##  Create a dummy column if not existing
 make_new_column(con, "META", "cm21_dark_flag", "character")
@@ -93,8 +83,6 @@ if (vddays > 100) {
     Date = missingdays,
     DARK = cm21DAILYdark(missingdays)
   )
-  # plot(test$day, test$cm21_dark_Eve_med)
-  # plot(test$day, test$cm21_dark_Mor_med)
   plot(test$Day, test$cm21_Daily_dark,
        main = "Constructed Dark values for CM-21")
   points(construct$Date, construct$DARK, col = "red")

@@ -1,6 +1,5 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
-
 #'
 #' Reads CM-21 signal from `[0-9]*06.LAP$``
 #'
@@ -8,11 +7,9 @@
 #'  - CM21_sig
 #'  - CM21_sig_sd
 #'
-#'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
-#'
 #'
 #+ echo=F, include=T
 
@@ -43,10 +40,10 @@ source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
-library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Import  CM-21  data\n\n")
@@ -197,14 +194,10 @@ stopifnot(
 # tbl(con, "LAP")  |> filter(Day %in% test)
 # tbl(con, "META") |> filter(Day %in% test)
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
-if (FALSE) {
+if (interactive()) {
 
   fs::file_size(DB_DUCK)
-
-  con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
   tbl(con, "LAP")  |> colnames()
   tbl(con, "META") |> colnames()
@@ -215,6 +208,9 @@ if (FALSE) {
 
   # dd <- tbl(con, "META") |> collect() |> data.table()
 }
+
+## clean exit
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

@@ -1,6 +1,5 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
-
 #'
 #' Read CHP-1 signal from `[0-9]*03.LAP$`
 #'
@@ -8,11 +7,9 @@
 #'  - CHP1_sig
 #'  - CHP1_sig_sd
 #'
-#'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
-#'
 #'
 #+ echo=F, include=T
 
@@ -42,10 +39,10 @@ source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
-library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Import  CHP-1  data\n\n")

@@ -1,13 +1,11 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
-
 #'
 #' Apply flags on data
 #'
 #' - CHP-1 bad data ranges
 #' - CHP-1 temperature bad data ranges
 #' - CM-21 bad data ranges
-#'
 #'
 #' TODO
 #'
@@ -28,7 +26,6 @@ knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
-
 ## __ Set environment __ -------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
@@ -41,25 +38,19 @@ if (!interactive()) {
     sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-
 ## __ Load libraries __ --------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
-source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
-source("~/CODE/FUNCTIONS/R/execlock.R")
 
-
-library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
-library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
-library(tools,      warn.conflicts = FALSE, quietly = TRUE)
-library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
-
-
+library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(pander,     warn.conflicts = FALSE, quietly = TRUE)
+library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 
 ## Load CHP-1 exclusions -------------------------------------------------------
 chp1_exclude_mtime <- file.mtime(CHP1_EXCLUDE)
