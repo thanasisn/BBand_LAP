@@ -23,7 +23,7 @@
 #+ echo=F, include=T
 
 #+ echo=F, include=F
-## __ Document options ---------------------------------------------------------
+## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
