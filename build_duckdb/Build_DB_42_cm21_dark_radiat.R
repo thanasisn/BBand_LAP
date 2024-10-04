@@ -61,16 +61,10 @@ library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-
-##  Create a dummy column if not exist
+##  Create a dummy column if not existing
 make_new_column(con, "META", "cm21_dark_flag", "character")
 
-
-
-
-
 ## Create a dark construct!  ---------------------------------------------------
-
 ## create construct if are available data
 vddays <- tbl(con, "META") |> filter(!is.na(cm21_dark_flag)) |> tally() |> pull()
 if (vddays > 100) {
@@ -90,7 +84,8 @@ if (vddays > 100) {
   ## get dark missing days
   missingdays <- tbl(con, "META") |>
     filter(!is.na(cm21_basename)) |>
-    filter(cm21_dark_flag %in% c("MISSING", "CONSTRUCTED")) |>
+    # filter(is.na(cm21_dark_flag) | cm21_dark_flag %in% c("MISSING", "CONSTRUCTED")) |> ## consider it to see more
+    filter(cm21_dark_flag %in% c("MISSING", "CONSTRUCTED")) |>                           ## consider it to see less (original)
     select(Day) |> collect() |> data.table()
   ## should we use missing only?
   ## Create missing dark
@@ -103,31 +98,15 @@ if (vddays > 100) {
   plot(test$Day, test$cm21_Daily_dark,
        main = "Constructed Dark values for CM-21")
   points(construct$Date, construct$DARK, col = "red")
-
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+##  Dark and radiation calculations  -------------------------------------------
 ## days to loop
-dayslist <- tbl(con, "META") |> filter(is.na(cm21_dark_flag) & !is.na(cm21_basename)) |> select(Day) |> pull()
+dayslist <- tbl(con, "META") |>
+  filter(is.na(cm21_dark_flag) & !is.na(cm21_basename)) |>
+  select(Day) |> pull()
 
-## go find dark and radiation
 cc <- 0
 for (ad in dayslist) {
   ad <- as.Date(ad, origin = origin)
@@ -154,8 +133,6 @@ for (ad in dayslist) {
     next()
   }
 
-
-
   ## __ Compute dark values for day  -------------------------------------
   dark_day <- dark_calculations_2(
     dates      = daydata$Date,
@@ -165,10 +142,7 @@ for (ad in dayslist) {
     dstretch   = DSTRETCH
   )
 
-
-
   ## __ Resolve problematic dark calculations ----------------------------
-
   ## no data to use
   if (all(is.na(daydata$CM21_sig))) {
     dark_flag              <- "NO SIGNAL DATA"
@@ -214,7 +188,6 @@ for (ad in dayslist) {
   daydata[, GLB_wpsm    := CM21_sig_wo_dark * cm21factor(Date)]
   daydata[, GLB_SD_wpsm := CM21_sig_sd      * cm21factor(Date)]
 
-
   ## __ Day stats --------------------------------------------------------
   names(dark_day) <- paste0("cm21_", names(dark_day))
   meta_day <- data.frame(Day                = as.Date(ad),
@@ -234,56 +207,27 @@ for (ad in dayslist) {
                table    = "META",
                matchvar = "Day")
 
-
 }
 
+tbl(con, "META") |> group_by(cm21_dark_flag) |> tally()
 
 
 
-# remove_column(con, "META", "cm21_dark_flag")
+# tbl(con, "META") |> glimpse()
+# tbl(con, "LAP")  |> glimpse()
+#
+# tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag)) |> glimpse()
+# tbl(con, "LAP") |> filter(cm21_sig_limit_flag == 0)
+#
+# tbl(con, "META") |>
+#   filter(is.na(cm21_dark_flag) & !is.na(cm21_basename))
 
 
-tbl(con, "META") |> glimpse()
-tbl(con, "LAP")  |> glimpse()
-
-tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag)) |> glimpse()
-tbl(con, "LAP") |> filter(cm21_sig_limit_flag == 0)
-
-stop()
-
-
-
-
-
-
-##  Dark calculations on dataset  ----------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-print(
-    table(BB_meta[,(cm21_dark_flag)])
-)
-
+## clean exit
+dbDisconnect(con, disconnect = T); rm(con); closeAllConnections()
 
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
-

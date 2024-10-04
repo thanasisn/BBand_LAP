@@ -64,7 +64,7 @@ make_empty_column <- function(con, table, acolname, acoltype) {
 make_new_column <- function(con, table, acolname, acoltype) {
 
   if (any(dbListFields(con, table) %in% acolname)) {
-    cat(" Column ", acolname, " already exist!\n Do nothing!!")
+    cat(" Column ", acolname, " already exist! >> Do nothing!! <<\n\n")
     return()
   } else {
     ## create new columns with a query
