@@ -61,7 +61,15 @@ make_new_column <- function(con, table, acolname, acoltype) {
   }
 }
 
-
+remove_column <- function(con, table, acolname) {
+  if (any(dbListFields(con, table) %in% acolname)) {
+    qq <- paste0("ALTER TABLE ", table,
+                 " DROP ",  acolname)
+    res <- dbSendQuery(con, qq)
+  } else {
+    warning("No column to remove:", acolname)
+  }
+}
 
 update_table <- function(con, new_data, table, matchvar) {
 
