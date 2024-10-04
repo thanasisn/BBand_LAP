@@ -252,11 +252,39 @@ for (i in 1:nrow(ranges_CM21)) {
 
 ## apply bad data ranges
 
+temp_flag[, cm21_bad_data_flag := as.factor(cm21_bad_data_flag)]
+
+
+stop()
+
 ##  Remove any previous flags
 make_empty_column(con, "LAP", "cm21_bad_data_flag", "character")
 ##  Apply flags
 update_table(con, temp_flag, "LAP", "Date")
 
+
+
+
+
+con2 <- dbConnect(duckdb::duckdb())
+on.exit(dbDisconnect(con2, shutdown = TRUE))
+
+# Our unencoded data.
+data <- c('Hobbit', 'Elf', 'Elf', 'Man', 'Mayar', 'Hobbit', 'Mayar')
+
+# Our R dataframe holding an encoded version of our data column
+# 'as.factor' automatically encodes it.
+df_in <- data.frame(races=as.factor(data))
+
+
+duckdb::duckdb_register(con2, "characters", df_in)
+df_out <- dbReadTable(con2, "characters")
+
+
+tbl(con2, "characters")
+
+
+tbl(con, "LAP") |> glimpse()
 
 tbl(con, "LAP") |>
   group_by(cm21_bad_data_flag) |>
