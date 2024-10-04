@@ -1,6 +1,5 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
-
 #'
 #' Read Astropy
 #'
@@ -46,10 +45,10 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 
-library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
-library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Initialize DB and/or import Sun data\n\n")
@@ -157,14 +156,16 @@ if (all(tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> diff() == 1)) 
 }
 
 ## Info display
-tbl(con, "LAP") |> tally()
-tbl(con, "LAP") |> glimpse()
+if (interactive()) {
+  tbl(con, "LAP") |> tally()
+  tbl(con, "LAP") |> glimpse()
 
-tbl(con, "LAP")  |> select(Date) |> collect() |> pull() |> range()
-tbl(con, "META") |> select(Day)  |> collect() |> pull() |> range()
+  tbl(con, "LAP")  |> select(Date) |> collect() |> pull() |> range()
+  tbl(con, "META") |> select(Day)  |> collect() |> pull() |> range()
 
-tbl(con, "LAP")  |> select(Day) |> distinct() |> tally()
-tbl(con, "META") |> select(Day) |> distinct() |> tally()
+  tbl(con, "LAP")  |> select(Day) |> distinct() |> tally()
+  tbl(con, "META") |> select(Day) |> distinct() |> tally()
+}
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
