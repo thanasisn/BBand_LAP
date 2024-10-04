@@ -15,7 +15,7 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
+#' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
 #+ echo=F, include=T
 
@@ -50,10 +50,7 @@ source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 
-## __ Execution lock __ --------------------------------------------------------
 
-
-library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
@@ -232,6 +229,8 @@ ranges_CM21$HourSpan <- NULL
 
 
 
+
+
 ## _ CM-21 flag data -------------------------------------------------------
 
 ##  create exclusion table
@@ -247,16 +246,50 @@ for (i in 1:nrow(ranges_CM21)) {
   rm(tempex)
 }
 
-
-
-
 ## apply bad data ranges
-
 
 ##  Remove any previous flags
 make_empty_column(con, "LAP", "cm21_bad_data_flag", "character")
 ##  Apply flags
 update_table(con, temp_flag, "LAP", "Date")
+rm(temp_flag)
+
+
+## _ CHP-1 flag data -------------------------------------------------------
+
+##  create exclusion table
+##  FIXME make it vectorized somehow
+temp_flag <- data.table()
+for (i in 1:nrow(ranges_CHP1)) {
+  lower  <- ranges_CHP1$From[   i]
+  upper  <- ranges_CHP1$Until[  i]
+  comme  <- ranges_CHP1$Comment[i]
+  tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+                       chp1_bad_data_flag = comme)
+  temp_flag <- rbind(temp_flag, tempex)
+  rm(tempex)
+}
+
+## apply bad data ranges
+
+##  Remove any previous flags
+make_empty_column(con, "LAP", "chp1_bad_data_flag", "character")
+##  Apply flags
+update_table(con, temp_flag, "LAP", "Date")
+rm(temp_flag)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## TODO use ENUM for factors
 
@@ -305,9 +338,6 @@ stop()
 ##  Apply exclusion ranges to DB  ----------------------------------------------
 for (af in na.omit(filelist$names)) {
     datapart <- read_parquet(af)
-    ## add columns for this set
-    datapart[["year"]]  <- as.integer(year( datapart$Date))
-    datapart[["month"]] <- as.integer(month(datapart$Date))
 
     # cat(paste0(Script.ID, " Load: "), af, "\n")
 
