@@ -224,7 +224,7 @@ tbl(con, "META") |> group_by(cm21_dark_flag) |> tally()
 
 
 ## clean exit
-dbDisconnect(con, disconnect = T); rm(con); closeAllConnections()
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 
 tac <- Sys.time()
