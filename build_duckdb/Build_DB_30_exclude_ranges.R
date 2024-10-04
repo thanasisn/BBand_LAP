@@ -194,8 +194,7 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 {
   minday <- tbl(con, "META") |>
     select(Day) |>
-    to_arrow() |>
-    summarise(min(Day)) |>
+    summarise(min(Day, na.rm = TRUE)) |>
     collect() |>
     pull()
   alldays <- data.table(Day = seq(minday, Sys.Date(), by = "day"))
@@ -293,11 +292,11 @@ rm(temp_flag)
 
 ## TODO use ENUM for factors
 
-left_join(
-  tbl(con, "LAP") |> select(Date),
-  temp_flag,
-  copy = T
-) |> select(cm21_bad_data_flag) |> distinct()
+# left_join(
+#   tbl(con, "LAP") |> select(Date),
+#   temp_flag,
+#   copy = T
+# ) |> select(cm21_bad_data_flag) |> distinct()
 
 
 
@@ -306,18 +305,29 @@ tbl(con, "LAP") |>
   tally()
 
 tbl(con, "LAP") |>
+  group_by(chp1_bad_data_flag) |>
+  tally()
+
+
+
+tbl(con, "LAP") |>
   group_by(cm21_sig_limit_flag) |>
   tally()
 
-test <- tbl(con, "LAP") |>
-  filter(is.na(cm21_sig_limit_flag)) |> collect()
-
-dd <- tbl(con, "LAP")  |> select(Date) |> collect() |> pull() |> range()
-
-temp_flag[Date > dd[1] & Date < dd[2]]
+tbl(con, "LAP") |>
+  group_by(chp1_sig_limit_flag) |>
+  tally()
 
 
-# dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+# test <- tbl(con, "LAP") |>
+#   filter(is.na(cm21_sig_limit_flag)) |> collect()
+#
+# dd <- tbl(con, "LAP")  |> select(Date) |> collect() |> pull() |> range()
+#
+# temp_flag[Date > dd[1] & Date < dd[2]]
+
+
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 
 

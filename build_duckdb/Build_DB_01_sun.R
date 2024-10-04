@@ -195,7 +195,7 @@ tbl(con, "META") |> select(Day) |> distinct() |> tally()
 
 
 ## clean exit
-dbDisconnect(con); rm(con); closeAllConnections()
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
