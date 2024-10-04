@@ -168,25 +168,34 @@ if (nrow(inp_filelist) > 0) {
                             cm21_parsed   = Sys.time(),
                             cm21_md5sum   = as.vector(md5sum(ff$fullname)))
 
-    ## Add data
-    update_table(con      = con,
-                 new_data = day_data,
-                 table    = "LAP",
-                 matchvar = "Date")
-
-    ## Add metadata
-    if (!dbExistsTable(con, "META")) {
-      ## Create new table
-      cat("\n Initialize table 'META' \n\n")
-      dbWriteTable(con, "META", file_meta)
-      # db_create_index(con, "META", columns = "Day", unique = TRUE)
-    } else {
-      ## Append new data
+    ## Add data and metadata
+    {
       update_table(con      = con,
+                   new_data = day_data,
+                   table    = "LAP",
+                   matchvar = "Date")
+
+      ## Add metadata
+      if (!dbExistsTable(con, "META")) {
+        ## Create new table
+        cat("\n Initialize table 'META' \n\n")
+        dbWriteTable(con, "META", file_meta)
+        # db_create_index(con, "META", columns = "Day", unique = TRUE)
+      }
+      ## Append new data
+      res <- update_table(con      = con,
                    new_data = file_meta,
                    table    = "META",
                    matchvar = "Day")
 
+      stopifnot(res |> tally() |> pull() == 1)
+      stopifnot(!is.na(res |> select(Day) |> pull()))
+
+      # ## Append new data
+      # upsert_table(con      = con,
+      #              new_data = file_meta,
+      #              table    = "META",
+      #              matchvar = "Day")
 
       # res <- rows_update(x         = tbl(con, "META"),
       #                    y         = file_meta,
@@ -194,9 +203,7 @@ if (nrow(inp_filelist) > 0) {
       #                    unmatched = "ignore",
       #                    in_place  = TRUE,
       #                    copy      = TRUE)
-
     }
-
   }
 } else {
   cat(Script.ID, ": ", "No new files to add\n\n")
