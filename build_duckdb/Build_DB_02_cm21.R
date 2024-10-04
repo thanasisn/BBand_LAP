@@ -181,7 +181,7 @@ if (nrow(inp_filelist) > 0) {
 }
 
 ## clean exit
-dbDisconnect(con); rm(con); closeAllConnections()
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 ##  Checks  --------------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
@@ -206,7 +206,7 @@ stopifnot(
 
 
 ## clean exit
-dbDisconnect(con); rm(con); closeAllConnections()
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 
 if (FALSE) {
