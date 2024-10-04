@@ -14,7 +14,7 @@
 #+ echo=F, include=T
 
 #+ echo=F, include=F
-## __ Document options ---------------------------------------------------------
+## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
@@ -50,7 +50,7 @@ cat("\n Import  CHP-1  data\n\n")
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-##  Get CHP-1 files  --------------------------------------------------------
+##  Get CHP-1 files  -----------------------------------------------------------
 inp_filelist <- list.files(path        = SIRENA_DIR,
                            recursive   = TRUE,
                            pattern     = "[0-9]*03.LAP$",
