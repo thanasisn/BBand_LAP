@@ -27,6 +27,7 @@ knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_02_cm21.R"
@@ -182,6 +183,7 @@ if (nrow(inp_filelist) > 0) {
         dbWriteTable(con, "META", file_meta)
         # db_create_index(con, "META", columns = "Day", unique = TRUE)
       }
+
       ## Append new data
       res <- update_table(con      = con,
                    new_data = file_meta,

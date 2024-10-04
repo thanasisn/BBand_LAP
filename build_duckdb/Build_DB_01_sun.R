@@ -34,6 +34,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 
 ## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_01_sun.R"
@@ -128,6 +129,15 @@ SUN[, SZA   := 90 - Elevat]
 SUN[Azimuth <= 180, preNoon := TRUE ]
 SUN[Azimuth >  180, preNoon := FALSE]
 
+## Info
+cat(paste(
+  Script.ID,
+  ":",
+  unique(as.Date(SUN$Date)
+  )),
+  sep = "\n")
+
+##  Add data  ------------------------------------------------------------------
 if (!dbExistsTable(con, "LAP")) {
   ## Create new table
   cat("\n Initialize table 'LAP' \n\n")
@@ -160,7 +170,6 @@ tbl(con, "LAP") |> glimpse()
 SUN             |> tally()
 SUN             |> glimpse()
 tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> range()
-
 
 
 
