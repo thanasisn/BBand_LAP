@@ -16,7 +16,6 @@
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
 #'
-#'
 #+ echo=F, include=T
 
 
@@ -63,25 +62,8 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 
 
-
-make_new_column <- function(con, table, acolname, acoltype) {
-
-  if (any(dbListFields(con, table) %in% acolname)) {
-    warning("Column ", acolname, " already exist!")
-    return()
-  } else {
-    ## create new columns with a query
-    qq <- paste("ALTER TABLE", table,
-                "ADD COLUMN",  acolname,  acoltype, "DEFAULT null")
-    res <- dbSendQuery(con, qq)
-  }
-}
-
-
-
 make_new_column(con, "META", "cm21_dark_flag", "DATE")
 
-make_empty_column(con, "META", "cm21_dark_flag", "character")
 
 
 
@@ -247,8 +229,6 @@ for (af in filelist$names) {
     write_parquet(x = datapart, sink = af)
     write_parquet(BB_meta, DB_META_fl)
     cat("42 Save: ", af, "\n\n")
-    ## clean
-    rm(datapart)
 }
 
 

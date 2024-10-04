@@ -104,7 +104,8 @@ inp_filelist <- right_join(inp_filelist,
 
 
 ## add only files not in the metadata
-if (dbExistsTable(con, "META")) {
+if (dbExistsTable(con, "META") &
+    any(dbListFields(con, "META") %in% "cm21_basename")) {
   inp_filelist <- anti_join(inp_filelist,
                             tbl(con, "META") |>
                               filter(!is.na(cm21_basename)) |>
@@ -113,6 +114,7 @@ if (dbExistsTable(con, "META")) {
                             by = "Day") |>
     filter(!is.na(cm21_basename))
 }
+
 
 
 ## parse all files
@@ -185,26 +187,11 @@ if (nrow(inp_filelist) > 0) {
       }
 
       ## Append new data
-      res <- update_table(con      = con,
+      update_table(con      = con,
                    new_data = file_meta,
                    table    = "META",
                    matchvar = "Day")
 
-      stopifnot(res |> tally() |> pull() == 1)
-      stopifnot(!is.na(res |> select(Day) |> pull()))
-
-      # ## Append new data
-      # upsert_table(con      = con,
-      #              new_data = file_meta,
-      #              table    = "META",
-      #              matchvar = "Day")
-
-      # res <- rows_update(x         = tbl(con, "META"),
-      #                    y         = file_meta,
-      #                    by        = "Day",
-      #                    unmatched = "ignore",
-      #                    in_place  = TRUE,
-      #                    copy      = TRUE)
     }
   }
 } else {
@@ -226,17 +213,14 @@ stopifnot(
 )
 
 
-A <- tbl(con, "LAP")  |> filter(!is.na(CM21_sig))      |> distinct(Day) |> pull()
-B <- tbl(con, "META") |> filter(!is.na(cm21_basename)) |> distinct(Day) |> pull()
-
-
-test <- A[!A %in% B]
-B[!B %in% A]
-
-tbl(con, "LAP")  |> filter(Day %in% test)
-tbl(con, "META") |> filter(Day %in% test)
-
-
+# A <- tbl(con, "LAP")  |> filter(!is.na(CM21_sig))      |> distinct(Day) |> pull()
+# B <- tbl(con, "META") |> filter(!is.na(cm21_basename)) |> distinct(Day) |> pull()
+#
+# test <- A[!A %in% B]
+# B[!B %in% A]
+#
+# tbl(con, "LAP")  |> filter(Day %in% test)
+# tbl(con, "META") |> filter(Day %in% test)
 
 
 ## clean exit
