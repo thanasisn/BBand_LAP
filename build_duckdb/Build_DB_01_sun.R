@@ -23,7 +23,6 @@
 #'
 #+ echo=F, include=T
 
-
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
@@ -32,36 +31,28 @@ knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
-
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_01_sun.R"
 Script.ID   <- "01"
-# renv::load("~/BBand_LAP")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
     sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
-source("~/CODE/FUNCTIONS/R/execlock.R")
 
-library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
-library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
-
 cat("\n Initialize DB and/or import Sun data\n\n")
-
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
@@ -74,8 +65,7 @@ setorder(SUN, Date)
 stopifnot(length(unique(SUN$Date)) == nrow(SUN))
 SUN <- SUN[as.Date(Date) >= DB_start_date, ]
 
-
-### FIXME TEST
+### FIXME this is for TEST
 {
   start_test <- as.Date("2020-01-01")
   end_test   <- start_test + 99
@@ -91,23 +81,10 @@ SUN <- SUN[as.Date(Date) >= DB_start_date, ]
   SUN <- SUN[Date < end_test & Date > start_test]
 }
 
-## Use epoch as key
-# SUN$Epoch <- as.integer(SUN$Date)
-# SUN$Date  <- NULL
-
-## Use date
+## Use date as integer
 SUN[, Date := round_date(Date, unit = "second")]
 
-## drop existing dates
-# if (dbExistsTable(con, "LAP")) {
-#   SUN <- anti_join(SUN,
-#             tbl(con, "LAP") |>
-#               select(Epoch) |>
-#               filter(!is.na(Epoch)) |>
-#               collect(),
-#             by = "Epoch")
-# }
-
+## select what is missing to add
 if (dbExistsTable(con, "LAP")) {
   SUN <- anti_join(SUN,
                    tbl(con, "LAP")        |>
@@ -117,7 +94,7 @@ if (dbExistsTable(con, "LAP")) {
                    by = "Date")
 }
 
-## create some nice vars
+##  Create some useful variables
 names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
 SUN <- SUN |> relocate(Date) |> data.table()
 SUN[, month := month(  as.POSIXct(SUN$Date, origin = "1970-01-01"))]
@@ -128,7 +105,7 @@ SUN[, SZA   := 90 - Elevat]
 SUN[Azimuth <= 180, preNoon := TRUE ]
 SUN[Azimuth >  180, preNoon := FALSE]
 
-## Info
+##  Info display
 cat(paste(
   Script.ID,
   ":",
@@ -152,16 +129,13 @@ if (!dbExistsTable(con, "LAP")) {
 
 ##  Create all corresponding metadata days
 if (!dbExistsTable(con, "META")) {
-  ## Create new table
-  cat("\n Initialize table 'META' \n\n")
 
   ## FIXME should be done in pure SQL
   init <- tbl(con, "LAP") |> select(Day) |> distinct() |> collect() |> data.table()
 
-  dbWriteTable(con, "META",
-               init)
+  dbWriteTable(con, "META", init)
 } else {
-  ## Add new dates
+  ##  Add new dates
   rows_insert(
     tbl(con, "META"),
     tbl(con, "LAP") |> select(Day) |> distinct(),
@@ -170,7 +144,6 @@ if (!dbExistsTable(con, "META")) {
     in_place = TRUE
   )
 }
-
 
 ##  Checks  --------------------------------------------------------------------
 stopifnot(tbl(con, "LAP") |> filter(is.na(Date))    |> collect() |> nrow() == 0)
@@ -183,7 +156,7 @@ if (all(tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> diff() == 1)) 
   stop("DATES NOT SORTED OR NOT REGULAR\n\n")
 }
 
-## Info
+## Info display
 tbl(con, "LAP") |> tally()
 tbl(con, "LAP") |> glimpse()
 
@@ -192,7 +165,6 @@ tbl(con, "META") |> select(Day)  |> collect() |> pull() |> range()
 
 tbl(con, "LAP")  |> select(Day) |> distinct() |> tally()
 tbl(con, "META") |> select(Day) |> distinct() |> tally()
-
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()

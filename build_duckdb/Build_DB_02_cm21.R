@@ -16,7 +16,6 @@
 #'
 #+ echo=F, include=T
 
-
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment    = ""      )
@@ -24,7 +23,6 @@ knitr::opts_chunk$set(dev        = "png"   )
 knitr::opts_chunk$set(out.width  = "100%"  )
 knitr::opts_chunk$set(fig.align  = "center")
 knitr::opts_chunk$set(fig.pos    = '!h'    )
-
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
@@ -38,21 +36,18 @@ if (!interactive()) {
     sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
-library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
-
 
 cat("\n Import  CM-21  data\n\n")
 
@@ -78,7 +73,6 @@ inp_filelist$Day <- as.Date(parse_date_time(
   "dmy"))
 setorder(inp_filelist, Day)
 cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
-
 
 ## keep only files which correspond to existing dates
 inp_filelist <- right_join(inp_filelist,
@@ -194,7 +188,6 @@ stopifnot(
   )
 )
 
-
 # A <- tbl(con, "LAP")  |> filter(!is.na(CM21_sig))      |> distinct(Day) |> pull()
 # B <- tbl(con, "META") |> filter(!is.na(cm21_basename)) |> distinct(Day) |> pull()
 #
@@ -204,10 +197,8 @@ stopifnot(
 # tbl(con, "LAP")  |> filter(Day %in% test)
 # tbl(con, "META") |> filter(Day %in% test)
 
-
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
-
 
 if (FALSE) {
 
@@ -224,7 +215,6 @@ if (FALSE) {
 
   # dd <- tbl(con, "META") |> collect() |> data.table()
 }
-
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
