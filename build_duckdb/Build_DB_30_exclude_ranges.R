@@ -260,9 +260,13 @@ update_table(con, temp_flag, "LAP", "Date")
 
 ## TODO use ENUM for factors
 
+left_join(
+  tbl(con, "LAP") |> select(Date),
+  temp_flag,
+  copy = T
+) |> select(cm21_bad_data_flag) |> distinct()
 
 
-tbl(con, "LAP") |> glimpse()
 
 tbl(con, "LAP") |>
   group_by(cm21_bad_data_flag) |>
@@ -272,6 +276,12 @@ tbl(con, "LAP") |>
   group_by(cm21_sig_limit_flag) |>
   tally()
 
+test <- tbl(con, "LAP") |>
+  filter(is.na(cm21_sig_limit_flag)) |> collect()
+
+dd <- tbl(con, "LAP")  |> select(Date) |> collect() |> pull() |> range()
+
+temp_flag[Date > dd[1] & Date < dd[2]]
 
 
 # dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
