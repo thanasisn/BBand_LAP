@@ -16,7 +16,7 @@
 #+ echo=F, include=T
 
 #+ echo=F, include=F
-## __ Document options ---------------------------------------------------------
+## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
@@ -117,7 +117,7 @@ if (nrow(inp_filelist) > 0) {
                      length.out = 1440,
                      by         = "min")
 
-    ## __  Read tracker sync file  -------------------------------------
+    ## __  Read tracker sync file  ---------------------------------------------
     ## TODO we should use step files as more reliable to detect async events!!!
     syc_temp    <- read.table(ff$fullname, sep = "\t", as.is = TRUE, na.strings = "None")
     ## get dates from file

@@ -16,7 +16,7 @@
 #+ echo=F, include=T
 
 #+ echo=F, include=F
-## __ Document options ---------------------------------------------------------
+## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
@@ -54,7 +54,7 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK))
 ##  Create a dummy column if not existing
 make_new_column(con, "META", "cm21_dark_flag", "character")
 
-## Create a dark construct!  ---------------------------------------------------
+##  Create a dark construct!  --------------------------------------------------
 ## create construct if are available data
 vddays <- tbl(con, "META") |> filter(!is.na(cm21_dark_flag)) |> tally() |> pull()
 if (vddays > 100) {
@@ -121,7 +121,7 @@ for (ad in dayslist) {
     next()
   }
 
-  ## __ Compute dark values for day  -------------------------------------
+  ## __ Compute dark values for day  -------------------------------------------
   dark_day <- dark_calculations_2(
     dates      = daydata$Date,
     values     = daydata$CM21_sig,
@@ -130,7 +130,7 @@ for (ad in dayslist) {
     dstretch   = DSTRETCH
   )
 
-  ## __ Resolve problematic dark calculations ----------------------------
+  ## __ Resolve problematic dark calculations  ---------------------------------
   ## no data to use
   if (all(is.na(daydata$CM21_sig))) {
     dark_flag              <- "NO SIGNAL DATA"
@@ -159,7 +159,7 @@ for (ad in dayslist) {
       cat("Need to constract dark:", format(as.Date(aday)),"\n")
     }
   } else {
-    ## __ Dark Correction function for non missing  --------------------
+    ## __ Dark Correction function for non missing  ----------------------------
     dark_generator <- dark_function_2(dark_day    = dark_day,
                                       DCOUNTLIM   = DCOUNTLIM,
                                       type        = "median",
@@ -169,14 +169,14 @@ for (ad in dayslist) {
     dark_flag              <- "COMPUTED"
   }
 
-  ## __ Apply dark correction for the day  -------------------------------
+  ## __ Apply dark correction for the day  -------------------------------------
   daydata[, CM21_sig_wo_dark := CM21_sig - todays_dark_correction]
 
-  ## __ Convert signal to radiation --------------------------------------
+  ## __ Convert signal to radiation  -------------------------------------------
   daydata[, GLB_wpsm    := CM21_sig_wo_dark * cm21factor(Date)]
   daydata[, GLB_SD_wpsm := CM21_sig_sd      * cm21factor(Date)]
 
-  ## __ Day stats --------------------------------------------------------
+  ## __ Day stats  -------------------------------------------------------------
   names(dark_day) <- paste0("cm21_", names(dark_day))
   meta_day <- data.frame(Day                = as.Date(ad),
                          cm21_Daily_dark    = mean(todays_dark_correction, na.rm = T),

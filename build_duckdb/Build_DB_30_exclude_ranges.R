@@ -19,14 +19,14 @@
 
 
 #+ echo=F, include=F
-## __ Document options __ ------------------------------------------------------
+## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
-## __ Set environment __ -------------------------------------------------------
+## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R"
@@ -38,7 +38,7 @@ if (!interactive()) {
     sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-## __ Load libraries __ --------------------------------------------------------
+## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
@@ -52,7 +52,7 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 
-## Load CHP-1 exclusions -------------------------------------------------------
+## Load CHP-1 exclusions  ------------------------------------------------------
 chp1_exclude_mtime <- file.mtime(CHP1_EXCLUDE)
 ranges_CHP1        <- read.table(CHP1_EXCLUDE,
                                  sep          = ";",
@@ -93,7 +93,7 @@ cat("\n\n\\normalsize\n\n")
 
 
 
-## Load CHP-1 temperature exclusions -------------------------------------------
+##  Load CHP-1 temperature exclusions  -----------------------------------------
 chp1_temp_exclude_mtime <- file.mtime(CHP1_TEMP_EX)
 ranges_CHP1_temp        <- read.table(CHP1_TEMP_EX,
                                 sep          = ";",
@@ -135,7 +135,7 @@ cat("\n\n\\normalsize\n\n")
 
 
 
-## Load CM-21 exclusions -------------------------------------------------------
+##  Load CM-21 exclusions  -----------------------------------------------------
 cm21_exclude_mtime <- file.mtime(CM21_EXCLUDE)
 ranges_CM21        <- read.table(CM21_EXCLUDE,
                                  sep          = ";",
@@ -221,7 +221,7 @@ ranges_CM21$HourSpan <- NULL
 
 
 
-## _ CM-21 flag data -------------------------------------------------------
+## _ CM-21 flag data  ----------------------------------------------------------
 
 ##  create exclusion table
 ##  FIXME make it vectorized somehow
@@ -245,7 +245,7 @@ update_table(con, temp_flag, "LAP", "Date")
 rm(temp_flag)
 
 
-## _ CHP-1 flag data -------------------------------------------------------
+## _ CHP-1 flag data  ----------------------------------------------------------
 
 ##  create exclusion table
 ##  FIXME make it vectorized somehow
@@ -269,7 +269,7 @@ update_table(con, temp_flag, "LAP", "Date")
 rm(temp_flag)
 
 
-## _ CHP-1 flag temperature data -----------------------------------------------
+## _ CHP-1 flag temperature data  ----------------------------------------------
 
 ##  create exclusion table
 ##  FIXME make it vectorized somehow
@@ -352,7 +352,6 @@ tbl(con, "LAP") |>
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 
-## __ Execution Unlock __ ------------------------------------------------------
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),

@@ -14,7 +14,7 @@
 #+ echo=F, include=T
 
 #+ echo=F, include=F
-## __ Document options ---------------------------------------------------------
+## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
@@ -50,7 +50,7 @@ cat("\n Import  CHP-1 temperature data\n\n")
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-##  Get tracker sync files  --------------------------------------------------------
+##  Get tracker sync files  ----------------------------------------------------
 inp_filelist <- list.files(path        = CHPTMP_DIR,
                            recursive   = TRUE,
                            pattern     = "sun_tracker_.*.therm$",,
@@ -104,7 +104,7 @@ if (nrow(inp_filelist) > 0) {
         paste(ff$Day),
         ll,"/",nrow(inp_filelist), "\n")
 
-    ## __  Read CHP-1 temperature file  --------------------------------
+    ## __  Read CHP-1 temperature file  ----------------------------------------
     temp_temp    <- read.table(ff$fullname, sep = "\t", as.is = TRUE)
     temp_temp$V1 <- as.POSIXct(temp_temp$V1)
     temp_temp$V1 <- as.POSIXct(format(temp_temp$V1, format = "%F %R"))
@@ -133,7 +133,7 @@ if (nrow(inp_filelist) > 0) {
                             chp1_temp_md5sum   = as.vector(md5sum(ff$fullname)))
 
 
-    ## _ CHP-1 flag temperature physical limits --------------------------------
+    ## _ CHP-1 flag temperature physical limits  -------------------------------
 
     ## NAN to NA
     day_data <- day_data |>
