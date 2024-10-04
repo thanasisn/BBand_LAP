@@ -191,7 +191,6 @@ if (nrow(inp_filelist) > 0) {
   cat(Script.ID, ": ", "No new files to add\n\n")
 }
 
-
 if (interactive()) {
 
   tbl(con, "LAP")  |> glimpse()
