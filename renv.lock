@@ -170,13 +170,13 @@
     },
     "askpass": {
       "Package": "askpass",
-      "Version": "1.2.1",
+      "Version": "1.2.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "sys"
       ],
-      "Hash": "c39f4155b3ceb1a9a2799d700fbd4b6a"
+      "Hash": "cad6cf7f1d5f6e906700b9d3e718c796"
     },
     "assertthat": {
       "Package": "assertthat",
@@ -326,18 +326,18 @@
     },
     "colorout": {
       "Package": "colorout",
-      "Version": "1.3-2",
+      "Version": "1.3-1",
       "Source": "GitHub",
       "OS_type": "unix",
       "RemoteType": "github",
       "RemoteUsername": "jalvesaq",
       "RemoteRepo": "colorout",
-      "RemoteSha": "6eca95213c6cb2fae1c2c4eaccf43de4c93a65b5",
+      "RemoteSha": "910592d576b4c9b43b323b8514c0428b27a29f00",
       "RemoteHost": "api.github.com",
       "Requirements": [
         "utils"
       ],
-      "Hash": "402f6ca94ed731e79e5b1748662f44f8"
+      "Hash": "981c25702045954bb9ad33d036fceea7"
     },
     "colorspace": {
       "Package": "colorspace",
@@ -590,6 +590,16 @@
       ],
       "Hash": "15aeb8c27f5ea5161f9f6a641fafd93a"
     },
+    "funr": {
+      "Package": "funr",
+      "Version": "0.3.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "utils"
+      ],
+      "Hash": "a4ab8c91e32321f23aed7d3bf3721f36"
+    },
     "gdata": {
       "Package": "gdata",
       "Version": "3.0.0",
@@ -651,14 +661,14 @@
     },
     "glue": {
       "Package": "glue",
-      "Version": "1.8.0",
+      "Version": "1.7.0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "methods"
       ],
-      "Hash": "5899f1eaa825580172bb56c08266f37c"
+      "Hash": "e0b3a53876554bd45879e596cdb10a52"
     },
     "gridExtra": {
       "Package": "gridExtra",
@@ -1331,10 +1341,10 @@
     },
     "sys": {
       "Package": "sys",
-      "Version": "3.4.3",
+      "Version": "3.4.2",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "de342ebfebdbf40477d0758d05426646"
+      "Hash": "3a1be13d68d47a8cd0bfd74739ca1555"
     },
     "tibble": {
       "Package": "tibble",
@@ -1476,7 +1486,7 @@
     },
     "xfun": {
       "Package": "xfun",
-      "Version": "0.48",
+      "Version": "0.47",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1485,7 +1495,7 @@
         "stats",
         "tools"
       ],
-      "Hash": "89e455b87c84e227eb7f60a1b4e5fe1f"
+      "Hash": "36ab21660e2d095fef0d83f689e0477c"
     },
     "yaml": {
       "Package": "yaml",
