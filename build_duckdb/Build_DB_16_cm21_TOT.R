@@ -54,10 +54,10 @@ inp_filelist <- list.files(path        = SIRENA_TOT,
                            recursive   = TRUE,
                            pattern     = "[0-9]*\\TOT.*.dat",
                            ignore.case = TRUE,
-                           full.names  = TRUE )
-cat("\n**Found:",paste(length(inp_filelist), "TOT CM-21 files from Sirena**\n"))
+                           full.names  = TRUE)
+cat("\n**Found:", length(inp_filelist), "TOT CM-21 files from Sirena**\n")
 ## just in case, there are nested folders with more lap files in Sirens
-inp_filelist <- grep("OLD", inp_filelist, ignore.case = T, invert = T, value = T )
+inp_filelist <- grep("OLD", inp_filelist, ignore.case = T, invert = T, value = T)
 
 inp_filelist <- data.table(fullname = inp_filelist)
 inp_filelist[, tot_cm21_basename := basename(fullname)]
@@ -105,45 +105,38 @@ if (nrow(inp_filelist) > 0) {
         paste(ff$Day),
         ll,"/",nrow(inp_filelist), "\n")
 
+    ## __  Read TOT file  ----------------------------------------------
+    day_data <- fread(ff$fullname, na.strings = "-9")
 
+    if (dim(day_data)[1] != 1440) {
+      cat("** Can not parse file: ", basename(ff$fullname), "**\n")
+      warning("Can not parse file: ", basename(ff$fullname))
+      next()
+    }
 
+    dateess   <- paste(ff$Day, day_data$TIME_UT %/% 1, round((day_data$TIME_UT %% 1) * 60))
+    ## use the 30 second times stamp
+    day_data$Date <- as.POSIXct(strptime(dateess, "%F %H %M")) - 30
+    day_data[, TIME_UT := NULL]
+    names(day_data)[names(day_data) == "SZA"]     <- "lap_sza"
+    names(day_data)[names(day_data) == "[W.m-2]"] <- "tot_glb"
+    names(day_data)[names(day_data) == "st.dev"]  <- "tot_glb_sd"
+    day_data[tot_glb    < -8, tot_glb    := NA]
+    day_data[tot_glb_sd < -8, tot_glb_sd := NA]
 
+    stopifnot(is.numeric(day_data$tot_glb))
+    stopifnot(is.numeric(day_data$tot_glb_sd))
+    stopifnot(dim(day_data)[1] == 1440)
 
-    stop()
-
-    ## prepare input file data
-    suppressWarnings(rm(D_minutes))
-    D_minutes <- seq(from       = as.POSIXct(paste(as_date(ff$Day), "00:00:30"), tz = ""),
-                     length.out = 1440,
-                     by         = "min")
-
-    lap    <- fread(ff$fullname, na.strings = "-9")
-    lap$V1 <- as.numeric(lap$V1)
-    lap$V2 <- as.numeric(lap$V2)
-    stopifnot(is.numeric(lap$V1))
-    stopifnot(is.numeric(lap$V2))
-    stopifnot(dim(lap)[1] == 1440)
-    lap[V1 < -8, V1 := NA]
-    lap[V2 < -8, V2 := NA]
-
-
-
-
-    day_data <- data.table(Date        = D_minutes,      # Date of the data point
-                           CM21_sig    = lap$V1,         # Raw value for CM21
-                           CM21_sig_sd = lap$V2)         # Raw SD value for CM21
+    ## get metadata
+    file_meta <- data.table(Day                 = ff$Day,
+                            tot_cm21_basename   = basename(ff$fullname),
+                            tot_cm21_mtime      = file.mtime(ff$fullname),
+                            tot_cm21_parsed     = Sys.time(),
+                            tot_cm21_md5sum     = as.vector(md5sum(ff$fullname)))
 
     ## try to fix dates
     day_data[, Date := round_date(Date, unit = "second")]
-
-
-
-    ## meta data for file
-    file_meta <- data.table(Day           = ff$Day,
-                            cm21_basename = basename(ff$fullname),
-                            cm21_mtime    = file.mtime(ff$fullname),
-                            cm21_parsed   = Sys.time(),
-                            cm21_md5sum   = as.vector(md5sum(ff$fullname)))
 
     ## Add data and metadata
     {
@@ -171,84 +164,41 @@ if (nrow(inp_filelist) > 0) {
   cat(Script.ID, ": ", "No new files to add\n\n")
 }
 
+## all days should match
+stopifnot(
+  setequal(
+    tbl(con, "LAP")  |> filter(!is.na(tot_glb))           |> distinct(Day) |> pull(),
+    tbl(con, "META") |> filter(!is.na(tot_cm21_basename)) |> distinct(Day) |> pull()
+  )
+)
+
+# A <- tbl(con, "LAP")  |> filter(!is.na(tot_glb))      |> distinct(Day) |> pull()
+# B <- tbl(con, "META") |> filter(!is.na(tot_cm21_basename)) |> distinct(Day) |> pull()
+#
+# test <- A[!A %in% B]
+# B[!B %in% A]
+#
+# tbl(con, "LAP")  |> filter(Day %in% test)
+# tbl(con, "META") |> filter(Day %in% test)
 
 
+if (interactive()) {
 
+  fs::file_size(DB_DUCK)
 
+  tbl(con, "LAP")  |> colnames()
+  tbl(con, "META") |> colnames()
 
+  tbl(con, "LAP")  |> filter(!is.na(tot_glb)) |> glimpse()
 
+  tbl(con, "LAP")  |> filter(!is.na(tot_glb)) |> tally()
 
-for (YYYY in unique(year(inp_filelist$day))) {
-    subyear <- inp_filelist[year(day) == YYYY]
-    ## months to do
-    for (mm in subyear[, unique(month(day))]) {
-
-        ##  read this month set files
-        gathermeta <- data.table()
-        for (ad in submonth$day) {
-            ss <- submonth[day == ad]
-
-            ## __  Read TOT file  ----------------------------------------------
-            temp <- fread(ss$fullname, na.strings = "-9")
-
-            if (dim(temp)[1] != 1440) {
-                cat("** Can not parse file: ", basename(ss$fullname), "**\n")
-                warning("Can not parse file: ", basename(ss$fullname))
-                next()
-            }
-
-            dateess   <- paste(ss$day, temp$TIME_UT %/% 1, round((temp$TIME_UT %% 1) * 60))
-            ## use the 30 second times stamp
-            temp$Date <- as.POSIXct(strptime(dateess, "%F %H %M")) - 30
-            temp[, TIME_UT := NULL]
-            ## rename columns
-            names(temp)[names(temp) == "SZA"]     <- "lap_sza"
-            names(temp)[names(temp) == "[W.m-2]"] <- "tot_glb"
-            names(temp)[names(temp) == "st.dev"]  <- "tot_glb_sd"
-            ## deal with NAs
-            temp[tot_glb    < -8, tot_glb    := NA]
-            temp[tot_glb_sd < -8, tot_glb_sd := NA]
-
-            stopifnot(is.numeric(temp$tot_glb))
-            stopifnot(is.numeric(temp$tot_glb_sd))
-            stopifnot(dim(temp)[1] == 1440)
-
-            temp[, year  := as.integer(year(Date))]
-            temp[, month := as.integer(month(Date))]
-
-            ## get metadata
-            file_meta <- data.table(day                 = as_date(ad),
-                                    tot_cm21_basename   = basename(ss$fullname),
-                                    tot_cm21_mtime      = file.mtime(ss$fullname),
-                                    tot_cm21_parsed     = Sys.time(),
-                                    tot_cm21_md5sum     = as.vector(md5sum(ss$fullname)))
-
-            # gather <- rows_patch(gather, day_data, by = "Date")
-            # gather     <- rows_update(gather, day_data, by = "Date")
-            gather     <- rows_upsert(gather, temp, by = "Date")
-            gathermeta <- rbind(gathermeta, file_meta)
-            rm(temp, file_meta, ss )
-        }
-
-        if (nrow(gathermeta) == 0) {
-            cat("\nNo new files to import\n\n")
-            next()
-        }
-
-        BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
-        # BBdaily <- rows_patch(BBdaily, gathermeta, by = "day", unmatched = "ignore")
-
-        setorder(gather, Date)
-
-    }
+  # dd <- tbl(con, "META") |> collect() |> data.table()
 }
 
+## clean exit
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
-
-
-
-
-myunlock(DB_lock)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
