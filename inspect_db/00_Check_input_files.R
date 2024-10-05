@@ -43,8 +43,6 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
-#'
 #' - Lists Sirena files
 #' - Lists Radmon files
 #' - Incremental Stores metadata for source files
@@ -77,7 +75,6 @@ if (!interactive()) {
     sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
-
 ## __ Load libraries  ----------------------------------------------------------
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
@@ -86,7 +83,6 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
-
 
 ##  CHP-1 raw data check  ------------------------------------------------------
 
@@ -112,15 +108,12 @@ radmon_files <- list.files(path        = RADMON_DIR,
                            ignore.case = TRUE,
                            full.names  = TRUE )
 
-
 ## __  Compare files between Radmon and Sirena  --------------------------------
 sir_names <- basename(sirena_files)
 rad_names <- basename(radmon_files)
 
-
 cat("\n**CHP-1:", paste(length(sirena_files), "files from Sirena**\n"))
 cat("\n**CHP-1:", paste(length(radmon_files), "files from Radmon**\n"))
-
 
 missing_from_sir <- rad_names[!rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
@@ -132,9 +125,6 @@ if (length(missing_from_sir) > 0) {
     cat("\nThere aren't any CHP-1 files in Radmon missing from Sirena\n\n")
 }
 rm(rad_names, radmon_files, sirena_files)
-
-
-
 
 ##  CM-21 raw data check  ------------------------------------------------------
 
@@ -161,15 +151,12 @@ radmon_files <- list.files(path        = RADMON_GLB,
                            ignore.case = TRUE,
                            full.names  = TRUE )
 
-
 ## __  Compare files between Radmon and Sirena  --------------------------------
 sir_names <- basename(sirena_files)
 rad_names <- basename(radmon_files)
 
-
 cat("\n**CM-21:", paste(length(sirena_files), "files from Sirena**\n"))
 cat("\n**CM-21:", paste(length(radmon_files), "files from Radmon**\n"))
-
 
 missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
@@ -181,10 +168,6 @@ if (length(missing_from_sir) > 0) {
     cat("\nThere aren't any CM-21 files in Radmon missing from Sirena\n\n")
 }
 rm(rad_names, radmon_files, sirena_files)
-
-
-
-
 
 ##  ECO-UVA raw data check  ----------------------------------------------------
 
@@ -211,15 +194,12 @@ radmon_files <- list.files(path        = RADMON_GLB,
                            ignore.case = TRUE,
                            full.names  = TRUE )
 
-
 ## __  Compare files between Radmon and Sirena  --------------------------------
 sir_names <- basename(sirena_files)
 rad_names <- basename(radmon_files)
 
-
 cat("\n**EKO:", paste(length(sirena_files), "files from Sirena**\n"))
 cat("\n**EKO:", paste(length(radmon_files), "files from Radmon**\n"))
-
 
 missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
@@ -231,10 +211,6 @@ if (length(missing_from_sir) > 0) {
     cat("\nThere aren't any EKO files in Radmon missing from Sirena\n\n")
 }
 rm(rad_names, radmon_files, sirena_files)
-
-
-
-
 
 ##  Checksum test  -------------------------------------------------------------
 
@@ -266,8 +242,6 @@ parthash <- melt(data = parthash,
                  na.rm = TRUE)
 parthash$variable <- NULL
 
-
-
 ## __ Update hash table  -------------------------------------------------------
 if (!file.exists(DB_HASH_fl)) {
     ## Nothing to compare to, just store the new table
@@ -278,7 +252,6 @@ if (!file.exists(DB_HASH_fl)) {
     ## read stored
     mainhash <- read_parquet(DB_HASH_fl)
 
-
     ## merge stored with current in DB
     parthash <- unique(rbind(parthash, mainhash))
     ## order to keep most resent afte deduplication
@@ -288,7 +261,6 @@ if (!file.exists(DB_HASH_fl)) {
 
     writePARQUET(x = parthash, sink = DB_HASH_fl)
 }
-
 
 ## __ Check duplicate hashes  --------------------------------------------------
 dups <- mainhash[duplicated(mainhash$md5sum)]
@@ -308,7 +280,6 @@ if (nrow(dups) > 0) {
     cat("\n**All checksum are unique**\n")
 }
 
-
 ## __ Check files with different hashes  ---------------------------------------
 tabs <- mainhash[, .N, by = basename]
 tabs <- tabs[N > 1, ]
@@ -325,8 +296,6 @@ if (nrow(tabs) > 0) {
 }
 
 
-
-
 ## TODO
 ## - list snc
 ## - list therm
@@ -334,11 +303,9 @@ if (nrow(tabs) > 0) {
 ## - more instruments
 
 
-
-#' **END**
-#+ include=T, echo=F
+#+ include=T, echo=F, results="asis"
 tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
 
