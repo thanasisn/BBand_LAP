@@ -82,7 +82,7 @@ library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 source("~/BBand_LAP/DEFINITIONS.R")
-source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 
 ##  CHP-1 raw data check  ------------------------------------------------------
 
