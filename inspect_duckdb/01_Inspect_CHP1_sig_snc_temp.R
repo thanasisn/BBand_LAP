@@ -109,18 +109,12 @@ cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-stop()
-
 ## years in the data base
-datayears <- opendata() |>
-    filter(!is.na(CHP1_sig)) |>
-    select(year) |>
-    unique()     |>
-    collect()    |>
-    pull()
-
-BB_meta   <- read_parquet(DB_META_fl)
-
+datayears <- tbl(con, "LAP") |>
+  filter(!is.na(CHP1_sig))   |>
+  select(year)               |>
+  distinct()                 |>
+  pull()
 
 ## TODO compare output files with parsed dates from meta
 years_to_do <- datayears
@@ -149,7 +143,6 @@ years_to_do <- datayears
 #'
 #' This is just a report it doesn't alter the data.
 #'
-#'
 
 #+ include=TRUE, echo=FALSE, results="asis"
 for (YYYY in sort(years_to_do)) {
@@ -163,9 +156,8 @@ for (YYYY in sort(years_to_do)) {
     cat("\n## Year:", YYYY, "\n\n")
 
     ## load data for year
-    year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
+    year_data <- tbl(con, "LAP") |> filter(year == YYYY) |> collect() |> data.table()
     setorder(year_data, Date)
-
 
     ## Recording limits
     year_data[, sig_lowlim := chp1_signal_lower_limit(Date)]
@@ -205,7 +197,6 @@ for (YYYY in sort(years_to_do)) {
     empty_days <- days_of_year[!days_of_year %in% dwd]
     cat(format(empty_days), " ")
     cat("\n\n")
-
 
     ## Get outliers limits
     suppressWarnings({
@@ -256,7 +247,6 @@ for (YYYY in sort(years_to_do)) {
     cat(pander(summary(year_data[, .(Date, SZA, CHP1_sig, CHP1_sig_sd, Async_tracker_flag)])))
     cat('\n\n\\normalsize\n\n')
 
-
     hist(year_data$CHP1_sig,
          breaks = 50,
          main   = paste("CHP1 signal ",  YYYY))
@@ -264,14 +254,12 @@ for (YYYY in sort(years_to_do)) {
     abline(v = yearlims[ an == "CHP1_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
-
     hist(year_data$CHP1_sig_sd,
          breaks = 50,
          main   = paste("CHP1 signal SD", YYYY))
     abline(v = yearlims[ an == "CHP1_sig_sd", low], lty = 3, col = "red")
     abline(v = yearlims[ an == "CHP1_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
-
 
     plot(year_data$Elevat, year_data$CHP1_sig,
          pch  = 19,
@@ -282,7 +270,6 @@ for (YYYY in sort(years_to_do)) {
     points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
     cat('\n\n')
-
 
     plot(year_data$Date, year_data$CHP1_sig,
          pch  = 19,
@@ -296,7 +283,6 @@ for (YYYY in sort(years_to_do)) {
     abline(h = yearlims[ an == "CHP1_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
-
     plot(year_data$Elevat, year_data$CHP1_sig_sd,
          pch  = 19,
          cex  = .1,
@@ -306,7 +292,6 @@ for (YYYY in sort(years_to_do)) {
     abline(h = yearlims[ an == "CHP1_sig_sd", low], lty = 3, col = "red")
     abline(h = yearlims[ an == "CHP1_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
-
 
     all    <- cumsum(tidyr::replace_na(year_data$CHP1_sig, 0))
     pos    <- year_data[ CHP1_sig > 0 ]
@@ -337,7 +322,6 @@ for (YYYY in sort(years_to_do)) {
            col = c("blue", "red", "black"))
     cat('\n\n')
 
-
     all    <- cumsum(tidyr::replace_na(year_data$CHP1_sig_sd, 0))
     pos    <- year_data[ CHP1_sig > 0 ]
     pos$V1 <- cumsum(tidyr::replace_na(pos$CHP1_sig_sd, 0))
@@ -366,7 +350,6 @@ for (YYYY in sort(years_to_do)) {
            lty = 1, bty = "n", cex = 0.8,
            col = c("red", "blue", "black"))
     cat('\n\n')
-
 
     month_vec <- strftime(  year_data$Date, format = "%m")
     dd        <- aggregate( year_data[, .(CHP1_sig, CHP1_sig_sd, Elevat, Azimuth)],
@@ -397,7 +380,6 @@ for (YYYY in sort(years_to_do)) {
     # boxplot(year_data$Azimuth ~ month_vec )
     # title(main = paste("Azimuth by month", YYYY) )
     # cat('\n\n')
-
 
     if (year_data[!is.na(chp1_temperature), .N] > 0) {
         cat("\n\n\\FloatBarrier\n\n")
@@ -468,15 +450,12 @@ for (YYYY in sort(years_to_do)) {
 
 }
 
+## clean exit
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
-
-
-
-#' **END**
-#+ include=T, echo=F
-# myunlock(DB_lock)
+#+ include=T, echo=F, results="asis"
 tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
 
