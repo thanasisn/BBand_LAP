@@ -14,7 +14,7 @@
 #+ echo=F, include=T
 
 #+ echo=F, include=F
-## __ Document options  --------------------------------------------------------
+## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
@@ -22,7 +22,6 @@ knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 ## __ Set environment  ---------------------------------------------------------
-closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_02_cm21.R"
@@ -35,7 +34,6 @@ if (!interactive()) {
 
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
-source("~/CODE/FUNCTIONS/R/execlock.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
