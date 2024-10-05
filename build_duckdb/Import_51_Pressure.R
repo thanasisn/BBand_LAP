@@ -52,7 +52,6 @@ cat("\n Import  Pressure  data\n\n")
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 ##  Load all Pressure data  ----------------------------------------------------
-if (!file.exists(COMP_PRES)) { stop("Missing Pressure file:", COMP_PRES) }
 PRESSURE <- data.table(readRDS(COMP_PRES))
 
 if (second(PRESSURE$Date[1]) == 0) {
