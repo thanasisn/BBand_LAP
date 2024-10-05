@@ -107,7 +107,7 @@ if (nrow(inp_filelist) > 0) {
         paste(ff$Day),
         ll,"/",nrow(inp_filelist), "\n")
 
-    ## prepare input file data
+    ## __ Read CM-21 LAP file  ----------------------------------------------
     suppressWarnings(rm(D_minutes))
     D_minutes <- seq(from       = as.POSIXct(paste(as_date(ff$Day), "00:00:30"), tz = ""),
                      length.out = 1440,
@@ -172,12 +172,6 @@ if (nrow(inp_filelist) > 0) {
 } else {
   cat(Script.ID, ": ", "No new files to add\n\n")
 }
-
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
-
-##  Checks  --------------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 ## all days should match
 stopifnot(
