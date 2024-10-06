@@ -103,7 +103,7 @@ update_table <- function(con, new_data, table, matchvar) {
 
 
 
-insert_table <- function(con,  new_data, table, matchvar) {
+insert_table <- function(con,  new_data, table, matchvar, conflict) {
 
   create_missing_columns(con      = con,
                          new_data = new_data,
@@ -112,7 +112,7 @@ insert_table <- function(con,  new_data, table, matchvar) {
   res <- rows_insert(x        = tbl(con, table),
                      y        = new_data,
                      by       = matchvar,
-                     conflict = "ignore",
+                     conflict = conflict,
                      in_place = TRUE,
                      copy     = TRUE)
   return(res)
@@ -133,4 +133,5 @@ upsert_table <- function(con,  new_data, table, matchvar) {
                      copy     = TRUE)
   return(res)
 }
+
 
