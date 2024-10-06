@@ -12,9 +12,7 @@ Copyright 2016 Athanasios Natsis <natsisthanasis@gmail.com>
 
 # load necessary modules
 import datetime
-import warnings
 import sys
-
 
 # load parameters from file
 sys.path.append('/home/athan/Aerosols/source_Python')
