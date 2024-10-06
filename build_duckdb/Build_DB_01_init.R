@@ -57,7 +57,81 @@ cat("\n Initialize DB and/or import Sun data\n\n")
 con <- dbConnect(duckdb(dbdir = DB_DUCK))
 sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
-tbl(sun, "params")
+
+## TEST
+con <- dbConnect(duckdb(dbdir = "~/ZHOST/test.duckdb"))
+##  Get Astropy data  ----------------------------------------------------------
+SUN <- tbl(sun, "params") |>
+  filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
+  select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist)  |>
+  rename(Azimuth          = "AsPy_Azimuth")              |>
+  rename(Sun_Dist_Astropy = "AsPy_Dist")                 |>
+  rename(Elevat           = "AsPy_Elevation")
+
+## select what is missing to add
+if (dbExistsTable(con, "LAP")) {
+  SUN <- anti_join(SUN,
+                   tbl(con, "LAP")        |>
+                     select(Date)         |>
+                     filter(!is.na(Date)) |>
+                     collect(),
+                   by = "Date")
+}
+
+##  Create some useful variables
+SUN <- SUN |> mutate(
+  month   = as.integer(month(Date)),
+  year    = as.integer(year(Date)),
+  doy     = as.integer(yday(Date)),
+  Day     = as.Date(Date),
+  SZA     = 90 - Elevat,
+  preNoon = case_when(
+    Azimuth <= 180 ~ TRUE,
+    Azimuth >  180 ~ FALSE
+  )
+)
+
+##  Info display
+cat(paste(
+  Script.ID,
+  ":",
+  SUN |> distinct(Day) |> tally() |> pull(),
+  "New days"),
+  sep = "\n")
+
+##  Add data  ------------------------------------------------------------------
+if (!dbExistsTable(con, "LAP")) {
+  ## Create new table
+  cat("\n Initialize table 'LAP' \n\n")
+  dbWriteTable(con, "LAP", SUN)
+  ## indexing will block drop of columns for now!!
+  # db_create_index(con, "LAP", columns = "Date", unique = TRUE)
+} else {
+  ## Append new data
+  cat("\n Add data to 'LAP' \n\n")
+  dbWriteTable(con, "LAP", SUN, append = TRUE)
+}
+
+##  Create all corresponding metadata days
+if (!dbExistsTable(con, "META")) {
+
+  ## FIXME should be done in pure SQL
+  init <- tbl(con, "LAP") |> select(Day) |> distinct() |> collect() |> data.table()
+
+  dbWriteTable(con, "META", init)
+} else {
+  ##  Add new dates
+  rows_insert(
+    tbl(con, "META"),
+    tbl(con, "LAP") |> select(Day) |> distinct(),
+    by = "Day",
+    conflict = "ignore",
+    in_place = TRUE
+  )
+}
+
+
+
 
 
 stop()
@@ -171,7 +245,9 @@ if (interactive()) {
 }
 
 ## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
+dbDisconnect(sun, shutdown = TRUE); rm("sun"); closeAllConnections()
+
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
