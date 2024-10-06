@@ -83,12 +83,10 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 panderOptions("table.alignment.default", "right")
 panderOptions("table.split.table",        120   )
 
-
 ## __  Variables  --------------------------------------------------------------
 OutliersPlot <- 4
 CLEAN        <- TRUE
 # CLEAN        <- FALSE
-
 
 ## __ Execution control  -------------------------------------------------------
 ## When knitting
@@ -156,6 +154,7 @@ for (YYYY in sort(years_to_do)) {
     cat("\n## Year:", YYYY, "\n\n")
 
     ## load data for year
+    ## FIXME this draws all data in memory, could use only database
     year_data <- tbl(con, "LAP") |> filter(year == YYYY) |> collect() |> data.table()
     setorder(year_data, Date)
 
@@ -167,24 +166,28 @@ for (YYYY in sort(years_to_do)) {
     if (CLEAN) {
         year_data[!is.na(CHP1_sig), .N]
         cat("\nRemove bad data regions\n")
-        cat(year_data[!is.na(chp1_bad_data_flag), .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+        cat(year_data[!is.na(chp1_bad_data_flag), .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
         year_data$CHP1_sig   [!is.na(year_data$chp1_bad_data_flag)] <- NA
         year_data$CHP1_sig_sd[!is.na(year_data$chp1_bad_data_flag)] <- NA
 
         cat("\nRemove tracker async cases\n")
-        cat(year_data[Async_tracker_flag == TRUE, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
+        cat(year_data[Async_tracker_flag == TRUE, .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
         year_data$CHP1_sig   [year_data$Async_tracker_flag == TRUE] <- NA
         year_data$CHP1_sig_sd[year_data$Async_tracker_flag == TRUE] <- NA
 
         cat("\nRemove data above physical limits\n")
-        cat(year_data[CHP1_sig > sig_upplim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CHP1_sig   [year_data$CHP1_sig > year_data$sig_upplim] <- NA
-        year_data$CHP1_sig_sd[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+        cat(year_data[chp1_sig_limit_flag == 2, .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
+        # year_data$CHP1_sig   [year_data$CHP1_sig > year_data$sig_upplim] <- NA
+        # year_data$CHP1_sig_sd[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+        year_data[chp1_sig_limit_flag == 2, CHP1_sig    := NA ]
+        year_data[chp1_sig_limit_flag == 2, CHP1_sig_sd := NA ]
 
         cat("\nRemove data below physical limits\n")
-        cat(year_data[CHP1_sig < sig_lowlim, .N], year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CHP1_sig   [year_data$CHP1_sig < year_data$sig_lowlim] <- NA
-        year_data$CHP1_sig_sd[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+        cat(year_data[chp1_sig_limit_flag == 1, .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
+        # year_data$CHP1_sig   [year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+        # year_data$CHP1_sig_sd[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+        year_data[chp1_sig_limit_flag == 1, CHP1_sig    := NA ]
+        year_data[chp1_sig_limit_flag == 1, CHP1_sig_sd := NA ]
 
         cat("\nRemove bad temperatrue data\n")
         year_data[!is.na(chp1_bad_temp_flag), chp1_temperature    := NA]
