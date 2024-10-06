@@ -76,6 +76,9 @@ if (!dbExistsTable(con, "params")) {
   start_date <- tbl(con, "params") |> summarise(max(Date, na.rm = T)) |> pull()
   DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
   DT[ , Date := round_date(Date, unit = "second")]
+  if (nrow(DT) == 0) {
+    stop("No dates to add, exit!\n")
+  }
   cat(Script.ID, ": Dates", paste(range(DT$Date)), "\n")
   insert_table(con, DT, "params", "Date")
 }
