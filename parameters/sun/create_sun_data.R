@@ -66,6 +66,7 @@ if (!dbExistsTable(con, "params")) {
   ## Create all dates
   DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
   DT[ , Date := round_date(Date, unit = "second")]
+  setorder(DT, Date)
   cat(Script.ID, ": Dates", paste(range(DT$Date)), "\n")
   dbWriteTable(con, "params", DT)
 } else {
@@ -73,11 +74,13 @@ if (!dbExistsTable(con, "params")) {
   start_date <- tbl(con, "params") |> summarise(max(Date, na.rm = T)) |> pull()
   DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
   DT[ , Date := round_date(Date, unit = "second")]
-  if (nrow(DT) == 0) {
-    stop("No dates to add, exit!\n")
+  setorder(DT, Date)
+  if (nrow(DT) > 1) {
+    cat(Script.ID, ": Dates", paste(range(DT$Date)), "\n")
+    res <- insert_table(con, DT, "params", "Date")
+  } else {
+    cat("No new dates to add\n")
   }
-  cat(Script.ID, ": Dates", paste(range(DT$Date)), "\n")
-  insert_table(con, DT, "params", "Date")
 }
 
 ##  Compute Astropy data  ------------------------------------------------------
@@ -93,7 +96,7 @@ if (dbExistsTable(con, "params") &
   ## fill all dates
   while (tbl(con, "params") |> filter(is.na(AsPy_Elevation)) |> tally() |> pull() > 0) {
     ## batch to fill
-    dates_to_do <- tbl(con, "params") |> filter(is.na(AsPy_Elevation)) |> select(Date) |> pull()
+    dates_to_do <- tbl(con, "params") |> filter(is.na(AsPy_Elevation)) |> select(Date) |> pull() |> sort()
     dates_to_do <- data.table::first(dates_to_do, memlimit)
 
     cat(Script.ID, ": Astropy", paste(range(dates_to_do)), "\n")
@@ -127,7 +130,7 @@ if (dbExistsTable(con, "params") &
   ##  Put in the data base
   update_table(con, month, "params", "Date")
 }
-rm(sun_vector())
+rm("sun_vector")
 
 ##  Compute Pysolar data  ------------------------------------------------------
 source_python("~/BBand_LAP/parameters/sun/sun_vector_pysolar_p3.py")
@@ -142,7 +145,7 @@ if (dbExistsTable(con, "params") &
   ## fill all dates
   while (tbl(con, "params") |> filter(is.na(PySo_Elevation)) |> tally() |> pull() > 0) {
     ## batch to fill
-    dates_to_do <- tbl(con, "params") |> filter(is.na(PySo_Elevation)) |> select(Date) |> pull()
+    dates_to_do <- tbl(con, "params") |> filter(is.na(PySo_Elevation)) |> select(Date) |> pull() |> sort()
     dates_to_do <- data.table::first(dates_to_do, memlimit)
 
     cat(Script.ID, ": Pysolar", paste(range(dates_to_do)), "\n")
@@ -174,7 +177,7 @@ if (dbExistsTable(con, "params") &
   ##  Put in the data base
   update_table(con, month, "params", "Date")
 }
-rm(sun_vector())
+rm("sun_vector")
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
