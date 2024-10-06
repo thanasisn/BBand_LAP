@@ -88,8 +88,11 @@ SUN <- SUN |> mutate(
   preNoon = case_when(
     Azimuth <= 180 ~ TRUE,
     Azimuth >  180 ~ FALSE
-  )
+  ) |>
+    arrange(Date)
 )
+
+
 
 ##  Info display
 cat(paste(
