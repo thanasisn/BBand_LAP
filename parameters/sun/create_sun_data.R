@@ -34,8 +34,8 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_01_sun.R"
-Script.ID   <- "01"
+Script.Name <- "~/BBand_LAP/parameters/sun/create_sun_data.R"
+Script.ID   <- "0A"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -44,6 +44,7 @@ if (!interactive()) {
 
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
@@ -54,15 +55,44 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Initialize DB and/or import Sun data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+con   <- dbConnect(duckdb(dbdir = DB_LAP))
 
-##  Get Astropy files  ---------------------------------------------------------
-SUN <- data.table(readRDS(ASTROPY_FL))
-names(SUN)[names(SUN) == "Dist"]      <- "Sun_Dist_Astropy"
-names(SUN)[names(SUN) == "Elevation"] <- "Elevat"
-setorder(SUN, Date)
-stopifnot(length(unique(SUN$Date)) == nrow(SUN))
-SUN <- SUN[as.Date(Date) >= DB_start_date, ]
+##  Initialize table with dates to fill
+start_date <- as.POSIXct("1992-01-01") + 30
+
+## TEST
+end_date   <- ceiling_date(as.POSIXct("1993-01-01 00:00"), unit = "month")
+# end_date   <- ceiling_date(Sys.time(), unit = "month")
+
+if (!dbExistsTable(con, "params")) {
+  cat("Initialize dates\n")
+  ## Create all dates
+  DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
+  DT[ , Date := round_date(Date, unit = "second")]
+  dbWriteTable(con, "params", DT)
+} else {
+  ## Extend days
+  stop("kkk")
+  start_date <- tbl(con, "params") |> summarise(max(Date, na.rm = T)) |> pull()
+  ## TEST
+  end_date  <- start_date + 60 * 10000
+  DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
+  DT[ , Date := round_date(Date, unit = "second")]
+
+  insert_table(con, DT, "params", "Date")
+
+
+}
+
+data.table(tbl(con, "params") |> collect())
+
+
+
+
+
+
+
+stop()
 
 ### FIXME this is for TEST
 {
