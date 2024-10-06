@@ -103,7 +103,7 @@ update_table <- function(con, new_data, table, matchvar) {
 
 
 
-insert_table <- function(con,  new_data, table, matchvar, conflict) {
+insert_table <- function(con,  new_data, table, matchvar) {
 
   create_missing_columns(con      = con,
                          new_data = new_data,
@@ -112,7 +112,7 @@ insert_table <- function(con,  new_data, table, matchvar, conflict) {
   res <- rows_insert(x        = tbl(con, table),
                      y        = new_data,
                      by       = matchvar,
-                     conflict = conflict,
+                     conflict = "ignore",  ## only option for duckdb
                      in_place = TRUE,
                      copy     = TRUE)
   return(res)
