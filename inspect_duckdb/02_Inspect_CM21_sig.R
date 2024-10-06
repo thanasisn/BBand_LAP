@@ -87,7 +87,7 @@ panderOptions("table.split.table",        120   )
 ## __  Variables  --------------------------------------------------------------
 OutliersPlot <- 4
 CLEAN        <- TRUE
-CLEAN        <- FALSE
+# CLEAN        <- FALSE
 
 
 ## __ Execution control  -------------------------------------------------------
@@ -155,9 +155,9 @@ for (YYYY in sort(years_to_do)) {
     cat("\n## Year:", YYYY, "\n\n")
 
     ## load data for year
-    year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
+    ## FIXME this draws all data in memory, could use only database
+    year_data <- tbl(con, "LAP") |> filter(year == YYYY) |> collect() |> data.table()
     setorder(year_data, Date)
-
 
     ## Recording limits
     year_data[, sig_lowlim := cm21_signal_lower_limit(Date)]
@@ -167,19 +167,24 @@ for (YYYY in sort(years_to_do)) {
     if (CLEAN) {
         year_data[!is.na(CM21_sig), .N]
         cat("\nRemove bad data regions\n")
-        cat(year_data[!is.na(cm21_bad_data_flag), .N], year_data[!is.na(CM21_sig), .N], "\n\n")
+        cat(year_data[!is.na(cm21_bad_data_flag), .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
         year_data$CM21_sig   [!is.na(year_data$cm21_bad_data_flag)] <- NA
         year_data$CM21_sig_sd[!is.na(year_data$cm21_bad_data_flag)] <- NA
 
         cat("\nRemove data above physical limits\n")
-        cat(year_data[CM21_sig > sig_upplim, .N], year_data[!is.na(CM21_sig), .N], "\n\n")
-        year_data$CM21_sig   [year_data$CM21_sig > year_data$sig_upplim] <- NA
-        year_data$CM21_sig_sd[year_data$CM21_sig > year_data$sig_upplim] <- NA
+        cat(year_data[cm21_sig_limit_flag == 2, .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
+        # year_data$CM21_sig   [year_data$CM21_sig > year_data$sig_upplim] <- NA
+        # year_data$CM21_sig_sd[year_data$CM21_sig > year_data$sig_upplim] <- NA
+        year_data[cm21_sig_limit_flag == 2, CM21_sig    := NA ]
+        year_data[cm21_sig_limit_flag == 2, CM21_sig_sd := NA ]
 
         cat("\nRemove data below physical limits\n")
-        cat(year_data[CM21_sig < sig_lowlim, .N], year_data[!is.na(CM21_sig), .N], "\n\n")
-        year_data$CM21_sig   [year_data$CM21_sig < year_data$sig_lowlim] <- NA
-        year_data$CM21_sig_sd[year_data$CM21_sig < year_data$sig_lowlim] <- NA
+        # cat(year_data[CM21_sig < sig_lowlim, .N], year_data[!is.na(CM21_sig), .N], "\n\n")
+        cat(year_data[cm21_sig_limit_flag == 2, .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
+        # year_data$CM21_sig   [year_data$CM21_sig < year_data$sig_lowlim] <- NA
+        # year_data$CM21_sig_sd[year_data$CM21_sig < year_data$sig_lowlim] <- NA
+        year_data[cm21_sig_limit_flag == 1, CM21_sig    := NA ]
+        year_data[cm21_sig_limit_flag == 1, CM21_sig_sd := NA ]
     }
 
     ## Missing days
@@ -188,7 +193,6 @@ for (YYYY in sort(years_to_do)) {
     empty_days <- days_of_year[!days_of_year %in% dwd]
     cat(format(empty_days), " ")
     cat("\n\n")
-
 
     ## Get outliers limits
     suppressWarnings({
@@ -239,7 +243,6 @@ for (YYYY in sort(years_to_do)) {
     cat(pander(summary(year_data[, .(Date, SZA, CM21_sig, CM21_sig_sd)])))
     cat('\n\n\\normalsize\n\n')
 
-
     hist(year_data$CM21_sig,
          breaks = 50,
          main   = paste("CM21 signal ",  YYYY))
@@ -247,14 +250,12 @@ for (YYYY in sort(years_to_do)) {
     abline(v = yearlims[ an == "CM21_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
-
     hist(year_data$CM21_sig_sd,
          breaks = 50,
          main   = paste("CM21 signal SD", YYYY))
     abline(v = yearlims[ an == "CM21_sig_sd", low], lty = 3, col = "red")
     abline(v = yearlims[ an == "CM21_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
-
 
     plot(year_data$Elevat, year_data$CM21_sig,
          pch  = 19,
@@ -265,7 +266,6 @@ for (YYYY in sort(years_to_do)) {
     points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
     cat('\n\n')
-
 
     plot(year_data$Date, year_data$CM21_sig,
          pch  = 19,
@@ -279,7 +279,6 @@ for (YYYY in sort(years_to_do)) {
     abline(h = yearlims[ an == "CM21_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
-
     plot(year_data$Elevat, year_data$CM21_sig_sd,
          pch  = 19,
          cex  = .1,
@@ -289,7 +288,6 @@ for (YYYY in sort(years_to_do)) {
     abline(h = yearlims[ an == "CM21_sig_sd", low], lty = 3, col = "red")
     abline(h = yearlims[ an == "CM21_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
-
 
     all    <- cumsum(tidyr::replace_na(year_data$CM21_sig, 0))
     pos    <- year_data[ CM21_sig > 0 ]
@@ -320,7 +318,6 @@ for (YYYY in sort(years_to_do)) {
            col = c("blue", "red", "black"))
     cat('\n\n')
 
-
     all    <- cumsum(tidyr::replace_na(year_data$CM21_sig_sd, 0))
     pos    <- year_data[ CM21_sig > 0 ]
     pos$V1 <- cumsum(tidyr::replace_na(pos$CM21_sig_sd, 0))
@@ -350,7 +347,6 @@ for (YYYY in sort(years_to_do)) {
            col = c("red", "blue", "black"))
     cat('\n\n')
 
-
     month_vec <- strftime(  year_data$Date, format = "%m")
     dd        <- aggregate( year_data[, .(CM21_sig, CM21_sig_sd, Elevat, Azimuth)],
                             list(month_vec), FUN = summary, digits = 6 )
@@ -371,8 +367,6 @@ for (YYYY in sort(years_to_do)) {
     # title(main = paste("Azimuth by month", YYYY) )
     # cat('\n\n')
 
-
-
     ## __ Plots of exceptions for investigation  -------------------------------
 
     ## ____ 1995 ---------------------------------------------------------------
@@ -389,7 +383,6 @@ for (YYYY in sort(years_to_do)) {
         abline(v = signal_physical_limits$Date, lty = 3)
         cat('\n\n')
 
-
         part <- year_data[Date > as.POSIXct("1995-11-15") &
                           Date < as.POSIXct("1995-12-31") ]
         plot(  part$Date, part$CM21_sig,   pch = ".", ylim = c(-1,2))
@@ -402,7 +395,6 @@ for (YYYY in sort(years_to_do)) {
                pch = ".", col = "cyan")
         cat('\n\n')
     }
-
 
     ## ____ 1996 ---------------------------------------------------------------
     if (YYYY == 1996) {
@@ -483,10 +475,6 @@ for (YYYY in sort(years_to_do)) {
     }
 
 }
-
-
-
-
 
 #' **END**
 #+ include=T, echo=F

@@ -26,9 +26,6 @@ try({
                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
-
-
-
 try({
     cat("\n\n 1a. Inspect CHP-1 signal CLEAN\n")
     rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/01_Inspect_CHP1_sig_snc_temp.R",
