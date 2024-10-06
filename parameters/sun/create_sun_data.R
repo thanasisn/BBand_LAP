@@ -61,32 +61,26 @@ con   <- dbConnect(duckdb(dbdir = DB_LAP))
 
 ##  Initialize table with dates to fill  ---------------------------------------
 start_date <- as.POSIXct("1992-01-01") + 30
-memlimit   <- 1000
-
-## TEST
-end_date   <- ceiling_date(as.POSIXct("1993-01-01 00:00"), unit = "month")
-# end_date   <- ceiling_date(Sys.time(), unit = "month")
+memlimit   <- 6666   ## add data in batches
+end_date   <- ceiling_date(Sys.time(), unit = "month")
 
 if (!dbExistsTable(con, "params")) {
   cat("Initialize dates\n")
   ## Create all dates
   DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
   DT[ , Date := round_date(Date, unit = "second")]
+  cat(Script.ID, ": Dates", paste(range(DT$Date)), "\n")
   dbWriteTable(con, "params", DT)
 } else {
-  ## Extend days
+  ## Extend days, add from last date
   start_date <- tbl(con, "params") |> summarise(max(Date, na.rm = T)) |> pull()
-  ## TEST
-  end_date  <- start_date + 60 * 100
-
   DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
   DT[ , Date := round_date(Date, unit = "second")]
+  cat(Script.ID, ": Dates", paste(range(DT$Date)), "\n")
   insert_table(con, DT, "params", "Date")
 }
 
-
 ##  Compute Astropy data  ------------------------------------------------------
-
 source_python("~/BBand_LAP/parameters/sun/sun_vector_astropy_p3.py")
 ## Call pythons Astropy for sun distance calculation
 sunR_astropy <- function(date) {
@@ -96,17 +90,33 @@ sunR_astropy <- function(date) {
 
 if (dbExistsTable(con, "params") &
     any(dbListFields(con, "params") %in% "AsPy_Elevation")) {
-  tbl(con, "params") |> filter(is.na(cElevation))
+  ## fill all dates
+  while (tbl(con, "params") |> filter(is.na(AsPy_Elevation)) |> tally() |> pull() > 0) {
+    ## batch to fill
+    dates_to_do <- tbl(con, "params") |> filter(is.na(AsPy_Elevation)) |> select(Date) |> pull()
+    dates_to_do <- data.table::first(dates_to_do, memlimit)
 
+    cat(Script.ID, ": Astropy", paste(range(dates_to_do)), "\n")
+
+    ##  Calculate sun vector
+    sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
+    ##  reshape data
+    month <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
+                        AsPy_Elevation = unlist(sss$X2),
+                        AsPy_Dist      = unlist(sss$X3),
+                        Date           = as.POSIXct(unlist(sss$X4),
+                                                    origin = "1970-01-01"))
+    ##  Put in the data base
+    update_table(con, month, "params", "Date")
+  }
 } else {
-  stop("ddd")
-
+  ##  fill some days to initialize table
   dates_to_do <- tbl(con, "params") |> select(Date) |> pull()
   dates_to_do <- data.table::first(dates_to_do, memlimit)
 
   cat(Script.ID, ": Astropy", paste(range(dates_to_do)), "\n")
 
-  ##  Calculate sun distance for some dates
+  ##  Calculate sun vector
   sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
   ##  reshape data
   month <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
@@ -114,129 +124,57 @@ if (dbExistsTable(con, "params") &
                       AsPy_Dist      = unlist(sss$X3),
                       Date           = as.POSIXct(unlist(sss$X4),
                                                   origin = "1970-01-01"))
-
+  ##  Put in the data base
   update_table(con, month, "params", "Date")
+}
+rm(sun_vector())
 
+##  Compute Pysolar data  ------------------------------------------------------
+source_python("~/BBand_LAP/parameters/sun/sun_vector_pysolar_p3.py")
+## Call pythons Astropy for sun distance calculation
+sunR_pysolar <- function(date) {
+  # sun_vector( format(date) )
+  cbind(t(sun_vector(date)), date)
 }
 
+if (dbExistsTable(con, "params") &
+    any(dbListFields(con, "params") %in% "PySo_Elevation")) {
+  ## fill all dates
+  while (tbl(con, "params") |> filter(is.na(PySo_Elevation)) |> tally() |> pull() > 0) {
+    ## batch to fill
+    dates_to_do <- tbl(con, "params") |> filter(is.na(PySo_Elevation)) |> select(Date) |> pull()
+    dates_to_do <- data.table::first(dates_to_do, memlimit)
 
+    cat(Script.ID, ": Pysolar", paste(range(dates_to_do)), "\n")
 
-
-
-
-
-
-
-data.table(tbl(con, "params") |> collect())
-
-
-
-
-
-
-
-stop()
-
-### FIXME this is for TEST
-{
-  start_test <- as.Date("2020-01-01")
-  test_cnt   <- "~/ZHOST/.test_counter.Rds"
-  if (!file.exists(test_cnt)) {
-    sscn <- 1
-    saveRDS(sscn, test_cnt)
-  } else {
-    sscn <- readRDS(test_cnt) + 1
-    saveRDS(sscn, test_cnt)
+    ##  Calculate sun vector
+    sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
+    ##  reshape data
+    month <- data.frame(PySo_Azimuth   = unlist(sss$X1),
+                        PySo_Elevation = unlist(sss$X2),
+                        Date           = as.POSIXct(unlist(sss$X4),
+                                                    origin = "1970-01-01"))
+    ##  Put in the data base
+    update_table(con, month, "params", "Date")
   }
-  end_test <- start_test + 360 + sscn * 1
-  SUN <- SUN[Date < end_test & Date > start_test]
-}
-
-## Use date as integer
-SUN[, Date := round_date(Date, unit = "second")]
-
-## select what is missing to add
-if (dbExistsTable(con, "LAP")) {
-  SUN <- anti_join(SUN,
-                   tbl(con, "LAP")        |>
-                     select(Date)         |>
-                     filter(!is.na(Date)) |>
-                     collect(),
-                   by = "Date")
-}
-
-##  Create some useful variables
-names(SUN)[names(SUN) == "Dist"] <- "Sun_Dist_Astropy"
-SUN <- SUN |> relocate(Date) |> data.table()
-SUN[, month := month(  as.POSIXct(SUN$Date, origin = "1970-01-01"))]
-SUN[, year  := year(   as.POSIXct(SUN$Date, origin = "1970-01-01"))]
-SUN[, doy   := yday(   as.POSIXct(SUN$Date, origin = "1970-01-01"))]
-SUN[, Day   := as.Date(as.POSIXct(SUN$Date, origin = "1970-01-01"))]
-SUN[, SZA   := 90 - Elevat]
-SUN[Azimuth <= 180, preNoon := TRUE ]
-SUN[Azimuth >  180, preNoon := FALSE]
-
-##  Info display
-cat(paste(
-  Script.ID,
-  ":",
-  unique(as.Date(SUN$Date)
-  )),
-  sep = "\n")
-
-##  Add data  ------------------------------------------------------------------
-if (!dbExistsTable(con, "LAP")) {
-  ## Create new table
-  cat("\n Initialize table 'LAP' \n\n")
-  dbWriteTable(con, "LAP", SUN)
-  ## indexing will block drop of columns for now!!
-  # db_create_index(con, "LAP", columns = "Date", unique = TRUE)
 } else {
-  ## Append new data
-  cat("\n Add data to 'LAP' \n\n")
-  dbWriteTable(con, "LAP", SUN, append = TRUE)
+  ##  fill some days to initialize table
+  dates_to_do <- tbl(con, "params") |> select(Date) |> pull()
+  dates_to_do <- data.table::first(dates_to_do, memlimit)
+
+  cat(Script.ID, ": Pysolar", paste(range(dates_to_do)), "\n")
+
+  ##  Calculate sun vector
+  sss   <- data.frame(t(sapply(dates_to_do, sunR_pysolar )))
+  ##  reshape data
+  month <- data.frame(PySo_Azimuth   = unlist(sss$X1),
+                      PySo_Elevation = unlist(sss$X2),
+                      Date           = as.POSIXct(unlist(sss$X4),
+                                                  origin = "1970-01-01"))
+  ##  Put in the data base
+  update_table(con, month, "params", "Date")
 }
-
-##  Create all corresponding metadata days
-if (!dbExistsTable(con, "META")) {
-
-  ## FIXME should be done in pure SQL
-  init <- tbl(con, "LAP") |> select(Day) |> distinct() |> collect() |> data.table()
-
-  dbWriteTable(con, "META", init)
-} else {
-  ##  Add new dates
-  rows_insert(
-    tbl(con, "META"),
-    tbl(con, "LAP") |> select(Day) |> distinct(),
-    by = "Day",
-    conflict = "ignore",
-    in_place = TRUE
-  )
-}
-
-##  Checks  --------------------------------------------------------------------
-stopifnot(tbl(con, "LAP") |> filter(is.na(Date))    |> collect() |> nrow() == 0)
-stopifnot(tbl(con, "LAP") |> filter(is.na(Elevat))  |> collect() |> nrow() == 0)
-stopifnot(tbl(con, "LAP") |> filter(is.na(Azimuth)) |> collect() |> nrow() == 0)
-
-if (all(tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> diff() == 1)) {
-  cat("Dates are sorted and regular\n\n")
-} else {
-  stop("DATES NOT SORTED OR NOT REGULAR\n\n")
-}
-
-## Info display
-if (interactive()) {
-  tbl(con, "LAP") |> tally()
-  tbl(con, "LAP") |> glimpse()
-
-  tbl(con, "LAP")  |> select(Date) |> collect() |> pull() |> range()
-  tbl(con, "META") |> select(Day)  |> collect() |> pull() |> range()
-
-  tbl(con, "LAP")  |> select(Day) |> distinct() |> tally()
-  tbl(con, "META") |> select(Day) |> distinct() |> tally()
-}
+rm(sun_vector())
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
