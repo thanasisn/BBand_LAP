@@ -54,13 +54,14 @@ library(reticulate, warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 use_python("/usr/bin/python3")
 
-cat("\n Initialize DB and/or import Sun data\n\n")
+cat("\n Initialize params DB and/or import Sun data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_LAP))
 
 ##  Initialize table with dates to fill  ---------------------------------------
 start_date <- as.POSIXct("1992-01-01") + 30
+memlimit   <- 1000
 
 ## TEST
 end_date   <- ceiling_date(as.POSIXct("1993-01-01 00:00"), unit = "month")
@@ -95,24 +96,27 @@ sunR_astropy <- function(date) {
 
 if (dbExistsTable(con, "params") &
     any(dbListFields(con, "params") %in% "AsPy_Elevation")) {
-  tbl(con, "params") |> filter(is.na(AsPy_Elevation))
+  tbl(con, "params") |> filter(is.na(cElevation))
 
 } else {
   stop("ddd")
 
   dates_to_do <- tbl(con, "params") |> select(Date) |> pull()
-  dates_to_do <- data.table::first(dates_to_do, 10000)
+  dates_to_do <- data.table::first(dates_to_do, memlimit)
 
   cat(Script.ID, ": Astropy", paste(range(dates_to_do)), "\n")
 
   ##  Calculate sun distance for some dates
   sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
   ##  reshape data
-  month <- data.frame(Azimuth   = unlist(sss$X1),
-                      Elevation = unlist(sss$X2),
-                      Dist      = unlist(sss$X3),
-                      Date      = as.POSIXct(unlist(sss$X4),
-                                             origin = "1970-01-01"))
+  month <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
+                      AsPy_Elevation = unlist(sss$X2),
+                      AsPy_Dist      = unlist(sss$X3),
+                      Date           = as.POSIXct(unlist(sss$X4),
+                                                  origin = "1970-01-01"))
+
+  update_table(con, month, "params", "Date")
+
 }
 
 
