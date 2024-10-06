@@ -1,20 +1,15 @@
 #!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Read Astropy
-#'
-#' This also initializes a lot of columns in the dataset and meta data.
+#' Compute sun vector for LAP with standard tools
 #'
 #' Populates:
 #'  - Date
-#'  - Azimuth
-#'  - Elevat
-#'  - SZA
-#'  - year
-#'  - month
-#'  - doy
-#'  - preNoon
-#'
+#'  - AsPy_Azimuth
+#'  - AsPy_Elevatation
+#'  - AsPy_Dist
+#'  - PySo_Azimuth
+#'  - PySo_Elevation
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -38,8 +33,8 @@ Script.Name <- "~/BBand_LAP/parameters/sun/create_sun_data.R"
 Script.ID   <- "0A"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -60,9 +55,11 @@ cat("\n Initialize params DB and/or import Sun data\n\n")
 con   <- dbConnect(duckdb(dbdir = DB_LAP))
 
 ##  Initialize table with dates to fill  ---------------------------------------
-start_date <- as.POSIXct("1992-01-01") + 30
-memlimit   <- 6666   ## add data in batches
-end_date   <- ceiling_date(Sys.time(), unit = "month")
+start_date <- as.POSIXct("1992-01-01") + 30   ## start before time
+memlimit   <- 66666                           ## add data in batches to limit memory
+end_date   <- ceiling_date(Sys.time(),
+                           unit = "month") +
+  24 * 60 * 60 + 30                           ## until the near future
 
 if (!dbExistsTable(con, "params")) {
   cat("Initialize dates\n")
