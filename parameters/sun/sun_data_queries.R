@@ -68,6 +68,8 @@ solstices <- SUN |> group_by(year) |> filter(Elevat == max(Elevat)) |> collect()
 ## - sun angle limits
 ## - solstice
 
+class(1L)
+
 
 stop()
 
