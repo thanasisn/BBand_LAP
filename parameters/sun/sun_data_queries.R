@@ -72,6 +72,23 @@ SUN |> group_by(year)
 stop()
 
 
+            daydata$Sign <- sign(daydata$V3)
+            daydata$Diff <- c(0, diff(daydata$Sign))
+
+            daydata[daydata$Diff == 2, "V1"]
+            daydata[which(daydata$Diff == -2) - 1, ]
+
+            temp1 <- data.frame( Date    = daydata[daydata$Diff == 2, "V1"],
+                                 Azimuth = daydata[daydata$Diff == 2, "V2"],
+                                 Elevat  = daydata[daydata$Diff == 2, "V3"],
+                                 Day     = as.Date(daydata$V1[750]),
+                                 Sun     = "Sunrise")
+            temp2 <- data.frame( Date    = daydata[which(daydata$Diff == -2) - 1, "V1"],
+                                 Azimuth = daydata[which(daydata$Diff == -2) - 1, "V2"],
+                                 Elevat  = daydata[which(daydata$Diff == -2) - 1, "V3"],
+                                 Day     = as.Date(daydata$V1[750]),
+                                 Sun     = "Sunset")
+
 
 
 
