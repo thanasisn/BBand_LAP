@@ -56,19 +56,23 @@ con   <- dbConnect(duckdb(dbdir = DB_LAP))
 
 ##  Initialize table with dates to fill  ---------------------------------------
 start_date <- as.POSIXct("1992-01-01") + 30   ## start before time
-memlimit   <- 66666                           ## add data in batches to limit memory
+memlimit   <- 666                           ## add data in batches to limit memory
 end_date   <- ceiling_date(Sys.time(),
                            unit = "month") +
   24 * 60 * 60 + 30                           ## until the near future
 
+
+con   <- dbConnect(duckdb(dbdir = "~/ZHOST/testd65.duckdb"))
+
+
 if (!dbExistsTable(con, "params")) {
-  cat("Initialize dates\n")
+  cat("Initialize table\n")
+  dbExecute(con, "CREATE TABLE params (Date TIMESTAMP_S)")
   ## Create all dates
   DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
   DT[ , Date := round_date(Date, unit = "second")]
   setorder(DT, Date)
-  cat(Script.ID, ": Dates", paste(range(DT$Date)), "\n")
-  dbWriteTable(con, "params", DT)
+  insert_table(con, DT, "params", "Date")
 } else {
   ## Extend days, add from last date
   start_date <- tbl(con, "params") |> summarise(max(Date, na.rm = T)) |> pull()
@@ -82,6 +86,8 @@ if (!dbExistsTable(con, "params")) {
     cat("No new dates to add\n")
   }
 }
+
+stop()
 
 ##  Compute Astropy data  ------------------------------------------------------
 source_python("~/BBand_LAP/parameters/sun/sun_vector_astropy_p3.py")
