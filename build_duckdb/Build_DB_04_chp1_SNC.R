@@ -12,7 +12,6 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#'
 #+ echo=F, include=T
 
 #+ echo=F, include=F
@@ -73,6 +72,9 @@ inp_filelist$Day <- as.Date(
 setorder(inp_filelist, Day)
 cat("\n**Found:", nrow(inp_filelist), "tracker sync files**\n")
 
+## check files have unique days
+stopifnot(!any(duplicated(inp_filelist$Day)))
+
 ## keep only files which correspond to existing dates
 inp_filelist <- right_join(inp_filelist,
                            tbl(con, "LAP") |>
@@ -99,7 +101,7 @@ setorder(inp_filelist, Day)
 inp_filelist <- inp_filelist[Day < as.Date(Sys.Date())]
 cat("\n**Parse:", nrow(inp_filelist), "tracker sync files**\n\n")
 
-## parse all files
+##  Import tracker sync  --------------------------------------------------------
 if (nrow(inp_filelist) > 0) {
   for (ll in 1:nrow(inp_filelist)) {
     ff <- inp_filelist[ll, ]
@@ -111,6 +113,12 @@ if (nrow(inp_filelist) > 0) {
 
     async    <- rep(FALSE, 1440)  # The snc file exist, so start with all not async
     asyncstp <- rep(NA,    1440)  # Async magnitude (steps missed)
+
+    ## __ Check data base is ready for import  ---------------------------------
+    if (tbl(con, "LAP") |> filter(Day == ff$Day) |> tally() |> pull() != 1440) {
+      cat("Data base not ready to import", paste(ff$Day), "\n")
+      next()
+    }
 
     ## Recreate time stamp for all minutes of day starting from zero!!!
     D_minutes <- seq(from       = as.POSIXct(paste(as_date(ff$Day), "00:00:00 UTC")),
@@ -170,21 +178,17 @@ if (nrow(inp_filelist) > 0) {
                    new_data = day_data,
                    table    = "LAP",
                    matchvar = "Date")
-
       ## Add metadata
       if (!dbExistsTable(con, "META")) {
         ## Create new table
         cat("\n Initialize table 'META' \n\n")
         dbWriteTable(con, "META", file_meta)
-        # db_create_index(con, "META", columns = "Day", unique = TRUE)
       }
-
       ## Append new data
       update_table(con      = con,
                    new_data = file_meta,
                    table    = "META",
                    matchvar = "Day")
-
     }
   }
 } else {
@@ -220,6 +224,6 @@ if (interactive()) {
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
