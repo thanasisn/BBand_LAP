@@ -101,7 +101,7 @@ if (nrow(inp_filelist) > 0) {
     cat(Script.ID, ": ",
         basename(ff$fullname),
         paste(ff$Day),
-        ll,"/",nrow(inp_filelist), "\n")
+        ll, "/", nrow(inp_filelist), "\n")
 
     ## prepare input file data
     suppressWarnings(rm(D_minutes))
@@ -170,19 +170,17 @@ if (nrow(inp_filelist) > 0) {
   cat(Script.ID, ": ", "No new files to add\n\n")
 }
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 ##  Checks  --------------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
-
-## all days should match
-stopifnot(
-  setequal(
-    tbl(con, "LAP")  |> filter(!is.na(CHP1_sig))      |> distinct(Day) |> pull(),
-    tbl(con, "META") |> filter(!is.na(chp1_basename)) |> distinct(Day) |> pull()
+## __ All days should match  ---------------------------------------------------
+if (any(tbl(con, "META") |> colnames() %in% "chp1_basename")) {
+  stopifnot(
+    setequal(
+      tbl(con, "LAP")  |> filter(!is.na(CHP1_sig))      |> distinct(Day) |> pull(),
+      tbl(con, "META") |> filter(!is.na(chp1_basename)) |> distinct(Day) |> pull()
+    )
   )
-)
+}
 
 # A <- tbl(con, "LAP")  |> filter(!is.na(CHP1_sig))      |> distinct(Day) |> pull()
 # B <- tbl(con, "META") |> filter(!is.na(chp1_basename)) |> distinct(Day) |> pull()
@@ -193,8 +191,6 @@ stopifnot(
 # tbl(con, "LAP")  |> filter(Day %in% test)
 # tbl(con, "META") |> filter(Day %in% test)
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 if (FALSE) {
 
@@ -209,8 +205,10 @@ if (FALSE) {
 
   tbl(con, "LAP")  |> filter(!is.na(CHP1_sig)) |> tally()
 
-  # dd <- tbl(con, "META") |> collect() |> data.table()
 }
+
+## clean exit
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
