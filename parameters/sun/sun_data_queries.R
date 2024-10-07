@@ -21,8 +21,8 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/parameters/sun/create_sun_data.R"
-Script.ID   <- "0A"
+Script.Name <- "~/BBand_LAP/parameters/sun/sun_data_queries.R"
+Script.ID   <- "1A"
 
 if (!interactive()) {
   pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -44,6 +44,13 @@ cat("\n Initialize params DB and/or import Sun data\n\n")
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
+SUN <- tbl(con, "LAP") |>
+  select(Date, Azimuth, Elevat, Sun_Dist_Astropy, SZA, year)
+
+
+
+# sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
+#
 # ##  Relly on Astropy data
 # SUN <- tbl(sun, "params") |>
 #   filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
@@ -53,13 +60,18 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 #   rename(Elevat           = "AsPy_Elevation")
 
 
-SUN <- tbl(con, "LAP") |>
-  select(Date, Azimuth, Elevat, Sun_Dist_Astropy, SZA, year)
 
-SUN |> glimpse()
 
-solstices <- SUN |> group_by(year) |> filter(Elevat == max(Elevat)) |> collect() |> data.table()
+solstices <- SUN |>
+  group_by(year(Date))                        |>
+  filter(Elevat == max(Elevat, na.rm = TRUE)) |>
+  collect()                                   |>
+  data.table()
 
+Eleva > 0 & min(elevat ) & by preNoon
+
+
+SUN |> arrange(Date) |> mutate(elev_change = Elevat - lag(Elevat))
 
 
 ## TODO find some daily values
