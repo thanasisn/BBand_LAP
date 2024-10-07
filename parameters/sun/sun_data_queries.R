@@ -53,12 +53,12 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 #   rename(Elevat           = "AsPy_Elevation")
 
 
-tbl(sun, "params") |>
+SUN <- tbl(con, "LAP") |>
   select(Date, Azimuth, Elevat, Sun_Dist_Astropy, SZA, year)
 
 SUN |> glimpse()
 
-SUN |> group_by(year)
+solstices <- SUN |> group_by(year) |> filter(Elevat == max(Elevat)) |> collect() |> data.table()
 
 
 

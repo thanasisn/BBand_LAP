@@ -18,10 +18,11 @@ create_missing_columns <- function(con, new_data, table) {
       ## translate data types to duckdb
       ctype <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
                       POSIXctPOSIXt = "datetime",
+                      numeric       = "DECIMAL(18,13)", ## change default numeric values
                       unlist(new_vars$types[i]))
 
       ## info
-      cat("\nNEW VAR:", paste(new_vars[i, ]), "\n")
+      cat("\nNEW VAR:", paste(new_vars[i, ]), "->", ctype, "\n")
 
       ## create new columns with a query
       qq <- paste("ALTER TABLE", table,
@@ -135,3 +136,4 @@ upsert_table <- function(con,  new_data, table, matchvar) {
 }
 
 
+class(unlist(122.33333))
