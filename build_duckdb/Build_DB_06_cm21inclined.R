@@ -188,7 +188,7 @@ if (nrow(inp_filelist) > 0) {
 
 ## __ Check matching days  -----------------------------------------------------
 A <- tbl(con, "LAP")  |> filter(!is.na(CM21INC_sig))      |> distinct(Day) |> pull()
-B <- tbl(con, "META") |> filter(!is.na(cm21INC_basename)) |> distinct(Day) |> pull()
+B <- tbl(con, "META") |> filter(!is.na(cm21inc_basename)) |> distinct(Day) |> pull()
 
 ## Signal missing from meta data
 test_A <- A[!A %in% B]
