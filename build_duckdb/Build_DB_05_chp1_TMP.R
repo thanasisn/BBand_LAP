@@ -10,7 +10,6 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#'
 #+ echo=F, include=T
 
 #+ echo=F, include=F
@@ -68,6 +67,9 @@ inp_filelist$Day <- as.Date(parse_date_time(
 setorder(inp_filelist, Day)
 cat("\n**Found:",paste(nrow(inp_filelist), "CHP-1 temperature files**\n"))
 
+## check files have unique days
+stopifnot(!any(duplicated(inp_filelist$Day)))
+
 ## keep only files which correspond to existing dates
 inp_filelist <- right_join(inp_filelist,
                            tbl(con, "LAP") |>
@@ -94,7 +96,7 @@ setorder(inp_filelist, Day)
 inp_filelist <- inp_filelist[ Day < as.Date(Sys.Date())]
 cat("\n**Parse:", nrow(inp_filelist), "CHP-1 temperature files**\n\n")
 
-## parse all files
+##  Import CHP-1 temperature  --------------------------------------------------------
 if (nrow(inp_filelist) > 0) {
   for (ll in 1:nrow(inp_filelist)) {
     ff <- inp_filelist[ll, ]
@@ -103,6 +105,12 @@ if (nrow(inp_filelist) > 0) {
         basename(ff$fullname),
         paste(ff$Day),
         ll,"/",nrow(inp_filelist), "\n")
+
+    ## __ Check data base is ready for import  ---------------------------------
+    if (tbl(con, "LAP") |> filter(Day == ff$Day) |> tally() |> pull() != 1440) {
+      cat("Data base not ready to import", paste(ff$Day), "\n")
+      next()
+    }
 
     ## __  Read CHP-1 temperature file  ----------------------------------------
     temp_temp    <- read.table(ff$fullname, sep = "\t", as.is = TRUE)
@@ -209,7 +217,6 @@ if (interactive()) {
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
-

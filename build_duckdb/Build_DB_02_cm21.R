@@ -93,8 +93,9 @@ if (dbExistsTable(con, "META") &
                             by = "Day") |>
     filter(!is.na(cm21_basename))
 }
+setorder(inp_filelist, Day)
 
-cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
+cat("\n**Parse:", paste(nrow(inp_filelist), "CM-21 files**\n\n"))
 
 ##  Import CM-21 files  --------------------------------------------------------
 if (nrow(inp_filelist) > 0) {
@@ -158,20 +159,17 @@ if (nrow(inp_filelist) > 0) {
                    new_data = day_data,
                    table    = "LAP",
                    matchvar = "Date")
-
       ## Add metadata
       if (!dbExistsTable(con, "META")) {
         ## Create new table
         cat("\n Initialize table 'META' \n\n")
         dbWriteTable(con, "META", file_meta)
       }
-
       ## Append new data
       update_table(con      = con,
                    new_data = file_meta,
                    table    = "META",
                    matchvar = "Day")
-
     }
   }
 } else {

@@ -94,6 +94,7 @@ if (dbExistsTable(con, "META") &
                             by = "Day") |>
     filter(!is.na(cm21inc_basename))
 }
+setorder(inp_filelist, Day)
 
 cat("\n**Parse:", paste(nrow(inp_filelist), "INCLINED CM-21 files**\n\n"))
 
@@ -107,7 +108,13 @@ if (nrow(inp_filelist) > 0) {
         paste(ff$Day),
         ll,"/",nrow(inp_filelist), "\n")
 
-    ## prepare input file data
+    ## __ Check data base is ready for import  ---------------------------------
+    if (tbl(con, "LAP") |> filter(Day == ff$Day) |> tally() |> pull() != 1440) {
+      cat("Data base not ready to import", paste(ff$Day), "\n")
+      next()
+    }
+
+    ## __ Read INCLINED CM-21 LAP file  ----------------------------------------
     suppressWarnings(rm(D_minutes))
     D_minutes <- seq(from       = as.POSIXct(paste(as_date(ff$Day), "00:00:30"), tz = ""),
                      length.out = 1440,
@@ -122,12 +129,10 @@ if (nrow(inp_filelist) > 0) {
     lap[V1 < -8, V1 := NA]
     lap[V2 < -8, V2 := NA]
 
-    ## get data
     day_data <- data.table(Date           = D_minutes,      # Date of the data point
                            CM21INC_sig    = lap$V1,         # Raw value for INCLINED CM21
                            CM21INC_sig_sd = lap$V2)         # Raw SD value for INCLINED CM21
 
-    ## get metadata
     file_meta <- data.table(Day                = ff$Day,
                             cm21inc_basename   = basename(ff$fullname),
                             cm21inc_mtime      = file.mtime(ff$fullname),
@@ -162,50 +167,44 @@ if (nrow(inp_filelist) > 0) {
                    new_data = day_data,
                    table    = "LAP",
                    matchvar = "Date")
-
       ## Add metadata
       if (!dbExistsTable(con, "META")) {
         ## Create new table
         cat("\n Initialize table 'META' \n\n")
         dbWriteTable(con, "META", file_meta)
       }
-
       ## Append new data
       update_table(con      = con,
                    new_data = file_meta,
                    table    = "META",
                    matchvar = "Day")
-
     }
   }
 } else {
   cat(Script.ID, ": ", "No new files to add\n\n")
 }
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
-
 ##  Checks  --------------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-## all days should match
-stopifnot(
-  setequal(
-    tbl(con, "LAP")  |> filter(!is.na(CM21INC_sig))      |> distinct(Day) |> pull(),
-    tbl(con, "META") |> filter(!is.na(cm21inc_basename)) |> distinct(Day) |> pull()
-  )
-)
+## __ Check matching days  -----------------------------------------------------
+A <- tbl(con, "LAP")  |> filter(!is.na(CM21INC_sig))      |> distinct(Day) |> pull()
+B <- tbl(con, "META") |> filter(!is.na(cm21INC_basename)) |> distinct(Day) |> pull()
 
-# A <- tbl(con, "LAP")  |> filter(!is.na(CM21INC_sig))      |> distinct(Day) |> pull()
-# B <- tbl(con, "META") |> filter(!is.na(cm21INC_basename)) |> distinct(Day) |> pull()
-#
-# test <- A[!A %in% B]
-# B[!B %in% A]
-#
-# tbl(con, "LAP")  |> filter(Day %in% test)
-# tbl(con, "META") |> filter(Day %in% test)
+## Signal missing from meta data
+test_A <- A[!A %in% B]
+AA <- tbl(con, "LAP")  |> filter(Day %in% test_A) |> collect() |> data.table()
+BB <- tbl(con, "META") |> filter(Day %in% test_A) |> collect() |> data.table()
+stopifnot(nrow(AA) == 0)
+stopifnot(nrow(BB) == 0)
 
+## Ignore meta data files without any data
+test_B <- B[!B %in% A]
+CC <- tbl(con, "LAP")  |> filter(Day %in% test_B) |> collect() |> data.table()
+DD <- tbl(con, "META") |> filter(Day %in% test_B) |> collect() |> data.table()
+days_to_ignore <- CC[is.na(CM21INC_sig), unique(Day) ]
+stopifnot(DD[!Day %in% days_to_ignore, .N] == 0)
 
+##  Do some inspection  --------------------------------------------------------
 if (interactive()) {
 
   fs::file_size(DB_DUCK)
@@ -224,6 +223,6 @@ if (interactive()) {
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
