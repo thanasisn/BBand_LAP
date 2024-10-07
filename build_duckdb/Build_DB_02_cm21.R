@@ -1,5 +1,5 @@
 #!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Reads CM-21 signal from `[0-9]*06.LAP$``
 #'
@@ -210,7 +210,7 @@ if (interactive()) {
 }
 
 ## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
 tac <- Sys.time()
 cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

@@ -55,11 +55,11 @@ cat("\n Initialize params DB and/or import Sun data\n\n")
 con   <- dbConnect(duckdb(dbdir = DB_LAP))
 
 ##  Initialize table with dates to fill  ---------------------------------------
-start_date <- as.POSIXct("1992-01-01") + 30   ## start before time
-memlimit   <- 6666                            ## add data in batches to limit memory
+start_date <- as.POSIXct("1992-01-01") + 30  ## start before time
+memlimit   <- 9999                           ## add data in batches to save memory
 end_date   <- ceiling_date(Sys.time(),
                            unit = "month") +
-  24 * 60 * 60 + 30                           ## until the near future
+  24 * 60 * 60 + 30                          ## until the near future
 
 ##  Create all dates  ----------------------------------------------------------
 if (!dbExistsTable(con, "params")) {

@@ -1,5 +1,5 @@
 #!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Read CHP-1 signal from `[0-9]*03.LAP$`
 #'
@@ -159,20 +159,17 @@ if (nrow(inp_filelist) > 0) {
                    new_data = day_data,
                    table    = "LAP",
                    matchvar = "Date")
-
       ## Add metadata
       if (!dbExistsTable(con, "META")) {
         ## Create new table
         cat("\n Initialize table 'META' \n\n")
         dbWriteTable(con, "META", file_meta)
       }
-
       ## Append new data
       update_table(con      = con,
                    new_data = file_meta,
                    table    = "META",
                    matchvar = "Day")
-
     }
   }
 } else {
@@ -213,7 +210,7 @@ if (interactive()) {
 }
 
 ## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
 tac <- Sys.time()
 cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
