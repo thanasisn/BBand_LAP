@@ -126,12 +126,12 @@ if (nrow(inp_filelist) > 0) {
     temp_temp[V2 < 0, V3 := NA]
 
     day_data <- data.frame(Date                = temp_temp$V1,
-                           chp1_R_therm        = temp_temp$V2,
-                           chp1_R_SD_therm     = temp_temp$V3,
-                           chp1_R_meas_ERR     = Protek_506_R_error(   temp_temp$V2),
+                           chp1_kohm_therm     = temp_temp$V2                        / 1000,
+                           chp1_kohm_SD_therm  = temp_temp$V3                        / 1000,
+                           chp1_kohm_meas_ERR  = Protek_506_R_error(   temp_temp$V2) / 1000,
                            chp1_temperature    = CHP_thermistor_R_to_T(temp_temp$V2),
                            chp1_temperature_SD = CHP_thermistor_ResUnc_to_TempUnc(temp_temp$V2, temp_temp$V3))
-    day_data$chp1_temp_UNC <- CHP_thermistor_ResUnc_to_TempUnc(temp_temp$V2, day_data$chp1_R_meas_ERR)
+    day_data$chp1_temp_UNC <- CHP_thermistor_ResUnc_to_TempUnc(temp_temp$V2, day_data$chp1_kohm_meas_ERR * 1000)
 
     ## get file metadata
     file_meta <- data.table(Day                = ff$Day,
