@@ -36,6 +36,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_01_sun.R"
 Script.ID   <- "01"
+memlimit    <- 66666
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -101,6 +102,10 @@ cat(paste(
   SUN |> distinct(Day) |> tally() |> pull(),
   "New days"),
   sep = "\n")
+
+SUN |> head()
+
+stop()
 
 ##  Add data  ------------------------------------------------------------------
 if (!dbExistsTable(con, "LAP")) {
