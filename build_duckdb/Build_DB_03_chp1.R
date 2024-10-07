@@ -70,6 +70,9 @@ inp_filelist$Day <- as.Date(parse_date_time(
 setorder(inp_filelist, Day)
 cat("\n**Found:",paste(nrow(inp_filelist), "CHP-1 files**\n"))
 
+## check files have unique days
+stopifnot(!any(duplicated(inp_filelist$Day)))
+
 ## keep only files which correspond to existing dates
 inp_filelist <- right_join(inp_filelist,
                            tbl(con, "LAP") |>
@@ -93,7 +96,7 @@ if (dbExistsTable(con, "META") &
 
 cat("\n**Parse:",paste(nrow(inp_filelist), "CHP-1 files**\n\n"))
 
-## parse all files
+##  Import CHP-1 files  --------------------------------------------------------
 if (nrow(inp_filelist) > 0) {
   for (ll in 1:nrow(inp_filelist)) {
     ff <- inp_filelist[ll, ]
@@ -103,7 +106,13 @@ if (nrow(inp_filelist) > 0) {
         paste(ff$Day),
         ll, "/", nrow(inp_filelist), "\n")
 
-    ## prepare input file data
+    ## __ Check data base is ready for import  ---------------------------------
+    if (tbl(con, "LAP") |> filter(Day == ff$Day) |> tally() |> pull() != 1440) {
+      cat("Data base not ready to import", paste(ff$Day), "\n")
+      next()
+    }
+
+    ## __ Read CHP-1 LAP file  ----------------------------------------------
     suppressWarnings(rm(D_minutes))
     D_minutes <- seq(from       = as.POSIXct(paste(as_date(ff$Day), "00:00:30"), tz = ""),
                      length.out = 1440,
@@ -155,7 +164,6 @@ if (nrow(inp_filelist) > 0) {
         ## Create new table
         cat("\n Initialize table 'META' \n\n")
         dbWriteTable(con, "META", file_meta)
-        # db_create_index(con, "META", columns = "Day", unique = TRUE)
       }
 
       ## Append new data
@@ -170,33 +178,30 @@ if (nrow(inp_filelist) > 0) {
   cat(Script.ID, ": ", "No new files to add\n\n")
 }
 
-
 ##  Checks  --------------------------------------------------------------------
-## __ All days should match  ---------------------------------------------------
-if (any(tbl(con, "META") |> colnames() %in% "chp1_basename")) {
-  stopifnot(
-    setequal(
-      tbl(con, "LAP")  |> filter(!is.na(CHP1_sig))      |> distinct(Day) |> pull(),
-      tbl(con, "META") |> filter(!is.na(chp1_basename)) |> distinct(Day) |> pull()
-    )
-  )
-}
 
-# A <- tbl(con, "LAP")  |> filter(!is.na(CHP1_sig))      |> distinct(Day) |> pull()
-# B <- tbl(con, "META") |> filter(!is.na(chp1_basename)) |> distinct(Day) |> pull()
-#
-# test <- A[!A %in% B]
-# B[!B %in% A]
-#
-# tbl(con, "LAP")  |> filter(Day %in% test)
-# tbl(con, "META") |> filter(Day %in% test)
+## __ Check matching days  -----------------------------------------------------
+A <- tbl(con, "LAP")  |> filter(!is.na(CHP1_sig))      |> distinct(Day) |> pull()
+B <- tbl(con, "META") |> filter(!is.na(chp1_basename)) |> distinct(Day) |> pull()
 
+## Signal missing from meta data
+test_A <- A[!A %in% B]
+AA <- tbl(con, "LAP")  |> filter(Day %in% test_A) |> collect() |> data.table()
+BB <- tbl(con, "META") |> filter(Day %in% test_A) |> collect() |> data.table()
+stopifnot(nrow(AA) == 0)
+stopifnot(nrow(BB) == 0)
 
-if (FALSE) {
+## Ignore meta data files without any data
+test_B <- B[!B %in% A]
+CC <- tbl(con, "LAP")  |> filter(Day %in% test_B) |> collect() |> data.table()
+DD <- tbl(con, "META") |> filter(Day %in% test_B) |> collect() |> data.table()
+days_to_ignore <- CC[is.na(CHP1_sig), unique(Day) ]
+stopifnot(DD[!Day %in% days_to_ignore, .N] == 0)
+
+##  Do some inspection  --------------------------------------------------------
+if (interactive()) {
 
   fs::file_size(DB_DUCK)
-
-  con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
   tbl(con, "LAP")  |> colnames()
   tbl(con, "META") |> colnames()
@@ -204,13 +209,12 @@ if (FALSE) {
   tbl(con, "LAP")  |> filter(!is.na(CHP1_sig)) |> glimpse()
 
   tbl(con, "LAP")  |> filter(!is.na(CHP1_sig)) |> tally()
-
 }
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
 tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
