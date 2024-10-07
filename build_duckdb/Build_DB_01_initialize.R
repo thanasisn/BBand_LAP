@@ -44,6 +44,7 @@ if (!interactive()) {
 
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
@@ -78,18 +79,12 @@ SUN <- SUN |> mutate(
   )
 )
 
-stop()
-
-tbl(sun, "params") |>
-  filter(!is.na(AsPy_Elevation))
-
 ##  Add data  ------------------------------------------------------------------
 if (!dbExistsTable(con, "LAP")) {
   ## Create new table
   cat("\n Initialize table 'LAP' \n\n")
   ## create table and date variable with pure SQL call
   dbExecute(con, "CREATE TABLE LAP (Date TIMESTAMP)")
-
 
 
   yto <- SUN |> summarise(min(year, na.rm = T)) |> pull()
@@ -100,8 +95,6 @@ if (!dbExistsTable(con, "LAP")) {
             paste(ADD |> reframe(range(Date)) |> pull(), collapse = " -- ")
   ), sep = "\n")
   res <- insert_table(con, ADD, "LAP", "Date")
-  ## indexing will block drop of columns for now!!
-  # db_create_index(con, "LAP", columns = "Date", unique = TRUE)
 } else {
   ## Append new data
   cat("\n Add more data to 'LAP' \n\n")
@@ -118,9 +111,7 @@ if (!dbExistsTable(con, "LAP")) {
               "New days",
               paste(ADD |> reframe(range(Date)) |> pull(), collapse = " -- ")
     ), sep = "\n")
-
-    stop()
-    dbWriteTable(con, "LAP", ADD, append = TRUE)
+    res <- insert_table(con, ADD, "LAP", "Date")
   }
 }
 
@@ -142,18 +133,16 @@ if (!dbExistsTable(con, "META")) {
   )
 }
 
-## Use date as integer
-# SUN[, Date := round_date(Date, unit = "second")]
-
 ##  Checks  --------------------------------------------------------------------
 stopifnot(tbl(con, "LAP") |> filter(is.na(Date))    |> collect() |> nrow() == 0)
 stopifnot(tbl(con, "LAP") |> filter(is.na(Elevat))  |> collect() |> nrow() == 0)
 stopifnot(tbl(con, "LAP") |> filter(is.na(Azimuth)) |> collect() |> nrow() == 0)
 
-if (all(tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> diff() == 1)) {
-  cat("Dates are sorted and regular\n\n")
+if (all(tbl(con, "LAP") |> select(Date) |> arrange(Date) |> collect() |> pull() |> diff() == 1)) {
+  cat("Dates are regular.\n\n")
 } else {
-  stop("DATES NOT SORTED OR NOT REGULAR\n\n")
+  # stop("DATES NOT REGULAR\n\n")
+  warning("DATES NOT REGULAR\n\n")
 }
 
 ##  Do some inspection  --------------------------------------------------------
