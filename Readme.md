@@ -16,7 +16,7 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Wed Sep 25 09:43:18 UTC 2024 -->
+<!-- Added by: athan, at: 2024-10-07T19:15:14 UTC -->
 
 <!--te-->
 
@@ -24,16 +24,29 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 ## Data status overview
 
 
-| Name             |     Rows | Vars |    Values |      Size |   Fill | Bytes/Value |
-|:-----------------|---------:|-----:|----------:|----------:|-------:|------------:|
-| BBDB             | 16679520 |   71 | 406175780 |   1.8 GiB |  34.3% |        4.72 |
-| BBDB meta        |    11583 |   80 |    475472 |   3.4 MiB | 51.31% |        7.43 |
-| TrackerDB        |  8394756 |   23 |  75546850 | 161.3 MiB | 39.13% |        2.24 |
-| TrackerDB meta   |     3071 |    9 |     14983 | 188.0 KiB | 54.21% |       12.85 |
-| Raw files hashes |   760410 |    4 |   3041640 |   3.9 MiB |   100% |        1.34 |
-| **Total**        | 25849340 |  187 | 485254725 |   2.0 GiB |    NA% |        4.32 |
 
-Table: Datasets sizes on 2024-09-25
+
+| Name             |     Rows | Vars |    Values |      Size |   Fill |
+|:-----------------|---------:|-----:|----------:|----------:|-------:|
+| BBDB             | 16704000 |   71 | 406860057 |   2.3 GiB | 34.31% |
+| BBDB meta        |    11601 |   80 |    476587 |   3.4 MiB | 51.35% |
+| TrackerDB        |  8394756 |   23 |  75546850 | 161.9 MiB | 39.13% |
+| TrackerDB meta   |     3071 |    9 |     14983 | 259.0 KiB | 54.21% |
+| Raw files hashes |   760483 |    4 |   3041932 |   4.0 MiB |   100% |
+| **Total**        | 25873911 |  187 | 485940409 |   2.4 GiB |    NA% |
+
+Table: Datasets sizes on 2024-10-07 (continued below)
+
+ 
+
+| Bytes/Value |
+|------------:|
+|        6.01 |
+|        7.44 |
+|        2.25 |
+|        17.7 |
+|        1.38 |
+|         5.4 |
 
 
 
@@ -94,13 +107,14 @@ Table: Datasets sizes on 2024-09-25
 
 ## TODO
 
+- Fully port all to duckdb
 - Replace and compare processes from "CM_21_GLB"
   - All the major stages have been replaced
   - Secondary processes are to be ported
 - Process more instruments
-- Interactive plot of db variables
 - Import libRadtran data
 - May import CSid
+- Import other references
 
 ----------------------
 
@@ -111,6 +125,8 @@ Table: Datasets sizes on 2024-09-25
 Some aspects on the implementation of this project.
 
 - We use a dataset of `parquet` files as a database for all measurements and additional data.
+- We are migrating the original parquet dataset scheme to `Duckdb` to improve overall
+  efficiency.
 - The `parquet` dataset use one file for each month, this facilitates:
   - Syncing of the data between different computers.
   - Partial processing when needed without using the dataset function.
