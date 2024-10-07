@@ -33,7 +33,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_01_sun.R"
+Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_01_initialize.R"
 Script.ID   <- "01"
 memlimit    <- 66666
 
@@ -78,10 +78,20 @@ SUN <- SUN |> mutate(
   )
 )
 
+stop()
+
+tbl(sun, "params") |>
+  filter(!is.na(AsPy_Elevation))
+
 ##  Add data  ------------------------------------------------------------------
 if (!dbExistsTable(con, "LAP")) {
   ## Create new table
   cat("\n Initialize table 'LAP' \n\n")
+
+  dbExecute(con, "CREATE TABLE params (Date TIMESTAMP)")
+
+
+
   yto <- SUN |> summarise(min(year, na.rm = T)) |> pull()
   ADD <- SUN |> filter(year == yto) |> collect() |> data.table() |> arrange(Date)
   cat(paste(Script.ID, ":",
