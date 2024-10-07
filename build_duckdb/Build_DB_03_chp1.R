@@ -93,6 +93,7 @@ if (dbExistsTable(con, "META") &
                             by = "Day") |>
     filter(!is.na(chp1_basename))
 }
+setorder(inp_filelist, Day)
 
 cat("\n**Parse:",paste(nrow(inp_filelist), "CHP-1 files**\n\n"))
 
