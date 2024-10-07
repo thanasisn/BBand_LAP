@@ -14,7 +14,7 @@
 #+ echo=F, include=T
 
 #+ echo=F, include=F
-## __ Document options ---------------------------------------------------------
+## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
@@ -22,6 +22,7 @@ knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 ## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_02_cm21.R"
@@ -56,12 +57,12 @@ inp_filelist <- list.files(path        = SIRENA_GLB,
                            ignore.case = TRUE,
                            full.names  = TRUE)
 cat("\n**Found:", length(inp_filelist), "CM-21 files from Sirena**\n")
-## just in case, there are nested folders with more lap files in Sirens
+## just in case, there are nested folders with more lap files in Sirena
 inp_filelist <- grep("OLD", inp_filelist, ignore.case = T, invert = T, value = T)
 
 inp_filelist <- data.table(fullname = inp_filelist)
 inp_filelist[, cm21_basename := basename(fullname)]
-stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$cm21_basename))) == FALSE )
+stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$cm21_basename))) == FALSE)
 
 inp_filelist$Day <- as.Date(parse_date_time(
   sub("06\\..*", "", inp_filelist$cm21_basename),
@@ -104,6 +105,12 @@ if (nrow(inp_filelist) > 0) {
         basename(ff$fullname),
         paste(ff$Day),
         ll,"/",nrow(inp_filelist), "\n")
+
+    ## __ Check data base is ready for import  ---------------------------------
+    if (tbl(con, "LAP") |> filter(Day == ff$Day) |> tally() |> pull() != 1440) {
+      cat("Data base not ready to import", paste(ff$Day), "\n")
+      next()
+    }
 
     ## __ Read CM-21 LAP file  ----------------------------------------------
     suppressWarnings(rm(D_minutes))
@@ -171,24 +178,27 @@ if (nrow(inp_filelist) > 0) {
   cat(Script.ID, ": ", "No new files to add\n\n")
 }
 
-## all days should match
-stopifnot(
-  setequal(
-    tbl(con, "LAP")  |> filter(!is.na(CM21_sig))      |> distinct(Day) |> pull(),
-    tbl(con, "META") |> filter(!is.na(cm21_basename)) |> distinct(Day) |> pull()
-  )
-)
+##  Checks  --------------------------------------------------------------------
 
-# A <- tbl(con, "LAP")  |> filter(!is.na(CM21_sig))      |> distinct(Day) |> pull()
-# B <- tbl(con, "META") |> filter(!is.na(cm21_basename)) |> distinct(Day) |> pull()
-#
-# test <- A[!A %in% B]
-# B[!B %in% A]
-#
-# tbl(con, "LAP")  |> filter(Day %in% test)
-# tbl(con, "META") |> filter(Day %in% test)
+## __ Check matching days  -----------------------------------------------------
+A <- tbl(con, "LAP")  |> filter(!is.na(CM21_sig))      |> distinct(Day) |> pull()
+B <- tbl(con, "META") |> filter(!is.na(cm21_basename)) |> distinct(Day) |> pull()
 
+## Signal missing from meta data
+test_A <- A[!A %in% B]
+AA <- tbl(con, "LAP")  |> filter(Day %in% test_A) |> collect() |> data.table()
+BB <- tbl(con, "META") |> filter(Day %in% test_A) |> collect() |> data.table()
+stopifnot(nrow(AA) == 0)
+stopifnot(nrow(BB) == 0)
 
+## Ignore meta data files without any data
+test_B <- B[!B %in% A]
+CC <- tbl(con, "LAP")  |> filter(Day %in% test_B) |> collect() |> data.table()
+DD <- tbl(con, "META") |> filter(Day %in% test_B) |> collect() |> data.table()
+days_to_ignore <- CC[is.na(CM21_sig), unique(Day) ]
+stopifnot(DD[!Day %in% days_to_ignore, .N] == 0)
+
+##  Do some inspection  --------------------------------------------------------
 if (interactive()) {
 
   fs::file_size(DB_DUCK)
@@ -199,8 +209,6 @@ if (interactive()) {
   tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> glimpse()
 
   tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> tally()
-
-  # dd <- tbl(con, "META") |> collect() |> data.table()
 }
 
 ## clean exit
