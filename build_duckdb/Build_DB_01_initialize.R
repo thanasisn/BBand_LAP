@@ -1,9 +1,9 @@
 #!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Read Astropy
+#' Initialize main data base
 #'
-#' This also initializes a lot of columns in the dataset and meta data.
+#' This also creates some columns in the dataset and meta data.
 #'
 #' Populates:
 #'  - Date
@@ -15,10 +15,9 @@
 #'  - doy
 #'  - preNoon
 #'
-#'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
+#' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
 #+ echo=F, include=T
 
@@ -40,7 +39,7 @@ memlimit    <- 66666
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+    sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -58,7 +57,7 @@ cat("\n Initialize DB and/or import Sun data\n\n")
 con <- dbConnect(duckdb(dbdir = DB_DUCK))
 sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
-##  Get Astropy data  ----------------------------------------------------------
+##  Select Astropy data  -------------------------------------------------------
 SUN <- tbl(sun, "params") |>
   filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
   select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist)  |>
@@ -145,8 +144,9 @@ if (all(tbl(con, "LAP") |> select(Date) |> collect() |> pull() |> diff() == 1)) 
   stop("DATES NOT SORTED OR NOT REGULAR\n\n")
 }
 
-## Info display
+##  Do some inspection  --------------------------------------------------------
 if (interactive()) {
+
   fs::file_size(DB_DUCK)
 
   tbl(con, "LAP") |> tally()
@@ -163,8 +163,7 @@ if (interactive()) {
 dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 dbDisconnect(sun, shutdown = TRUE); rm("sun"); closeAllConnections()
 
-
 tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
+cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
