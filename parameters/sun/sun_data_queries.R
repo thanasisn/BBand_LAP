@@ -44,8 +44,16 @@ cat("\n Initialize params DB and/or import Sun data\n\n")
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
+## Get data from the main database
 SUN <- tbl(con, "LAP") |>
-  select(Date, Azimuth, Elevat, Sun_Dist_Astropy, SZA, year)
+  select(Date,
+         Azimuth,
+         Elevat,
+         SZA,
+         year,
+         Day,
+         preNoon,
+         doy)
 
 
 
@@ -62,16 +70,35 @@ SUN <- tbl(con, "LAP") |>
 
 
 
-solstices <- SUN |>
+Solstices <- SUN |>
   group_by(year(Date))                        |>
   filter(Elevat == max(Elevat, na.rm = TRUE)) |>
   collect()                                   |>
   data.table()
 
-Eleva > 0 & min(elevat ) & by preNoon
+# Eleva > 0 & min(elevat ) & by preNoon
 
 
-SUN |> arrange(Date) |> mutate(elev_change = Elevat - lag(Elevat))
+
+Sunsets <- SUN |>
+  filter(Elevat > 0) |>
+  group_by(Day, preNoon) |>
+  filter(Elevat == min(Elevat, na.rm = T)) |>
+  mutate(Sun = case_when(
+    preNoon == TRUE  ~ "Sunrise",
+    preNoon == FALSE ~ "Sunset"
+  )) |> collect() |> data.table()
+
+
+Sunsets <- Sunsets[, ] |> select(-year, -preNoon)
+
+
+Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60), by = Day]
+
+
+plot(Daylength)
+summary(Daylength)
+
 
 
 ## TODO find some daily values
@@ -86,22 +113,6 @@ class(1L)
 stop()
 
 
-            daydata$Sign <- sign(daydata$V3)
-            daydata$Diff <- c(0, diff(daydata$Sign))
-
-            daydata[daydata$Diff == 2, "V1"]
-            daydata[which(daydata$Diff == -2) - 1, ]
-
-            temp1 <- data.frame( Date    = daydata[daydata$Diff == 2, "V1"],
-                                 Azimuth = daydata[daydata$Diff == 2, "V2"],
-                                 Elevat  = daydata[daydata$Diff == 2, "V3"],
-                                 Day     = as.Date(daydata$V1[750]),
-                                 Sun     = "Sunrise")
-            temp2 <- data.frame( Date    = daydata[which(daydata$Diff == -2) - 1, "V1"],
-                                 Azimuth = daydata[which(daydata$Diff == -2) - 1, "V2"],
-                                 Elevat  = daydata[which(daydata$Diff == -2) - 1, "V3"],
-                                 Day     = as.Date(daydata$V1[750]),
-                                 Sun     = "Sunset")
 
 
 
