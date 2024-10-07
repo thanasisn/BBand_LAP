@@ -24,8 +24,6 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 ## Data status overview
 
 
-
-
 | Name             |     Rows | Vars |    Values |      Size |   Fill | Bytes/Value |
 |:-----------------|---------:|-----:|----------:|----------:|-------:|------------:|
 | BBDB             | 16679520 |   71 | 406175780 |   1.8 GiB |  34.3% |        4.72 |
