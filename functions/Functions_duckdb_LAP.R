@@ -1,5 +1,14 @@
 
 
+#' Create all columns for a table with default types
+#'
+#' @param con      Data base connection
+#' @param new_data An R table used to add data in the data base
+#' @param table    The name of the data base table to add
+#'
+#' @return         Nothing. It executes an DQL query
+#' @export
+#'
 create_missing_columns <- function(con, new_data, table) {
   ## detect data types
   tt1 <- data.table(names = colnames(tbl(con, table)),
@@ -17,8 +26,9 @@ create_missing_columns <- function(con, new_data, table) {
 
       ## translate data types to duckdb
       ctype <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
-                      POSIXctPOSIXt = "datetime",
-                      numeric       = "DECIMAL(18,13)", ## change default numeric values
+                      POSIXctPOSIXt = "TIMESTAMP_MS",    ## all dates except radiation date
+                      numeric       = "DECIMAL(18, 14)", ## change default numeric values for all data
+                                                         ## ~9999.99999999999999
                       unlist(new_vars$types[i]))
 
       ## info
@@ -54,7 +64,7 @@ make_empty_column <- function(con, table, acolname, acoltype) {
 #' @param con      Connection to the database
 #' @param table    Name of the table in the database
 #' @param acolname Name of the new column
-#' @param acoltype Databse data type for the new column
+#' @param acoltype Database data type for the new column
 #'
 #' @details
 #' Create a column or do nothing if already exist
@@ -136,4 +146,4 @@ upsert_table <- function(con,  new_data, table, matchvar) {
 }
 
 
-class(unlist(122.33333))
+
