@@ -87,8 +87,8 @@ tbl(sun, "params") |>
 if (!dbExistsTable(con, "LAP")) {
   ## Create new table
   cat("\n Initialize table 'LAP' \n\n")
-
-  dbExecute(con, "CREATE TABLE params (Date TIMESTAMP)")
+  ## create table and date variable with pure SQL call
+  dbExecute(con, "CREATE TABLE LAP (Date TIMESTAMP)")
 
 
 
@@ -99,7 +99,7 @@ if (!dbExistsTable(con, "LAP")) {
             "New days",
             paste(ADD |> reframe(range(Date)) |> pull(), collapse = " -- ")
   ), sep = "\n")
-  dbWriteTable(con, "LAP", ADD)
+  res <- insert_table(con, ADD, "LAP", "Date")
   ## indexing will block drop of columns for now!!
   # db_create_index(con, "LAP", columns = "Date", unique = TRUE)
 } else {
@@ -118,6 +118,8 @@ if (!dbExistsTable(con, "LAP")) {
               "New days",
               paste(ADD |> reframe(range(Date)) |> pull(), collapse = " -- ")
     ), sep = "\n")
+
+    stop()
     dbWriteTable(con, "LAP", ADD, append = TRUE)
   }
 }
