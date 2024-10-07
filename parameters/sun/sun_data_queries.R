@@ -42,12 +42,31 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Initialize params DB and/or import Sun data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
+con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+
+# ##  Relly on Astropy data
+# SUN <- tbl(sun, "params") |>
+#   filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
+#   select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist)  |>
+#   rename(Azimuth          = "AsPy_Azimuth")              |>
+#   rename(Sun_Dist_Astropy = "AsPy_Dist")                 |>
+#   rename(Elevat           = "AsPy_Elevation")
+
+
+tbl(sun, "params") |>
+  select(Date, Azimuth, Elevat, Sun_Dist_Astropy, SZA, year)
+
+SUN |> glimpse()
+
+SUN |> group_by(year)
 
 
 
-
-
+## TODO find some daily values
+## - length of daylight
+## - sun set and sun rise
+## - sun angle limits
+## - solstice
 
 
 stop()
