@@ -1,0 +1,70 @@
+#!/opt/R/4.2.3/bin/Rscript
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
+#'
+#' Use full querries of Sun data
+#'
+#' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
+#'
+#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
+#'
+#+ echo=F, include=T
+
+#+ echo=F, include=F
+## __ Document options  --------------------------------------------------------
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.pos   = '!h'    )
+
+## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
+Sys.setenv(TZ = "UTC")
+tic <- Sys.time()
+Script.Name <- "~/BBand_LAP/parameters/sun/create_sun_data.R"
+Script.ID   <- "0A"
+
+if (!interactive()) {
+  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+}
+
+## __ Load libraries  ----------------------------------------------------------
+source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
+
+library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
+
+cat("\n Initialize params DB and/or import Sun data\n\n")
+
+##  Open dataset  --------------------------------------------------------------
+con   <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
+
+
+
+
+
+
+
+stop()
+
+
+
+
+
+
+
+
+
+
+## clean exit
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+
+tac <- Sys.time()
+cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
+    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
