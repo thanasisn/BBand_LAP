@@ -113,38 +113,32 @@ tbl(con, "LAP") |> summarise_all(~ sum(!is.na(.)))
 tbl(con, "LAP") |> summarise_all(~(sum(is.na(.))))
 
 
-## count na
-fullness <- tbl(con, "LAP") |>
-  summarise_all(
-    ~ sum(case_match(!is.na(.x),
-                     TRUE ~ 1L,
-                     FALSE ~0L))
-  ) |> collect() |> data.table()
+db_stats <- data.table()
+for (atbl in  dbListTables(con)) {
+  ## count nas
+  fillness <- tbl(con, atbl) |>
+    summarise_all(
+      ~ sum(case_match(!is.na(.x),
+                       TRUE  ~1L,
+                       FALSE ~0L))
+    ) |> collect() |> data.table()
+  ## compute
+  fillness <- data.table(
+    Table    = atbl,
+    Variable = names(fullness),
+    Non_na   = as.vector(fullness |> t()),
+    N        = tbl(con, atbl) |> tally() |> pull()
+  )
+  fillness[, missing  := N - Non_na]
+  fillness[, fill_pc  := round(100 * (N - Non_na) / N, 4) ]
+  fillness[, empty_pc := round(100 * (1 - (N - Non_na) / N), 4) ]
+  db_stats <- rbind(db_stats, fillness)
+}
+db_sums <- db_stats[, .(Values = sum(Non_na) * min(N)), by = Table]
 
-fillness <- data.table(
-  Variable = names(fullness),
-  Non_na   = as.vector(fullness |> t()),
-  N        = tbl(con, "LAP") |> tally() |> pull()
-)
-fillness[, missing  := N - Non_na]
-fillness[, fill_pc  := round(100 * (N - Non_na) / N, 4) ]
-fillness[, empty_pc := round(100 * (1 - (N - Non_na) / N), 4) ]
+## bytes per value
+db_sums[, file.size(DB_DUCK) / sum(Values)]
 
-
-
-
-  lap_vars <- tbl(con, "LAP") |> colnames() |> length()
-  lap_cols <- tbl(con, "LAP") |> tally() |> pull()
-
-  meta_vars <- tbl(con, "META") |> colnames() |> length()
-  meta_cols <- tbl(con, "META") |> tally() |> pull()
-
-
-values <- lap_vars * lap_cols + meta_vars * meta_cols
-
-
-
-round(file.size(DB_DUCK) / (as.double(lap_cols) * as.double(lap_vars) + as.double(meta_cols) * as.double(meta_vars)), 5 )
 
 
 
