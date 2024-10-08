@@ -143,6 +143,26 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 
 DT <- tbl(con, "LAP")
+
+## remove old columns
+make_empty_column(con, "LAP", "GLB_strict")
+
+ADD <- DT |>
+  filter(Elevat > QS$sun_elev_min)    |>  ## sun is up
+  filter(!is.na(CM21_sig))            |>  ## valid measurements
+  filter(is.na(cm21_bad_data_flag))   |>  ## not bad data
+  filter(cm21_sig_limit_flag == 0)    |>  ## in acceptable values range
+  select(Date, GLB_wpsm)              |>
+  mutate(GLB_strict = case_when(
+    GLB_wpsm <  0 ~ 0,                    ## Negative values to zero
+    GLB_wpsm >= 0 ~ GLB_wpsm              ## All other selected values as is
+  ))
+
+update_table()
+
+
+stop()
+
 DT |>
   filter(Elevat > QS$sun_elev_min)  |>  ## sun is up
   filter(!is.na(CHP1_sig))          |>  ## valid measurements

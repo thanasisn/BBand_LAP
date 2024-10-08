@@ -44,16 +44,18 @@ create_missing_columns <- function(con, new_data, table) {
 
 
 
-make_empty_column <- function(con, table, acolname, acoltype) {
+make_empty_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") {
 
   if (any(dbListFields(con, table) %in% acolname)) {
     qq <- paste0("ALTER TABLE ", table,
-                 " DROP ",  acolname)
+                 " DROP ", acolname)
+    cat(qq, "\n")
     res <- dbSendQuery(con, qq)
   }
   ## create new columns with a query
   qq <- paste("ALTER TABLE", table,
               "ADD COLUMN",  acolname,  acoltype, "DEFAULT null")
+  cat(qq, "\n")
   res <- dbSendQuery(con, qq)
 }
 
@@ -72,7 +74,7 @@ make_empty_column <- function(con, table, acolname, acoltype) {
 #' @return Nothing create the column with an SQL query
 #' @export
 #'
-make_new_column <- function(con, table, acolname, acoltype) {
+make_new_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") {
 
   if (any(dbListFields(con, table) %in% acolname)) {
     cat(" Column ", acolname, " already exist! >> Do nothing!! <<\n\n")
@@ -81,6 +83,7 @@ make_new_column <- function(con, table, acolname, acoltype) {
     ## create new columns with a query
     qq <- paste("ALTER TABLE", table,
                 "ADD COLUMN",  acolname,  acoltype, "DEFAULT null")
+    cat(qq, "\n")
     res <- dbSendQuery(con, qq)
   }
 }
@@ -97,6 +100,19 @@ remove_column <- function(con, table, acolname) {
   }
 }
 
+
+
+#'
+#'
+#' @param con
+#' @param new_data
+#' @param table
+#' @param matchvar
+#'
+#' @return
+#' @export
+#'
+#' @examples
 update_table <- function(con, new_data, table, matchvar) {
 
   create_missing_columns(con      = con,
