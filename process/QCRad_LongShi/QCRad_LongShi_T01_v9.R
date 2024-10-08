@@ -147,10 +147,15 @@ DT |>
   filter(Elevat > QS$sun_elev_min)  |>  ## sun is up
   filter(!is.na(CHP1_sig))          |>  ## valid measurements
   filter(is.na(chp1_bad_data_flag)) |>  ## not bad data
-  filter(chp1_sig_limit_flag == 0)    ## acceptable values range
+  filter(chp1_sig_limit_flag == 0)  |>  ## acceptable values range
+  filter(Async_tracker_flag != T)   |>  ## not in an async
+  select(Date, DIR_)
 
-DT |> select(Asyn)
+DT |> colnames()
 
+
+DT |> select(Async_tracker_flag) |> group_by(Async_tracker_flag) |> tally()
+DT |> filter(Async_tracker_flag==T) |> select(Async_step_count)
 
 stop()
 
