@@ -74,8 +74,6 @@ if (file.exists(DB_META_fl)) {
     stop("NO METADATA FILE!!")
 }
 
-
-
 ##  Dark calculations on dataset  ----------------------------------------------
 
 ## list data base files
