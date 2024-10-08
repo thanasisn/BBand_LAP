@@ -73,6 +73,7 @@ SUN <- tbl(con, "LAP") |>
 Solstices <- SUN |>
   group_by(year(Date))                        |>
   filter(Elevat == max(Elevat, na.rm = TRUE)) |>
+  select(-preNoon)                            |>
   collect()                                   |>
   data.table()
 
@@ -96,7 +97,7 @@ Sunsets <- Sunsets[, ] |> select(-year, -preNoon)
 Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60), by = Day]
 
 
-plot(Daylength)
+plot(Daylengths)
 summary(Daylength)
 
 
@@ -107,7 +108,16 @@ summary(Daylength)
 ## - sun angle limits
 ## - solstice
 
-class(1L)
+
+lap_vars <- tbl(con, "LAP") |> colnames() |> length()
+lap_cols <- tbl(con, "LAP") |> tally() |> pull()
+
+meta_vars <- tbl(con, "META") |> colnames() |> length()
+meta_cols <- tbl(con, "META") |> tally() |> pull()
+
+
+values <- lap_vars * lap_cols + meta_vars * meta_cols
+data_density <- file.size(DB_DUCK) / values
 
 
 stop()
