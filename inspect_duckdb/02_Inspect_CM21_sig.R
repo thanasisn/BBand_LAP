@@ -111,7 +111,7 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 ## years in the data base
 datayears <- tbl(con, "LAP") |>
-  filter(!is.na(CHP1_sig))   |>
+  filter(!is.na(CM21_sig))   |>
   select(year)               |>
   distinct()                 |>
   pull()

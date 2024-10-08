@@ -97,7 +97,7 @@ Sunsets <- Sunsets[, ] |> select(-year, -preNoon)
 Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60), by = Day]
 
 plot(Daylengths)
-summary(Daylength)
+summary(Daylengths)
 
 
 
