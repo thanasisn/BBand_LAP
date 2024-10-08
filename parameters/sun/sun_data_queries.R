@@ -108,6 +108,24 @@ summary(Daylengths)
 ## - solstice
 
 
+tbl(con, "LAP") |> summarise_all(~ sum(!is.na(.)))
+
+tbl(con, "LAP") |> summarise_all(~(sum(is.na(.))))
+
+gather <- data.frame(
+  Name = "BBDB",
+  Rows = tbl(con, "LAP") |> tally() |> pull(),
+  Vars = tbl(con, "LAP") |> colnames() |> length(),
+  Valu = tbl(con, "LAP") |> summarise(across(everything(), ~ sum(!is.na(.), na.rm = T))) |>
+    collect() |> rowwise() |> sum(),
+  Size = strsplit(
+    system(
+      paste("du -s", DB_DUCK),
+            intern = TRUE),
+      "\t")[[1]][1]
+  )
+
+
 lap_vars <- tbl(con, "LAP") |> colnames() |> length()
 lap_cols <- tbl(con, "LAP") |> tally() |> pull()
 
@@ -118,8 +136,10 @@ meta_cols <- tbl(con, "META") |> tally() |> pull()
 values <- lap_vars * lap_cols + meta_vars * meta_cols
 
 
-"Bytes/Value" <-
+
 round(file.size(DB_DUCK) / (as.double(lap_cols) * as.double(lap_vars) + as.double(meta_cols) * as.double(meta_vars)), 5 )
+
+
 
 
 
