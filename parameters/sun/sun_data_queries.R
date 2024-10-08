@@ -1,11 +1,11 @@
-#!/opt/R/4.2.3/bin/Rscript
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Use full querries of Sun data
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
+#' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
 #+ echo=F, include=T
 
@@ -92,49 +92,6 @@ summary(Daylengths)
 
 
 
-duckdb_stats <- function(db_file) {
-  con <- dbConnect(duckdb(dbdir = db_file, read_only = TRUE))
-  db_stats <- data.table()
-  for (atbl in  dbListTables(con)) {
-    ## count nas
-    fillness <- tbl(con, atbl) |>
-      summarise_all(
-        ~ sum(case_match(!is.na(.x),
-                         TRUE  ~1L,
-                         FALSE ~0L))
-      ) |> collect() |> data.table()
-    ## compute
-    fillness <- data.table(
-      Table    = atbl,
-      Variable = names(fillness),
-      Non_na   = as.vector(fillness |> t()),
-      N        = tbl(con, atbl) |> tally() |> pull()
-    )
-    fillness[, missing  := N - Non_na]
-    fillness[, fill_pc  := round(100 * (N - Non_na) / N, 5) ]
-    fillness[, empty_pc := round(100 * (1 - (N - Non_na) / N), 5) ]
-    db_stats <- rbind(db_stats, fillness)
-  }
-  db_sums <- db_stats[, .(Values = sum(Non_na),
-                          Total  = sum(N)), by = Table]
-  ## bytes per value
-  data_density <- db_sums[, file.size(db_file) / sum(Values)]
-
-  dbDisconnect(con, shutdown = TRUE)
-
-  return(
-    list(data_base    = db_file,
-         base_name    = basename(db_file),
-         db_stats     = db_stats,
-         db_sums      = db_sums,
-         file_sise    = file.size(db_file),
-         file_sise_h  = fs::as_fs_bytes(file.size(db_file)),
-         data_density = data_density)
-  )
-}
-
-duckdb_stats(DB_DUCK)
-duckdb_stats(DB_LAP)
 
 
 
