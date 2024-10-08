@@ -42,56 +42,45 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Initialize params DB and/or import Sun data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
-## Get data from the main database
-SUN <- tbl(con, "LAP") |>
-  select(Date,
-         Azimuth,
-         Elevat,
-         SZA,
-         year,
-         Day,
-         preNoon,
-         doy)
-
-
-
-# sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
-#
-# ##  Relly on Astropy data
-# SUN <- tbl(sun, "params") |>
-#   filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
-#   select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist)  |>
-#   rename(Azimuth          = "AsPy_Azimuth")              |>
-#   rename(Sun_Dist_Astropy = "AsPy_Dist")                 |>
-#   rename(Elevat           = "AsPy_Elevation")
+##  Rely on sun data only
+SUN <- tbl(sun, "params") |>
+  filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
+  select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist)  |>
+  rename(Azimuth          = "AsPy_Azimuth")              |>
+  rename(Sun_Dist_Astropy = "AsPy_Dist")                 |>
+  rename(Elevat           = "AsPy_Elevation")            |>
+  mutate(
+    SZA     = 90 - Elevat,
+    preNoon = case_when(
+      Azimuth <= 180 ~ TRUE,
+      Azimuth >  180 ~ FALSE
+    )
+  )
 
 
-
-
+##  Detect Solstices in sun data
 Solstices <- SUN |>
-  group_by(year(Date))                        |>
+  group_by(year = year(Date))                        |>
   filter(Elevat == max(Elevat, na.rm = TRUE)) |>
   select(-preNoon)                            |>
   collect()                                   |>
   data.table()
 
-# Eleva > 0 & min(elevat ) & by preNoon
-
-
-
+##  Detect sunsets, sunrises
 Sunsets <- SUN |>
   filter(Elevat > 0) |>
-  group_by(Day, preNoon) |>
+  group_by(Day = as.Date(Date), preNoon) |>
   filter(Elevat == min(Elevat, na.rm = T)) |>
   mutate(Sun = case_when(
     preNoon == TRUE  ~ "Sunrise",
     preNoon == FALSE ~ "Sunset"
-  )) |> collect() |> data.table()
-
-
-Sunsets <- Sunsets[, ] |> select(-year, -preNoon)
+  )) |>
+  collect() |>
+  arrange(Date) |>
+  data.table() |>
+  select(-preNoon)
 
 
 Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60), by = Day]
@@ -101,44 +90,51 @@ summary(Daylengths)
 
 
 
-## TODO find some daily values
-## - length of daylight
-## - sun set and sun rise
-## - sun angle limits
-## - solstice
 
 
-tbl(con, "LAP") |> summarise_all(~ sum(!is.na(.)))
+duckdb_stats <- function(db_file) {
+  con <- dbConnect(duckdb(dbdir = db_file, read_only = TRUE))
+  db_stats <- data.table()
+  for (atbl in  dbListTables(con)) {
+    ## count nas
+    fillness <- tbl(con, atbl) |>
+      summarise_all(
+        ~ sum(case_match(!is.na(.x),
+                         TRUE  ~1L,
+                         FALSE ~0L))
+      ) |> collect() |> data.table()
+    ## compute
+    fillness <- data.table(
+      Table    = atbl,
+      Variable = names(fillness),
+      Non_na   = as.vector(fillness |> t()),
+      N        = tbl(con, atbl) |> tally() |> pull()
+    )
+    fillness[, missing  := N - Non_na]
+    fillness[, fill_pc  := round(100 * (N - Non_na) / N, 5) ]
+    fillness[, empty_pc := round(100 * (1 - (N - Non_na) / N), 5) ]
+    db_stats <- rbind(db_stats, fillness)
+  }
+  db_sums <- db_stats[, .(Values = sum(Non_na),
+                          Total  = sum(N)), by = Table]
+  ## bytes per value
+  data_density <- db_sums[, file.size(db_file) / sum(Values)]
 
-tbl(con, "LAP") |> summarise_all(~(sum(is.na(.))))
+  dbDisconnect(con, shutdown = TRUE)
 
-
-db_stats <- data.table()
-for (atbl in  dbListTables(con)) {
-  ## count nas
-  fillness <- tbl(con, atbl) |>
-    summarise_all(
-      ~ sum(case_match(!is.na(.x),
-                       TRUE  ~1L,
-                       FALSE ~0L))
-    ) |> collect() |> data.table()
-  ## compute
-  fillness <- data.table(
-    Table    = atbl,
-    Variable = names(fullness),
-    Non_na   = as.vector(fullness |> t()),
-    N        = tbl(con, atbl) |> tally() |> pull()
+  return(
+    list(data_base    = db_file,
+         base_name    = basename(db_file),
+         db_stats     = db_stats,
+         db_sums      = db_sums,
+         file_sise    = file.size(db_file),
+         file_sise_h  = fs::as_fs_bytes(file.size(db_file)),
+         data_density = data_density)
   )
-  fillness[, missing  := N - Non_na]
-  fillness[, fill_pc  := round(100 * (N - Non_na) / N, 4) ]
-  fillness[, empty_pc := round(100 * (1 - (N - Non_na) / N), 4) ]
-  db_stats <- rbind(db_stats, fillness)
 }
-db_sums <- db_stats[, .(Values = sum(Non_na) * min(N)), by = Table]
 
-## bytes per value
-db_sums[, file.size(DB_DUCK) / sum(Values)]
-
+duckdb_stats(DB_DUCK)
+duckdb_stats(DB_LAP)
 
 
 
