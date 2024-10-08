@@ -177,8 +177,8 @@ for (ad in dayslist) {
   daydata[, CHP1_sig_wo_dark := CHP1_sig - todays_dark_correction]
 
   ## __ Convert signal to radiation  -------------------------------------------
-  daydata[, GLB_wpsm    := CHP1_sig_wo_dark * chp1factor(Date)]
-  daydata[, GLB_SD_wpsm := CHP1_sig_sd      * chp1factor(Date)]
+  daydata[, DIR_wpsm    := CHP1_sig_wo_dark * chp1factor(Date)]
+  daydata[, DIR_SD_wpsm := CHP1_sig_sd      * chp1factor(Date)]
 
   ## __ Day stats  -------------------------------------------------------------
   names(dark_day) <- paste0("chp1_", names(dark_day))
