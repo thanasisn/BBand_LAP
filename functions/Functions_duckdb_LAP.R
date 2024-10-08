@@ -61,6 +61,7 @@ make_empty_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)"
 
 
 
+#'
 #' Create a new column with a data type in a duckdb table
 #'
 #' @param con      Connection to the database
@@ -103,16 +104,17 @@ remove_column <- function(con, table, acolname) {
 
 
 #'
+#' Modifies existing rows. Key values in `new_data` must be unique, and,
+#' by default, key values in `new_data` must exist in `con`.
 #'
-#' @param con
-#' @param new_data
-#' @param table
-#' @param matchvar
+#' @param con      A connection to a duckdb
+#' @param new_data A table of data to update
+#' @param table    The name of the database table to update
+#' @param matchvar The name of the key variable to match
 #'
-#' @return
+#' @return         A tibble and an in place mutation of the data base
 #' @export
 #'
-#' @examples
 update_table <- function(con, new_data, table, matchvar) {
 
   create_missing_columns(con      = con,
@@ -130,7 +132,18 @@ update_table <- function(con, new_data, table, matchvar) {
 
 
 
-insert_table <- function(con,  new_data, table, matchvar) {
+#'
+#' Adds new rows. By default, key values in `new_data` must not exist in `con`.
+#'
+#' @param con      A connection to a duckdb
+#' @param new_data A table of data to update
+#' @param table    The name of the database table to update
+#' @param matchvar The name of the key variable to match
+#'
+#' @return         A tibble and an in place mutation of the data base
+#' @export
+#'
+insert_table <- function(con, new_data, table, matchvar) {
 
   create_missing_columns(con      = con,
                          new_data = new_data,
@@ -147,7 +160,19 @@ insert_table <- function(con,  new_data, table, matchvar) {
 
 
 
-upsert_table <- function(con,  new_data, table, matchvar) {
+#'
+#' inserts or updates depending on whether or not the key value in `new_data`
+#' already exists in `con`. Key values in `new_data` must be unique.
+#'
+#' @param con      A connection to a duckdb
+#' @param new_data A table of data to update
+#' @param table    The name of the database table to update
+#' @param matchvar The name of the key variable to match
+#'
+#' @return         A tibble and an in place mutation of the data base
+#' @export
+#'
+upsert_table <- function(con, new_data, table, matchvar) {
 
   create_missing_columns(con      = con,
                          new_data = new_data,
