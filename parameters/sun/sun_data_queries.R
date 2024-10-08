@@ -96,7 +96,6 @@ Sunsets <- Sunsets[, ] |> select(-year, -preNoon)
 
 Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60), by = Day]
 
-
 plot(Daylengths)
 summary(Daylength)
 
@@ -117,7 +116,11 @@ meta_cols <- tbl(con, "META") |> tally() |> pull()
 
 
 values <- lap_vars * lap_cols + meta_vars * meta_cols
-data_density <- file.size(DB_DUCK) / values
+
+
+"Bytes/Value" <-
+round(file.size(DB_DUCK) / (as.double(lap_cols) * as.double(lap_vars) + as.double(meta_cols) * as.double(meta_vars)), 5 )
+
 
 
 stop()
