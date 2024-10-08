@@ -95,7 +95,6 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
-source("~/CODE/FUNCTIONS/R/trig_deg.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
@@ -188,10 +187,6 @@ DT |>
     DIFF_strict = GLB_strict - HOR_strict
   )
 
-DT |> head() |>
-  mutate(TT = 180 * cos(SZA) / pi ) |> select(TT)
-
-DT |> colnames()
 
 
 
@@ -211,9 +206,6 @@ datapart[Elevat > QS$sun_elev_min        &
            is.na(chp1_bad_data_flag)   &
            Async_tracker_flag == FALSE,
          HOR_strict := HOR_wpsm]
-
-
-
 
 ## __ Negative radiation to zero  ------------------------------------------
 datapart[DIR_strict < 0, DIR_strict := 0]
