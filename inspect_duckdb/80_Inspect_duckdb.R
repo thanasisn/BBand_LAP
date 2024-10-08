@@ -97,7 +97,8 @@ duckdb_stats <- function(db_file) {
       summarise_all(
         ~ sum(case_match(!is.na(.x),
                          TRUE  ~1L,
-                         FALSE ~0L))
+                         FALSE ~0L),
+              na.rm = TRUE)
       ) |> collect() |> data.table()
     ## compute
     fillness <- data.table(
@@ -107,8 +108,8 @@ duckdb_stats <- function(db_file) {
       N        = tbl(con, atbl) |> tally() |> pull()
     )
     fillness[, missing  := N - Non_na]
-    fillness[, fill_pc  := round(100 * (N - Non_na) / N, 5) ]
-    fillness[, empty_pc := round(100 * (1 - (N - Non_na) / N), 5) ]
+    fillness[, empty_pc  := round(100 * (N - Non_na) / N, 5) ]
+    fillness[, fill_pc := round(100 * (1 - (N - Non_na) / N), 5) ]
     db_stats <- rbind(db_stats, fillness)
   }
   db_sums <- db_stats[, .(Values = sum(Non_na),
