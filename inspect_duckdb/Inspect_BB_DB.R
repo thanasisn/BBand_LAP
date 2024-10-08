@@ -15,6 +15,7 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R"
 renv::load("~/BBand_LAP")
 
+output_dir <- "~/BBand_LAP/REPORTS/REPORTS_duck/"
 
 cat("\n\nwrite it in shell to parallelize\n\n")
 
@@ -23,7 +24,7 @@ try({
     cat("\n\n 0. Check files\n")
     rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/00_Check_input_files.R",
                       params      = list(CLEAN = TRUE),
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+                      output_dir  = output_dir)
 })
 
 try({
@@ -31,14 +32,14 @@ try({
     rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/01_Inspect_CHP1_sig_snc_temp.R",
                       params      = list(CLEAN = TRUE),
                       output_file = "01_Inspect_CHP1_sig_snc_temp_CLEAN.pdf",
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+                      output_dir  = output_dir)
 })
 try({
     cat("\n\n 1b. Inspect CHP-1 signal DIRTY\n")
     rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/01_Inspect_CHP1_sig_snc_temp.R",
                       params      = list(CLEAN = FALSE),
                       output_file = "01_Inspect_CHP1_sig_snc_temp_DIRTY.pdf",
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+                      output_dir  = output_dir)
 })
 
 
@@ -49,14 +50,14 @@ try({
     rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/02_Inspect_CM21_sig.R",
                       params      = list(CLEAN = TRUE),
                       output_file = "02_Inspect_CM21_sig_CLEAN.pdf",
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+                      output_dir  = output_dir)
 })
 try({
     cat("\n\n 2b. Inspect CM-21 signal DIRTY\n")
     rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/02_Inspect_CM21_sig.R",
                       params      = list(CLEAN = FALSE),
                       output_file = "02_Inspect_CM21_sig_DIRTY.pdf",
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+                      output_dir  = output_dir)
 })
 
 
@@ -96,14 +97,14 @@ try({
     cat("\n\n 20. Inspect CHP-1 radiation\n")
     rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/20_Inspect_CHP1_rad_temp.R",
                       # params     = list(CLEAN = FALSE),
-                      output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+                      output_dir  = output_dir)
 })
 
 try({
     cat("\n\n 21. Inspect CM-21 radiation\n")
     rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/21_Inspect_CM21_rad.R",
                       # params     = list(CLEAN = FALSE),
-                      output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+                      output_dir  = output_dir)
 })
 
 
@@ -123,7 +124,7 @@ try({
 try({
     cat("\n\n 60. Inspect CM-21/TOT radiation\n")
     rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
-                      output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+                      output_dir  = output_dir)
 })
 
 
