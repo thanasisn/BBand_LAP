@@ -141,12 +141,15 @@ PLOT_LAST  <- as_date("2024-01-01")
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-
 DT <- tbl(con, "LAP")
 
-## remove old columns
-make_empty_column(con, "LAP", "GLB_strict")
+##  Create strict radiation data  ----------------------------------------------
 
+
+## __ GHI  ---------------------------------------------------------------------
+##  Always create an empty column
+make_empty_column(con, "LAP", "GLB_strict")
+##  Prepare data to add in the database
 ADD <- DT |>
   filter(Elevat > QS$sun_elev_min)    |>  ## sun is up
   filter(!is.na(CM21_sig))            |>  ## valid measurements
@@ -157,8 +160,14 @@ ADD <- DT |>
     GLB_wpsm <  0 ~ 0,                    ## Negative values to zero
     GLB_wpsm >= 0 ~ GLB_wpsm              ## All other selected values as is
   ))
+##  Create data in the data base
+res <- update_table(con, ADD, "LAP", "Date")
 
-update_table()
+## __ DNI  ---------------------------------------------------------------------
+##  Always create an empty column
+make_empty_column(con, "LAP", "DIR_strict")
+make_empty_column(con, "LAP", "HOR_strict")
+make_empty_column(con, "LAP", "DIFF_strict")
 
 
 stop()
@@ -169,13 +178,22 @@ DT |>
   filter(is.na(chp1_bad_data_flag)) |>  ## not bad data
   filter(chp1_sig_limit_flag == 0)  |>  ## acceptable values range
   filter(Async_tracker_flag != T)   |>  ## not in an async
-  select(Date, DIR_)
+  select(Date, DIR_wpsm, SZA)       |>
+  mutate(
+    DIR_strict = case_when(
+      DIR_wpsm <  0 ~ 0,                    ## Negative values to zero
+      DIR_wpsm >= 0 ~ DIR_wpsm              ## All other selected values as is
+    ),
+    HOR_strict  = DIR_strict * 180 * cos(SZA) / pi,
+    DIFF_strict = GLB_strict - HOR_strict
+  )
+
+DT |> head() |>
+  mutate(TT = 180 * cos(SZA) / pi ) |> select(TT)
 
 DT |> colnames()
 
 
-DT |> select(Async_tracker_flag) |> group_by(Async_tracker_flag) |> tally()
-DT |> filter(Async_tracker_flag==T) |> select(Async_step_count)
 
 stop()
 
@@ -193,10 +211,7 @@ datapart[Elevat > QS$sun_elev_min        &
            is.na(chp1_bad_data_flag)   &
            Async_tracker_flag == FALSE,
          HOR_strict := HOR_wpsm]
-## GHI
-datapart[Elevat > QS$sun_elev_min        &
-           is.na(cm21_bad_data_flag),
-         GLB_strict := GLB_wpsm]
+
 
 
 
