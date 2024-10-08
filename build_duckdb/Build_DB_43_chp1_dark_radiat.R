@@ -86,7 +86,7 @@ if (vddays > 100) {
   ## Create missing dark
   construct <- data.table(
     Date = missingdays,
-    DARK = chp1DAILYdark(missingdays)
+    DARK = chp1DAILYdark(missingdays$Day)
   )
   plot(test$Day, test$chp1_Daily_dark,
        main = "Constructed Dark values for CM-21")
@@ -150,17 +150,17 @@ for (ad in dayslist) {
     ## get dark from pre-computed file
     if (exists("construct")) {
       ## can not find date
-      if (!aday %in% construct$Date) {
+      if (!ad %in% construct$Date) {
         todays_dark_correction <- as.numeric(NA)
         dark_flag              <- "MISSING"
         missingdark            <- as.numeric(NA)
       } else {
         ## get data from recomputed dark database
-        todays_dark_correction <- construct[Date == aday, DARK]
+        todays_dark_correction <- construct[Date == ad, DARK]
         dark_flag              <- "CONSTRUCTED"
       }
     } else {
-      cat("Need to constract dark:", format(as.Date(aday)),"\n")
+      cat("Need to constract dark:", format(as.Date(ad)),"\n")
     }
   } else {
     ## __ Dark Correction function for non missing  ----------------------------
