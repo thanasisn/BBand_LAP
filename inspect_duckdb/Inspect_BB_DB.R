@@ -128,6 +128,11 @@ try({
 })
 
 
+try({
+    cat("\n\n 80. Inspect duckdbs\n")
+    rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/80_Inspect_duckdb.R",
+                      output_dir  = output_dir)
+})
 
 
 
