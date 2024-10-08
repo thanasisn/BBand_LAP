@@ -1,10 +1,12 @@
 #!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Compute or construct dark signal offset for CM-21.
 #'
 #' Fills:
-#' - `CM21_sig_wo_dark` when it's appropriate
+#' - `CM21_sig_wo_dark` Global radiation signal without dark signal
+#' - `GLB_wpsm`         Global radiation
+#' - `GLB_SD_wpsm`      Global radiation standard radiation
 #'
 #' On the second run will replace 'MISSING' dark with 'CONSTRUCTED' dark.
 #'
@@ -88,7 +90,6 @@ if (vddays > 100) {
   points(construct$Date, construct$DARK, col = "red")
 }
 
-
 ##  Dark and radiation calculations  -------------------------------------------
 ## days to loop
 dayslist <- tbl(con, "META") |>
@@ -146,17 +147,17 @@ for (ad in dayslist) {
     ## get dark from pre-computed file
     if (exists("construct")) {
       ## can not find date
-      if (!aday %in% construct$Date) {
+      if (!ad %in% construct$Date) {
         todays_dark_correction <- as.numeric(NA)
         dark_flag              <- "MISSING"
         missingdark            <- as.numeric(NA)
       } else {
         ## get data from recomputed dark database
-        todays_dark_correction <- construct[Date == aday, DARK]
+        todays_dark_correction <- construct[Date == ad, DARK]
         dark_flag              <- "CONSTRUCTED"
       }
     } else {
-      cat("Need to constract dark:", format(as.Date(aday)),"\n")
+      cat("Need to constract dark:", format(as.Date(ad)),"\n")
     }
   } else {
     ## __ Dark Correction function for non missing  ----------------------------
@@ -183,22 +184,20 @@ for (ad in dayslist) {
                          cm21_dark_flag     = dark_flag,
                          dark_day,
                          cm21_dark_computed = Sys.time()
-  )
+  ) |> mutate_if(is.numeric, function(x) ifelse(is.nan(x), NA, x))
 
   ## __  Store data in the database  -------------------------------------------
-  update_table(con      = con,
-               new_data = daydata,
-               table    = "LAP",
-               matchvar = "Date")
-  update_table(con      = con,
-               new_data = meta_day,
-               table    = "META",
-               matchvar = "Day")
-
+  res <- update_table(con      = con,
+                      new_data = daydata,
+                      table    = "LAP",
+                      matchvar = "Date")
+  res <- update_table(con      = con,
+                      new_data = meta_day,
+                      table    = "META",
+                      matchvar = "Day")
 }
 
 tbl(con, "META") |> group_by(cm21_dark_flag) |> tally()
-
 
 
 # tbl(con, "META") |> glimpse()
@@ -213,7 +212,6 @@ tbl(con, "META") |> group_by(cm21_dark_flag) |> tally()
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
-
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

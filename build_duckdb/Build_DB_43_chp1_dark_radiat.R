@@ -1,17 +1,17 @@
 #!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Compute or construct dark signal offset for CHP-1.
 #'
 #' Fills with valid only data:
 #'
-#' - `CHP1_sig_wo_dark`
-#' - `DIR_wpsm`
-#' - `DIR_SD_wpsm`
-#' - `HOR_wpsm`
-#' - `HOR_SD_wpsm`
+#' - `CHP1_sig_wo_dark` Direct beam signal without dark signal
+#' - `DIR_wpsm`         Direct Beam radiation
+#' - `DIR_SD_wpsm`      Direct Beam radiation standard deviation
+#' - `HOR_wpsm`         Direct on horizontal plane
+#' - `HOR_SD_wpsm`      Direct on horizontal plane standard deviation
 #'
-#' On the second run will replace 'MISSING' dark with 'CONSTRUCTED' dark.
+#' On the second pass will replace 'MISSING' dark with 'CONSTRUCTED' dark.
 #'
 #' TODO
 #' - print dark type on graphs from metadata
@@ -45,7 +45,6 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_dark_calculation.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
-source("~/CODE/FUNCTIONS/R/trig_deg.R")
 
 # library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
@@ -188,17 +187,17 @@ for (ad in dayslist) {
                          chp1_dark_flag     = dark_flag,
                          dark_day,
                          chp1_dark_computed = Sys.time()
-  )
+  ) |> mutate_if(is.numeric, function(x) ifelse(is.nan(x), NA, x))
 
   ## __  Store data in the database  -------------------------------------------
-  update_table(con      = con,
-               new_data = daydata,
-               table    = "LAP",
-               matchvar = "Date")
-  update_table(con      = con,
-               new_data = meta_day,
-               table    = "META",
-               matchvar = "Day")
+  res <- update_table(con      = con,
+                      new_data = daydata,
+                      table    = "LAP",
+                      matchvar = "Date")
+  res <- update_table(con      = con,
+                      new_data = meta_day,
+                      table    = "META",
+                      matchvar = "Day")
 }
 
 tbl(con, "META") |> group_by(chp1_dark_flag) |> tally()
