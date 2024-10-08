@@ -112,25 +112,32 @@ tbl(con, "LAP") |> summarise_all(~ sum(!is.na(.)))
 
 tbl(con, "LAP") |> summarise_all(~(sum(is.na(.))))
 
-gather <- data.frame(
-  Name = "BBDB",
-  Rows = tbl(con, "LAP") |> tally() |> pull(),
-  Vars = tbl(con, "LAP") |> colnames() |> length(),
-  Valu = tbl(con, "LAP") |> summarise(across(everything(), ~ sum(!is.na(.), na.rm = T))) |>
-    collect() |> rowwise() |> sum(),
-  Size = strsplit(
-    system(
-      paste("du -s", DB_DUCK),
-            intern = TRUE),
-      "\t")[[1]][1]
-  )
+
+## count na
+fullness <- tbl(con, "LAP") |>
+  summarise_all(
+    ~ sum(case_match(!is.na(.x),
+                     TRUE ~ 1L,
+                     FALSE ~0L))
+  ) |> collect() |> data.table()
+
+fillness <- data.table(
+  Variable = names(fullness),
+  Non_na   = as.vector(fullness |> t()),
+  N        = tbl(con, "LAP") |> tally() |> pull()
+)
+fillness[, missing  := N - Non_na]
+fillness[, fill_pc  := round(100 * (N - Non_na) / N, 4) ]
+fillness[, empty_pc := round(100 * (1 - (N - Non_na) / N), 4) ]
 
 
-lap_vars <- tbl(con, "LAP") |> colnames() |> length()
-lap_cols <- tbl(con, "LAP") |> tally() |> pull()
 
-meta_vars <- tbl(con, "META") |> colnames() |> length()
-meta_cols <- tbl(con, "META") |> tally() |> pull()
+
+  lap_vars <- tbl(con, "LAP") |> colnames() |> length()
+  lap_cols <- tbl(con, "LAP") |> tally() |> pull()
+
+  meta_vars <- tbl(con, "META") |> colnames() |> length()
+  meta_cols <- tbl(con, "META") |> tally() |> pull()
 
 
 values <- lap_vars * lap_cols + meta_vars * meta_cols
