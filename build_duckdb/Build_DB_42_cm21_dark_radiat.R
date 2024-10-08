@@ -8,7 +8,7 @@
 #' - `GLB_wpsm`         Global radiation
 #' - `GLB_SD_wpsm`      Global radiation standard radiation
 #'
-#' On the second run will replace 'MISSING' dark with 'CONSTRUCTED' dark.
+#' On the second pass will replace 'MISSING' dark with 'CONSTRUCTED' dark.
 #'
 #' TODO
 #' - print dark type on graphs from metadata
@@ -83,7 +83,7 @@ if (vddays > 100) {
   ## Create missing dark
   construct <- data.table(
     Date = missingdays,
-    DARK = cm21DAILYdark(missingdays)
+    DARK = cm21DAILYdark(missingdays$Day)
   )
   plot(test$Day, test$cm21_Daily_dark,
        main = "Constructed Dark values for CM-21")
