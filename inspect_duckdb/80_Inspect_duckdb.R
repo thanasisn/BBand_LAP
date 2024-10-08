@@ -87,7 +87,6 @@ panderOptions("table.split.table",        120   )
 #'
 #' ##  Statistics of the databases
 #'
-#'
 #+ echo=F
 duckdb_stats <- function(db_file) {
   con <- dbConnect(duckdb(dbdir = db_file, read_only = TRUE))
@@ -117,7 +116,7 @@ duckdb_stats <- function(db_file) {
   ## bytes per value
   data_density <- db_sums[, file.size(db_file) / sum(Values)]
 
-  dbDisconnect(con, shutdown = TRUE)
+  dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
   return(
     list(data_base    = db_file,
