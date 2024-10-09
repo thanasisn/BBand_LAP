@@ -145,8 +145,7 @@ DT <- tbl(con, "LAP")
 ##  Create strict radiation data  ----------------------------------------------
 
 ## __ GHI  ---------------------------------------------------------------------
-##  Always create an empty column to update all data
-make_empty_column(con, "LAP", "GLB_strict")
+make_empty_column(con, "LAP", "GLB_strict") ## Always create empty column
 
 ##  Prepare strict global irradiance
 ADD <- DT |>
@@ -159,12 +158,11 @@ ADD <- DT |>
     GLB_wpsm <  0 ~ 0,                    ## Negative values to zero
     GLB_wpsm >= 0 ~ GLB_wpsm              ## All other selected values as is
   ))
-##  Create data in the data base
+##  Write data in the data base
 res <- update_table(con, ADD, "LAP", "Date")
 
 ## __ DNI  ---------------------------------------------------------------------
-##  Always create an empty column
-make_empty_column(con, "LAP", "DIR_strict")
+make_empty_column(con, "LAP", "DIR_strict") ## Always create empty column
 
 ##  Prepare strict direct radiation
 ADD <- DT |>
@@ -179,12 +177,11 @@ ADD <- DT |>
       DIR_wpsm <  0 ~ 0,                ## Negative values to zero
       DIR_wpsm >= 0 ~ DIR_wpsm          ## All other selected values as is
     ))
-##  Wright data in the data base
+##  Write data in the data base
 res <- update_table(con, ADD, "LAP", "Date")
 
 ## __  HOR  --------------------------------------------------------------------
-##  Always create an empty column
-make_empty_column(con, "LAP", "HOR_strict")
+make_empty_column(con, "LAP", "HOR_strict") ## Always create empty column
 
 ##  Prepare strict direct on horizontal plane radiation
 ADD <- DT |>
@@ -194,13 +191,12 @@ ADD <- DT |>
   mutate(
     HOR_strict = DIR_strict * cos(SZA * pi / 180)
   )
-##  Wright data in the data base
+##  Write data in the data base
 res <- update_table(con, ADD, "LAP", "Date")
 
 ## __  DIFF  -------------------------------------------------------------------
 ##  DHI = GHI – DNI cos(z)
-##  Always create an empty column
-make_empty_column(con, "LAP", "DIFF_strict")
+make_empty_column(con, "LAP", "DIFF_strict") ## Always create empty column
 
 ##  Prepare strict diffuse radiation
 ADD <- DT |>
@@ -210,26 +206,50 @@ ADD <- DT |>
   select(Date, GLB_strict, HOR_strict) |>
   mutate(
     DIFF_strict = GLB_strict - HOR_strict
+  ) |>
+  mutate(
+    DIFF_strict = case_when(
+      DIFF_strict <  0 ~ NA,               ## diffuse only positive
+      DIFF_strict >= 0 ~ DIFF_strict
+    )
   )
-##  Wright data in the data base
+##  Write data in the data base
 res <- update_table(con, ADD, "LAP", "Date")
 
 ## __ Transmittance  -------------------------------------------------------
 ## ClearnessIndex_kt -> Transmittance_GLB rename to proper
 ## or Solar insolation ratio, Solar insolation factor
+make_empty_column(con, "LAP", "Transmittance_GLB") ## Always create empty column
 
-##  Always create an empty column
-make_empty_column(con, "LAP", "Transmittance_GLB")
-
-##  Prepare strict diffuse radiation
+##  Prepare strict transmittance
 ADD <- DT |>
-  filter(Elevat > QS$sun_elev_min)     |>
-  filter(!is.na(GLB_strict))           |>
-  filter(!is.na(TSI))                |>
-  select(Date, GLB_strict, HOR_strict) |>
+  filter(Elevat > 0)       |>
+  filter(!is.na(GLB_strict))             |>
+  filter(GLB_strict >= 0)                |>  ## only for positive global
+  filter(!is.na(TSI_TOA))                |>
+  select(Date, GLB_strict, SZA, TSI_TOA) |>
   mutate(
-    DIFF_strict = GLB_strict - HOR_strict
+    Transmittance_GLB = GLB_strict / (cos(SZA * pi / 180) * TSI_TOA)
   )
+##  Write data in the data base
+res <- update_table(con, ADD, "LAP", "Date")
+
+## __ Diffuse fraction  ----------------------------------------------------
+make_empty_column(con, "LAP", "DiffuseFraction_kd") ## Always create empty column
+
+##  Prepare strict diffuse fraction
+ADD <- DT |>
+  filter(Elevat > QS$sun_elev_min)      |>
+  filter(!is.na(DIFF_strict))           |>
+  filter(!is.na(GLB_strict))            |>
+  filter(GLB_strict > 0)                |> ## don't use zero global
+  filter(DIFF_strict < GLB_strict)      |> ## diffuse < global
+  select(Date, DIFF_strict, GLB_strict) |>
+  mutate(
+    DiffuseFraction_kd = DIFF_strict / GLB_strict
+  )
+##  Write data in the data base
+res <- update_table(con, ADD, "LAP", "Date")
 
 
 stop()
@@ -242,9 +262,6 @@ datapart[, ClearnessIndex_kt := GLB_strict / (cosde(SZA) * TSI_TOA)]
 
 ## __ Diffuse fraction  ----------------------------------------------------
 datapart[, DiffuseFraction_kd := DIFF_strict / GLB_strict]
-
-## replace infinite values
-datapart[is.infinite(DiffuseFraction_kd), DiffuseFraction_kd := NA]
 
 
 
