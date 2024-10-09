@@ -1,11 +1,10 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Use full querries of Sun data
+#' Use full queries of Sun data
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
 #+ echo=F, include=T
 
@@ -21,8 +20,8 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/parameters/sun/sun_data_queries.R"
-Script.ID   <- "1A"
+Script.Name <- "~/BBand_LAP/parameters/sun/export_sun_data.R"
+Script.ID   <- "0B"
 
 if (!interactive()) {
   pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -73,8 +72,11 @@ Solstices <- SUN                              |>
   arrange(Date)                               |>
   data.table()
 
-saveRDS(  Solstices, paste0(solstices_fl, ".Rds"))
-write.csv(Solstices, paste0(solstices_fl, ".csv"), quote = F)
+if (!file.exists(paste0(solstices_fl, ".Rds")) |
+    file.mtime(paste0(solstices_fl, ".Rds")) < Sys.time() - 30 * 3600) {
+  saveRDS(  Solstices, paste0(solstices_fl, ".Rds"))
+  write.csv(Solstices, paste0(solstices_fl, ".csv"), quote = F)
+}
 
 ##  Detect sunsets, sunrises  --------------------------------------------------
 Sunsets <- SUN |>
@@ -90,15 +92,25 @@ Sunsets <- SUN |>
   data.table() |>
   select(-preNoon)
 
-saveRDS(  Sunsets, paste0(sunsets_fl, ".Rds"))
-write.csv(Sunsets, paste0(sunsets_fl, ".csv"), quote = F)
+if (!file.exists(paste0(sunsets_fl, ".Rds")) |
+    file.mtime(paste0(sunsets_fl, ".Rds")) < Sys.time() - 30 * 3600) {
+  saveRDS(  Sunsets, paste0(sunsets_fl, ".Rds"))
+  write.csv(Sunsets, paste0(sunsets_fl, ".csv"), quote = F)
+}
 
 ##  Compute daylength  ---------------------------------------------------------
 Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60),
                       by = Day]
 
-saveRDS(  Daylengths, paste0(daylength_fl, ".Rds"))
-write.csv(Daylengths, paste0(daylength_fl, ".csv"), quote = F)
+if (!file.exists(paste0(daylength_fl, ".Rds")) |
+    file.mtime(paste0(daylength_fl, ".Rds")) < Sys.time() - 30 * 3600) {
+  saveRDS(  Daylengths, paste0(daylength_fl, ".Rds"))
+  write.csv(Daylengths, paste0(daylength_fl, ".csv"), quote = F)
+}
+
+
+##  Export legacy  -------------------------------------------------------------
+
 
 
 ## clean exit
