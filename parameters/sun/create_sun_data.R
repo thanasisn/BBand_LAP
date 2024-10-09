@@ -76,6 +76,10 @@ if (!dbExistsTable(con, "params")) {
 } else {
   ## Extend days, add from last date
   start_date <- tbl(con, "params") |> summarise(max(Date, na.rm = T)) |> pull()
+
+  ## temporary fix
+  if (end_date < start_date) { end_date <- start_date}
+
   DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
   DT[ , Date := round_date(Date, unit = "second")]
   setorder(DT, Date)
@@ -121,7 +125,7 @@ if (dbExistsTable(con, "params") &
   dates_to_do <- tbl(con, "params") |> select(Date) |> pull() |> sort()
   dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-  cat(Script.ID, ": Astropy", paste(range(dates_to_do), collapse = "--"), "\n")
+  cat(Script.ID, ": Astropy", paste(range(dates_to_do), collapse = " -- "), "\n")
 
   ##  Calculate sun vector
   sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
@@ -152,7 +156,7 @@ if (dbExistsTable(con, "params") &
     dates_to_do <- tbl(con, "params") |> filter(is.na(PySo_Elevation)) |> select(Date) |> pull() |> sort()
     dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-    cat(Script.ID, ": Pysolar", paste(range(dates_to_do), collapse = "--"), "\n")
+    cat(Script.ID, ": Pysolar", paste(range(dates_to_do), collapse = " -- "), "\n")
 
     ##  Calculate sun vector
     sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
@@ -169,7 +173,7 @@ if (dbExistsTable(con, "params") &
   dates_to_do <- tbl(con, "params") |> select(Date) |> pull() |> sort()
   dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-  cat(Script.ID, ": Pysolar", paste(range(dates_to_do), collapse = "--"), "\n")
+  cat(Script.ID, ": Pysolar", paste(range(dates_to_do), collapse = " -- "), "\n")
 
   ##  Calculate sun vector
   sss   <- data.frame(t(sapply(dates_to_do, sunR_pysolar )))
@@ -215,7 +219,7 @@ if (dbExistsTable(con, "params") &
   dates_to_do <- tbl(con, "params") |> select(Date) |> pull() |> sort()
   dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-  cat(Script.ID, ": zenangle", paste(range(dates_to_do), collapse = "--"), "\n")
+  cat(Script.ID, ": zenangle", paste(range(dates_to_do), collapse = " -- "), "\n")
 
   ##  Calculate sun vector
   for (aday in dates_to_do) {
