@@ -148,7 +148,7 @@ DT <- tbl(con, "LAP")
 ##  Always create an empty column to update all data
 make_empty_column(con, "LAP", "GLB_strict")
 
-##  Prepare data to add in the database
+##  Prepare strict global irradiance
 ADD <- DT |>
   filter(Elevat > QS$sun_elev_min)    |>  ## sun is up
   filter(!is.na(CM21_sig))            |>  ## valid measurements
@@ -166,7 +166,7 @@ res <- update_table(con, ADD, "LAP", "Date")
 ##  Always create an empty column
 make_empty_column(con, "LAP", "DIR_strict")
 
-##  Prepare data to add in the database
+##  Prepare strict direct radiation
 ADD <- DT |>
   filter(Elevat > QS$sun_elev_min)  |>  ## sun is up
   filter(!is.na(CHP1_sig))          |>  ## valid measurements
@@ -179,55 +179,60 @@ ADD <- DT |>
       DIR_wpsm <  0 ~ 0,                ## Negative values to zero
       DIR_wpsm >= 0 ~ DIR_wpsm          ## All other selected values as is
     ))
-##  Create data in the data base
+##  Wright data in the data base
 res <- update_table(con, ADD, "LAP", "Date")
-
 
 ## __  HOR  --------------------------------------------------------------------
 ##  Always create an empty column
 make_empty_column(con, "LAP", "HOR_strict")
 
-DT |>
+##  Prepare strict direct on horizontal plane radiation
+ADD <- DT |>
   filter(Elevat > QS$sun_elev_min) |>
   filter(!is.na(DIR_strict))       |>
-  filter(!is.na(GLB_strict))       |>
-  select(Date, DIR_strict, GLB_strict, SZA) |>
+  select(Date, DIR_strict, SZA)    |>
   mutate(
-    DIR_strict = DIR_strict * 180 * cos(SZA) / pi
+    HOR_strict = DIR_strict * cos(SZA * pi / 180)
+  )
+##  Wright data in the data base
+res <- update_table(con, ADD, "LAP", "Date")
+
+## __  DIFF  -------------------------------------------------------------------
+##  DHI = GHI – DNI cos(z)
+##  Always create an empty column
+make_empty_column(con, "LAP", "DIFF_strict")
+
+##  Prepare strict diffuse radiation
+ADD <- DT |>
+  filter(Elevat > QS$sun_elev_min)     |>
+  filter(!is.na(GLB_strict))           |>
+  filter(!is.na(HOR_strict))           |>
+  select(Date, GLB_strict, HOR_strict) |>
+  mutate(
+    DIFF_strict = GLB_strict - HOR_strict
+  )
+##  Wright data in the data base
+res <- update_table(con, ADD, "LAP", "Date")
+
+## __ Transmittance  -------------------------------------------------------
+## ClearnessIndex_kt -> Transmittance_GLB rename to proper
+## or Solar insolation ratio, Solar insolation factor
+
+##  Always create an empty column
+make_empty_column(con, "LAP", "Transmittance_GLB")
+
+##  Prepare strict diffuse radiation
+ADD <- DT |>
+  filter(Elevat > QS$sun_elev_min)     |>
+  filter(!is.na(GLB_strict))           |>
+  filter(!is.na(TSI))                |>
+  select(Date, GLB_strict, HOR_strict) |>
+  mutate(
+    DIFF_strict = GLB_strict - HOR_strict
   )
 
 
 stop()
-
-DT |> glimpse()
-
-
-make_empty_column(con, "LAP", "DIFF_strict")
-
-
-# HOR_strict  = DIR_strict * 180 * cos(SZA) / pi,
-# DIFF_strict = GLB_strict - HOR_strict
-
-
-stop()
-
-##  Create strict radiation data  ------------------------------------------
-
-
-## DHI
-datapart[Elevat > QS$sun_elev_min        &
-           is.na(chp1_bad_data_flag)   &
-           Async_tracker_flag == FALSE,
-         HOR_strict := HOR_wpsm]
-
-## __ Negative radiation to zero  ------------------------------------------
-datapart[DIR_strict < 0, DIR_strict := 0]
-datapart[HOR_strict < 0, HOR_strict := 0]
-datapart[GLB_strict < 0, GLB_strict := 0]
-
-## __ Diffuse radiation  ---------------------------------------------------
-## DHI = GHI – DNI cos(z)
-datapart[, DIFF_strict := GLB_strict - HOR_strict]
 
 ## __ Transmittance  -------------------------------------------------------
 ## ClearnessIndex_kt -> Transmittance_GLB rename to proper
