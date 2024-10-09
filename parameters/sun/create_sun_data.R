@@ -47,6 +47,8 @@ library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(reticulate, warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
+library(foreach,    warn.conflicts = FALSE, quietly = TRUE)
+library(doMC,       warn.conflicts = FALSE, quietly = TRUE)
 use_python("/usr/bin/python3")
 
 cat("\n Initialize params DB and/or import Sun data\n\n")
@@ -58,8 +60,8 @@ con   <- dbConnect(duckdb(dbdir = DB_LAP))
 start_date <- as.POSIXct("1992-01-01") + 30  ## start before time
 memlimit   <- 9999                           ## add data in batches to save memory
 end_date   <- ceiling_date(Sys.time(),
-                           unit = "month") +
-  24 * 60 * 60 + 30                          ## until the near future
+                           unit = "week") +
+  30 * 60 * 60 + 30                          ## until the near future
 
 ##  Create all dates  ----------------------------------------------------------
 if (!dbExistsTable(con, "params")) {
@@ -119,7 +121,7 @@ if (dbExistsTable(con, "params") &
   dates_to_do <- tbl(con, "params") |> select(Date) |> pull() |> sort()
   dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-  cat(Script.ID, ": Astropy", paste(range(dates_to_do)), "\n")
+  cat(Script.ID, ": Astropy", paste(range(dates_to_do), collapse = "--"), "\n")
 
   ##  Calculate sun vector
   sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
@@ -150,7 +152,7 @@ if (dbExistsTable(con, "params") &
     dates_to_do <- tbl(con, "params") |> filter(is.na(PySo_Elevation)) |> select(Date) |> pull() |> sort()
     dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-    cat(Script.ID, ": Pysolar", paste(range(dates_to_do)), "\n")
+    cat(Script.ID, ": Pysolar", paste(range(dates_to_do), collapse = "--"), "\n")
 
     ##  Calculate sun vector
     sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
@@ -167,7 +169,7 @@ if (dbExistsTable(con, "params") &
   dates_to_do <- tbl(con, "params") |> select(Date) |> pull() |> sort()
   dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-  cat(Script.ID, ": Pysolar", paste(range(dates_to_do)), "\n")
+  cat(Script.ID, ": Pysolar", paste(range(dates_to_do), collapse = "--"), "\n")
 
   ##  Calculate sun vector
   sss   <- data.frame(t(sapply(dates_to_do, sunR_pysolar )))
@@ -180,6 +182,53 @@ if (dbExistsTable(con, "params") &
   update_table(con, month, "params", "Date")
 }
 rm("sun_vector")
+
+##  Compute LAP sun vector data  -----------------------------------------------
+
+## Sun position algorithm as the other broadband
+zenangle <- function(year, min, doy){
+  as.numeric(
+    system(
+      paste("~/BBand_LAP/parameters/sun/zenangle64 ", year, min, doy, " 40.634 -22.956"),
+      intern = T)
+  )
+}
+
+## Parallelize zenangle
+registerDoMC()
+pzen <- function(year, min = 1:1440, doy) {
+  foreach(min = min, .combine = 'c') %dopar% zenangle(year = year, min = min, doy = doy)
+}
+
+
+for (ad in missza) {
+  new_sza <- pzen(yyyy, 1:1440, ad)
+  DATA[doy == ad, lap_sza := new_sza]
+  cat("\nFilled LAP SZA for doy:", ad, "\n")
+}
+
+if (dbExistsTable(con, "params") &
+    any(dbListFields(con, "params") %in% "Lap_SZA_start")) {
+  stop()
+} else {
+  ##  fill some days to initialize table
+  dates_to_do <- tbl(con, "params") |> select(Date) |> pull() |> sort()
+  dates_to_do <- data.table::first(dates_to_do, memlimit)
+
+  cat(Script.ID, ": zenangle", paste(range(dates_to_do), collapse = "--"), "\n")
+
+  ##  Calculate sun vector
+  for (aday in dates_to_do) {
+    year <- year(aday)
+    doy  <- yday(aday)
+
+    LAP_SZA_start  <- pzen(year,   1:1440  , doy)
+    LAP_SZA_middle <- pzen(year, 1.5:1440.5, doy)
+  }
+  stop()
+}
+
+
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
