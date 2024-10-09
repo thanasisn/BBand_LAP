@@ -183,12 +183,25 @@ ADD <- DT |>
 res <- update_table(con, ADD, "LAP", "Date")
 
 
+## __  HOR  --------------------------------------------------------------------
+##  Always create an empty column
+make_empty_column(con, "LAP", "HOR_strict")
+
+DT |>
+  filter(Elevat > QS$sun_elev_min) |>
+  filter(!is.na(DIR_strict))       |>
+  filter(!is.na(GLB_strict))       |>
+  select(Date, DIR_strict, GLB_strict, SZA) |>
+  mutate(
+    DIR_strict = DIR_strict * 180 * cos(SZA) / pi
+  )
+
 
 stop()
 
 DT |> glimpse()
 
-make_empty_column(con, "LAP", "HOR_strict")
+
 make_empty_column(con, "LAP", "DIFF_strict")
 
 
@@ -200,13 +213,7 @@ stop()
 
 ##  Create strict radiation data  ------------------------------------------
 
-## __ Daytime radiation only  ----------------------------------------------
 
-## Direct beam DNI
-datapart[Elevat > QS$sun_elev_min        &
-           is.na(chp1_bad_data_flag)   &
-           Async_tracker_flag == FALSE,
-         DIR_strict := DIR_wpsm]
 ## DHI
 datapart[Elevat > QS$sun_elev_min        &
            is.na(chp1_bad_data_flag)   &
