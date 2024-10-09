@@ -31,6 +31,7 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
+source("~/CODE/R_myRtools/myRtools/R/write_.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
@@ -111,6 +112,28 @@ if (!file.exists(paste0(daylength_fl, ".Rds")) |
 
 ##  Export legacy  -------------------------------------------------------------
 
+## __ Export pysolar for old and forgotten processes  ---------------------------
+pysolar_file = "~/DATA/SUN/Pysolar_LAP.Rds"
+pysolar <- tbl(sun, "params") |>
+  filter(!is.na(PySo_Azimuth))                   |>
+  filter(!is.na(PySo_Elevation))                 |>
+  filter(Date >= as.POSIXct("1993-01-01 00:00")) |>
+  select(Date, PySo_Azimuth, PySo_Elevation)     |>
+  rename(V1 = Date)                              |>
+  rename(V2 = PySo_Azimuth)                      |>
+  rename(V3 = PySo_Elevation)                    |>
+  arrange(V1)                                    |>
+  collect()                                      |>
+  data.table()
+
+write_RDS(pysolar, pysolar_file)
+rm(pysolar); gc()
+
+
+
+
+
+stop()
 
 
 ## clean exit
