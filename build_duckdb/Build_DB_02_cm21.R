@@ -152,7 +152,7 @@ if (nrow(inp_filelist) > 0) {
                             cm21_mtime    = file.mtime(ff$fullname),
                             cm21_parsed   = Sys.time(),
                             cm21_md5sum   = as.vector(md5sum(ff$fullname)))
-
+stop()
     ## Add data and metadata
     {
       update_table(con      = con,
