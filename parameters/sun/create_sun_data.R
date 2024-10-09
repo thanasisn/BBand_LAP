@@ -15,8 +15,6 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
-#'
 #+ echo=F, include=T
 
 #+ echo=F, include=F
@@ -60,10 +58,8 @@ con   <- dbConnect(duckdb(dbdir = DB_LAP))
 
 ##  Initialize table with dates to fill  ---------------------------------------
 start_date <- as.POSIXct("1992-01-01") + 30  ## start before time
+end_date   <- Sys.time() + 72 * 3600 + 30    ## until the near future
 memlimit   <- 9999                           ## add data in batches to save memory
-end_date   <- ceiling_date(Sys.time(),
-                           unit = "week") +
-  30 * 60 * 60 + 30                          ## until the near future
 
 ##  Create all dates  ----------------------------------------------------------
 if (!dbExistsTable(con, "params")) {
