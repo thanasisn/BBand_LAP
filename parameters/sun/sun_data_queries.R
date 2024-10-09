@@ -41,10 +41,14 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Initialize params DB and/or import Sun data\n\n")
 
+solstices_fl <- "~/DATA/SUN/LAP_solstices"
+sunsets_fl   <- "~/DATA/SUN/LAP_sunrises_sunsets"
+daylength_fl <- "~/DATA/SUN/LAP_daylength"
+
 ##  Open dataset  --------------------------------------------------------------
 sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
-##  Rely on sun data only
+##  Choose Astropy  ------------------------------------------------------------
 SUN <- tbl(sun, "params") |>
   filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
   select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist)  |>
@@ -60,15 +64,19 @@ SUN <- tbl(sun, "params") |>
   )
 
 
-##  Detect Solstices in sun data
-Solstices <- SUN |>
-  group_by(year = year(Date))                        |>
+##  Detect Solstices in sun data  ----------------------------------------------
+Solstices <- SUN                              |>
+  group_by(year = year(Date))                 |>
   filter(Elevat == max(Elevat, na.rm = TRUE)) |>
   select(-preNoon)                            |>
   collect()                                   |>
+  arrange(Date)                               |>
   data.table()
 
-##  Detect sunsets, sunrises
+saveRDS(  Solstices, paste0(solstices_fl, ".Rds"))
+write.csv(Solstices, paste0(solstices_fl, ".csv"), quote = F)
+
+##  Detect sunsets, sunrises  --------------------------------------------------
 Sunsets <- SUN |>
   filter(Elevat > 0) |>
   group_by(Day = as.Date(Date), preNoon) |>
@@ -82,35 +90,19 @@ Sunsets <- SUN |>
   data.table() |>
   select(-preNoon)
 
+saveRDS(  Sunsets, paste0(sunsets_fl, ".Rds"))
+write.csv(Sunsets, paste0(sunsets_fl, ".csv"), quote = F)
 
-Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60), by = Day]
+##  Compute daylength  ---------------------------------------------------------
+Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60),
+                      by = Day]
 
-plot(Daylengths)
-summary(Daylengths)
-
-
-
-
-
-
-
-
-
-
-stop()
-
-
-
-
-
-
-
-
-
+saveRDS(  Daylengths, paste0(daylength_fl, ".Rds"))
+write.csv(Daylengths, paste0(daylength_fl, ".csv"), quote = F)
 
 
 ## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

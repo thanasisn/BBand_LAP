@@ -55,4 +55,7 @@ info "Run other processes"
 info "Update Readme.md file"
 "$HOME/BBand_LAP/.update_readme.sh"
 
+info "New implementation"
+"$HOME/BBand_LAP/build_duckdb/Build_BB_DB.R"
+
 exit 0
