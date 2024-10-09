@@ -146,13 +146,16 @@ if (nrow(inp_filelist) > 0) {
     day_data[CM21_sig > cm21_signal_upper_limit(Date),
              cm21_sig_limit_flag := 2L ]
 
+    ##  data base limits
+    day_data[CM21_sig > 9000, CM21_sig := 9000]
+
     ## meta data for file
     file_meta <- data.table(Day           = ff$Day,
                             cm21_basename = basename(ff$fullname),
                             cm21_mtime    = file.mtime(ff$fullname),
                             cm21_parsed   = Sys.time(),
                             cm21_md5sum   = as.vector(md5sum(ff$fullname)))
-stop()
+
     ## Add data and metadata
     {
       update_table(con      = con,
