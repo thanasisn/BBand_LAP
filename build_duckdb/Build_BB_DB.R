@@ -17,6 +17,10 @@ renv::load("~/BBand_LAP")
 #     source("~/BBand_LAP/build_duckdb/Build_chp1_tracker_DB.R"       )
 # )
 
+##  Prepare sun data for the database  -----------------------------------------
+source("~/BBand_LAP/parameters/sun/create_sun_data.R"           )
+
+
 ##  Import raw data from instruments  ------------------------------------------
 source("~/BBand_LAP/build_duckdb/Build_DB_01_initialize.R"      )
 source("~/BBand_LAP/build_duckdb/Build_DB_02_cm21.R"            )

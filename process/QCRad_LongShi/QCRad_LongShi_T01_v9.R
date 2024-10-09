@@ -144,10 +144,10 @@ DT <- tbl(con, "LAP")
 
 ##  Create strict radiation data  ----------------------------------------------
 
-
 ## __ GHI  ---------------------------------------------------------------------
-##  Always create an empty column
+##  Always create an empty column to update all data
 make_empty_column(con, "LAP", "GLB_strict")
+
 ##  Prepare data to add in the database
 ADD <- DT |>
   filter(Elevat > QS$sun_elev_min)    |>  ## sun is up
@@ -165,13 +165,9 @@ res <- update_table(con, ADD, "LAP", "Date")
 ## __ DNI  ---------------------------------------------------------------------
 ##  Always create an empty column
 make_empty_column(con, "LAP", "DIR_strict")
-make_empty_column(con, "LAP", "HOR_strict")
-make_empty_column(con, "LAP", "DIFF_strict")
 
-
-stop()
-
-DT |>
+##  Prepare data to add in the database
+ADD <- DT |>
   filter(Elevat > QS$sun_elev_min)  |>  ## sun is up
   filter(!is.na(CHP1_sig))          |>  ## valid measurements
   filter(is.na(chp1_bad_data_flag)) |>  ## not bad data
@@ -180,14 +176,24 @@ DT |>
   select(Date, DIR_wpsm, SZA)       |>
   mutate(
     DIR_strict = case_when(
-      DIR_wpsm <  0 ~ 0,                    ## Negative values to zero
-      DIR_wpsm >= 0 ~ DIR_wpsm              ## All other selected values as is
-    ),
-    HOR_strict  = DIR_strict * 180 * cos(SZA) / pi,
-    DIFF_strict = GLB_strict - HOR_strict
-  )
+      DIR_wpsm <  0 ~ 0,                ## Negative values to zero
+      DIR_wpsm >= 0 ~ DIR_wpsm          ## All other selected values as is
+    ))
+##  Create data in the data base
+res <- update_table(con, ADD, "LAP", "Date")
 
 
+
+stop()
+
+DT |> glimpse()
+
+make_empty_column(con, "LAP", "HOR_strict")
+make_empty_column(con, "LAP", "DIFF_strict")
+
+
+# HOR_strict  = DIR_strict * 180 * cos(SZA) / pi,
+# DIFF_strict = GLB_strict - HOR_strict
 
 
 stop()
