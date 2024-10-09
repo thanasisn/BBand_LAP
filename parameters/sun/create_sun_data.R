@@ -10,6 +10,8 @@
 #'  - AsPy_Dist
 #'  - PySo_Azimuth
 #'  - PySo_Elevation
+#'  - LAP_SZA_start
+#'  - LAP_SZA_middle
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -107,38 +109,40 @@ if (dbExistsTable(con, "params") &
     dates_to_do <- tbl(con, "params") |> filter(is.na(AsPy_Elevation)) |> select(Date) |> pull() |> sort()
     dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-    cat(Script.ID, ": Astropy", paste(range(dates_to_do)), "\n")
+    cat(Script.ID, ": Astropy", paste(range(dates_to_do), collapse = " -- "), " c")
 
     ##  Calculate sun vector
-    sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
+    sss <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
     ##  reshape data
-    month <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
-                        AsPy_Elevation = unlist(sss$X2),
-                        AsPy_Dist      = unlist(sss$X3),
-                        Date           = as.POSIXct(unlist(sss$X4),
-                                                    origin = "1970-01-01"))
+    ADD <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
+                      AsPy_Elevation = unlist(sss$X2),
+                      AsPy_Dist      = unlist(sss$X3),
+                      Date           = as.POSIXct(unlist(sss$X4),
+                                                  origin = "1970-01-01"))
     ##  Put in the data base
-    update_table(con, month, "params", "Date")
+    cat(" w\n")
+    res <- update_table(con, ADD, "params", "Date")
   }
 } else {
   ##  fill some days to initialize table
   dates_to_do <- tbl(con, "params") |> select(Date) |> pull() |> sort()
   dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-  cat(Script.ID, ": Astropy", paste(range(dates_to_do), collapse = " -- "), "\n")
+  cat(Script.ID, ": Astropy", paste(range(dates_to_do), collapse = " -- "), " c")
 
   ##  Calculate sun vector
-  sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
+  sss <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
   ##  reshape data
-  month <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
-                      AsPy_Elevation = unlist(sss$X2),
-                      AsPy_Dist      = unlist(sss$X3),
-                      Date           = as.POSIXct(unlist(sss$X4),
-                                                  origin = "1970-01-01"))
+  ADD <- data.frame(AsPy_Azimuth   = unlist(sss$X1),
+                    AsPy_Elevation = unlist(sss$X2),
+                    AsPy_Dist      = unlist(sss$X3),
+                    Date           = as.POSIXct(unlist(sss$X4),
+                                                origin = "1970-01-01"))
   ##  Put in the data base
-  update_table(con, month, "params", "Date")
+  cat(" w\n")
+  res <- update_table(con, ADD, "params", "Date")
 }
-rm("sun_vector")
+rm("sun_vector", "ADD")
 
 ##  Compute Pysolar data  ------------------------------------------------------
 source_python("~/BBand_LAP/parameters/sun/sun_vector_pysolar_p3.py")
@@ -156,36 +160,38 @@ if (dbExistsTable(con, "params") &
     dates_to_do <- tbl(con, "params") |> filter(is.na(PySo_Elevation)) |> select(Date) |> pull() |> sort()
     dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-    cat(Script.ID, ": Pysolar", paste(range(dates_to_do), collapse = " -- "), "\n")
+    cat(Script.ID, ": Pysolar", paste(range(dates_to_do), collapse = " -- "), " c")
 
     ##  Calculate sun vector
-    sss   <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
+    sss <- data.frame(t(sapply(dates_to_do, sunR_astropy )))
     ##  reshape data
-    month <- data.frame(PySo_Azimuth   = unlist(sss$X1),
-                        PySo_Elevation = unlist(sss$X2),
-                        Date           = as.POSIXct(unlist(sss$X4),
-                                                    origin = "1970-01-01"))
+    ADD <- data.frame(PySo_Azimuth   = unlist(sss$X1),
+                      PySo_Elevation = unlist(sss$X2),
+                      Date           = as.POSIXct(unlist(sss$X4),
+                                                  origin = "1970-01-01"))
     ##  Put in the data base
-    update_table(con, month, "params", "Date")
+    cat(" w\n")
+    res <- update_table(con, ADD, "params", "Date")
   }
 } else {
   ##  fill some days to initialize table
   dates_to_do <- tbl(con, "params") |> select(Date) |> pull() |> sort()
   dates_to_do <- data.table::first(dates_to_do, memlimit)
 
-  cat(Script.ID, ": Pysolar", paste(range(dates_to_do), collapse = " -- "), "\n")
+  cat(Script.ID, ": Pysolar", paste(range(dates_to_do), collapse = " -- "), " c")
 
   ##  Calculate sun vector
-  sss   <- data.frame(t(sapply(dates_to_do, sunR_pysolar )))
+  sss <- data.frame(t(sapply(dates_to_do, sunR_pysolar )))
   ##  reshape data
-  month <- data.frame(PySo_Azimuth   = unlist(sss$X1),
-                      PySo_Elevation = unlist(sss$X2),
-                      Date           = as.POSIXct(unlist(sss$X4),
-                                                  origin = "1970-01-01"))
+  ADD <- data.frame(PySo_Azimuth   = unlist(sss$X1),
+                    PySo_Elevation = unlist(sss$X2),
+                    Date           = as.POSIXct(unlist(sss$X4),
+                                                origin = "1970-01-01"))
   ##  Put in the data base
-  update_table(con, month, "params", "Date")
+  cat(" w\n")
+  res <- update_table(con, ADD, "params", "Date")
 }
-rm("sun_vector")
+rm("sun_vector", "ADD")
 
 ##  Compute LAP sun vector data  -----------------------------------------------
 
@@ -204,35 +210,73 @@ pzen <- function(year, min = 1:1440, doy) {
   foreach(min = min, .combine = 'c') %dopar% zenangle(year = year, min = min, doy = doy)
 }
 
-
-for (ad in missza) {
-  new_sza <- pzen(yyyy, 1:1440, ad)
-  DATA[doy == ad, lap_sza := new_sza]
-  cat("\nFilled LAP SZA for doy:", ad, "\n")
-}
-
 if (dbExistsTable(con, "params") &
-    any(dbListFields(con, "params") %in% "Lap_SZA_start")) {
-  stop()
+    any(dbListFields(con, "params") %in% "LAP_SZA_start")) {
+  ## fill all dates
+  while (tbl(con, "params") |> filter(is.na(LAP_SZA_start)) |> tally() |> pull() > 0) {
+    ## batch to fill
+    dates_to_do <- tbl(con, "params") |> filter(is.na(LAP_SZA_start)) |> select(Date) |> pull() |> sort()
+    dates_to_do <- data.table::first(dates_to_do, memlimit)
+    days_to_do  <- unique(as.Date(dates_to_do))
+
+    cat(Script.ID, ": zenangle", paste(range(days_to_do), collapse = " -- "), "")
+
+    ##  Calculate sun vector
+    ADD <- data.table()
+    for (aday in days_to_do) {
+      aday <- as.Date(aday, origin = origin)
+      year <- year(aday)
+      doy  <- yday(aday)
+
+      cat(" c")
+      LAP_SZA_start  <- pzen(year,   1:1440  , doy)
+      LAP_SZA_middle <- pzen(year, 1.5:1440.5, doy)
+
+      Dates <- tbl(con, "params")     |>
+        filter(as.Date(Date) == aday) |>
+        select(Date)                  |> pull()
+
+      temp <- data.table(Date = Dates,
+                         LAP_SZA_start  = LAP_SZA_start,
+                         LAP_SZA_middle = LAP_SZA_middle)
+      ADD <- rbind(ADD, temp)
+    }
+    ##  Put in the data base
+    cat(" w\n")
+    res <- update_table(con, ADD, "params", "Date")
+  }
 } else {
   ##  fill some days to initialize table
   dates_to_do <- tbl(con, "params") |> select(Date) |> pull() |> sort()
   dates_to_do <- data.table::first(dates_to_do, memlimit)
+  days_to_do  <- unique(as.Date(dates_to_do))
 
-  cat(Script.ID, ": zenangle", paste(range(dates_to_do), collapse = " -- "), "\n")
+  cat(Script.ID, ": zenangle", paste(range(days_to_do), collapse = " -- "), "")
 
   ##  Calculate sun vector
-  for (aday in dates_to_do) {
+  ADD <- data.table()
+  for (aday in days_to_do) {
+    aday <- as.Date(aday, origin = origin)
     year <- year(aday)
     doy  <- yday(aday)
 
+    cat(" c")
     LAP_SZA_start  <- pzen(year,   1:1440  , doy)
     LAP_SZA_middle <- pzen(year, 1.5:1440.5, doy)
+
+    Dates <- tbl(con, "params")     |>
+      filter(as.Date(Date) == aday) |>
+      select(Date)                  |> pull()
+
+    temp <- data.table(Date = Dates,
+                       LAP_SZA_start  = LAP_SZA_start,
+                       LAP_SZA_middle = LAP_SZA_middle)
+    ADD <- rbind(ADD, temp)
   }
-  stop()
+  ##  Put in the data base
+  cat(" w\n")
+  res <- update_table(con, ADD, "params", "Date")
 }
-
-
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()

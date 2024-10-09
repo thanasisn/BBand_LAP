@@ -89,7 +89,7 @@ if (vddays > 100) {
     DARK = chp1DAILYdark(missingdays$Day)
   )
   plot(test$Day, test$chp1_Daily_dark,
-       main = "Constructed Dark values for CM-21")
+       main = "Constructed Dark values for CHP-1")
   points(construct$Date, construct$DARK, col = "red")
 }
 
@@ -117,7 +117,7 @@ for (ad in dayslist) {
 
   ## Ignore bad and missing data
   if (nrow(daydata) == 0) {
-    cat("     No usefull CM-21 data in this file\n\n")
+    cat("     No usefull CHP-1 data in this file\n\n")
     next()
   }
   if (any(is.na(daydata$Elevat))) {
