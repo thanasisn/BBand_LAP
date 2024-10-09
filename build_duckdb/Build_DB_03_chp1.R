@@ -146,6 +146,9 @@ if (nrow(inp_filelist) > 0) {
     day_data[CHP1_sig > chp1_signal_upper_limit(Date),
              chp1_sig_limit_flag := 2L ]
 
+    ##  data base limits
+    day_data[CHP1_sig > 9000, CHP1_sig := 9000]
+
     ## meta data for file
     file_meta <- data.table(Day           = ff$Day,
                             chp1_basename = basename(ff$fullname),
