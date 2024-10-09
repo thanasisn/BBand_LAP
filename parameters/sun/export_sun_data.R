@@ -41,9 +41,12 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Initialize params DB and/or import Sun data\n\n")
 
+export_hours <- 30
 solstices_fl <- "~/DATA/SUN/LAP_solstices"
 sunsets_fl   <- "~/DATA/SUN/LAP_sunrises_sunsets"
 daylength_fl <- "~/DATA/SUN/LAP_daylength"
+pysolar_file <- "~/DATA/SUN/Pysolar_LAP.Rds"
+astropy_file <- "~/DATA_RAW/SUN/Astropy_LAP.Rds"
 
 ##  Open dataset  --------------------------------------------------------------
 sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
@@ -65,46 +68,49 @@ SUN <- tbl(sun, "params") |>
 
 
 ##  Detect Solstices in sun data  ----------------------------------------------
-Solstices <- SUN                              |>
-  group_by(year = year(Date))                 |>
-  filter(Elevat == max(Elevat, na.rm = TRUE)) |>
-  select(-preNoon)                            |>
-  collect()                                   |>
-  arrange(Date)                               |>
-  data.table()
-
 if (!file.exists(paste0(solstices_fl, ".Rds")) |
-    file.mtime(paste0(solstices_fl, ".Rds")) < Sys.time() - 30 * 3600) {
+    file.mtime(paste0(solstices_fl, ".Rds")) < Sys.time() - export_hours * 3600) {
+
+  Solstices <- SUN                              |>
+    group_by(year = year(Date))                 |>
+    filter(Elevat == max(Elevat, na.rm = TRUE)) |>
+    select(-preNoon)                            |>
+    collect()                                   |>
+    arrange(Date)                               |>
+    data.table()
+
   saveRDS(  Solstices, paste0(solstices_fl, ".Rds"))
   write.csv(Solstices, paste0(solstices_fl, ".csv"), quote = F)
 }
 
 ##  Detect sunsets, sunrises  --------------------------------------------------
-Sunsets <- SUN |>
-  filter(Elevat > 0) |>
-  group_by(Day = as.Date(Date), preNoon) |>
-  filter(Elevat == min(Elevat, na.rm = T)) |>
-  mutate(Sun = case_when(
-    preNoon == TRUE  ~ "Sunrise",
-    preNoon == FALSE ~ "Sunset"
-  )) |>
-  collect() |>
-  arrange(Date) |>
-  data.table() |>
-  select(-preNoon)
-
 if (!file.exists(paste0(sunsets_fl, ".Rds")) |
     file.mtime(paste0(sunsets_fl, ".Rds")) < Sys.time() - 30 * 3600) {
+
+  Sunsets <- SUN |>
+    filter(Elevat > 0) |>
+    group_by(Day = as.Date(Date), preNoon) |>
+    filter(Elevat == min(Elevat, na.rm = T)) |>
+    mutate(Sun = case_when(
+      preNoon == TRUE  ~ "Sunrise",
+      preNoon == FALSE ~ "Sunset"
+    )) |>
+    collect() |>
+    arrange(Date) |>
+    data.table() |>
+    select(-preNoon)
+
   saveRDS(  Sunsets, paste0(sunsets_fl, ".Rds"))
   write.csv(Sunsets, paste0(sunsets_fl, ".csv"), quote = F)
 }
 
 ##  Compute daylength  ---------------------------------------------------------
-Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60),
-                      by = Day]
-
 if (!file.exists(paste0(daylength_fl, ".Rds")) |
     file.mtime(paste0(daylength_fl, ".Rds")) < Sys.time() - 30 * 3600) {
+
+  Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60),
+                        by = Day]
+
   saveRDS(  Daylengths, paste0(daylength_fl, ".Rds"))
   write.csv(Daylengths, paste0(daylength_fl, ".csv"), quote = F)
 }
@@ -113,46 +119,49 @@ if (!file.exists(paste0(daylength_fl, ".Rds")) |
 ##  Export legacy  -------------------------------------------------------------
 
 ## __ Export pysolar for old and forgotten processes  ---------------------------
-pysolar_file <- "~/DATA/SUN/Pysolar_LAP.Rds"
-pysolar <- tbl(sun, "params") |>
-  filter(!is.na(PySo_Azimuth))                   |>
-  filter(!is.na(PySo_Elevation))                 |>
-  filter(Date >= as.POSIXct("1993-01-01 00:00")) |>
-  select(Date, PySo_Azimuth, PySo_Elevation)     |>
-  rename(V1 = Date)                              |>
-  rename(V2 = PySo_Azimuth)                      |>
-  rename(V3 = PySo_Elevation)                    |>
-  collect()                                      |>
-  arrange(V1)                                    |>
-  data.table()
 
-write_RDS(pysolar, pysolar_file, notes = Script.Name)
-rm(pysolar); gc()
+if (!file.exists(pysolar_file) |
+    file.mtime(pysolar_file) < Sys.time() - 30 * 3600) {
 
+  pysolar <- tbl(sun, "params") |>
+    filter(!is.na(PySo_Azimuth))                   |>
+    filter(!is.na(PySo_Elevation))                 |>
+    filter(Date >= as.POSIXct("1993-01-01 00:00")) |>
+    select(Date, PySo_Azimuth, PySo_Elevation)     |>
+    rename(V1 = Date)                              |>
+    rename(V2 = PySo_Azimuth)                      |>
+    rename(V3 = PySo_Elevation)                    |>
+    collect()                                      |>
+    arrange(V1)                                    |>
+    data.table()
+
+  write_RDS(pysolar, pysolar_file, notes = Script.Name)
+  rm(pysolar); gc()
+}
 
 ## __ Export Astropy for old and forgotten processes  ---------------------------
-astropy_file <- "~/DATA_RAW/SUN/Astropy_LAP.Rds"
-astropy <- tbl(sun, "params") |>
-  filter(!is.na(AsPy_Azimuth))                          |>
-  filter(!is.na(AsPy_Elevation))                        |>
-  filter(Date >= as.POSIXct("1993-01-01 00:00"))        |>
-  select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist) |>
-  rename(Azimuth          = "AsPy_Azimuth")             |>
-  rename(Dist             = "AsPy_Dist")                |>
-  rename(Elevation        = "AsPy_Elevation")           |>
-  collect()                                             |>
-  arrange(Date)                                         |>
-  data.table()
+if (!file.exists(astropy_file) |
+    file.mtime(pysolar_file) < Sys.time() - 30 * 3600) {
 
-write_RDS(astropy, astropy_file, notes = Script.Name)
-rm(astropy); gc()
+  astropy <- tbl(sun, "params") |>
+    filter(!is.na(AsPy_Azimuth))                          |>
+    filter(!is.na(AsPy_Elevation))                        |>
+    filter(Date >= as.POSIXct("1993-01-01 00:00"))        |>
+    select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist) |>
+    rename(Azimuth          = "AsPy_Azimuth")             |>
+    rename(Dist             = "AsPy_Dist")                |>
+    rename(Elevation        = "AsPy_Elevation")           |>
+    collect()                                             |>
+    arrange(Date)                                         |>
+    data.table()
 
-
-
+  write_RDS(astropy, astropy_file, notes = Script.Name)
+  rm(astropy); gc()
+}
 
 
 ## clean exit
-dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
+dbDisconnect(sun, shutdown = TRUE); rm("sun"); closeAllConnections()
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
