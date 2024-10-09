@@ -47,7 +47,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Import  CHP-1 temperature data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 ##  Get tracker sync files  ----------------------------------------------------
 inp_filelist <- list.files(path        = CHPTMP_DIR,
@@ -165,6 +165,9 @@ if (nrow(inp_filelist) > 0) {
     day_data[chp1_temperature_SD > CHP1_TEMP_STD_LIM,
              chp1_bad_temp_flag := 3L ]
 
+    ## Over 9000!!
+    day_data[chp1_kohm_therm > 9000, chp1_kohm_therm := 9000]
+
     ## Add data and metadata
     {
       update_table(con      = con,
@@ -215,6 +218,7 @@ if (interactive()) {
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+
 
 tac <- Sys.time()
 cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
