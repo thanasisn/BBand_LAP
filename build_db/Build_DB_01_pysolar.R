@@ -45,7 +45,7 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+mylock(DB_lock)
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
@@ -152,41 +152,56 @@ if (file.exists(DB_META_fl)) {
 
 
 ##  Get PySolar files  ---------------------------------------------------------
-inp_filelist <- list.files(path       = SUN_FOLDER,
-                           pattern    = "sun_path_.*.dat.gz",
-                           recursive  = TRUE,
-                           full.names = TRUE)
-inp_filelist <- data.table(fullname = inp_filelist)
-inp_filelist[, basename := basename(fullname)]
-inp_filelist$day <- as.Date(
-    strptime(
-        sub("\\.dat\\.gz", "",
-            sub("sun_path_", "",
-                inp_filelist$basename)),
-        format = "%F"))
-setorder(inp_filelist, day)
-cat("\n**Found:",paste(nrow(inp_filelist), "PySolar files**\n"))
+# inp_filelist <- list.files(path       = SUN_FOLDER,
+#                            pattern    = "sun_path_.*.dat.gz",
+#                            recursive  = TRUE,
+#                            full.names = TRUE)
+# inp_filelist <- data.table(fullname = inp_filelist)
+# inp_filelist[, basename := basename(fullname)]
+# inp_filelist$day <- as.Date(
+#     strptime(
+#         sub("\\.dat\\.gz", "",
+#             sub("sun_path_", "",
+#                 inp_filelist$basename)),
+#         format = "%F"))
+# setorder(inp_filelist, day)
+# cat("\n**Found:",paste(nrow(inp_filelist), "PySolar files**\n"))
+#
+# ## only new files in the date range
+# inp_filelist <- inp_filelist[!inp_filelist$basename %in% BB_meta$pysolar_basename]
+# inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
+#
+# cat("\n**Parse:", paste(nrow(inp_filelist), "PySolar files**\n\n"))
 
-## only new files in the date range
-inp_filelist <- inp_filelist[!inp_filelist$basename %in% BB_meta$pysolar_basename]
-inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 
-cat("\n**Parse:", paste(nrow(inp_filelist), "PySolar files**\n\n"))
+##  Replace Pysolar with database  ---------------------------------------------
+cat("\n**Read from :", DB_LAP, "PySolar files**\n\n")
 
-
-##  Replace Pysolar  -----------------------------------------
 sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
+pysolar <- tbl(sun, "params") |>
+  filter(!is.na(PySo_Azimuth))                   |>
+  filter(!is.na(PySo_Elevation))                 |>
+  filter(Date >= as.POSIXct("1993-01-01 00:00")) |>
+  select(Date, PySo_Azimuth, PySo_Elevation)
 
-stop()
+inp_days <- pysolar |>
+  mutate(day = as.Date(Date)) |>
+  distinct(day) |> pull()
 
+inp_days <- inp_days[!inp_days %in% BB_meta$day]
 
 ##  Import PySolar files  ------------------------------------------------------
-for (YYYY in unique(year(inp_filelist$day))) {
-    subyear <- inp_filelist[year(day) == YYYY]
+# for (YYYY in unique(year(inp_filelist$day))) {
+for (YYYY in unique(year(inp_days))) {
+    # subyear <- inp_filelist[year(day) == YYYY]
+    subyear_days <- inp_days[year(inp_days) == YYYY]
+    # subyear <- inp_filelist[year(day) == YYYY]
     ## Months to do
-    for (mm in subyear[, unique(month(day))]) {
-        submonth <- subyear[month(day) == mm]
+    # for (mm in subyear[, unique(month(day))]) {
+    for (mm in unique(month(subyear_days))) {
+        # submonth <- subyear[month(day) == mm]
+        submonth_days <- subyear_days[month(subyear_days) == mm]
         ## Export file name and hive dir
         filedir <- paste0(DB_DIR, "/", YYYY, "/", mm, "/" )
         dir.create(filedir, recursive = TRUE, showWarnings = FALSE)
@@ -202,17 +217,34 @@ for (YYYY in unique(year(inp_filelist$day))) {
             cat("01  NEW: ", partfile, "\n")
             gather <- data.table()
         }
-
         ##  Read this month set files
         gathermeta <- data.table()
-        for (ad in submonth$day) {
-            ss <- submonth[day == ad]
+        # for (ad in submonth$day) {
+        for (ad in sort(submonth_days)) {
+            # ss <- submonth[day == ad]
+
+            ## fake pysolar file
+            ad <- as.Date(ad, origin = origin)
+            ss <- data.frame(
+              fullname = paste0("Use/pysolar/database/DB_pyso_",ad),
+              day      = ad
+            )
+
             ## Read sun data file  ---------------------------------------------
-            sun_temp <- fread(ss$fullname, na.strings = "None")
-            names(sun_temp)[names(sun_temp) == "DATE"] <- "Date"
-            names(sun_temp)[names(sun_temp) == "AZIM"] <- "Azimuth"
-            names(sun_temp)[names(sun_temp) == "ELEV"] <- "Elevat"
-            sun_temp[, DIST  := NULL]
+            # sun_temp <- fread(ss$fullname, na.strings = "None")
+            # names(sun_temp)[names(sun_temp) == "DATE"] <- "Date"
+            # names(sun_temp)[names(sun_temp) == "AZIM"] <- "Azimuth"
+            # names(sun_temp)[names(sun_temp) == "ELEV"] <- "Elevat"
+
+            sun_temp <- pysolar |>
+              filter(as.Date(Date) == ad)      |>
+              rename(Azimuth = PySo_Azimuth)   |>
+              rename(Elevat  = PySo_Elevation) |>
+              arrange(Date) |>
+              collect() |>
+              data.table()
+
+            # sun_temp[, DIST  := NULL]
             sun_temp[, SZA   := 90 - Elevat]
             sun_temp[, year  := year( Date)]
             sun_temp[, month := month(Date)]
@@ -221,7 +253,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
             ## Get metadata for each sun file ----------------------------------
             sun_meta <- data.table(day              = as_date(ad),
                                    pysolar_basename = basename(ss$fullname),
-                                   pysolar_mtime    = file.mtime(ss$fullname),
+                                   # pysolar_mtime    = file.mtime(ss$fullname),
+                                   pysolar_mtime    = file.mtime(DB_LAP),
                                    pysolar_parsed   = Sys.time(),
                                    daylength        = sun_temp[Elevat >= 0, .N])
 
@@ -325,7 +358,7 @@ for (YYYY in unique(year(inp_filelist$day))) {
     }
     rm(subyear)
 }
-rm(inp_filelist)
+# rm(inp_filelist)
 
 
 
