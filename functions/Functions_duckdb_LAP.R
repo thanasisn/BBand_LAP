@@ -95,6 +95,7 @@ remove_column <- function(con, table, acolname) {
   if (any(dbListFields(con, table) %in% acolname)) {
     qq <- paste0("ALTER TABLE ", table,
                  " DROP ",  acolname)
+    cat(qq, "\n")
     res <- dbSendQuery(con, qq)
   } else {
     warning("No column to remove:", acolname)
