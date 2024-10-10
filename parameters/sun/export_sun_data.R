@@ -1,10 +1,9 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Use full queries of Sun data
+#' Export some sun data for other uses
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
-#'
 #'
 #+ echo=F, include=T
 
@@ -50,47 +49,6 @@ astropy_file <- "~/DATA_RAW/SUN/Astropy_LAP.Rds"
 
 ##  Open dataset  --------------------------------------------------------------
 sun <- dbConnect(duckdb(dbdir = DB_LAP,  read_only = TRUE))
-con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
-
-
-
-
-## Test SZA
-SUN <- tbl(sun, "params")
-LAP <- tbl(con, "LAP")
-
-SUN <- SUN |>
-  filter(as.Date(Date) > "1993-04-01") |>
-  select(LAP_SZA_start, LAP_SZA_middle, Date)
-LAP <- LAP |>
-  filter(as.Date(Date) > "1993-04-01") |>
-  select(lap_sza, Date)
-
-test <-
-  left_join(SUN, LAP, by = "Date", copy = T) |>
-  collect() |> data.table()
-
-
-summary(test[, lap_sza /  LAP_SZA_start])
-summary(test[, lap_sza /  LAP_SZA_middle])
-
-lm(test$lap_sza ~ test$LAP_SZA_middle)
-lm(test$lap_sza ~ test$LAP_SZA_start)
-
-
-cor(test$lap_sza, test$LAP_SZA_start)
-cor(test$lap_sza, test$LAP_SZA_middle)
-
-
-cov(test$lap_sza, test$LAP_SZA_start)
-cov(test$lap_sza, test$LAP_SZA_middle)
-
-plot(test[, lap_sza / LAP_SZA_start, Date])
-plot(test[, lap_sza / LAP_SZA_middle, Date])
-
-
-stop()
-
 
 ##  Choose Astropy  ------------------------------------------------------------
 SUN <- tbl(sun, "params") |>
@@ -106,7 +64,6 @@ SUN <- tbl(sun, "params") |>
       Azimuth >  180 ~ FALSE
     )
   )
-
 
 ##  Detect Solstices in sun data  ----------------------------------------------
 if (!file.exists(paste0(solstices_fl, ".Rds")) |
@@ -158,9 +115,9 @@ if (!file.exists(paste0(daylength_fl, ".Rds")) |
 
 
 ##  Export legacy  -------------------------------------------------------------
+## These exports will be removed in the future
 
-## __ Export pysolar for old and forgotten processes  ---------------------------
-
+## __ Export pysolar for old and forgotten processes  --------------------------
 if (!file.exists(pysolar_file) |
     file.mtime(pysolar_file) < Sys.time() - 30 * 3600) {
 
@@ -180,7 +137,7 @@ if (!file.exists(pysolar_file) |
   rm(pysolar); gc()
 }
 
-## __ Export Astropy for old and forgotten processes  ---------------------------
+## __ Export Astropy for old and forgotten processes  --------------------------
 if (!file.exists(astropy_file) |
     file.mtime(pysolar_file) < Sys.time() - 30 * 3600) {
 
@@ -203,6 +160,45 @@ if (!file.exists(astropy_file) |
 
 ## clean exit
 dbDisconnect(sun, shutdown = TRUE); rm("sun"); closeAllConnections()
+
+
+## __ Test SZAs matching  ------------------------------------------------------
+# SUN <- tbl(sun, "params")
+# LAP <- tbl(con, "LAP")
+#
+# SUN <- SUN |>
+#   filter(as.Date(Date) > "1993-04-01") |>
+#   select(LAP_SZA_start, LAP_SZA_middle, Date)
+# LAP <- LAP |>
+#   filter(as.Date(Date) > "1993-04-01") |>
+#   select(lap_sza, Date)
+#
+# test <-
+#   left_join(SUN, LAP, by = "Date", copy = T) |>
+#   collect() |> data.table()
+#
+# A <- test[, .(sum(abs(lap_sza - LAP_SZA_start), na.rm = T),
+#          sum(abs(lap_sza - LAP_SZA_start), na.rm = T)/mean(lap_sza, na.rm = T)),  by = year(Date)]
+# B <- test[, .(sum(abs(lap_sza - LAP_SZA_middle), na.rm = T),
+#          sum(abs(lap_sza - LAP_SZA_middle), na.rm = T)/mean(lap_sza, na.rm = T)), by = year(Date)]
+#
+# ylim = range(A$V2, B$V2, na.rm = T)
+# plot(  A$year, A$V2, ylim = ylim)
+# points(B$year, B$V2, col = "red")
+#
+# ylim = range(A$V1, B$V1, na.rm = T)
+# plot(  A$year, A$V1, ylim = ylim)
+# points(B$year, B$V1, col = "red")
+#
+# summary(test[, lap_sza /  LAP_SZA_start])
+# summary(test[, lap_sza /  LAP_SZA_middle])
+#
+# lm(test$lap_sza ~ test$LAP_SZA_middle)
+# lm(test$lap_sza ~ test$LAP_SZA_start)
+#
+# cor(test$lap_sza, test$LAP_SZA_start, use = "complete.obs")
+# cor(test$lap_sza, test$LAP_SZA_middle, use = "complete.obs")
+
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

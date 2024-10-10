@@ -226,15 +226,17 @@ if (dbExistsTable(con, "params") &
 
       cat(" c")
       LAP_SZA_start  <- pzen(year,   1:1440  , doy)
-      LAP_SZA_middle <- pzen(year, 1.5:1440.5, doy)
+      # LAP_SZA_middle <- pzen(year, 1.5:1440.5, doy)
+      # Have tested the case for middle and found that across all years the
+      # start of the minute is used for TOT, although is not exact match.
 
       Dates <- tbl(con, "params")     |>
         filter(as.Date(Date) == aday) |>
         select(Date)                  |> pull()
 
-      temp <- data.table(Date = Dates,
-                         LAP_SZA_start  = LAP_SZA_start,
-                         LAP_SZA_middle = LAP_SZA_middle)
+      temp <- data.table(Date           = Dates,
+                         LAP_SZA_start  = LAP_SZA_start)
+                         # LAP_SZA_middle = LAP_SZA_middle)
       ADD <- rbind(ADD, temp)
     }
     ##  Put in the data base
@@ -258,21 +260,25 @@ if (dbExistsTable(con, "params") &
 
     cat(" c")
     LAP_SZA_start  <- pzen(year,   1:1440  , doy)
-    LAP_SZA_middle <- pzen(year, 1.5:1440.5, doy)
+    # LAP_SZA_middle <- pzen(year, 1.5:1440.5, doy)
+    # Have tested the case for middle and found that across all years the
+    # start of the minute is used for TOT, although is not exact match.
 
     Dates <- tbl(con, "params")     |>
       filter(as.Date(Date) == aday) |>
       select(Date)                  |> pull()
 
-    temp <- data.table(Date = Dates,
-                       LAP_SZA_start  = LAP_SZA_start,
-                       LAP_SZA_middle = LAP_SZA_middle)
+    temp <- data.table(Date           = Dates,
+                       LAP_SZA_start  = LAP_SZA_start)
+                       # LAP_SZA_middle = LAP_SZA_middle)
     ADD <- rbind(ADD, temp)
   }
   ##  Put in the data base
   cat(" w\n")
   res <- update_table(con, ADD, "params", "Date")
 }
+
+remove_column(con = con, table = "params", acolname = "LAP_SZA_middle")
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
