@@ -79,7 +79,7 @@ if (!file.exists(paste0(solstices_fl, ".Rds")) |
     arrange(Date)                               |>
     data.table()
 
-  saveRDS(  Solstices, paste0(solstices_fl, ".Rds"))
+  write_RDS(Solstices, paste0(solstices_fl, ".Rds"), notes = Script.Name)
   write.csv(Solstices, paste0(solstices_fl, ".csv"), quote = F)
 }
 
@@ -100,7 +100,7 @@ if (!file.exists(paste0(sunsets_fl, ".Rds")) |
     data.table() |>
     select(-preNoon)
 
-  saveRDS(  Sunsets, paste0(sunsets_fl, ".Rds"))
+  write_RDS(Sunsets, paste0(sunsets_fl, ".Rds"), notes = Script.Name)
   write.csv(Sunsets, paste0(sunsets_fl, ".csv"), quote = F)
 }
 
@@ -111,7 +111,7 @@ if (!file.exists(paste0(daylength_fl, ".Rds")) |
   Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60),
                         by = Day]
 
-  saveRDS(  Daylengths, paste0(daylength_fl, ".Rds"))
+  write_RDS(Daylengths, paste0(daylength_fl, ".Rds"), notes = Script.Name)
   write.csv(Daylengths, paste0(daylength_fl, ".csv"), quote = F)
 }
 
