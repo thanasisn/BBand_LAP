@@ -142,6 +142,7 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 DT <- tbl(con, "LAP")
 
+
 ##  Create strict radiation data  ----------------------------------------------
 
 if (Sys.info()["nodename"] == "sagan") {
