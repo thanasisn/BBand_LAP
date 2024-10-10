@@ -278,8 +278,6 @@ if (dbExistsTable(con, "params") &
   res <- update_table(con, ADD, "params", "Date")
 }
 
-remove_column(con = con, table = "params", acolname = "LAP_SZA_middle")
-
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
