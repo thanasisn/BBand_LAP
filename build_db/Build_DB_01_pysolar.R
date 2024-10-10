@@ -347,14 +347,17 @@ for (YYYY in unique(year(inp_days))) {
             rm(sun_temp, sun_meta, ss)
         }
 
-        BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
+        # old
+        # BB_meta <- rows_update(BB_meta, gathermeta, by = "day")
+        ## new
+        BB_meta <- rows_upsert(BB_meta, gathermeta, by = "day")
 
         setorder(gather, Date)
 
         ## Store this month / set data
         write_parquet(gather,  partfile)
         write_parquet(BB_meta, DB_META_fl)
-        rm(gather, gathermeta, submonth)
+        rm(gather, gathermeta, submonth_days)
     }
     rm(subyear)
 }
