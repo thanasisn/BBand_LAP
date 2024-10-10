@@ -49,7 +49,29 @@ pysolar_file <- "~/DATA/SUN/Pysolar_LAP.Rds"
 astropy_file <- "~/DATA_RAW/SUN/Astropy_LAP.Rds"
 
 ##  Open dataset  --------------------------------------------------------------
-sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
+sun <- dbConnect(duckdb(dbdir = DB_LAP,  read_only = TRUE))
+con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+
+
+
+
+## Test SZA
+SUN <- tbl(sun, "params")
+LAP <- tbl(con, "LAP")
+
+SUN <- SUN |>
+  select(LAP_SZA_start, LAP_SZA_middle, Date)
+LAP <- LAP |>
+  select(lap_sza, Date)
+
+test <-
+  semi_join(SUN, LAP, by = "Date", copy = T) |>
+  slice_sample(prop = .1) |>
+  collect() |> data.table()
+
+
+stop()
+
 
 ##  Choose Astropy  ------------------------------------------------------------
 SUN <- tbl(sun, "params") |>
