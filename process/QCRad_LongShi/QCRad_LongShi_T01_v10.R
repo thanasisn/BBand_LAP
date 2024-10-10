@@ -366,7 +366,7 @@ dummy <- gc()
 ## load filter parameters
 QS <- readRDS(parameter_fl)
 
-
+## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
 
 ####  1. Physically possible limits per BSRN  ----------------------------------
