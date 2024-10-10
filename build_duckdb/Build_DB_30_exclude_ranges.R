@@ -218,7 +218,7 @@ ranges_CM21$HourSpan <- NULL
 
 
 
-
+## use dplyr::reframe() to create the data
 
 
 ## _ CM-21 flag data  ----------------------------------------------------------
