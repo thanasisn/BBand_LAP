@@ -264,7 +264,7 @@ for (i in 1:nrow(ranges_CM21)) {
 ## apply bad data ranges
 
 ##  Remove any previous flags
-make_empty_column(con, "LAP", "cm21_bad_data_flag", "character")
+make_null_column(con, "LAP", "cm21_bad_data_flag", "character")
 ##  Apply flags
 update_table(con, temp_flag, "LAP", "Date")
 rm(temp_flag)
@@ -288,7 +288,7 @@ for (i in 1:nrow(ranges_CHP1)) {
 ## apply bad data ranges
 
 ##  Remove any previous flags
-make_empty_column(con, "LAP", "chp1_bad_data_flag", "character")
+make_null_column(con, "LAP", "chp1_bad_data_flag", "character")
 ##  Apply flags
 update_table(con, temp_flag, "LAP", "Date")
 rm(temp_flag)
@@ -313,7 +313,7 @@ for (i in 1:nrow(ranges_CHP1_temp)) {
 ## apply bad data ranges
 
 ##  Remove any previous flags
-make_empty_column(con, "LAP", "chp1_bad_temp_flag", "character")
+make_null_column(con, "LAP", "chp1_bad_temp_flag", "character")
 ##  Apply flags
 update_table(con, temp_flag, "LAP", "Date")
 rm(temp_flag)

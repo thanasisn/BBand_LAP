@@ -83,9 +83,9 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi_v9.R"
+Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T01_v10.R"
 Script.ID    <- "Q1"
-parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v9_duck_parameters.Rds"
+parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -140,7 +140,8 @@ PLOT_LAST  <- as_date("2024-01-01")
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-DT <- tbl(con, "LAP")
+DT <- tbl(con, "LAP") |>
+  filter(Elevat > 0)
 
 
 ##  Create strict radiation data  ----------------------------------------------
@@ -148,7 +149,7 @@ DT <- tbl(con, "LAP")
 if (Sys.info()["nodename"] == "sagan") {
 
   ## __ GHI  -------------------------------------------------------------------
-  make_empty_column(con, "LAP", "GLB_strict") ## Always create empty column
+  make_null_column(con, "LAP", "GLB_strict") ## Always create empty column
 
   ##  Prepare strict global irradiance
   ADD <- DT |>
@@ -165,7 +166,7 @@ if (Sys.info()["nodename"] == "sagan") {
   res <- update_table(con, ADD, "LAP", "Date")
 
   ## __ DNI  -------------------------------------------------------------------
-  make_empty_column(con, "LAP", "DIR_strict") ## Always create empty column
+  make_null_column(con, "LAP", "DIR_strict") ## Always create empty column
 
   ##  Prepare strict direct radiation
   ADD <- DT |>
@@ -184,7 +185,7 @@ if (Sys.info()["nodename"] == "sagan") {
   res <- update_table(con, ADD, "LAP", "Date")
 
   ## __  HOR  ------------------------------------------------------------------
-  make_empty_column(con, "LAP", "HOR_strict") ## Always create empty column
+  make_null_column(con, "LAP", "HOR_strict") ## Always create empty column
 
   ##  Prepare strict direct on horizontal plane radiation
   ADD <- DT |>
@@ -199,7 +200,7 @@ if (Sys.info()["nodename"] == "sagan") {
 
   ## __  DIFF  -----------------------------------------------------------------
   ##  DHI = GHI – DNI cos(z)
-  make_empty_column(con, "LAP", "DIFF_strict") ## Always create empty column
+  make_null_column(con, "LAP", "DIFF_strict") ## Always create empty column
 
   ##  Prepare strict diffuse radiation
   ADD <- DT |>
@@ -220,7 +221,7 @@ if (Sys.info()["nodename"] == "sagan") {
   res <- update_table(con, ADD, "LAP", "Date")
 
   ## __ Diffuse fraction  ------------------------------------------------------
-  make_empty_column(con, "LAP", "DiffuseFraction_kd") ## Always create empty column
+  make_null_column(con, "LAP", "DiffuseFraction_kd") ## Always create empty column
 
   ##  Prepare strict diffuse fraction
   ADD <- DT |>
@@ -239,7 +240,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ## __ Transmittance  ---------------------------------------------------------
   ## ClearnessIndex_kt -> Transmittance_GLB rename to proper
   ## or Solar insolation ratio, Solar insolation factor
-  make_empty_column(con, "LAP", "Transmittance_GLB") ## Always create empty column
+  make_null_column(con, "LAP", "Transmittance_GLB") ## Always create empty column
 
   ##  Prepare strict transmittance
   ADD <- DT |>
@@ -282,10 +283,43 @@ QS$glo_SWdn_off <- 160    # Global departure offset above the model
 QS$glo_SWdn_amp <-   1.3  # Global departure factor above the model
 
 testN        <- 1
-flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
-flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
+flagname_DIR <- paste0("QCv10_", sprintf("%02d", testN), "_dir_flag")
+flagname_GLB <- paste0("QCv10_", sprintf("%02d", testN), "_glb_flag")
 cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
+## TODO check only not flagged
+# create columns if not exist
+create_missing_columns()
+## run mutate on NA and fill all
+
+DT |>
+  mutate(!!flagname_DIR := case_when(
+
+    DIR_strict           < QS$dir_SWdn_min ~ "Physical possible limit min (5)",
+    TSI_TOA - DIR_strict < QS$dir_SWdn_dif ~ "Physical possible limit max (6)",
+
+    .default = "passed"
+  )) |>
+  filter(!is.na(!!flagname_DIR)) |>
+  select(!!flagname_DIR) |>
+  group_by(!!flagname_DIR) |> tally()
+
+DT |>
+  mutate(Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off) |>
+  mutate(!!flagname_GLB := case_when(
+
+    GLB_strict < QS$glo_SWdn_min ~ "Physical possible limit min (5)",
+    GLB_strict > Glo_max_ref     ~ "Physical possible limit max (6)",
+
+    .default = "passed"
+  )) |>
+  filter(!is.na(!!flagname_GLB)) |>
+  select(!!flagname_GLB) |>
+  group_by(!!flagname_GLB) |> tally()
+
+
+
+stop()
 ## __ Direct  ----------------------------------------------------------
 datapart[DIR_strict < QS$dir_SWdn_min,
          (flagname_DIR) := "Physical possible limit min (5)"]
@@ -295,6 +329,7 @@ datapart[TSI_TOA - DIR_strict < QS$dir_SWdn_dif,
 ## __ Global  ----------------------------------------------------------
 datapart[GLB_strict < QS$glo_SWdn_min,
          (flagname_GLB) := "Physical possible limit min (5)"]
+
 datapart[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cosde(SZA)^1.2 + QS$glo_SWdn_off]
 datapart[GLB_strict > Glo_max_ref,
          (flagname_GLB) := "Physical possible limit max (6)"]
@@ -342,8 +377,8 @@ QS <- readRDS(parameter_fl)
 #+ echo=F, include=T, results="asis"
 if (QS$TEST_01) {
   testN        <- 1
-  flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
-  flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
+  flagname_DIR <- paste0("QCv10_", sprintf("%02d", testN), "_dir_flag")
+  flagname_GLB <- paste0("QCv10_", sprintf("%02d", testN), "_glb_flag")
 
   cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
              caption = flagname_DIR))
@@ -385,12 +420,12 @@ if (QS$TEST_01) {
       pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
     }
 
-    test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
-    test <- BB |> filter(!is.na(QCv9_01_dir_flag)) |> collect() |> as.data.table()
+    test <- BB |> filter(!QCv10_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
+    test <- BB |> filter(!is.na(QCv10_01_dir_flag)) |> collect() |> as.data.table()
 
     ## TODO
     if (nrow(test) == 0) {
-      cat("\nNO CASES FOR DIRECT QCv9_01_dir_flag\n\n")
+      cat("\nNO CASES FOR DIRECT QCv10_01_dir_flag\n\n")
     }
     for (ad in sort(unique(as.Date(test$Date)))) {
       pp <- data.table(
@@ -412,9 +447,9 @@ if (QS$TEST_01) {
     }
 
     ## Plot Global radiation
-    test <- BB |> filter(!is.na(QCv9_01_glb_flag) ) |> collect() |> as.data.table()
+    test <- BB |> filter(!is.na(QCv10_01_glb_flag) ) |> collect() |> as.data.table()
     if (nrow(test) == 0) {
-      cat("\nNO CASES FOR GLOBAL QCv9_01_glb_flag\n\n")
+      cat("\nNO CASES FOR GLOBAL QCv10_01_glb_flag\n\n")
     }
     for (ad in sort(unique(as.Date(c(test$Date))))) {
       pp <- data.table(
