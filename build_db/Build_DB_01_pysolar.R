@@ -16,8 +16,7 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
-#'
+#' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
 #+ echo=F, include=T
 
@@ -46,12 +45,13 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
-mylock(DB_lock)
+# mylock(DB_lock)
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Initialize DB or import  PySolar  Sun data\n\n")
@@ -150,6 +150,7 @@ if (file.exists(DB_META_fl)) {
 
 
 
+
 ##  Get PySolar files  ---------------------------------------------------------
 inp_filelist <- list.files(path       = SUN_FOLDER,
                            pattern    = "sun_path_.*.dat.gz",
@@ -172,6 +173,12 @@ inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 
 cat("\n**Parse:", paste(nrow(inp_filelist), "PySolar files**\n\n"))
 
+
+##  Replace Pysolar  -----------------------------------------
+sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
+
+
+stop()
 
 
 ##  Import PySolar files  ------------------------------------------------------
