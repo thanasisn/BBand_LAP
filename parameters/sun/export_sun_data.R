@@ -60,14 +60,33 @@ SUN <- tbl(sun, "params")
 LAP <- tbl(con, "LAP")
 
 SUN <- SUN |>
+  filter(as.Date(Date) > "1993-04-01") |>
   select(LAP_SZA_start, LAP_SZA_middle, Date)
 LAP <- LAP |>
+  filter(as.Date(Date) > "1993-04-01") |>
   select(lap_sza, Date)
 
 test <-
-  semi_join(SUN, LAP, by = "Date", copy = T) |>
-  slice_sample(prop = .1) |>
+  left_join(SUN, LAP, by = "Date", copy = T) |>
   collect() |> data.table()
+
+
+summary(test[, lap_sza /  LAP_SZA_start])
+summary(test[, lap_sza /  LAP_SZA_middle])
+
+lm(test$lap_sza ~ test$LAP_SZA_middle)
+lm(test$lap_sza ~ test$LAP_SZA_start)
+
+
+cor(test$lap_sza, test$LAP_SZA_start)
+cor(test$lap_sza, test$LAP_SZA_middle)
+
+
+cov(test$lap_sza, test$LAP_SZA_start)
+cov(test$lap_sza, test$LAP_SZA_middle)
+
+plot(test[, lap_sza / LAP_SZA_start, Date])
+plot(test[, lap_sza / LAP_SZA_middle, Date])
 
 
 stop()
