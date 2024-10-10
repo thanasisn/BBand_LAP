@@ -44,7 +44,17 @@ create_missing_columns <- function(con, new_data, table) {
 
 
 
-make_empty_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") {
+#' Create a null column eve if exists
+#'
+#' @param con      A connection to duckdb
+#' @param table    The name of the table to create column in
+#' @param acolname New column name
+#' @param acoltype Data type of duckdb
+#'
+#' @return  Nothing. It executes duckdb commands directly
+#' @export
+#'
+make_null_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") {
 
   if (any(dbListFields(con, table) %in% acolname)) {
     qq <- paste0("ALTER TABLE ", table,
