@@ -137,7 +137,7 @@ duckdb_stats(DB_LAP)
 
 
 
-#' **END**
+k#' **END**
 #+ include=T, echo=F
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

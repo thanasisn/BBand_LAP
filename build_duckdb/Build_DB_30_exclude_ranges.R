@@ -92,6 +92,33 @@ pander(data.table(table(ranges_CHP1$Comment)))
 cat("\n\n\\normalsize\n\n")
 
 
+# temp_flag <- data.table()
+# for (i in 1:nrow(ranges_CHP1)) {
+#   lower  <- ranges_CHP1$From[   i]
+#   upper  <- ranges_CHP1$Until[  i]
+#   comme  <- ranges_CHP1$Comment[i]
+#   tempex <- data.table(Date = seq(lower + 30, upper - 60 + 30, by = "min"),
+#                        chp1_bad_data_flag = comme)
+#   temp_flag <- rbind(temp_flag, tempex)
+#   rm(tempex)
+# }
+#
+# ll <- ranges_CHP1[1, ]
+#
+#
+# exrange <- function(x){
+#         data.table(
+#           Date = seq.POSIXt(
+#             from = x$From  + 30,
+#             to   = x$Until - 60 + 30,
+#             by   = "min"),
+#           Comment = x$Comment
+#           )
+#   }
+#
+# exrange(ll)
+
+
 
 ##  Load CHP-1 temperature exclusions  -----------------------------------------
 chp1_temp_exclude_mtime <- file.mtime(CHP1_TEMP_EX)
@@ -216,9 +243,7 @@ ranges_CM21$HourSpan <- NULL
 #             by   = "min")) }
 # )
 
-
-
-## use dplyr::reframe() to create the data
+## use dplyr::reframe() to create the data?
 
 
 ## _ CM-21 flag data  ----------------------------------------------------------
@@ -299,10 +324,6 @@ rm(temp_flag)
 
 
 
-
-
-
-
 ## TODO use ENUM for factors
 
 # left_join(
@@ -335,18 +356,10 @@ tbl(con, "LAP") |>
 
 
 
-
-
-
-
-
-
 # ## Save flagged metadata
 # BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime     ]
 # BB_meta[day %in% chg_days, chp1_bad_temp_flagged := chp1_temp_exclude_mtime]
 # BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime     ]
-#
-
 
 
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
