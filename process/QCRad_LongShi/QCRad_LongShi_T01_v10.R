@@ -111,17 +111,13 @@ if (file.exists(parameter_fl)) {
   QS <<- list()
 }
 
-QS$sun_elev_min <- -2 * 0.103  ## Drop ALL radiation data when sun is below this point
-
-
-
+QS$sun_elev_min <- 0  ## Drop ALL radiation data when sun is below this point
 
 ## mostly for daily plots
 DO_PLOTS     <- TRUE
 if (interactive()) {
     DO_PLOTS <- FALSE
 }
-
 
 # Daily plots
 DO_PLOTS       <- TRUE
@@ -138,14 +134,13 @@ PLOT_LAST  <- as_date("2024-01-01")
 
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 DT <- tbl(con, "LAP") |>
-  filter(Elevat > 0)
+  filter(Elevat > QS$sun_elev_min)  ## sun is up
 
 
 ##  Create strict radiation data  ----------------------------------------------
-
 if (Sys.info()["nodename"] == "sagan") {
 
   ## __ GHI  -------------------------------------------------------------------
@@ -255,7 +250,6 @@ if (Sys.info()["nodename"] == "sagan") {
         GLB_strict / (cos(SZA * pi / 180) * TSI_TOA) <= 9000 ~ GLB_strict / (cos(SZA * pi / 180) * TSI_TOA)
       )
     )
-
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
 }
@@ -288,8 +282,10 @@ cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n")
 
 ## TODO check only not flagged
 # create columns if not exist
-create_missing_columns()
-## run mutate on NA and fill all
+# test that....
+create_missing_columns(con, "LAP", flagname_DIR, "character")
+create_missing_columns(con, "LAP", flagname_GLB, "character")
+## run mutate on NA and fill all other with a flag
 
 DT |>
   mutate(!!flagname_DIR := case_when(
