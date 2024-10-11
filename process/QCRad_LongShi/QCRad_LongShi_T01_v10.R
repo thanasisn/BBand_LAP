@@ -282,9 +282,8 @@ QS$glo_SWdn_min <-  -4    # Minimum global value to consider valid measurement
 QS$glo_SWdn_off <- 160    # Global departure offset above the model
 QS$glo_SWdn_amp <-   1.3  # Global departure factor above the model
 
-testN        <- 1
-flagname_DIR <- paste0("QCv10_", sprintf("%02d", testN), "_dir_flag")
-flagname_GLB <- paste0("QCv10_", sprintf("%02d", testN), "_glb_flag")
+flagname_DIR <- "QCv10_01_dir_flag"
+flagname_GLB <- "QCv10_01_glb_flag"
 cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
 ## TODO check only not flagged
