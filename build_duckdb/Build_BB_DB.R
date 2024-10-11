@@ -45,10 +45,10 @@ source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
 
 # ## __ Extra process for CHP-1 temperature  -------------------------------------
 # # source("~/BBand_LAP/build_duckdb/Build_DB_44_chp1_temp_correc.R")
-#
-# ## Add data from other sources  ------------------------------------------------
-# source("~/BBand_LAP/build_duckdb/Import_50_TSI.R"               )
-# source("~/BBand_LAP/build_duckdb/Import_51_Pressure.R"          )
+
+## Add data from other sources  ------------------------------------------------
+source("~/BBand_LAP/build_duckdb/Import_50_TSI.R"               )
+source("~/BBand_LAP/build_duckdb/Import_51_Pressure.R"          )
 
 
 
