@@ -15,6 +15,8 @@ knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
+stop("wait for paeper end")
+
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
