@@ -174,7 +174,7 @@ stop("fix this")
 
     ff <- tbl(con, "LAP") |> select(TSI_TOA, SZA) |> collect() |> data.table()
 
-    ## this is posible
+    ## this is possible
     ff[, test := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
     summary(ff)
 
