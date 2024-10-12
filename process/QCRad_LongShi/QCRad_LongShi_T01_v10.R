@@ -44,8 +44,7 @@
 #'
 #' ---
 
-#'
-#' **QCRad**
+#' **QCRad T01**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -53,21 +52,8 @@
 #'
 #' The chosen levels and filters have to be evaluated with the available data.
 #'
-#' For now this is a copy of
-#' "~/RAD_QC/QCRad_LongShi_v8_id_CM21_CHP1.R" and
-#' "~/RAD_QC/QCRad_LongShi_v8_apply_CM21_CHP1.R"
 #'
-#' ## Difference in implementation!
 #'
-#' Here the previous flags do not exclude the next.
-#' In the original if a flag was set then the next filter will ignore the point.
-#'
-#' TODO:
-#' - #6 needs more
-#' - implement ignore previous flags on all plots
-#' - plot combination of flag for each point
-#' - plot cumulative graphs like the old
-#' - Plot daily graphs with all available flags
 #'
 #+ echo=F, include=T
 
@@ -108,9 +94,9 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 if (file.exists(parameter_fl)) {
   QS <<- readRDS(parameter_fl)
 } else {
-  QS <<- list()
+  stop("File not initialiazed")
 }
-
+stop()
 QS$sun_elev_min <- 0  ## Drop ALL radiation data when sun is below this point
 
 ## mostly for daily plots
@@ -132,182 +118,93 @@ PARTIAL    <- TRUE
 PLOT_FIRST <- as_date("1993-01-01")
 PLOT_LAST  <- as_date("2024-01-01")
 
-
-##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
-
-DT <- tbl(con, "LAP") |>
-  filter(Elevat > QS$sun_elev_min)  ## sun is up
+##  Open dataset  ------------------------------------------------------------
+con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 
-##  Create strict radiation data  ----------------------------------------------
 if (Sys.info()["nodename"] == "sagan") {
 
-  ## __ GHI  -------------------------------------------------------------------
-  make_null_column(con, "LAP", "GLB_strict") ## Always create empty column
+  ##  Open dataset  ------------------------------------------------------------
+  con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-  ##  Prepare strict global irradiance
-  ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min)    |>  ## sun is up
-    filter(!is.na(CM21_sig))            |>  ## valid measurements
-    filter(is.na(cm21_bad_data_flag))   |>  ## not bad data
-    filter(cm21_sig_limit_flag == 0)    |>  ## in acceptable values range
-    select(Date, GLB_wpsm)              |>
-    mutate(GLB_strict = case_when(
-      GLB_wpsm <  0 ~ 0,                    ## Negative values to zero
-      GLB_wpsm >= 0 ~ GLB_wpsm              ## All other selected values as is
+  ## 1. Physically possible limits per BSRN  -----------------------------------
+  #'
+  #' ## 1. Physically possible limits per BSRN
+  #'
+  #' Test values are within physical/logical limits.
+  #'
+  #' Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
+  #' or need to remove data.
+  #'
+  #' Global upper constrain is an modelled GHI value.
+  #'
+  #' These limit should not be met, they are defined neat the maximum observed
+  #' values of the data set.
+
+  QS$dir_SWdn_min <-  -4    # Minimum direct value to consider valid measurement
+  QS$dir_SWdn_dif <- 327    # Closeness to to TSI
+  QS$glo_SWdn_min <-  -4    # Minimum global value to consider valid measurement
+  QS$glo_SWdn_off <- 160    # Global departure offset above the model
+  QS$glo_SWdn_amp <-   1.3  # Global departure factor above the model
+
+  flagname_DIR <- "QCv10_01_dir_flag"
+  flagname_GLB <- "QCv10_01_glb_flag"
+  cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
+
+  ##  Make null columns as above
+  make_null_column(con, "LAP", flagname_DIR, "character")
+  make_null_column(con, "LAP", flagname_GLB, "character")
+
+  DT <- tbl(con, "LAP") |>
+    filter(Elevat > QS$sun_elev_min)  ## sun is up
+
+  ##  Flag direct  -------------------------------------------------------------
+  ADD <- DT |>
+    filter(is.na(!!flagname_DIR)) |>
+    mutate(!!flagname_DIR := case_when(
+
+      DIR_strict           < QS$dir_SWdn_min ~ "Physical possible limit min (5)",
+      TSI_TOA - DIR_strict < QS$dir_SWdn_dif ~ "Physical possible limit max (6)",
+
+      .default = "passed"
     ))
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
 
-  ## __ DNI  -------------------------------------------------------------------
-  make_null_column(con, "LAP", "DIR_strict") ## Always create empty column
+  ##  Flag global  -------------------------------------------------------------
+  ADD <- DT |>
+    mutate(Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off) |>
+    mutate(!!flagname_GLB := case_when(
 
-  ##  Prepare strict direct radiation
-  ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min)  |>  ## sun is up
-    filter(!is.na(CHP1_sig))          |>  ## valid measurements
-    filter(is.na(chp1_bad_data_flag)) |>  ## not bad data
-    filter(chp1_sig_limit_flag == 0)  |>  ## acceptable values range
-    filter(Async_tracker_flag != T)   |>  ## not in an async
-    select(Date, DIR_wpsm, SZA)       |>
-    mutate(
-      DIR_strict = case_when(
-        DIR_wpsm <  0 ~ 0,                ## Negative values to zero
-        DIR_wpsm >= 0 ~ DIR_wpsm          ## All other selected values as is
-      ))
+      GLB_strict < QS$glo_SWdn_min ~ "Physical possible limit min (5)",
+      GLB_strict > Glo_max_ref     ~ "Physical possible limit max (6)",
+
+      .default = "passed"
+    ))
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
 
-  ## __  HOR  ------------------------------------------------------------------
-  make_null_column(con, "LAP", "HOR_strict") ## Always create empty column
+  ##  Store filters parameters  ------------------------------------------------
+  saveRDS(object = QS,
+          file   = parameter_fl)
 
-  ##  Prepare strict direct on horizontal plane radiation
-  ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min) |>
-    filter(!is.na(DIR_strict))       |>
-    select(Date, DIR_strict, SZA)    |>
-    mutate(
-      HOR_strict = DIR_strict * cos(SZA * pi / 180)
-    )
-  ##  Write data in the data base
-  res <- update_table(con, ADD, "LAP", "Date")
-
-  ## __  DIFF  -----------------------------------------------------------------
-  ##  DHI = GHI – DNI cos(z)
-  make_null_column(con, "LAP", "DIFF_strict") ## Always create empty column
-
-  ##  Prepare strict diffuse radiation
-  ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min)     |>
-    filter(!is.na(GLB_strict))           |>
-    filter(!is.na(HOR_strict))           |>
-    select(Date, GLB_strict, HOR_strict) |>
-    mutate(
-      DIFF_strict = GLB_strict - HOR_strict
-    ) |>
-    mutate(
-      DIFF_strict = case_when(
-        DIFF_strict <  0 ~ NA,               ## diffuse only positive
-        DIFF_strict >= 0 ~ DIFF_strict
-      )
-    )
-  ##  Write data in the data base
-  res <- update_table(con, ADD, "LAP", "Date")
-
-  ## __ Diffuse fraction  ------------------------------------------------------
-  make_null_column(con, "LAP", "DiffuseFraction_kd") ## Always create empty column
-
-  ##  Prepare strict diffuse fraction
-  ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min)      |>
-    filter(!is.na(DIFF_strict))           |>
-    filter(!is.na(GLB_strict))            |>
-    filter(GLB_strict > 0)                |> ## don't use zero global
-    filter(DIFF_strict < GLB_strict)      |> ## diffuse < global
-    select(Date, DIFF_strict, GLB_strict) |>
-    mutate(
-      DiffuseFraction_kd = DIFF_strict / GLB_strict
-    )
-  ##  Write data in the data base
-  res <- update_table(con, ADD, "LAP", "Date")
-
-  ## __ Transmittance  ---------------------------------------------------------
-  ## ClearnessIndex_kt -> Transmittance_GLB rename to proper
-  ## or Solar insolation ratio, Solar insolation factor
-  make_null_column(con, "LAP", "Transmittance_GLB") ## Always create empty column
-
-  ##  Prepare strict transmittance
-  ADD <- tbl(con, "LAP") |>
-    filter(Elevat > 0)                     |>  ## can compute only when sun is up
-    filter(!is.na(GLB_strict))             |>
-    filter(GLB_strict >= 0)                |>  ## only for positive global
-    filter(!is.na(TSI_TOA))                |>
-    select(Date, GLB_strict, SZA, TSI_TOA) |>
-    mutate(
-      Transmittance_GLB = case_when(
-        GLB_strict / (cos(SZA * pi / 180) * TSI_TOA) >  9000 ~ 9000,
-        GLB_strict / (cos(SZA * pi / 180) * TSI_TOA) <= 9000 ~ GLB_strict / (cos(SZA * pi / 180) * TSI_TOA)
-      )
-    )
-  ##  Write data in the data base
-  res <- update_table(con, ADD, "LAP", "Date")
 }
 
-stop()
 
-## 1. Physically possible limits per BSRN  ---------------------------------
-#'
-#' ## 1. Physically possible limits per BSRN
-#'
-#' Test values are within physical/logical limits.
-#'
-#' Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
-#' or need to remove data.
-#'
-#' Global upper constrain is an modelled GHI value.
-#'
-#' These limit should not be met, they are defined neat the maximum observed
-#' values of the data set.
 
-QS$dir_SWdn_min <-  -4    # Minimum direct value to consider valid measurement
-QS$dir_SWdn_dif <- 327    # Closeness to to TSI
-QS$glo_SWdn_min <-  -4    # Minimum global value to consider valid measurement
-QS$glo_SWdn_off <- 160    # Global departure offset above the model
-QS$glo_SWdn_amp <-   1.3  # Global departure factor above the model
 
-flagname_DIR <- "QCv10_01_dir_flag"
-flagname_GLB <- "QCv10_01_glb_flag"
-cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
-## TODO check only not flagged
-# create columns if not exist
-# test that....
-create_missing_columns(con, "LAP", flagname_DIR, "character")
-create_missing_columns(con, "LAP", flagname_GLB, "character")
-## run mutate on NA and fill all other with a flag
+
+DT <- tbl(con, "LAP") |>
+  filter(Elevat > QS$sun_elev_min)  ## sun is up
 
 DT |>
-  mutate(!!flagname_DIR := case_when(
-
-    DIR_strict           < QS$dir_SWdn_min ~ "Physical possible limit min (5)",
-    TSI_TOA - DIR_strict < QS$dir_SWdn_dif ~ "Physical possible limit max (6)",
-
-    .default = "passed"
-  )) |>
   filter(!is.na(!!flagname_DIR)) |>
   select(!!flagname_DIR) |>
   group_by(!!flagname_DIR) |> tally()
 
+
 DT |>
-  mutate(Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off) |>
-  mutate(!!flagname_GLB := case_when(
-
-    GLB_strict < QS$glo_SWdn_min ~ "Physical possible limit min (5)",
-    GLB_strict > Glo_max_ref     ~ "Physical possible limit max (6)",
-
-    .default = "passed"
-  )) |>
   filter(!is.na(!!flagname_GLB)) |>
   select(!!flagname_GLB) |>
   group_by(!!flagname_GLB) |> tally()
@@ -336,9 +233,6 @@ dummy <- gc()
 
 stop()
 
-##  Store filters parameters  ----------------------------------------------
-saveRDS(object = QS,
-        file   = parameter_fl)
 
 ## clean
 rm(datapart)
@@ -473,7 +367,6 @@ if (QS$TEST_01) {
 
 
 
-#' **END**
 #+ include=T, echo=F, results="asis"
 tac <- Sys.time()
 cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
