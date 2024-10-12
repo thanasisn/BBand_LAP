@@ -35,9 +35,12 @@ create_missing_columns <- function(con, new_data, table) {
       cat("\nNEW VAR:", paste(new_vars[i, ]), "->", ctype, "\n")
 
       ## create new columns with a query
-      qq <- paste("ALTER TABLE", table,
-                  "ADD COLUMN",  new_vars$names[i], ctype, "DEFAULT null")
-      dbSendQuery(con, qq)
+      qq <- paste0("ALTER TABLE  ",  table,
+                   "  ADD COLUMN  ", new_vars$names[i],
+                   "  ",             ctype,
+                   "  DEFAULT null")
+      cat(qq, "\n")
+      res <- dbSendQuery(con, qq)
     }
   }
 }
@@ -57,14 +60,16 @@ create_missing_columns <- function(con, new_data, table) {
 make_null_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") {
 
   if (any(dbListFields(con, table) %in% acolname)) {
-    qq <- paste0("ALTER TABLE ", table,
-                 " DROP ", acolname)
+    qq <- paste0("ALTER TABLE  ",  table,
+                 "  DROP        ", acolname)
     cat(qq, "\n")
     res <- dbSendQuery(con, qq)
   }
   ## create new columns with a query
-  qq <- paste("ALTER TABLE", table,
-              "ADD COLUMN",  acolname,  acoltype, "DEFAULT null")
+  qq <- paste0("ALTER TABLE  ",   table,
+               "  ADD COLUMN  ",  acolname,
+               "  ",              acoltype,
+               "  DEFAULT null")
   cat(qq, "\n")
   res <- dbSendQuery(con, qq)
 }
@@ -92,8 +97,10 @@ make_new_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") 
     return()
   } else {
     ## create new columns with a query
-    qq <- paste("ALTER TABLE", table,
-                "ADD COLUMN",  acolname,  acoltype, "DEFAULT null")
+    qq <- paste0("ALTER TABLE  ",   table,
+                 "  ADD COLUMN  ",  acolname,
+                 "  ",              acoltype,
+                 "  DEFAULT null")
     cat(qq, "\n")
     res <- dbSendQuery(con, qq)
   }
@@ -101,10 +108,19 @@ make_new_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") 
 
 
 
+#' Drop a column from a table
+#'
+#' @param con      Connection to the database
+#' @param table    Name of the table in the database
+#' @param acolname Name of the new column to delete
+#'
+#' @return Nothing, it drops the column with an SQL query
+#' @export
+#'
 remove_column <- function(con, table, acolname) {
   if (any(dbListFields(con, table) %in% acolname)) {
-    qq <- paste0("ALTER TABLE ", table,
-                 " DROP ",  acolname)
+    qq <- paste0("ALTER TABLE  ",  table,
+                 "  DROP        ", acolname)
     cat(qq, "\n")
     res <- dbSendQuery(con, qq)
   } else {
