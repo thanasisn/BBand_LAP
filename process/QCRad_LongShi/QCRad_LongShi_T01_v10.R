@@ -152,7 +152,6 @@ if (Sys.info()["nodename"] == "sagan") {
   ## __ Flag direct  -----------------------------------------------------------
   ADD <- tbl(con, "LAP")             |>
     filter(Elevat > QS$sun_elev_min) |>
-    filter(is.na(!!flagname_DIR))    |>
     mutate(
 
       !!flagname_DIR := case_when(
@@ -163,15 +162,27 @@ if (Sys.info()["nodename"] == "sagan") {
       ))
   res <- update_table(con, ADD, "LAP", "Date")
 
+stop("fix this")
   ## __ Flag global  -----------------------------------------------------------
   ## create a reference for global
+  ## TODO create Glo_max_ref column
   ADD <- tbl(con, "LAP")             |>
     filter(Elevat > QS$sun_elev_min) |>
-    mutate(
+    filter(!is.na(TSI_TOA))          |>
+    mutate(ss = QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2) |>
+    select(ss, TSI_TOA)
+
+    ff <- tbl(con, "LAP") |> select(TSI_TOA, SZA) |> collect() |> data.table()
+
+    ## this is posible
+    ff[, test := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
+    summary(ff)
+
+      mutate(
 
       Glo_max_ref := case_when(
         TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off >  9000 ~ 9000,
-        TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off / TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
+        TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off <= 9000 ~ TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
 
       ))
   res <- update_table(con, ADD, "LAP", "Date")
