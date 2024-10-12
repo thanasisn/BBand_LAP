@@ -147,7 +147,7 @@ if (Sys.info()["nodename"] == "sagan") {
   make_null_column(con, "LAP", "GLB_strict") ## Always create empty column
 
   ##  Prepare strict global irradiance
-  ADD <- DT |>
+  ADD <- tbl(con, "LAP") |>
     filter(Elevat > QS$sun_elev_min)    |>  ## sun is up
     filter(!is.na(CM21_sig))            |>  ## valid measurements
     filter(is.na(cm21_bad_data_flag))   |>  ## not bad data
@@ -164,7 +164,7 @@ if (Sys.info()["nodename"] == "sagan") {
   make_null_column(con, "LAP", "DIR_strict") ## Always create empty column
 
   ##  Prepare strict direct radiation
-  ADD <- DT |>
+  ADD <- tbl(con, "LAP") |>
     filter(Elevat > QS$sun_elev_min)  |>  ## sun is up
     filter(!is.na(CHP1_sig))          |>  ## valid measurements
     filter(is.na(chp1_bad_data_flag)) |>  ## not bad data
@@ -183,7 +183,7 @@ if (Sys.info()["nodename"] == "sagan") {
   make_null_column(con, "LAP", "HOR_strict") ## Always create empty column
 
   ##  Prepare strict direct on horizontal plane radiation
-  ADD <- DT |>
+  ADD <- tbl(con, "LAP") |>
     filter(Elevat > QS$sun_elev_min) |>
     filter(!is.na(DIR_strict))       |>
     select(Date, DIR_strict, SZA)    |>
@@ -198,7 +198,7 @@ if (Sys.info()["nodename"] == "sagan") {
   make_null_column(con, "LAP", "DIFF_strict") ## Always create empty column
 
   ##  Prepare strict diffuse radiation
-  ADD <- DT |>
+  ADD <- tbl(con, "LAP") |>
     filter(Elevat > QS$sun_elev_min)     |>
     filter(!is.na(GLB_strict))           |>
     filter(!is.na(HOR_strict))           |>
@@ -219,7 +219,7 @@ if (Sys.info()["nodename"] == "sagan") {
   make_null_column(con, "LAP", "DiffuseFraction_kd") ## Always create empty column
 
   ##  Prepare strict diffuse fraction
-  ADD <- DT |>
+  ADD <- tbl(con, "LAP") |>
     filter(Elevat > QS$sun_elev_min)      |>
     filter(!is.na(DIFF_strict))           |>
     filter(!is.na(GLB_strict))            |>
@@ -238,7 +238,7 @@ if (Sys.info()["nodename"] == "sagan") {
   make_null_column(con, "LAP", "Transmittance_GLB") ## Always create empty column
 
   ##  Prepare strict transmittance
-  ADD <- DT |>
+  ADD <- tbl(con, "LAP") |>
     filter(Elevat > 0)                     |>  ## can compute only when sun is up
     filter(!is.na(GLB_strict))             |>
     filter(GLB_strict >= 0)                |>  ## only for positive global
