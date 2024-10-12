@@ -51,23 +51,6 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#' The chosen levels and filters have to be evaluated with the available data.
-#'
-#' For now this is a copy of
-#' "~/RAD_QC/QCRad_LongShi_v8_id_CM21_CHP1.R" and
-#' "~/RAD_QC/QCRad_LongShi_v8_apply_CM21_CHP1.R"
-#'
-#' ## Difference in implementation!
-#'
-#' Here the previous flags do not exclude the next.
-#' In the original if a flag was set then the next filter will ignore the point.
-#'
-#' TODO:
-#' - #6 needs more
-#' - implement ignore previous flags on all plots
-#' - plot combination of flag for each point
-#' - plot cumulative graphs like the old
-#' - Plot daily graphs with all available flags
 #'
 #+ echo=F, include=T
 
@@ -93,9 +76,6 @@ if (!interactive()) {
 }
 
 ## __ Load libraries  ----------------------------------------------------------
-source("~/BBand_LAP/DEFINITIONS.R")
-source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
-source("~/CODE/FUNCTIONS/R/trig_deg.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
@@ -112,28 +92,7 @@ QS$sun_elev_min <- -2 * 0.103  ## Drop ALL radiation data when sun is below this
 
 
 ##  Execution control  ---------------------------------------------------------
-
-QS$TEST_01  <- FALSE
-QS$TEST_02  <- FALSE
-QS$TEST_03  <- FALSE
-QS$TEST_04  <- FALSE
-QS$TEST_05  <- FALSE
-QS$TEST_06  <- FALSE
-QS$TEST_07  <- FALSE
-QS$TEST_08  <- FALSE
-QS$TEST_09  <- FALSE
-QS$TEST_10  <- FALSE
-
-QS$TEST_01  <- TRUE
-QS$TEST_02  <- TRUE
-QS$TEST_03  <- TRUE
-QS$TEST_04  <- TRUE
-QS$TEST_05  <- TRUE
-QS$TEST_06  <- TRUE
-QS$TEST_07  <- FALSE  ## TODO
-QS$TEST_08  <- TRUE
-# QS$TEST_09  <- TRUE
-# QS$TEST_10  <- FALSE  ## TODO
+stop("this can not run")
 
 ## mostly for daily plots
 DO_PLOTS     <- TRUE
@@ -156,53 +115,9 @@ PLOT_FIRST <- as_date("2023-01-01")
 PLOT_LAST  <- as_date("2024-01-01")
 
 
-
-
-##  Find what needs update  ----------------------------------------------------
-
-
-## Init watchdog variables in metadata
-InitVariableBBmeta("QCv9_applied",     as.POSIXct(NA))
-InitVariableBBmeta("QCv9_filters_md5", as.character(NA))
-
-
-
-
-## ~ ~ Apply Filters ~ ~  ------------------------------------------------------
-#'
-#' # Apply Filters
-#'
-#' Go through all files in data base and apply flags.
-#'
-#+ include=T
-
 ##  Create strict radiation data  ------------------------------------------
 
 ## __ Daytime radiation only  ----------------------------------------------
-
-## Direct beam DNI
-datapart[Elevat > QS$sun_elev_min        &
-           is.na(chp1_bad_data_flag)   &
-           Async_tracker_flag == FALSE,
-         DIR_strict := DIR_wpsm]
-## DHI
-datapart[Elevat > QS$sun_elev_min        &
-           is.na(chp1_bad_data_flag)   &
-           Async_tracker_flag == FALSE,
-         HOR_strict := HOR_wpsm]
-## GHI
-datapart[Elevat > QS$sun_elev_min        &
-           is.na(cm21_bad_data_flag),
-         GLB_strict := GLB_wpsm]
-
-## __ Negative radiation to zero  ------------------------------------------
-datapart[DIR_strict < 0, DIR_strict := 0]
-datapart[HOR_strict < 0, HOR_strict := 0]
-datapart[GLB_strict < 0, GLB_strict := 0]
-
-## __ Diffuse radiation  ---------------------------------------------------
-## DHI = GHI – DNI cos(z)
-datapart[, DIFF_strict := GLB_strict - HOR_strict]
 
 ## __ Transmittance  -------------------------------------------------------
 ## ClearnessIndex_kt -> Transmittance_GLB rename to proper
@@ -216,50 +131,6 @@ datapart[, DiffuseFraction_kd := DIFF_strict / GLB_strict]
 ## replace infinite values
 datapart[is.infinite(DiffuseFraction_kd), DiffuseFraction_kd := NA]
 
-
-
-## 1. Physically possible limits per BSRN  ---------------------------------
-#'
-#' ## 1. Physically possible limits per BSRN
-#'
-#' Test values are within physical/logical limits.
-#'
-#' Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
-#' or need to remove data.
-#'
-#' Global upper constrain is an modelled GHI value.
-#'
-#' These limit should not be met, they are defined neat the maximum observed
-#' values of the data set.
-
-QS$dir_SWdn_min <-  -4    # Minimum direct value to consider valid measurement
-QS$dir_SWdn_dif <- 327    # Closeness to to TSI
-QS$glo_SWdn_min <-  -4    # Minimum global value to consider valid measurement
-QS$glo_SWdn_off <- 160    # Global departure offset above the model
-QS$glo_SWdn_amp <-   1.3  # Global departure factor above the model
-
-if (QS$TEST_01) {
-  testN        <- 1
-  flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
-  flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
-  cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
-
-  ## __ Direct  ----------------------------------------------------------
-  datapart[DIR_strict < QS$dir_SWdn_min,
-           (flagname_DIR) := "Physical possible limit min (5)"]
-  datapart[TSI_TOA - DIR_strict < QS$dir_SWdn_dif,
-           (flagname_DIR) := "Physical possible limit max (6)"]
-
-  ## __ Global  ----------------------------------------------------------
-  datapart[GLB_strict < QS$glo_SWdn_min,
-           (flagname_GLB) := "Physical possible limit min (5)"]
-  datapart[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cosde(SZA)^1.2 + QS$glo_SWdn_off]
-  datapart[GLB_strict > Glo_max_ref,
-           (flagname_GLB) := "Physical possible limit max (6)"]
-
-  rm(list = ls(pattern = "flagname_.*"))
-  dummy <- gc()
-}
 
 
 
@@ -701,111 +572,6 @@ if (PARTIAL == TRUE) {
 }
 
 
-
-####  1. Physically possible limits per BSRN  ----------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 1. Physically possible limits per BSRN
-#'
-#+ echo=F, include=T, results="asis"
-if (QS$TEST_01) {
-  testN        <- 1
-  flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
-  flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
-
-  cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
-             caption = flagname_DIR))
-  cat(" \n \n")
-
-  cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always"),
-             caption = flagname_GLB))
-  cat(" \n \n")
-
-  ## TODO display limits on graphs
-  test <- BB |>
-    mutate(test = TSI_TOA - DIR_strict) |>
-    select(test) |> collect()
-
-  cat("\n", range(test$test, na.rm = T), "\n")
-
-  hist(test$test, breaks = 100,
-       main = "TSI_TOA - DIR_strict",
-       xlab = "")
-  cat(" \n \n")
-
-
-  ## TODO display limits on graphs
-  test <- BB |>
-    mutate(test = Glo_max_ref - GLB_strict) |>
-    select(test) |> collect()
-
-  cat("\n", range(test$test, na.rm = T), "\n")
-
-  hist(test$test, breaks = 100,
-       main = "Glo_max_ref - GLB_strict",
-       xlab = "")
-  cat(" \n \n")
-
-
-  if (DO_PLOTS) {
-
-    if (!interactive()) {
-      pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
-    }
-
-    test <- BB |> filter(!QCv9_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
-    test <- BB |> filter(!is.na(QCv9_01_dir_flag)) |> collect() |> as.data.table()
-
-    ## TODO
-    if (nrow(test) == 0) {
-      cat("\nNO CASES FOR DIRECT QCv9_01_dir_flag\n\n")
-    }
-    for (ad in sort(unique(as.Date(test$Date)))) {
-      pp <- data.table(
-        BB |> filter(as.Date(Date) == as.Date(ad) &
-                       Elevat > QS$sun_elev_min)   |>
-          collect()
-      )
-      ylim <- range(pp$TSI_TOA - QS$dir_SWdn_dif, pp$DIR_strict, na.rm = T)
-      plot(pp$Date, pp$DIR_strict, "l", col = "blue",
-           ylim = ylim, xlab = "", ylab = "DIR_strict")
-
-      title(paste("#1", as.Date(ad, origin = "1970-01-01")))
-
-      ## plot limits
-      lines(pp$Date, pp$TSI_TOA - QS$dir_SWdn_dif, col = "red")
-      ## mark offending data
-      points(pp[!is.na(get(flagname_DIR)), DIR_strict, Date],
-             col = "red", pch = 1)
-    }
-
-    ## Plot Global radiation
-    test <- BB |> filter(!is.na(QCv9_01_glb_flag) ) |> collect() |> as.data.table()
-    if (nrow(test) == 0) {
-      cat("\nNO CASES FOR GLOBAL QCv9_01_glb_flag\n\n")
-    }
-    for (ad in sort(unique(as.Date(c(test$Date))))) {
-      pp <- data.table(
-        BB |> filter(as.Date(Date) == as.Date(ad) &
-                       Elevat > QS$sun_elev_min)   |>
-          collect()
-      )
-      ylim <- range(pp$Glo_max_ref, pp$GLB_strict, na.rm = T)
-      plot(pp$Date, pp$GLB_strict, "l", col = "green",
-           ylim = ylim, xlab = "", ylab = "GLB")
-      title(paste("#1", as.Date(ad, origin = "1970-01-01")))
-      ## plot limits
-      lines(pp$Date, pp$Glo_max_ref, col = "red")
-      ## mark offending data
-      points(pp[!is.na(get(flagname_GLB)), GLB_strict, Date],
-             col = "red", pch = 1)
-    }
-  }
-  rm(list = ls(pattern = "flagname_.*"))
-  dummy <- gc()
-  if (!interactive()) dummy <- dev.off()
-}
-#+ echo=F, include=T
 
 
 
