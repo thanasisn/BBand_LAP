@@ -65,10 +65,13 @@ names(TSI)[names(TSI) == "Source"          ] <- "TSI_source"
 TSI$measur_error_comb <- NULL
 dummy <- gc()
 
+## TODO check TSI accuracy digits
+
 ##  Update TSI data in DB  -----------------------------------------------------
 TSI <- right_join(TSI,
-                  tbl(con, "LAP") |>
-                    select(Date)  |>
+                  tbl(con, "LAP")       |>
+                    filter(Elevat > -1) |> ## We don't use TSI below horizon
+                    select(Date)        |>
                     collect(),
                   by = "Date")
 
