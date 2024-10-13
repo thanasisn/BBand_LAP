@@ -181,7 +181,7 @@ if (Sys.info()["nodename"] == "sagan") {
         TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off >  9000 ~ 9000,
         TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off <= 9000 ~ TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
 
-      )) |> collect()
+      ))
   res <- update_table(con, ADD, "LAP", "Date")
 
   ## apply test
