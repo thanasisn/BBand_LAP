@@ -173,6 +173,7 @@ if (Sys.info()["nodename"] == "sagan") {
     select(TSI_TOA, SZA, Date, GLB_strict) |> collect() |> data.table()
 
   ## Create reference
+  # TODO create only missing
   ADD[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
 
   ## Apply test
@@ -259,6 +260,7 @@ DT |>
   select(!!flagname_GLB) |>
   group_by(!!flagname_GLB) |> tally()
 
+dd <- DT |> head() |> collect() |> data.table()
 
 stop("wait")
 
