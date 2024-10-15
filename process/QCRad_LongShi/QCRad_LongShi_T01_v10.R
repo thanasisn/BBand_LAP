@@ -52,7 +52,6 @@
 #'
 #' The chosen levels and filters have to be evaluated with the available data.
 #'
-#'
 #+ echo=F, include=T
 
 #+ echo=F, include=T
