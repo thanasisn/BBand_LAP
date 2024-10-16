@@ -142,13 +142,25 @@ if (Sys.info()["nodename"] == "sagan") {
   QS$dir_SWdn_too_low <-    3     # Ideal w/m^2
   QS$glo_SWdn_too_low <-    3     # Ideal w/m^2
 
+  categories <- c("empty",
+                  "pass",
+                  "Extremely rare limits min (3)",
+                  "Extremely rare limits max (4)")
+
+
   cat(paste("\n2. Extremely Rare Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
   ## __ Make null columns to update all values  --------------------------------
-  make_null_column(con, "LAP", flagname_DIR, "character")
-  make_null_column(con, "LAP", flagname_GLB, "character")
 
-## TODO categorical column
+  ## TODO just once
+  remove_column(con, "LAP", flagname_DIR)
+  remove_column(con, "LAP", flagname_GLB)
+
+  ## create categorical if not existing
+  make_categorical_column(flagname_DIR, categories, con, "LAP")
+  make_categorical_column(flagname_GLB, categories, con, "LAP")
+
+
 
   stop("wait")
 
@@ -157,7 +169,7 @@ if (Sys.info()["nodename"] == "sagan") {
     filter(Elevat > QS$sun_elev_min) |>
     filter(!is.na(TSI_TOA))          |>
     filter(!is.na(SZA))              |>
-    select(TSI_TOA, SZA, Date, GLB_strict) |> collect() |> data.table()
+    select(TSI_TOA, SZA, Date, GLB_strict, DIR_strict) |> collect() |> data.table()
 
 
   # Compute reference values
