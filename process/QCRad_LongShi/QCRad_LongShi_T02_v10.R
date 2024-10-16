@@ -211,7 +211,7 @@ if (Sys.info()["nodename"] == "sagan") {
 
       !!flagname_DIR := case_when(
         DIR_strict <  QS$dir_SWdn_min_ext ~ "Extremely rare limits min (3)",
-        DIR_strict >= Direct_max          ~ "Extremely rare limits max (4)"
+        DIR_strict >= Direct_max          ~ "Extremely rare limits max (4)",
 
         .default = "passed"
       )
@@ -226,7 +226,7 @@ if (Sys.info()["nodename"] == "sagan") {
 
       !!flagname_GLB := case_when(
         GLB_strict <  QS$glo_SWdn_min_ext ~ "Extremely rare limits min (3)",
-        GLB_strict >= Global_max          ~ "Extremely rare limits max (4)"
+        GLB_strict >= Global_max          ~ "Extremely rare limits max (4)",
 
         .default = "passed"
       )
