@@ -148,6 +148,7 @@ if (Sys.info()["nodename"] == "sagan") {
   make_null_column(con, "LAP", flagname_DIR, "character")
   make_null_column(con, "LAP", flagname_GLB, "character")
 
+## TODO categorical column
 
   stop("wait")
 
