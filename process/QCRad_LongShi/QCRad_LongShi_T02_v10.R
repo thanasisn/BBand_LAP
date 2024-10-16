@@ -150,9 +150,8 @@ if (Sys.info()["nodename"] == "sagan") {
 
   cat(paste("\n2. Extremely Rare Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
-  ## __ Make null columns to update all values  --------------------------------
-
-  ## TODO just once
+  ## __ Make categorical columns  ----------------------------------------------
+  ## remove existing
   remove_column(con, "LAP", flagname_DIR)
   remove_column(con, "LAP", flagname_GLB)
 
@@ -164,12 +163,36 @@ if (Sys.info()["nodename"] == "sagan") {
 
   stop("wait")
 
+
+  ## create reference values
+  ADD <- tbl(con, "LAP")             |>
+    filter(Elevat > QS$sun_elev_min) |>
+    filter(!is.na(TSI_TOA))          |>
+    filter(!is.na(SZA))
+
+  if (!any(ADD |> colnames() %in% "Direct_max")) {
+    AREF <- ADD |> collect() |> data.table()
+  } else {
+    AREF <- ADD |> filter(is.na(Direct_max)) |> collect() |> data.table()
+  }
+
+  AREF <- AREF[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off]
+  res  <- update_table(con, ADD, "LAP", "Date")
+  rm(AREF); gc()
+
+
+
   ## Select some data
   ADD <- tbl(con, "LAP")             |>
     filter(Elevat > QS$sun_elev_min) |>
     filter(!is.na(TSI_TOA))          |>
     filter(!is.na(SZA))              |>
-    select(TSI_TOA, SZA, Date, GLB_strict, DIR_strict) |> collect() |> data.table()
+    select(TSI_TOA, SZA, Date, GLB_strict, DIR_strict, Direct_max)
+
+ ADD |>
+   mutate(
+     Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off
+   )
 
 
   # Compute reference values
