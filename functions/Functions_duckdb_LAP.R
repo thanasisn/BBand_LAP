@@ -125,6 +125,13 @@ make_categorical_column <- function(flagname, categories, con, table) {
     return()
   } else {
 
+    ## remove type anyway
+    try({
+      qq <- paste0("DROP TYPE ", flagname, ";")
+      cat(qq, "\n")
+      res <- dbSendQuery(con, qq)
+    })
+
     ## create "enum" type
     qq <- paste0("CREATE TYPE  ", flagname,
                  "  AS ENUM  (",  paste(paste0("'", categories, "'"), collapse = ", " ),
