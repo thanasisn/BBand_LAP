@@ -160,67 +160,81 @@ if (Sys.info()["nodename"] == "sagan") {
   make_categorical_column(flagname_GLB, categories, con, "LAP")
 
 
-
-  stop("wait")
-
-
-  ## create reference values
+  ## Data to work on
   ADD <- tbl(con, "LAP")             |>
     filter(Elevat > QS$sun_elev_min) |>
     filter(!is.na(TSI_TOA))          |>
     filter(!is.na(SZA))
 
+  ## create reference values for direct
   if (!any(ADD |> colnames() %in% "Direct_max")) {
-    AREF <- ADD |> collect() |> data.table()
+    AREF <- ADD |>
+      select(Date, TSI_TOA, SZA) |>
+      collect() |> data.table()
   } else {
-    AREF <- ADD |> filter(is.na(Direct_max)) |> collect() |> data.table()
+    AREF <- ADD |>
+      select(Date, TSI_TOA, SZA) |>
+      filter(is.na(Direct_max)) |> collect() |> data.table()
   }
-
   AREF <- AREF[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off]
   res  <- update_table(con, ADD, "LAP", "Date")
   rm(AREF); gc()
 
+  ## create reference values for global
+  if (!any(ADD |> colnames() %in% "Global_max")) {
+    AREF <- ADD |>
+      select(Date, TSI_TOA, SZA) |>
+      collect() |> data.table()
+  } else {
+    AREF <- ADD |>
+      select(Date, TSI_TOA, SZA) |>
+      filter(is.na(Global_max)) |> collect() |> data.table()
+  }
+  AREF <- AREF[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off]
+  res  <- update_table(con, ADD, "LAP", "Date")
+  rm(AREF); gc()
 
+
+  stop("wait")
 
   ## Select some data
   ADD <- tbl(con, "LAP")             |>
     filter(Elevat > QS$sun_elev_min) |>
     filter(!is.na(TSI_TOA))          |>
     filter(!is.na(SZA))              |>
-    select(TSI_TOA, SZA, Date, GLB_strict, DIR_strict, Direct_max)
-
- ADD |>
-   mutate(
-     Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off
-   )
-
-
-  # Compute reference values
-  datapart[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off]
-  datapart[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cosde(SZA)^1.2 + QS$Glo_SWdn_off]
-
-  # Ignore too low values near horizon
-  datapart[Direct_max < QS$dir_SWdn_too_low, Direct_max := NA]
-  datapart[Global_max < QS$glo_SWdn_too_low, Direct_max := NA]
+    select(TSI_TOA, SZA, Date, GLB_strict, DIR_strict, Direct_max, Global_max)
 
   ## __ Direct  ----------------------------------------------------------
-  datapart[DIR_strict < QS$dir_SWdn_min_ext,
-           (flagname_DIR) := "Extremely rare limits min (3)"]
-  datapart[DIR_strict > Direct_max,
-           (flagname_DIR) := "Extremely rare limits max (4)"]
+  RES <- ADD |>
+    filter(Direct_max > QS$dir_SWdn_too_low) |> # Ignore too low values near horizon
+    mutate(
+
+      !!flagname_DIR := case_when(
+        DIR_strict <  QS$dir_SWdn_min_ext ~ "Extremely rare limits min (3)",
+        DIR_strict >= Direct_max          ~ "Extremely rare limits max (4)"
+
+        .default = "passed"
+      )
+    )
+  res <- update_table(con, RES, "LAP", "Date")
+
 
   ## __ Global  ----------------------------------------------------------
-  datapart[GLB_strict < QS$glo_SWdn_min_ext,
-           (flagname_GLB) := "Extremely rare limits min (3)"]
-  datapart[GLB_strict > Global_max,
-           (flagname_GLB) := "Extremely rare limits max (4)"]
+  RES <- ADD |>
+    filter(Global_max > QS$glo_SWdn_too_low) |> # Ignore too low values near horizon
+    mutate(
+
+      !!flagname_GLB := case_when(
+        GLB_strict <  QS$glo_SWdn_min_ext ~ "Extremely rare limits min (3)",
+        GLB_strict >= Global_max          ~ "Extremely rare limits max (4)"
+
+        .default = "passed"
+      )
+    )
+  res <- update_table(con, RES, "LAP", "Date")
 
 
 
-
-  ## __  Store used filters parameters  ----------------------------------------
-saveRDS(object = QS,
-        file   = parameter_fl)
 }
 
 
