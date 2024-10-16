@@ -66,13 +66,37 @@ test  <- DD |>
 
 
 ## create a test db
+file.remove("~/ZHOST/test.duckdb")
 con <- dbConnect(duckdb(dbdir = "~/ZHOST/test.duckdb"))
 dbWriteTable(con, "test", test)
 
 
 tt <- tbl(con, "test")
 
+categories <- c("empty",
+                "pass",
+                "Extremely rare limits min (3)",
+                "Extremely rare limits max (4)")
 
+
+
+
+
+
+
+
+make_categorical_column(flagname_DIR, categories, con, "test")
+
+
+
+tt <- tbl(con, "test")
+
+tt |> glimpse()
+
+add <- tt |> head(1) |>
+  mutate(QCv10_02_dir_flag = "Extremely rare limits min (3)")
+
+update_table(con, add, "test", "Date")
 
 
 

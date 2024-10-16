@@ -108,6 +108,41 @@ make_new_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") 
 
 
 
+#' Create enum type and column for a vector of factors
+#'
+#' @param flagname   The name of the enum categories and the new column
+#' @param categories A vector of strings with the categories
+#' @param con        A data base connection
+#' @param table      The name of the table in the data base
+#'
+#' @return           Nothing, it creates an categorical column in the data base
+#' @export
+#'
+make_categorical_column <- function(flagname, categories, con, table) {
+
+  if (any(dbListFields(con, table) %in% flagname)) {
+    cat(" Column ", flagname, " already exist! >> Do nothing!! <<\n\n")
+    return()
+  } else {
+
+    ## create "enum" type
+    qq <- paste0("CREATE TYPE  ", flagname,
+                 "  AS ENUM  (",  paste(paste0("'", categories, "'"), collapse = ", " ),
+                 ");")
+    cat(qq, "\n")
+    res <- dbSendQuery(con, qq)
+    ## add a column for the "enum" type
+    qq <- paste0("ALTER TABLE  ",   table,
+                 "  ADD COLUMN  ",  flagname,
+                 "  ",              flagname,
+                 "  DEFAULT 'empty'")
+    cat(qq, "\n")
+    res <- dbSendQuery(con, qq)
+  }
+}
+
+
+
 #' Drop a column from a table
 #'
 #' @param con      Connection to the database
