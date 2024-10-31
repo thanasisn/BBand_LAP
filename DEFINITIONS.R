@@ -5,7 +5,6 @@
 ####    Project root folder    #################################################
 BASED      <- "~/BBand_LAP/"
 
-
 ##  Input paths  ---------------------------------------------------------------
 SUN_FOLDER   <- "~/DATA_RAW/SUN/PySolar_LAP/"
 SIRENA_DIR   <- "~/DATA_RAW/Bband/CHP1_lap.DIR/"
@@ -33,9 +32,9 @@ CHP1_EXCLUDE <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CHP1.dat"
 CHP1_TEMP_EX <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CHP1_Temp.dat"
 
 
-
 ##  DB specifications  ---------------------------------------------------------
-DB_LAP              <- "~/DATA_RAW/LAP/LAP_parameters.duckdb"
+# DB_LAP              <- "~/DATA_RAW/LAP/LAP_parameters.duckdb"
+DB_LAP              <- "~/DATA_RAW/SUN/LAP_SUN.duckdb"
 DB_DUCK             <- "~/DATA/Broad_Band/Broad_Band_LAP.duckdb"
 DB_DIR              <- "~/DATA/Broad_Band/Broad_Band_DB"
 DB_META_fl          <- "~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"

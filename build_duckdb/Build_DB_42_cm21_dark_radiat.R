@@ -104,11 +104,11 @@ for (ad in dayslist) {
 
   ## use only valid data for dark calculation
   daydata <-
-    tbl(con, "LAP")                   |>
-    filter(Day == ad)                 |>  ## this day only
-    filter(!is.na(CM21_sig))          |>  ## valid measurements
-    filter(is.na(cm21_bad_data_flag)) |>  ## not bad data
-    filter(cm21_sig_limit_flag == 0)  |>  ## acceptable values range
+    tbl(con, "LAP")                       |>
+    filter(Day == ad)                     |>  ## this day only
+    filter(!is.na(CM21_sig))              |>  ## valid measurements
+    filter(is.na(cm21_bad_data_flag))     |>  ## not bad data
+    filter(cm21_sig_limit_flag == "pass") |>  ## acceptable values range
     collect() |>
     data.table()
 
@@ -204,7 +204,7 @@ tbl(con, "META") |> group_by(cm21_dark_flag) |> tally()
 # tbl(con, "LAP")  |> glimpse()
 #
 # tbl(con, "LAP") |> filter(!is.na(cm21_bad_data_flag)) |> glimpse()
-# tbl(con, "LAP") |> filter(cm21_sig_limit_flag == 0)
+# tbl(con, "LAP") |> filter(cm21_sig_limit_flag == "pass")
 #
 # tbl(con, "META") |>
 #   filter(is.na(cm21_dark_flag) & !is.na(cm21_basename))
