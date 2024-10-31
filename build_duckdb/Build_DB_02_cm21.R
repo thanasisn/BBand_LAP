@@ -97,6 +97,14 @@ setorder(inp_filelist, Day)
 
 cat("\n**Parse:", paste(nrow(inp_filelist), "CM-21 files**\n\n"))
 
+## create categorical column for signal
+categories <- c("empty",                 ## default NA
+                "pass",                  ## signal is normal
+                "Abnormal LOW signal",   ## too low signal
+                "Abnormal HIGH signal")  ## too high signal
+
+make_categorical_column("cm21_sig_limit_flag", categories, con, "LAP")
+
 ##  Import CM-21 files  --------------------------------------------------------
 if (nrow(inp_filelist) > 0) {
   for (ll in 1:nrow(inp_filelist)) {
@@ -135,18 +143,17 @@ if (nrow(inp_filelist) > 0) {
     ## try to fix dates
     day_data[, Date := round_date(Date, unit = "second")]
 
-    ## normal signal flag
-    day_data[, cm21_sig_limit_flag := 0L ]
+    ## flag signal limits
+    day_data[,
+             cm21_sig_limit_flag := "pass"]
 
-    ## "Abnormal LOW signal"
     day_data[CM21_sig < cm21_signal_lower_limit(Date),
-             cm21_sig_limit_flag := 1L ]
+             cm21_sig_limit_flag := "Abnormal LOW signal"]
 
-    ## "Abnormal HIGH signal"
     day_data[CM21_sig > cm21_signal_upper_limit(Date),
-             cm21_sig_limit_flag := 2L ]
+             cm21_sig_limit_flag := "Abnormal HIGH signal"]
 
-    ##  data base limits
+    ## enforce data base numeric scheme
     day_data[CM21_sig > 9000, CM21_sig := 9000]
 
     ## meta data for file
