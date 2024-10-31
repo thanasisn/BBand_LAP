@@ -1,5 +1,5 @@
 #!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Reads temperature data for CHP-1 into the database
 #'
@@ -33,8 +33,8 @@ if (!interactive()) {
 }
 
 ## __ Load libraries  ----------------------------------------------------------
-source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
@@ -96,6 +96,15 @@ setorder(inp_filelist, Day)
 inp_filelist <- inp_filelist[ Day < as.Date(Sys.Date())]
 cat("\n**Parse:", nrow(inp_filelist), "CHP-1 temperature files**\n\n")
 
+## create categorical column for CHP-1 temperature
+categories <- c("empty",                      ## default NA
+                "pass",                       ## signal is normal
+                "Abnormal LOW temperature",   ## too low temperature
+                "Abnormal HIGH temperature",  ## too high temperature
+                "Abnormal temperature SD")    ## too high temperature SD
+
+make_categorical_column("chp1_bad_temp_flag", categories, con, "LAP")
+
 ##  Import CHP-1 temperature  --------------------------------------------------------
 if (nrow(inp_filelist) > 0) {
   for (ll in 1:nrow(inp_filelist)) {
@@ -150,22 +159,20 @@ if (nrow(inp_filelist) > 0) {
     ## try to fix dates
     day_data[, Date := round_date(Date, unit = "second")]
 
-    ## normal signal flag
-    day_data[, chp1_bad_temp_flag := 0L ]
+    ## flag temperature limits
+    day_data[, 
+             chp1_bad_temp_flag := "pass"]
 
-    ## "Abnormal LOW temperature"
     day_data[chp1_temperature < CHP1_TEMP_MIN,
-             chp1_bad_temp_flag := 1L ]
+             chp1_bad_temp_flag := "Abnormal LOW temperature"]
 
-    ## "Abnormal HIGH temperature"
     day_data[chp1_temperature > CHP1_TEMP_MAX,
-             chp1_bad_temp_flag := 2L ]
+             chp1_bad_temp_flag := "Abnormal HIGH temperature"]
 
-    ## "Abnormal temperature SD"
     day_data[chp1_temperature_SD > CHP1_TEMP_STD_LIM,
-             chp1_bad_temp_flag := 3L ]
+             chp1_bad_temp_flag := "Abnormal temperature SD"]
 
-    ## Over 9000!!
+    ## Over 9000!! enforce data base numeric scheme
     day_data[chp1_kohm_therm > 9000, chp1_kohm_therm := 9000]
 
     ## Add data and metadata
