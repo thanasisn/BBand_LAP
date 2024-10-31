@@ -172,19 +172,14 @@ for (YYYY in sort(years_to_do)) {
         year_data$CM21_sig_sd[!is.na(year_data$cm21_bad_data_flag)] <- NA
 
         cat("\nRemove data above physical limits\n")
-        cat(year_data[cm21_sig_limit_flag == 2, .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
-        # year_data$CM21_sig   [year_data$CM21_sig > year_data$sig_upplim] <- NA
-        # year_data$CM21_sig_sd[year_data$CM21_sig > year_data$sig_upplim] <- NA
-        year_data[cm21_sig_limit_flag == 2, CM21_sig    := NA ]
-        year_data[cm21_sig_limit_flag == 2, CM21_sig_sd := NA ]
+        cat(year_data[cm21_sig_limit_flag == "Abnormal HIGH signal", .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
+        year_data[cm21_sig_limit_flag == "Abnormal HIGH signal", CM21_sig    := NA]
+        year_data[cm21_sig_limit_flag == "Abnormal HIGH signal", CM21_sig_sd := NA]
 
         cat("\nRemove data below physical limits\n")
-        # cat(year_data[CM21_sig < sig_lowlim, .N], year_data[!is.na(CM21_sig), .N], "\n\n")
-        cat(year_data[cm21_sig_limit_flag == 2, .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
-        # year_data$CM21_sig   [year_data$CM21_sig < year_data$sig_lowlim] <- NA
-        # year_data$CM21_sig_sd[year_data$CM21_sig < year_data$sig_lowlim] <- NA
-        year_data[cm21_sig_limit_flag == 1, CM21_sig    := NA ]
-        year_data[cm21_sig_limit_flag == 1, CM21_sig_sd := NA ]
+        cat(year_data[cm21_sig_limit_flag == "Abnormal LOW signal", .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
+        year_data[cm21_sig_limit_flag == "Abnormal LOW signal", CM21_sig    := NA ]
+        year_data[cm21_sig_limit_flag == "Abnormal LOW signal", CM21_sig_sd := NA ]
     }
 
     ## Missing days
