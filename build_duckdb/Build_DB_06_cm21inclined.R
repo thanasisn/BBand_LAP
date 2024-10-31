@@ -142,7 +142,7 @@ if (nrow(inp_filelist) > 0) {
     ## try to fix dates
     day_data[, Date := round_date(Date, unit = "second")]
 
-    ## TODO when have more data
+    ## TODO when have more data about the instrument function
     # ## normal signal flag
     # day_data[, cm21inc_sig_limit_flag := 0L ]
     #
