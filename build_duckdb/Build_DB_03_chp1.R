@@ -147,13 +147,13 @@ if (nrow(inp_filelist) > 0) {
     day_data[,
              chp1_sig_limit_flag := "pass"]
 
-    day_data[CM21_sig < chp1_signal_lower_limit(Date),
+    day_data[CHP1_sig < chp1_signal_lower_limit(Date),
              chp1_sig_limit_flag := "Abnormal LOW signal"]
 
     day_data[CHP1_sig > chp1_signal_upper_limit(Date),
              chp1_sig_limit_flag := "Abnormal HIGH signal" ]
 
-    ## enforce data base numeric scheme
+    ## Over 9000!! enforce data base numeric scheme
     day_data[CHP1_sig > 9000, CHP1_sig := 9000]
 
     ## meta data for file
