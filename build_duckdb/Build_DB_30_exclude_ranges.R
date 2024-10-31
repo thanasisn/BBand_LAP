@@ -17,6 +17,7 @@
 #'
 #+ echo=F, include=T
 
+stop("create categorical")
 
 #+ echo=F, include=F
 ## __ Document options  --------------------------------------------------------
@@ -204,6 +205,8 @@ pander(data.table(table(ranges_CM21$Comment)))
 cat("\n\n\\normalsize\n\n")
 
 
+
+
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
 
@@ -260,6 +263,9 @@ for (i in 1:nrow(ranges_CM21)) {
   temp_flag <- rbind(temp_flag, tempex)
   rm(tempex)
 }
+
+##  Create categorical column
+unique(c("empty", temp_flag$cm21_bad_data_flag))
 
 ## apply bad data ranges
 
