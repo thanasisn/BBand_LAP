@@ -40,8 +40,8 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_dark_calculation.R")
-source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
+source("~/BBand_LAP/functions/Functions_CM21.R")
 
 # library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
@@ -112,6 +112,8 @@ for (ad in dayslist) {
     filter(cm21_sig_limit_flag == "pass") |>  ## acceptable values range
     collect() |>
     data.table()
+
+  stop("check here")
 
   ## Ignore bad and missing data
   if (nrow(daydata) == 0) {
