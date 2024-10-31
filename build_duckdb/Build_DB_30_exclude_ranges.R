@@ -17,8 +17,6 @@
 #'
 #+ echo=F, include=T
 
-stop("create categorical")
-
 #+ echo=F, include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
@@ -204,12 +202,8 @@ cat("\n\\footnotesize\n\n")
 pander(data.table(table(ranges_CM21$Comment)))
 cat("\n\n\\normalsize\n\n")
 
-
-
-
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
-
 
 ## fill all days in meta data until today
 {
@@ -265,12 +259,17 @@ for (i in 1:nrow(ranges_CM21)) {
 }
 
 ##  Create categorical column
-unique(c("empty", temp_flag$cm21_bad_data_flag))
+categories <- unique(c("empty", temp_flag$cm21_bad_data_flag))
+
+## remove existing flags
+remove_column(con, "LAP", "cm21_bad_data_flag")
+
+## create categorical if not existing
+make_categorical_column("cm21_bad_data_flag", categories, con, "LAP")
 
 ## apply bad data ranges
-
 ##  Remove any previous flags
-make_null_column(con, "LAP", "cm21_bad_data_flag", "character")
+# make_null_column(con, "LAP", "cm21_bad_data_flag", "character")
 ##  Apply flags
 update_table(con, temp_flag, "LAP", "Date")
 rm(temp_flag)
@@ -291,10 +290,18 @@ for (i in 1:nrow(ranges_CHP1)) {
   rm(tempex)
 }
 
-## apply bad data ranges
+##  Create categorical column
+categories <- unique(c("empty", temp_flag$chp1_bad_data_flag))
 
+## remove existing flags
+remove_column(con, "LAP", "chp1_bad_data_flag")
+
+## create categorical if not existing
+make_categorical_column("chp1_bad_data_flag", categories, con, "LAP")
+
+## apply bad data ranges
 ##  Remove any previous flags
-make_null_column(con, "LAP", "chp1_bad_data_flag", "character")
+# make_null_column(con, "LAP", "chp1_bad_data_flag", "character")
 ##  Apply flags
 update_table(con, temp_flag, "LAP", "Date")
 rm(temp_flag)
@@ -315,22 +322,22 @@ for (i in 1:nrow(ranges_CHP1_temp)) {
   rm(tempex)
 }
 
+##  Create categorical column
+categories <- unique(c("empty", temp_flag$chp1_bad_temp_flag))
+
+## remove existing flags
+remove_column(con, "LAP", "chp1_bad_temp_flag")
+
+## create categorical if not existing
+make_categorical_column("chp1_bad_temp_flag", categories, con, "LAP")
 
 ## apply bad data ranges
-
 ##  Remove any previous flags
-make_null_column(con, "LAP", "chp1_bad_temp_flag", "character")
+# make_null_column(con, "LAP", "chp1_bad_temp_flag", "character")
 ##  Apply flags
 update_table(con, temp_flag, "LAP", "Date")
 rm(temp_flag)
 
-
-
-
-
-
-
-## TODO use ENUM for factors
 
 # left_join(
 #   tbl(con, "LAP") |> select(Date),
