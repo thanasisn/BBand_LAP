@@ -107,7 +107,8 @@ for (ad in dayslist) {
     tbl(con, "LAP")                       |>
     filter(Day == ad)                     |>  ## this day only
     filter(!is.na(CM21_sig))              |>  ## valid measurements
-    filter(is.na(cm21_bad_data_flag))     |>  ## not bad data
+#    filter(is.na(cm21_bad_data_flag))     |>  ## not bad data
+    filter(cm21_bad_data_flag  == "pass") |>  ## not bad data
     filter(cm21_sig_limit_flag == "pass") |>  ## acceptable values range
     collect() |>
     data.table()

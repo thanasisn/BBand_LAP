@@ -31,12 +31,12 @@ source("~/BBand_LAP/build_duckdb/Build_DB_06_cm21inclined.R"    )
 source("~/BBand_LAP/build_duckdb/Build_DB_16_cm21_TOT.R"        )
 
 ##  Flag bad data  -------------------------------------------------------------
-# source("~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R"  )
+source("~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R"  )
 
 ##  Raw to actual data  --------------------------------------------------------
 
 ## __ Apply dark offset and convert to radiation  ------------------------------
-# source("~/BBand_LAP/build_duckdb/Build_DB_42_cm21_dark_radiat.R")
+source("~/BBand_LAP/build_duckdb/Build_DB_42_cm21_dark_radiat.R")
 # source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
 
 ## __ Second pass to construct missing dark !  ---------------------------------
