@@ -144,10 +144,22 @@ if (Sys.info()["nodename"] == "sagan") {
 
   cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
+  ## __ Make categorical columns  ----------------------------------------------
+  categories <- c("empty",
+                  "pass",
+                  "Physical possible limit min (5)",
+                  "Physical possible limit max (6)")
+
+  ## remove existing flags
+  remove_column(con, "LAP", flagname_DIR)
+  remove_column(con, "LAP", flagname_GLB)
+
+  ## create flags if not existing
+  make_categorical_column(flagname_DIR, categories, con, "LAP")
+  make_categorical_column(flagname_GLB, categories, con, "LAP")
+
+
 stop("create categorical")
-  ## __ Make null columns to update all values  --------------------------------
-  make_null_column(con, "LAP", flagname_DIR, "character")
-  make_null_column(con, "LAP", flagname_GLB, "character")
 
   ## __ Flag direct  -----------------------------------------------------------
   ADD <- tbl(con, "LAP")             |>
@@ -155,10 +167,11 @@ stop("create categorical")
     mutate(
 
       !!flagname_DIR := case_when(
+
         DIR_strict           < QS$dir_SWdn_min ~ "Physical possible limit min (5)",
         TSI_TOA - DIR_strict < QS$dir_SWdn_dif ~ "Physical possible limit max (6)",
 
-        .default = "passed"
+        .default = "pass"
       ))
   res <- update_table(con, ADD, "LAP", "Date")
 
@@ -173,7 +186,7 @@ stop("create categorical")
     select(TSI_TOA, SZA, Date, GLB_strict) |> collect() |> data.table()
 
   ## Create reference
-  # TODO create only missing
+  # TODO create only missing although most resent TSI will change
   ADD[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
 
   ## Apply test
@@ -181,13 +194,13 @@ stop("create categorical")
     mutate(
 
       !!flagname_GLB := case_when(
+
         GLB_strict < QS$glo_SWdn_min ~ "Physical possible limit min (5)",
         GLB_strict > Glo_max_ref     ~ "Physical possible limit max (6)",
 
-        .default = "passed"
+        .default = "pass"
       ))
 
-  # summary(ADD$Glo_max_ref)
   # arrow::to_arrow() |>
   # mutate(ss = QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2) |>
   # select(ss, TSI_TOA)

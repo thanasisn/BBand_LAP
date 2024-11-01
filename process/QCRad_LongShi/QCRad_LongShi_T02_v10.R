@@ -142,15 +142,14 @@ if (Sys.info()["nodename"] == "sagan") {
   QS$dir_SWdn_too_low <-    3     # Ideal w/m^2
   QS$glo_SWdn_too_low <-    3     # Ideal w/m^2
 
+  cat(paste("\n2. Extremely Rare Limits", flagname_DIR, flagname_GLB, "\n\n"))
+
+  ## __ Make categorical columns  ----------------------------------------------
   categories <- c("empty",
                   "pass",
                   "Extremely rare limits min (3)",
                   "Extremely rare limits max (4)")
 
-
-  cat(paste("\n2. Extremely Rare Limits", flagname_DIR, flagname_GLB, "\n\n"))
-
-  ## __ Make categorical columns  ----------------------------------------------
   ## remove existing
   remove_column(con, "LAP", flagname_DIR)
   remove_column(con, "LAP", flagname_GLB)
