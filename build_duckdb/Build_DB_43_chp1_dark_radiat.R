@@ -100,7 +100,7 @@ dayslist <- tbl(con, "META") |>
   select(Day) |> pull()
 
 cc <- 0
-for (ad in dayslist) {
+for (ad in sort(dayslist)) {
   ad <- as.Date(ad, origin = origin)
   cc <- cc + 1
   cat(Script.ID, ":", paste(ad), cc, "/",length(dayslist), "\n")
