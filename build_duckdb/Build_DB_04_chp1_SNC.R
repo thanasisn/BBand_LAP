@@ -109,7 +109,7 @@ if (nrow(inp_filelist) > 0) {
     cat(Script.ID, ": ",
         basename(ff$fullname),
         paste(ff$Day),
-        ll,"/",nrow(inp_filelist), "\n")
+        ll,"/",nrow(inp_filelist))
 
     async    <- rep(FALSE, 1440)  # The snc file exist, so start with all not async
     asyncstp <- rep(NA,    1440)  # Async magnitude (steps missed)
@@ -136,6 +136,8 @@ if (nrow(inp_filelist) > 0) {
     uniq_async  <- unique(async_minu)
     ## async time distance
     syc_temp$timeDist <- apply(syc_temp[, c('V7', 'V8')], MARGIN = 1, FUN = max, na.rm = T)
+    cat(" r")
+
 
     for (amin in uniq_async) {
       min_ind <- async_minu == amin
@@ -171,6 +173,7 @@ if (nrow(inp_filelist) > 0) {
                             chp1_sync_mtime    = file.mtime(ff$fullname),
                             chp1_sync_parsed   = Sys.time(),
                             chp1_sync_md5sum   = as.vector(md5sum(ff$fullname)))
+    cat(" p")
 
     ## Add data and metadata
     {
@@ -189,6 +192,7 @@ if (nrow(inp_filelist) > 0) {
                    new_data = file_meta,
                    table    = "META",
                    matchvar = "Day")
+      cat(" w\n")
     }
   }
 } else {

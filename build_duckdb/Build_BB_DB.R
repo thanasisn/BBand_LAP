@@ -49,7 +49,7 @@ source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
 
 ## Add data from other sources  ------------------------------------------------
 source("~/BBand_LAP/build_duckdb/Import_50_TSI.R"               )
-# source("~/BBand_LAP/build_duckdb/Import_51_Pressure.R"          )
+source("~/BBand_LAP/build_duckdb/Import_51_Pressure.R"          )
 
 
 

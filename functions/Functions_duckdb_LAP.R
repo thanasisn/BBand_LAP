@@ -39,7 +39,7 @@ create_missing_columns <- function(con, new_data, table) {
                    "  ADD COLUMN  ", new_vars$names[i],
                    "  ",             ctype,
                    "  DEFAULT null")
-      cat(qq, "\n")
+      cat(qq, "\n\n")
       res <- dbSendQuery(con, qq)
     }
   }
@@ -70,7 +70,7 @@ make_null_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)")
                "  ADD COLUMN  ",  acolname,
                "  ",              acoltype,
                "  DEFAULT null")
-  cat(qq, "\n")
+  cat(qq, "\n\n")
   res <- dbSendQuery(con, qq)
 }
 
@@ -93,7 +93,7 @@ make_null_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)")
 make_new_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") {
 
   if (any(dbListFields(con, table) %in% acolname)) {
-    cat(" Column ", acolname, " already exist! >> Do nothing!! <<\n\n")
+    cat(" Column ", acolname, " already exist! >> No new column to be created!! <<\n\n")
     return()
   } else {
     ## create new columns with a query
@@ -101,7 +101,7 @@ make_new_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") 
                  "  ADD COLUMN  ",  acolname,
                  "  ",              acoltype,
                  "  DEFAULT null")
-    cat(qq, "\n")
+    cat(qq, "\n\n")
     res <- dbSendQuery(con, qq)
   }
 }
@@ -121,7 +121,7 @@ make_new_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") 
 make_categorical_column <- function(flagname, categories, con, table) {
 
   if (any(dbListFields(con, table) %in% flagname)) {
-    cat(" Column ", flagname, " already exist! >> Do nothing!! <<\n\n")
+    cat(" Column ", flagname, " already exist! >> No new column to be created!! <<\n\n")
     return()
   } else {
 
@@ -138,12 +138,13 @@ make_categorical_column <- function(flagname, categories, con, table) {
                  ");")
     cat(qq, "\n")
     res <- dbSendQuery(con, qq)
+
     ## add a column for the "enum" type
     qq <- paste0("ALTER TABLE  ",   table,
                  "  ADD COLUMN  ",  flagname,
                  "  ",              flagname,
                  "  DEFAULT 'empty'")
-    cat(qq, "\n")
+    cat(qq, "\n\n")
     res <- dbSendQuery(con, qq)
   }
 }
@@ -163,7 +164,7 @@ remove_column <- function(con, table, acolname) {
   if (any(dbListFields(con, table) %in% acolname)) {
     qq <- paste0("ALTER TABLE  ",  table,
                  "  DROP        ", acolname)
-    cat(qq, "\n")
+    cat(qq, "\n\n")
     res <- dbSendQuery(con, qq)
   } else {
     warning("No column to remove:", acolname)

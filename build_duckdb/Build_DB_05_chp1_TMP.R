@@ -113,7 +113,7 @@ if (nrow(inp_filelist) > 0) {
     cat(Script.ID, ": ",
         basename(ff$fullname),
         paste(ff$Day),
-        ll,"/",nrow(inp_filelist), "\n")
+        ll,"/",nrow(inp_filelist))
 
     ## __ Check data base is ready for import  ---------------------------------
     if (tbl(con, "LAP") |> filter(Day == ff$Day) |> tally() |> pull() != 1440) {
@@ -133,6 +133,7 @@ if (nrow(inp_filelist) > 0) {
                                   V3 = mean(V3, na.rm = T)), by = V1]
     temp_temp[V2 < 0, V2 := NA]
     temp_temp[V2 < 0, V3 := NA]
+    cat(" r")
 
     day_data <- data.frame(Date                = temp_temp$V1,
                            chp1_kohm_therm     = temp_temp$V2                        / 1000,
@@ -174,6 +175,7 @@ if (nrow(inp_filelist) > 0) {
 
     ## Over 9000!! enforce data base numeric scheme
     day_data[chp1_kohm_therm > 9000, chp1_kohm_therm := 9000]
+    cat(" p")
 
     ## Add data and metadata
     {
@@ -192,6 +194,7 @@ if (nrow(inp_filelist) > 0) {
                    new_data = file_meta,
                    table    = "META",
                    matchvar = "Day")
+      cat(" w\n")
     }
   }
 } else {

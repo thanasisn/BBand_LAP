@@ -106,7 +106,7 @@ if (nrow(inp_filelist) > 0) {
     cat(Script.ID, ": ",
         basename(ff$fullname),
         paste(ff$Day),
-        ll,"/",nrow(inp_filelist), "\n")
+        ll,"/",nrow(inp_filelist))
 
     ## __ Check data base is ready for import  ---------------------------------
     if (tbl(con, "LAP") |> filter(Day == ff$Day) |> tally() |> pull() != 1440) {
@@ -128,6 +128,7 @@ if (nrow(inp_filelist) > 0) {
     stopifnot(dim(lap)[1] == 1440)
     lap[V1 < -8, V1 := NA]
     lap[V2 < -8, V2 := NA]
+    cat(" r")
 
     day_data <- data.table(Date           = D_minutes,      # Date of the data point
                            CM21INC_sig    = lap$V1,         # Raw value for INCLINED CM21
@@ -160,6 +161,7 @@ if (nrow(inp_filelist) > 0) {
                             cm21inc_mtime    = file.mtime(ff$fullname),
                             cm21inc_parsed   = Sys.time(),
                             cm21inc_md5sum   = as.vector(md5sum(ff$fullname)))
+    cat(" p")
 
     ## Add data and metadata
     {
@@ -178,6 +180,7 @@ if (nrow(inp_filelist) > 0) {
                    new_data = file_meta,
                    table    = "META",
                    matchvar = "Day")
+      cat(" w\n")
     }
   }
 } else {
