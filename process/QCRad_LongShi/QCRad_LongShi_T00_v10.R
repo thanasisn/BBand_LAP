@@ -77,8 +77,8 @@ Script.ID    <- "Q0"
 parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
+  sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -115,16 +115,16 @@ if (Sys.info()["nodename"] == "sagan") {
 
   ##  Prepare strict global irradiance
   ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min)    |>  ## sun is up
-    filter(!is.na(CM21_sig))            |>  ## valid measurements
-    filter(is.na(cm21_bad_data_flag))   |>  ## not bad data
-    filter(cm21_sig_limit_flag == 0)    |>  ## in acceptable values range
-    select(Date, GLB_wpsm)              |>
+    filter(Elevat > QS$sun_elev_min)  |>  ## sun is up
+    filter(!is.na(CM21_sig))          |>  ## valid measurements
+    filter(is.na(cm21_bad_data_flag)) |>  ## not bad data
+    filter(cm21_sig_limit_flag == 0)  |>  ## in acceptable values range
+    select(Date, GLB_wpsm)            |>
     mutate(
 
       GLB_strict = case_when(
-        GLB_wpsm <  0 ~ 0,                    ## Negative values to zero
-        GLB_wpsm >= 0 ~ GLB_wpsm              ## All other selected values as is
+        GLB_wpsm <  0 ~ 0,                ## Negative values to zero
+        GLB_wpsm >= 0 ~ GLB_wpsm          ## All other selected values as is
 
       ))
   ##  Write data in the data base
