@@ -88,10 +88,16 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Variables  -----------------------------------------------------------------
+# if (file.exists(parameter_fl)) {
+#   QS <<- readRDS(parameter_fl)
+# } else {
+#   stop("File not initialiazed")
+# }
+
 if (file.exists(parameter_fl)) {
   QS <<- readRDS(parameter_fl)
 } else {
-  stop("File not initialiazed")
+  QS <<- list()
 }
 
 ## mostly for daily plots
@@ -136,11 +142,12 @@ if (Sys.info()["nodename"] == "sagan") {
   #' These limit should not be met, they are defined neat the maximum observed
   #' values of the data set.
 
-  QS$dir_SWdn_min <-  -4    # Minimum direct value to consider valid measurement
-  QS$dir_SWdn_dif <- 327    # Closeness to to TSI
-  QS$glo_SWdn_min <-  -4    # Minimum global value to consider valid measurement
-  QS$glo_SWdn_off <- 160    # Global departure offset above the model
-  QS$glo_SWdn_amp <-   1.3  # Global departure factor above the model
+  QS$sun_elev_min <- -2 * 0.103 # Drop ALL radiation data when sun is below this point
+  QS$dir_SWdn_min <-  -4        # Minimum direct value to consider valid measurement
+  QS$dir_SWdn_dif <- 327        # Closeness to to TSI
+  QS$glo_SWdn_min <-  -4        # Minimum global value to consider valid measurement
+  QS$glo_SWdn_off <- 160        # Global departure offset above the model
+  QS$glo_SWdn_amp <-   1.3      # Global departure factor above the model
 
   cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
@@ -159,8 +166,6 @@ if (Sys.info()["nodename"] == "sagan") {
   make_categorical_column(flagname_GLB, categories, con, "LAP")
 
 
-stop("create categorical")
-
   ## __ Flag direct  -----------------------------------------------------------
   ADD <- tbl(con, "LAP")             |>
     filter(Elevat > QS$sun_elev_min) |>
@@ -177,13 +182,13 @@ stop("create categorical")
 
 
   ## __ Flag global  -----------------------------------------------------------
-  ## FIXME do it in pure duckdb
 
   ## Select some data
-  ADD <- tbl(con, "LAP")             |>
-    filter(Elevat > QS$sun_elev_min) |>
-    filter(!is.na(TSI_TOA))          |>
-    select(TSI_TOA, SZA, Date, GLB_strict) |> collect() |> data.table()
+  ADD <- tbl(con, "LAP")                   |>
+    filter(Elevat > QS$sun_elev_min)       |>
+    filter(!is.na(TSI_TOA))                |>
+    select(TSI_TOA, SZA, Date, GLB_strict) |>
+    collect() |> data.table()
 
   ## Create reference
   # TODO create only missing although most resent TSI will change
@@ -200,45 +205,27 @@ stop("create categorical")
 
         .default = "pass"
       ))
+  res <- update_table(con, ADD, "LAP", "Date")
 
+  #### FIXME try to do it in pure duckdb
+  #
   # arrow::to_arrow() |>
   # mutate(ss = QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2) |>
   # select(ss, TSI_TOA)
   # ff <- tbl(con, "LAP") |> select(TSI_TOA, SZA) |> collect() |> data.table()
-  #
   # ## this is possible
   # ff[, test := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
-  # ## to_arrow?
   # mutate(
-  #
   # Glo_max_ref := case_when(
   #   TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off >  9000 ~ 9000,
   #   TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off <= 9000 ~ TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
-  #
   # ))
   # |>
   #   mutate(
-  #
   #     Glo_max_ref :=
   #       TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
-  #
   #     ) |>
   #   arrow::to_duckdb()
-
-  res <- update_table(con, ADD, "LAP", "Date")
-
-  # ## apply test
-  # ADD <- tbl(con, "LAP")             |>
-  #   filter(Elevat > QS$sun_elev_min) |>
-  #   mutate(
-  #
-  #     !!flagname_GLB := case_when(
-  #       GLB_strict < QS$glo_SWdn_min ~ "Physical possible limit min (5)",
-  #       GLB_strict > Glo_max_ref     ~ "Physical possible limit max (6)",
-  #
-  #       .default = "passed"
-  #     ))
-  # res <- update_table(con, ADD, "LAP", "Date")
 
   ## __  Store used filters parameters  ----------------------------------------
   saveRDS(object = QS,
@@ -255,7 +242,7 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 
 
-## Check that flads
+## Check that flags
 tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
 
 
@@ -275,9 +262,11 @@ DT |>
 
 dd <- DT |> head() |> collect() |> data.table()
 
+
+
+
+## should plot if there are hits
 stop("wait")
-
-
 
 
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
@@ -300,9 +289,6 @@ stop("wait")
 #' ## 1. Physically possible limits per BSRN
 #'
 #+ echo=F, include=T, results="asis"
-testN        <- 1
-flagname_DIR <- paste0("QCv10_", sprintf("%02d", testN), "_dir_flag")
-flagname_GLB <- paste0("QCv10_", sprintf("%02d", testN), "_glb_flag")
 
 cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
            caption = flagname_DIR))
@@ -341,7 +327,10 @@ cat(" \n \n")
 if (DO_PLOTS) {
 
   if (!interactive()) {
-    pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
+    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
+                    sub("\\.R$", "", basename(Script.Name)),
+                    ".pdf")
+    pdf(file = afile)
   }
 
   test <- BB |> filter(!QCv10_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
@@ -395,8 +384,6 @@ if (DO_PLOTS) {
 rm(list = ls(pattern = "flagname_.*"))
 dummy <- gc()
 if (!interactive()) dummy <- dev.off()
-
-
 
 
 
