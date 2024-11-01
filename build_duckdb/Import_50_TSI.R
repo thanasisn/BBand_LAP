@@ -87,7 +87,7 @@ TSI <- TSI[!is.na(TSI_source)]
 categories <- unique(c("empty", TSI$TSI_source))
 make_categorical_column("TSI_source", categories, con, "LAP")
 
-##  Add new data
+##  Add all TSI data to the database  ------------------------------------------
 if (nrow(TSI) > 0) {
   cat(Script.ID, ": ", nrow(TSI), "rows of TSI data to add\n")
 
@@ -95,8 +95,6 @@ if (nrow(TSI) > 0) {
                new_data = TSI,
                table    = "LAP",
                matchvar = "Date")
-
-  # cat(Script.ID, ": ", "This is not updating changed TSI data!!\n")
 
 } else {
   cat(Script.ID, ": ", "No new TSI data to add\n")
