@@ -61,23 +61,30 @@ if (second(PRESSURE$Date[1]) == 0) {
 names(PRESSURE)[names(PRESSURE) == "pressure"] <- "Pressure"
 names(PRESSURE)[names(PRESSURE) == "Source"  ] <- "Pressure_source"
 
-## clean some duplicate value
+## __ Clean some duplicate values  --------------------
 PRESSURE[duplicated(PRESSURE$Date) & Pressure_source == "iama_corrected" ]
 test <- PRESSURE[duplicated(PRESSURE$Date) | duplicated(PRESSURE$Date, fromLast = TRUE)]
 if (!nrow(test) == 0) {warning("Pressure data should be cleaner\n")}
 PRESSURE <- PRESSURE[!duplicated(PRESSURE$Date)]
 
-##  Update Pressure data in DB  -----------------------------------------------------
+
+## __ Get data to update  ------------------------------------------------------
 PRESSURE <- right_join(PRESSURE,
                   tbl(con, "LAP") |>
                     select(Date)  |>
                     collect(),
                   by = "Date")
+PRESSURE <- PRESSURE[!is.na(Pressure_source)]
 
+## __ Create categorical column  -----------------------------------------------
+categories <- unique(c("empty", PRESSURE$Pressure_source))
+make_categorical_column("Pressure_source", categories, con, "LAP")
+
+##  Add pressure data to database  ---------------------------------------------
 if (nrow(PRESSURE) > 0) {
   cat(Script.ID, ": ", nrow(PRESSURE), "rows of pressure data to add\n")
 
-  ## FIXME this will not update with changed pressure data
+  ## FIXME this will not update changed pressure data
   update_table(con      = con,
                new_data = PRESSURE,
                table    = "LAP",
