@@ -109,8 +109,7 @@ for (ad in dayslist) {
     filter(!is.na(CM21_sig))                            |> ## valid measurements
     filter(cm21_bad_data_flag  %in% c("pass", "empty")) |> ## not bad data
     filter(cm21_sig_limit_flag %in% c("pass", "empty")) |> ## acceptable values range
-    collect() |>
-    data.table()
+    collect() |> data.table()
 
   ## Ignore bad and missing data
   if (nrow(daydata) == 0) {
