@@ -115,7 +115,7 @@ for (ad in sort(dayslist)) {
 
   ## Ignore bad and missing data
   if (nrow(daydata) == 0) {
-    cat("      >>  No usefull CM-21 data in this file  <<\n")
+    cat("      >>  No usefull CM-21 on this day  <<\n")
     next()
   }
   if (any(is.na(daydata$Elevat))) {
