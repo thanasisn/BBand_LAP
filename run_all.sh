@@ -29,4 +29,7 @@ info "Run other processes"
 info "Update Readme.md file"
 "$HOME/BBand_LAP/.update_readme.sh"
 
-exit 0 
+# info "Build duck database"
+# "$HOME/BBand_LAP/build_duckdb/Build_BB_DB.R"
+
+exit 0
