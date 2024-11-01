@@ -212,7 +212,7 @@ if (Sys.info()["nodename"] == "sagan") {
         DIR_strict <  QS$dir_SWdn_min_ext ~ "Extremely rare limits min (3)",
         DIR_strict >= Direct_max          ~ "Extremely rare limits max (4)",
 
-        .default = "passed"
+        .default = "pass"
       )
     )
   res <- update_table(con, RES, "LAP", "Date")
@@ -227,12 +227,10 @@ if (Sys.info()["nodename"] == "sagan") {
         GLB_strict <  QS$glo_SWdn_min_ext ~ "Extremely rare limits min (3)",
         GLB_strict >= Global_max          ~ "Extremely rare limits max (4)",
 
-        .default = "passed"
+        .default = "pass"
       )
     )
   res <- update_table(con, RES, "LAP", "Date")
-
-
 
 }
 

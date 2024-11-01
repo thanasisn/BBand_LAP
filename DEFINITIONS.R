@@ -84,6 +84,7 @@ DCOUNTLIM   <- round((DSTRETCH/60) * 0.20, 0)
 ## Start dark computation when Sun is bellow elevation
 DARK_ELEV   <- -10
 
-
+## Drop ALL radiation data when sun is below this point create "strict" data
+Sun_elev_MIN <- -2 * 0.103
 
 

@@ -83,6 +83,7 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 panderOptions("table.alignment.default", "right")
 panderOptions("table.split.table",        120   )
 
+overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size_duckdb.Rds"
 
 #'
 #' ##  Statistics of the databases
@@ -135,9 +136,12 @@ duckdb_stats(DB_DUCK)
 
 duckdb_stats(DB_LAP)
 
+## TODO store data
+## deduplicate....
 
 
-k#' **END**
+
+#' **END**
 #+ include=T, echo=F
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
