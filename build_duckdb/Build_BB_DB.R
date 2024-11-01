@@ -38,14 +38,14 @@ source("~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R"  )
 
 ## __ Apply dark offset and convert to radiation  ------------------------------
 source("~/BBand_LAP/build_duckdb/Build_DB_42_cm21_dark_radiat.R")
-# source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
+source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
 
 ## __ Second pass to construct missing dark  -----------------------------------
-# source("~/BBand_LAP/build_duckdb/Build_DB_42_cm21_dark_radiat.R")
-# source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
+source("~/BBand_LAP/build_duckdb/Build_DB_42_cm21_dark_radiat.R")
+source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
 
 ## __ Extra process for CHP-1 temperature  -------------------------------------
-# # source("~/BBand_LAP/build_duckdb/Build_DB_44_chp1_temp_correc.R")
+# source("~/BBand_LAP/build_duckdb/Build_DB_44_chp1_temp_correc.R")
 
 ## Add data from other sources  ------------------------------------------------
 # source("~/BBand_LAP/build_duckdb/Import_50_TSI.R"               )

@@ -104,7 +104,6 @@ cat("\n\n\\normalsize\n\n")
 #
 # ll <- ranges_CHP1[1, ]
 #
-#
 # exrange <- function(x){
 #         data.table(
 #           Date = seq.POSIXt(
@@ -158,7 +157,6 @@ rm(temp)
 cat("\n\n\\footnotesize\n\n")
 pander(data.table(table(ranges_CHP1_temp$Comment)))
 cat("\n\n\\normalsize\n\n")
-
 
 
 ##  Load CM-21 exclusions  -----------------------------------------------------
