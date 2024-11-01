@@ -118,7 +118,7 @@ for (ad in sort(dayslist)) {
 
   ## Ignore bad and missing data
   if (nrow(daydata) == 0) {
-    cat("      >> No usefull CHP-1 data in this file <<\n")
+    cat("      >> No usefull CHP-1 data on this day  <<\n")
     next()
   }
   if (any(is.na(daydata$Elevat))) {
