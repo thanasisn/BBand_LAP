@@ -65,7 +65,14 @@ names(TSI)[names(TSI) == "Source"          ] <- "TSI_source"
 TSI$measur_error_comb <- NULL
 dummy <- gc()
 
-## TODO check TSI accuracy digits
+## TODO check TSI accuracy digits!!
+cat(Script.ID, ": ", "TODO Check TSI accuracy digits!\n")
+
+## Remove all TSI data from database in order to update all
+remove_column(con, "LAP", "TSI_TOA")
+remove_column(con, "LAP", "TSI_1au")
+remove_column(con, "LAP", "TSI_source")
+
 
 ##  Update TSI data in DB  -----------------------------------------------------
 TSI <- right_join(TSI,
@@ -76,8 +83,6 @@ TSI <- right_join(TSI,
                   by = "Date")
 TSI <- TSI[!is.na(TSI_source)]
 
-
-stop()
 ##  Create categorical column
 categories <- unique(c("empty", TSI$TSI_source))
 make_categorical_column("TSI_source", categories, con, "LAP")
@@ -86,13 +91,12 @@ make_categorical_column("TSI_source", categories, con, "LAP")
 if (nrow(TSI) > 0) {
   cat(Script.ID, ": ", nrow(TSI), "rows of TSI data to add\n")
 
-  ## FIXME this will not update with changed TSI data
   update_table(con      = con,
                new_data = TSI,
                table    = "LAP",
                matchvar = "Date")
 
-  cat(Script.ID, ": ", "This is not updating changed TSI data!!\n")
+  # cat(Script.ID, ": ", "This is not updating changed TSI data!!\n")
 
 } else {
   cat(Script.ID, ": ", "No new TSI data to add\n")
