@@ -51,7 +51,8 @@ source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
 source("~/BBand_LAP/build_duckdb/Import_50_TSI.R"               )
 source("~/BBand_LAP/build_duckdb/Import_51_Pressure.R"          )
 
-
+## __ Create some new variables  -----
+source("~/BBand_LAP/build_duckdb/Create_60_strict.R"            )
 
 # cat("\n\nEND of Building the DB\n\n")
 

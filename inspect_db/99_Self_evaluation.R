@@ -69,7 +69,7 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
-source("~/CODE/FUNCTIONS/R/execlock.R")
+# source("~/CODE/FUNCTIONS/R/execlock.R")
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
@@ -91,7 +91,7 @@ library(gdata,      warn.conflicts = FALSE, quietly = TRUE)
 
 overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size.Rds"
 
-## Broad band data base
+## Broad band parquet data base
 BB <- opendata()
 gather <- data.frame(
     Name = "BBDB",
@@ -107,7 +107,7 @@ gather <- data.frame(
 )
 rm(BB)
 
-## Broad band data base meta data
+## Broad band parquete data base meta data
 BB <- open_dataset(DB_META_fl)
 gather <- rbind(gather,
                 data.frame(
@@ -127,7 +127,7 @@ rm(BB)
 
 
 
-## Tracker data base
+## Tracker parqute data base
 BB <- open_dataset(DB_Steps_DIR)
 gather <- rbind(gather,
                 data.frame(
@@ -145,7 +145,7 @@ gather <- rbind(gather,
 )
 rm(BB)
 
-## Tracker data base meta data
+## Tracker parquet data base meta data
 BB <- open_dataset(DB_Steps_META_fl)
 gather <- rbind(gather,
                 data.frame(
@@ -316,10 +316,14 @@ DATA[, V6 := NULL]
 if (is.numeric(DATA$V5)) {
     names(DATA)[names(DATA) == "V5"] <- "Minutes"
 }
-## Parse script
+## Parse script name
+
+## get base dir
 DATA[, Script   := basename(V4)]
 DATA[, Category := basename(dirname(V4))]
+DATA[, Script_2 := paste0(Category, "::", Script)]
 DATA[, V4 := NULL]
+
 ## Parse host
 DATA[, c("User", "Host") := tstrsplit(V3, "@")]
 DATA[, V3 := NULL]
@@ -337,8 +341,9 @@ xlim <- range(DATA$Date)
 #' ## Last run
 #'
 #+ echo=F, include=T, results="asis"
-last <- DATA[DATA[, .I[which.max(Date)], by = .(Script, Category)]$V1]
-last <- last[, .(Script, Category, Date, Minutes)]
+# last <- DATA[DATA[, .I[which.max(Date)], by = .(Script, Category)]$V1]
+last <- DATA[DATA[, .I[which.max(Date)], by = .(Script_2)]$V1]
+last <- last[, .(Script_2, Category, Date, Minutes)]
 last$Minutes <- round(last$Minutes, 2)
 setorder(last, Date)
 cat(pander(last, justify = "lllr"),"\n")
@@ -358,8 +363,8 @@ stats <-
         Mean   = round(mean(Minutes)  , 2),
         .N
     ),
-    by = Script]
-stats <- stats[order(match(Script, last$Script))]
+    by = Script_2]
+stats <- stats[order(match(Script_2, last$Script_2))]
 pander(stats, justify = "lrrrrr")
 cat(" \n \n")
 
@@ -431,8 +436,8 @@ for (as in unique(partial$Category)) {
 #' ## Script statistics
 #'
 #+ echo=F, include=T, results = "asis", out.height = "30%"
-for (as in last$Script) {
-    pp <- DATA[Script == as]
+for (as in last$Script_2) {
+    pp <- DATA[Script_2 == as]
     plot(pp[, Minutes, Date],
          xlim = xlim,
          main = as)
