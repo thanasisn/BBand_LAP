@@ -18,6 +18,8 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
+#' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
+#'
 #+ echo=F, include=T
 
 #+ echo=F, include=F
@@ -36,8 +38,8 @@ Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R"
 Script.ID   <- "43"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
+  sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -103,7 +105,7 @@ cc <- 0
 for (ad in sort(dayslist)) {
   ad <- as.Date(ad, origin = origin)
   cc <- cc + 1
-  cat(Script.ID, ":", paste(ad), cc, "/",length(dayslist), "\n")
+  cat(Script.ID, ":", paste(ad), cc, "/",length(dayslist))
 
   ## use only valid data for dark calculation
   daydata <-
@@ -116,11 +118,11 @@ for (ad in sort(dayslist)) {
 
   ## Ignore bad and missing data
   if (nrow(daydata) == 0) {
-    cat("     No usefull CHP-1 data in this file\n\n")
+    cat("      >> No usefull CHP-1 data in this file <<\n")
     next()
   }
   if (any(is.na(daydata$Elevat))) {
-    cat("     The day is not initialized:", paste(ad),"\n")
+    cat("      >>  The day is not initialized:", paste(ad), " <<\n")
     next()
   }
 
@@ -178,6 +180,7 @@ for (ad in sort(dayslist)) {
   ## __ Convert signal to radiation  -------------------------------------------
   daydata[, DIR_wpsm    := CHP1_sig_wo_dark * chp1factor(Date)]
   daydata[, DIR_SD_wpsm := CHP1_sig_sd      * chp1factor(Date)]
+  cat(" p")
 
   ## __ Day stats  -------------------------------------------------------------
   names(dark_day) <- paste0("chp1_", names(dark_day))
@@ -193,10 +196,14 @@ for (ad in sort(dayslist)) {
                       new_data = daydata,
                       table    = "LAP",
                       matchvar = "Date")
+  cat(" w")
   res <- update_table(con      = con,
                       new_data = meta_day,
                       table    = "META",
                       matchvar = "Day")
+  cat(" w")
+
+  cat("\n")
 }
 
 tbl(con, "META") |> group_by(chp1_dark_flag) |> tally()
