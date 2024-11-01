@@ -1,15 +1,10 @@
 # /* #!/opt/R/4.2.3/bin/Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Radiation Quality Control **QCRad** "
+#' title:         "Create some radiometric variables"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
-#' abstract:      "Data quality for radiation measurements as described by
-#'                 CN Long and Y Shi, September 2006, DOE/SC-ARM/TR-074.
-#'                 - The QCRad Value Added Product Surface
-#'                 Radiation Measurement Quality Control Testing Including
-#'                 Climatology_Long2006.pdf"
 #'
 #' documentclass: article
 #' classoption:   a4paper,oneside
@@ -44,7 +39,6 @@
 #'
 #' ---
 
-#' **QCRad T00**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -72,9 +66,8 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T00_v10.R"
-Script.ID    <- "Q0"
-parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
+Script.Name  <- "~/BBand_LAP/build_duckdb/Create_60_strict.R"
+Script.ID    <- "60"
 
 if (!interactive()) {
   pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -91,14 +84,6 @@ library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
-##  Variables  -----------------------------------------------------------------
-if (file.exists(parameter_fl)) {
-  QS <<- readRDS(parameter_fl)
-} else {
-  QS <<- list()
-}
-
-QS$sun_elev_min <- 0  ## Drop ALL radiation data when sun is below this point
 
 ##  Create strict radiation data  ----------------------------------------------
 if (Sys.info()["nodename"] == "sagan") {
@@ -108,23 +93,23 @@ if (Sys.info()["nodename"] == "sagan") {
   con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
   DT <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min)  ## sun is up
+    filter(Elevat > Sun_elev_MIN)  ## sun is up
 
   ## __ GHI  -------------------------------------------------------------------
   make_null_column(con, "LAP", "GLB_strict") ## Always create empty column
 
   ##  Prepare strict global irradiance
   ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min)  |>  ## sun is up
-    filter(!is.na(CM21_sig))          |>  ## valid measurements
-    filter(is.na(cm21_bad_data_flag)) |>  ## not bad data
-    filter(cm21_sig_limit_flag == 0)  |>  ## in acceptable values range
-    select(Date, GLB_wpsm)            |>
+    filter(Elevat > Sun_elev_MIN)                       |> ## sun is up
+    filter(!is.na(CM21_sig))                            |> ## valid measurements
+    filter(cm21_bad_data_flag  %in% c("pass", "empty")) |> ## not bad data
+    filter(cm21_sig_limit_flag %in% c("pass", "empty")) |> ## in acceptable values range
+    select(Date, GLB_wpsm)                              |>
     mutate(
 
       GLB_strict = case_when(
-        GLB_wpsm <  0 ~ 0,                ## Negative values to zero
-        GLB_wpsm >= 0 ~ GLB_wpsm          ## All other selected values as is
+        GLB_wpsm <  0 ~        0,  ## Negative values set to zero
+        GLB_wpsm >= 0 ~ GLB_wpsm   ## All other selected values as is
 
       ))
   ##  Write data in the data base
@@ -135,17 +120,17 @@ if (Sys.info()["nodename"] == "sagan") {
 
   ##  Prepare strict direct radiation
   ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min)  |>  ## sun is up
-    filter(!is.na(CHP1_sig))          |>  ## valid measurements
-    filter(is.na(chp1_bad_data_flag)) |>  ## not bad data
-    filter(chp1_sig_limit_flag == 0)  |>  ## acceptable values range
-    filter(Async_tracker_flag != T)   |>  ## not in an async
-    select(Date, DIR_wpsm, SZA)       |>
+    filter(Elevat > Sun_elev_MIN)                       |> ## sun is up
+    filter(!is.na(CHP1_sig))                            |> ## valid measurements
+    filter(chp1_bad_data_flag  %in% c("pass", "empty")) |> ## not bad data
+    filter(chp1_sig_limit_flag %in% c("pass", "empty")) |> ## acceptable values range
+    filter(Async_tracker_flag != T)                     |> ## not in an async
+    select(Date, DIR_wpsm, SZA)                         |>
     mutate(
 
       DIR_strict = case_when(
-        DIR_wpsm <  0 ~ 0,                ## Negative values to zero
-        DIR_wpsm >= 0 ~ DIR_wpsm          ## All other selected values as is
+        DIR_wpsm <  0 ~        0,   ## Negative values set to zero
+        DIR_wpsm >= 0 ~ DIR_wpsm    ## All other selected values as is
 
       ))
   ##  Write data in the data base
@@ -156,9 +141,9 @@ if (Sys.info()["nodename"] == "sagan") {
 
   ##  Prepare strict direct on horizontal plane radiation
   ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min) |>
-    filter(!is.na(DIR_strict))       |>
-    select(Date, DIR_strict, SZA)    |>
+    filter(Elevat > Sun_elev_MIN) |>
+    filter(!is.na(DIR_strict))    |>
+    select(Date, DIR_strict, SZA) |>
     mutate(
 
       HOR_strict = DIR_strict * cos(SZA * pi / 180)
@@ -172,10 +157,10 @@ if (Sys.info()["nodename"] == "sagan") {
   make_null_column(con, "LAP", "DIFF_strict") ## Always create empty column
 
   ##  Prepare strict diffuse radiation
-  ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min)     |>
-    filter(!is.na(GLB_strict))           |>
-    filter(!is.na(HOR_strict))           |>
+  ADD <- tbl(con, "LAP")                 |>
+    filter(Elevat > Sun_elev_MIN)        |>  ## sun is up
+    filter(!is.na(GLB_strict))           |>  ## have global
+    filter(!is.na(HOR_strict))           |>  ## have direct
     select(Date, GLB_strict, HOR_strict) |>
     mutate(
 
@@ -198,9 +183,9 @@ if (Sys.info()["nodename"] == "sagan") {
 
   ##  Prepare strict diffuse fraction
   ADD <- tbl(con, "LAP") |>
-    filter(Elevat > QS$sun_elev_min)      |>
-    filter(!is.na(DIFF_strict))           |>
-    filter(!is.na(GLB_strict))            |>
+    filter(Elevat > Sun_elev_MIN)         |>
+    filter(!is.na(DIFF_strict))           |> ## have diffuse
+    filter(!is.na(GLB_strict))            |> ## have global
     filter(GLB_strict > 0)                |> ## don't use zero global
     filter(DIFF_strict < GLB_strict)      |> ## diffuse < global
     select(Date, DIFF_strict, GLB_strict) |>
@@ -213,7 +198,7 @@ if (Sys.info()["nodename"] == "sagan") {
   res <- update_table(con, ADD, "LAP", "Date")
 
   ## __ Transmittance  ---------------------------------------------------------
-  ## ClearnessIndex_kt -> Transmittance_GLB rename to proper
+  ## was in the old implementation ClearnessIndex_kt
   ## or Solar insolation ratio, Solar insolation factor
   make_null_column(con, "LAP", "Transmittance_GLB") ## Always create empty column
 
@@ -236,9 +221,7 @@ if (Sys.info()["nodename"] == "sagan") {
   res <- update_table(con, ADD, "LAP", "Date")
 }
 
-##  Store filters parameters  --------------------------------------------------
-saveRDS(object = QS,
-        file   = parameter_fl)
+
 
 ##  Clean exit  ----------------------------------------------------------------
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()

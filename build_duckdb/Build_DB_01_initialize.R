@@ -86,7 +86,6 @@ if (!dbExistsTable(con, "LAP")) {
   ## create table and date variable with pure SQL call
   dbExecute(con, "CREATE TABLE LAP (Date TIMESTAMP)")
 
-
   yto <- SUN |> summarise(min(year, na.rm = T)) |> pull()
   ADD <- SUN |> filter(year == yto) |> collect() |> data.table() |> arrange(Date)
   cat(paste(Script.ID, ":",
