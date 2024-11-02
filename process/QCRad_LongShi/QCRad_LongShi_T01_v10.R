@@ -225,10 +225,14 @@ if (Sys.info()["nodename"] == "sagan") {
     arrow::to_arrow()                |>
     mutate(
 
-      Glo_max_ref := case_when(
-        TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off >  9000 ~ 9000,
-        TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off <= 9000 ~ TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
-      )) |>
+      Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
+
+      # Glo_max_ref := case_when(
+      #   TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off >  9000 ~ 9000,
+      #   TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off <= 9000 ~ TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
+      # )
+
+      ) |>
     mutate(
 
       !!flagname_GLB := case_when(
@@ -282,6 +286,10 @@ tbl(con, "LAP") |> colnames() %in% "Glo_max_ref"
 tbl(con, "LAP") |> filter(!is.na(Glo_max_ref))
 
 tbl(con, "LAP") |> filter(is.na(Glo_max_ref))
+
+tbl(con, "LAP") |> summarise(mean(Glo_max_ref, na.rm = T))
+tbl(con, "LAP") |> summarise(max(Glo_max_ref, na.rm = T))
+
 
 ## should plot if there are hits
 stop("wait jj")
