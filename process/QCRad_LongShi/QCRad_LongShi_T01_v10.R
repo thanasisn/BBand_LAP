@@ -244,6 +244,7 @@ if (Sys.info()["nodename"] == "sagan") {
       ))
   ADD <- ADD |> collect() |> data.table()
   res <- update_table(con, ADD, "LAP", "Date")
+  rm(ADD); dummy <- gc()
 
   ## __  Store used filters parameters  ----------------------------------------
   saveRDS(object = QS,
@@ -290,12 +291,7 @@ tbl(con, "LAP") |> summarise(mean(Glo_max_ref, na.rm = T))
 tbl(con, "LAP") |> summarise(max(Glo_max_ref, na.rm = T))
 
 
-## should plot if there are hits
-stop("wait jj")
-
-
-## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
-
+## TODO should plot if there are hits
 
 
 ## ~ ~ Inspect quality control results ~ ~ -------------------------------------
@@ -304,9 +300,7 @@ stop("wait jj")
 #'
 #+ include=T, echo=F
 
-
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
-
 
 ####  1. Physically possible limits per BSRN  ----------------------------------
 #' \FloatBarrier
@@ -315,103 +309,104 @@ stop("wait jj")
 #'
 #+ echo=F, include=T, results="asis"
 
-cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
-           caption = flagname_DIR))
-cat(" \n \n")
+# cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
+#            caption = flagname_DIR))
+# cat(" \n \n")
+#
+# cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always"),
+#            caption = flagname_GLB))
+# cat(" \n \n")
+#
+# ## TODO display limits on graphs
+# test <- BB |>
+#   mutate(test = TSI_TOA - DIR_strict) |>
+#   select(test) |> collect()
+#
+# cat("\n", range(test$test, na.rm = T), "\n")
+#
+# hist(test$test, breaks = 100,
+#      main = "TSI_TOA - DIR_strict",
+#      xlab = "")
+# cat(" \n \n")
+#
+#
+# ## TODO display limits on graphs
+# test <- BB |>
+#   mutate(test = Glo_max_ref - GLB_strict) |>
+#   select(test) |> collect()
+#
+# cat("\n", range(test$test, na.rm = T), "\n")
+#
+# hist(test$test, breaks = 100,
+#      main = "Glo_max_ref - GLB_strict",
+#      xlab = "")
+# cat(" \n \n")
+#
+#
+# if (DO_PLOTS) {
+#
+#   if (!interactive()) {
+#     afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
+#                     sub("\\.R$", "", basename(Script.Name)),
+#                     ".pdf")
+#     pdf(file = afile)
+#   }
+#
+#   test <- BB |> filter(!QCv10_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
+#   test <- BB |> filter(!is.na(QCv10_01_dir_flag)) |> collect() |> as.data.table()
+#
+#   ## TODO
+#   if (nrow(test) == 0) {
+#     cat("\nNO CASES FOR DIRECT QCv10_01_dir_flag\n\n")
+#   }
+#   for (ad in sort(unique(as.Date(test$Date)))) {
+#     pp <- data.table(
+#       BB |> filter(as.Date(Date) == as.Date(ad) &
+#                      Elevat > QS$sun_elev_min)   |>
+#         collect()
+#     )
+#     ylim <- range(pp$TSI_TOA - QS$dir_SWdn_dif, pp$DIR_strict, na.rm = T)
+#     plot(pp$Date, pp$DIR_strict, "l", col = "blue",
+#          ylim = ylim, xlab = "", ylab = "DIR_strict")
+#
+#     title(paste("#1", as.Date(ad, origin = "1970-01-01")))
+#
+#     ## plot limits
+#     lines(pp$Date, pp$TSI_TOA - QS$dir_SWdn_dif, col = "red")
+#     ## mark offending data
+#     points(pp[!is.na(get(flagname_DIR)), DIR_strict, Date],
+#            col = "red", pch = 1)
+#   }
+#
+#   ## Plot Global radiation
+#   test <- BB |> filter(!is.na(QCv10_01_glb_flag) ) |> collect() |> as.data.table()
+#   if (nrow(test) == 0) {
+#     cat("\nNO CASES FOR GLOBAL QCv10_01_glb_flag\n\n")
+#   }
+#   for (ad in sort(unique(as.Date(c(test$Date))))) {
+#     pp <- data.table(
+#       BB |> filter(as.Date(Date) == as.Date(ad) &
+#                      Elevat > QS$sun_elev_min)   |>
+#         collect()
+#     )
+#     ylim <- range(pp$Glo_max_ref, pp$GLB_strict, na.rm = T)
+#     plot(pp$Date, pp$GLB_strict, "l", col = "green",
+#          ylim = ylim, xlab = "", ylab = "GLB")
+#     title(paste("#1", as.Date(ad, origin = "1970-01-01")))
+#     ## plot limits
+#     lines(pp$Date, pp$Glo_max_ref, col = "red")
+#     ## mark offending data
+#     points(pp[!is.na(get(flagname_GLB)), GLB_strict, Date],
+#            col = "red", pch = 1)
+#   }
+# }
+# rm(list = ls(pattern = "flagname_.*"))
+# dummy <- gc()
+# if (!interactive()) dummy <- dev.off()
 
-cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always"),
-           caption = flagname_GLB))
-cat(" \n \n")
 
-## TODO display limits on graphs
-test <- BB |>
-  mutate(test = TSI_TOA - DIR_strict) |>
-  select(test) |> collect()
-
-cat("\n", range(test$test, na.rm = T), "\n")
-
-hist(test$test, breaks = 100,
-     main = "TSI_TOA - DIR_strict",
-     xlab = "")
-cat(" \n \n")
-
-
-## TODO display limits on graphs
-test <- BB |>
-  mutate(test = Glo_max_ref - GLB_strict) |>
-  select(test) |> collect()
-
-cat("\n", range(test$test, na.rm = T), "\n")
-
-hist(test$test, breaks = 100,
-     main = "Glo_max_ref - GLB_strict",
-     xlab = "")
-cat(" \n \n")
-
-
-if (DO_PLOTS) {
-
-  if (!interactive()) {
-    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
-                    sub("\\.R$", "", basename(Script.Name)),
-                    ".pdf")
-    pdf(file = afile)
-  }
-
-  test <- BB |> filter(!QCv10_01_dir_flag %in% c(NA, "pass")) |> collect() |> as.data.table()
-  test <- BB |> filter(!is.na(QCv10_01_dir_flag)) |> collect() |> as.data.table()
-
-  ## TODO
-  if (nrow(test) == 0) {
-    cat("\nNO CASES FOR DIRECT QCv10_01_dir_flag\n\n")
-  }
-  for (ad in sort(unique(as.Date(test$Date)))) {
-    pp <- data.table(
-      BB |> filter(as.Date(Date) == as.Date(ad) &
-                     Elevat > QS$sun_elev_min)   |>
-        collect()
-    )
-    ylim <- range(pp$TSI_TOA - QS$dir_SWdn_dif, pp$DIR_strict, na.rm = T)
-    plot(pp$Date, pp$DIR_strict, "l", col = "blue",
-         ylim = ylim, xlab = "", ylab = "DIR_strict")
-
-    title(paste("#1", as.Date(ad, origin = "1970-01-01")))
-
-    ## plot limits
-    lines(pp$Date, pp$TSI_TOA - QS$dir_SWdn_dif, col = "red")
-    ## mark offending data
-    points(pp[!is.na(get(flagname_DIR)), DIR_strict, Date],
-           col = "red", pch = 1)
-  }
-
-  ## Plot Global radiation
-  test <- BB |> filter(!is.na(QCv10_01_glb_flag) ) |> collect() |> as.data.table()
-  if (nrow(test) == 0) {
-    cat("\nNO CASES FOR GLOBAL QCv10_01_glb_flag\n\n")
-  }
-  for (ad in sort(unique(as.Date(c(test$Date))))) {
-    pp <- data.table(
-      BB |> filter(as.Date(Date) == as.Date(ad) &
-                     Elevat > QS$sun_elev_min)   |>
-        collect()
-    )
-    ylim <- range(pp$Glo_max_ref, pp$GLB_strict, na.rm = T)
-    plot(pp$Date, pp$GLB_strict, "l", col = "green",
-         ylim = ylim, xlab = "", ylab = "GLB")
-    title(paste("#1", as.Date(ad, origin = "1970-01-01")))
-    ## plot limits
-    lines(pp$Date, pp$Glo_max_ref, col = "red")
-    ## mark offending data
-    points(pp[!is.na(get(flagname_GLB)), GLB_strict, Date],
-           col = "red", pch = 1)
-  }
-}
-rm(list = ls(pattern = "flagname_.*"))
-dummy <- gc()
-if (!interactive()) dummy <- dev.off()
-
-
-
+## clean exit
+dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
 #+ include=T, echo=F, results="asis"
 tac <- Sys.time()
