@@ -87,7 +87,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Create strict radiation data  ----------------------------------------------
 if (Sys.info()["nodename"] == "sagan") {
-  cat(paste("\n0. Create radiometric variables", "\n\n"))
+  cat(paste("\n Create radiometric variables", "\n\n"))
 
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))

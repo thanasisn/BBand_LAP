@@ -90,7 +90,7 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 if (file.exists(parameter_fl)) {
   QS <<- readRDS(parameter_fl)
 } else {
-  stop("File not initialiazed")
+  stop("File not initialized")
 }
 
 ## mostly for daily plots
