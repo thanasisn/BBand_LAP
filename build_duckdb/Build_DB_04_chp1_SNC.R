@@ -45,7 +45,7 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
-cat("\n Import  CHP-1 tracker async  data\n\n")
+cat("\n Import  CHP-1 tracker ASYNC data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
@@ -137,7 +137,6 @@ if (nrow(inp_filelist) > 0) {
     ## async time distance
     syc_temp$timeDist <- apply(syc_temp[, c('V7', 'V8')], MARGIN = 1, FUN = max, na.rm = T)
     cat(" r")
-
 
     for (amin in uniq_async) {
       min_ind <- async_minu == amin

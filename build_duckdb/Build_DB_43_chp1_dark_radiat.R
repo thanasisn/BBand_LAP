@@ -135,12 +135,12 @@ for (ad in sort(dayslist)) {
   )
 
   ## __ Resolve problematic dark calculations  ---------------------------------
-  ## no data to use
+
   if (all(is.na(daydata$CHP1_sig))) {
+    ## data to compute dark are missing
     dark_flag              <- "NO SIGNAL DATA"
     todays_dark_correction <- as.numeric(NA)
     missingdark            <- as.numeric(NA)
-    ## data to compute dark are missing
   } else if ( !((!is.na(dark_day$dark_Mor_med) & dark_day$dark_Mor_cnt >= DCOUNTLIM) |
                 (!is.na(dark_day$dark_Eve_med) & dark_day$dark_Eve_cnt >= DCOUNTLIM))) {
     todays_dark_correction <- as.numeric(NA)
@@ -160,7 +160,7 @@ for (ad in sort(dayslist)) {
         dark_flag              <- "CONSTRUCTED"
       }
     } else {
-      cat("Need to constract dark:", format(as.Date(ad)),"\n")
+      cat("Need to construct dark:", format(as.Date(ad)),"\n")
     }
   } else {
     ## __ Dark Correction function for non missing  ----------------------------
@@ -201,7 +201,6 @@ for (ad in sort(dayslist)) {
                       table    = "META",
                       matchvar = "Day")
   cat(" w")
-
   cat("\n")
 }
 
