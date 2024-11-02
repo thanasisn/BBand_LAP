@@ -54,6 +54,8 @@
 #'
 #+ echo=F, include=T
 
+stop("This is a reference file")
+
 #+ echo=F, include=T
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
@@ -113,23 +115,6 @@ PARTIAL    <- FALSE
 PARTIAL    <- TRUE
 PLOT_FIRST <- as_date("2023-01-01")
 PLOT_LAST  <- as_date("2024-01-01")
-
-
-##  Create strict radiation data  ------------------------------------------
-
-## __ Daytime radiation only  ----------------------------------------------
-
-## __ Transmittance  -------------------------------------------------------
-## ClearnessIndex_kt -> Transmittance_GLB rename to proper
-## or Solar insolation ratio, Solar insolation factor
-datapart[, ClearnessIndex_kt := GLB_strict / (cosde(SZA) * TSI_TOA)]
-# datapart[, Transmittance_GLB := GLB_strict / (cosde(SZA) * TSI_TOA)]
-
-## __ Diffuse fraction  ----------------------------------------------------
-datapart[, DiffuseFraction_kd := DIFF_strict / GLB_strict]
-
-## replace infinite values
-datapart[is.infinite(DiffuseFraction_kd), DiffuseFraction_kd := NA]
 
 
 
@@ -488,9 +473,9 @@ if (QS$TEST_09) {
   # InitVariableBBDB(flagname_GLB, as.character(NA))
 
   ## __ Global  ----------------------------------------------------------
-  datapart[ClearnessIndex_kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
+  datapart[Transmittance_GLB > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
            (flagname_GLB) := "Clearness index limit max (19)" ]
-  datapart[ClearnessIndex_kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele,
+  datapart[Transmittance_GLB < QS$CL_idx_min & Elevat > QS$CL_idx_ele,
            (flagname_GLB) := "Clearness index limit min (20)" ]
 
   rm(list = ls(pattern = "flagname_.*"))
@@ -1541,20 +1526,20 @@ if (QS$TEST_09) {
     cat("\n\n")
 
     test <- BB |>
-        filter(Elevat > 0 & !is.na(ClearnessIndex_kt) & ClearnessIndex_kt > 0) |>
-        select(!!flagname_GLB, ClearnessIndex_kt, Elevat,
+        filter(Elevat > 0 & !is.na(Transmittance_GLB) & Transmittance_GLB > 0) |>
+        select(!!flagname_GLB, Transmittance_GLB, Elevat,
                GLB_strict) |>
         collect() |> data.table()
 
-    range(test[Elevat > QS$CL_idx_ele, ClearnessIndex_kt], na.rm = T)
-    hist( test[Elevat > QS$CL_idx_ele, ClearnessIndex_kt], breaks = 100)
+    range(test[Elevat > QS$CL_idx_ele, Transmittance_GLB], na.rm = T)
+    hist( test[Elevat > QS$CL_idx_ele, Transmittance_GLB], breaks = 100)
     abline(v = QS$CL_idx_max, lty = 3, col = "red")
     abline(v = QS$CL_idx_min, lty = 3, col = "red")
 
     if (any(!is.na(test$QCv9_09_glb_flag))) {
         hist(test[!is.na(QCv9_09_glb_flag), GLB_strict],        breaks = 100)
         hist(test[!is.na(QCv9_09_glb_flag), Elevat ],           breaks = 100)
-        hist(test[!is.na(QCv9_09_glb_flag), ClearnessIndex_kt], breaks = 100)
+        hist(test[!is.na(QCv9_09_glb_flag), Transmittance_GLB], breaks = 100)
     }
 
 
@@ -1579,20 +1564,20 @@ if (QS$TEST_09) {
             )
 
             ylim = c(-0.5, 2)
-            plot(pp$Elevat, pp$ClearnessIndex_kt,
+            plot(pp$Elevat, pp$Transmittance_GLB,
                  pch = 19, cex = 0.1,
                  ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
 
             abline(v = QS$CL_idx_ele, col = "yellow")
             title(paste("#9", as.Date(ad, origin = "1970-01-01")))
 
-            points(pp[ClearnessIndex_kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Elevat],
-                   pp[ClearnessIndex_kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, ClearnessIndex_kt],
+            points(pp[Transmittance_GLB > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Elevat],
+                   pp[Transmittance_GLB > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Transmittance_GLB],
                    pch = 19, cex = 0.3, col = "red")
             abline(h = QS$CL_idx_max, col = "magenta", lwd = 0.5)
 
-            points(pp[ClearnessIndex_kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Elevat],
-                   pp[ClearnessIndex_kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, ClearnessIndex_kt],
+            points(pp[Transmittance_GLB < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Elevat],
+                   pp[Transmittance_GLB < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Transmittance_GLB],
                    pch = 19, cex = 0.3, col = "blue")
             abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
         }

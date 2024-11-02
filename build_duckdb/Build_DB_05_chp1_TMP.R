@@ -150,7 +150,6 @@ if (nrow(inp_filelist) > 0) {
                             chp1_temp_parsed   = Sys.time(),
                             chp1_temp_md5sum   = as.vector(md5sum(ff$fullname)))
 
-
     ## _ CHP-1 flag temperature physical limits  -------------------------------
 
     ## NAN to NA
@@ -161,7 +160,7 @@ if (nrow(inp_filelist) > 0) {
     day_data[, Date := round_date(Date, unit = "second")]
 
     ## flag temperature limits
-    day_data[, 
+    day_data[,
              chp1_bad_temp_flag := "pass"]
 
     day_data[chp1_temperature < CHP1_TEMP_MIN,

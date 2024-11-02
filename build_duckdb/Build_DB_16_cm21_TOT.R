@@ -1,7 +1,7 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Reads Global radiation from sirena TOT files into the database
+#' Reads Global radiation from Sirena TOT files into the database
 #'
 #'  - Reads raw resistance data
 #'  - Converts resistance to temperature

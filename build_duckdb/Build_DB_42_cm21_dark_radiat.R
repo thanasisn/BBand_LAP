@@ -115,7 +115,7 @@ for (ad in sort(dayslist)) {
 
   ## Ignore bad and missing data
   if (nrow(daydata) == 0) {
-    cat("      >>  No usefull CM-21 on this day  <<\n")
+    cat("      >>  No useful CM-21 data on this day  <<\n")
     next()
   }
   if (any(is.na(daydata$Elevat))) {
@@ -158,7 +158,7 @@ for (ad in sort(dayslist)) {
         dark_flag              <- "CONSTRUCTED"
       }
     } else {
-      cat("Need to constract dark:", format(as.Date(ad)),"\n")
+      cat("Need to construct dark:", format(as.Date(ad)),"\n")
     }
   } else {
     ## __ Dark Correction function for non missing  ----------------------------

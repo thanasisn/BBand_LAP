@@ -48,11 +48,11 @@ source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
 # source("~/BBand_LAP/build_duckdb/Build_DB_44_chp1_temp_correc.R")
 
 ## Add data from other sources  ------------------------------------------------
-source("~/BBand_LAP/build_duckdb/Import_50_TSI.R"               )
-source("~/BBand_LAP/build_duckdb/Import_51_Pressure.R"          )
+source("~/BBand_LAP/build_duckdb/Build_DB_50_Import_TSI.R"      )
+source("~/BBand_LAP/build_duckdb/Build_DB_51_Import_Pressure.R" )
 
 ## __ Create some new variables  -----
-source("~/BBand_LAP/build_duckdb/Create_60_strict.R"            )
+source("~/BBand_LAP/build_duckdb/Build_DB_60_Create_strict.R"   )
 
 # cat("\n\nEND of Building the DB\n\n")
 

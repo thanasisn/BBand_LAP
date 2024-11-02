@@ -96,7 +96,7 @@ if (file.exists(parameter_fl)) {
 ## mostly for daily plots
 DO_PLOTS     <- TRUE
 if (interactive()) {
-    DO_PLOTS <- FALSE
+  DO_PLOTS <- FALSE
 }
 
 # Daily plots
@@ -159,6 +159,8 @@ if (Sys.info()["nodename"] == "sagan") {
   make_categorical_column(flagname_GLB, categories, con, "LAP")
 
 
+  ## __ Create references  -----------------------------------------------------
+
   ## Data to work on
   ADD <- tbl(con, "LAP")             |>
     filter(Elevat > QS$sun_elev_min) |>
@@ -193,10 +195,7 @@ if (Sys.info()["nodename"] == "sagan") {
   res  <- update_table(con, ADD, "LAP", "Date")
   rm(AREF); gc()
 
-
-  stop("wait")
-
-  ## Select some data
+  ## __ Select data to touch  --------------------------------------------------
   ADD <- tbl(con, "LAP")             |>
     filter(Elevat > QS$sun_elev_min) |>
     filter(!is.na(TSI_TOA))          |>
