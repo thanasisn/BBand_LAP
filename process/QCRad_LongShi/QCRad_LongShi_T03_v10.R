@@ -71,7 +71,7 @@ parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+    # sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -352,7 +352,7 @@ if (DO_PLOTS) {
     pdf(file = afile)
   }
 
-
+  ## get days to plot
   tmp <- DT |>
     select(Day,
            !!flagname_LOW, !!flagname_OBS, !!flagname_UPP) |>
@@ -362,10 +362,6 @@ if (DO_PLOTS) {
     select(Day) |>
     distinct()  |> collect() |> data.table()
   setorder(tmp, Day)
-
-  ## TEST
-  tmp <- tmp[1:10]
-
 
   for (ad in tmp$Day) {
     ddd <- as.Date(ad, origin = origin)
@@ -397,35 +393,34 @@ if (DO_PLOTS) {
           ylim = ylim, col = "green", ylab = "", xlab = "")
     lines(pp$Date, pp$DIR_strict, col = "blue" )
 
-#     points(pp[!is.na(QCv9_03_upp_flag), Date],
-#            pp[!is.na(QCv9_03_upp_flag), DIR_strict],
-#            ylim = ylim, col = "red")
-#     points(pp[!is.na(QCv9_03_upp_flag), Date],
-#            pp[!is.na(QCv9_03_upp_flag), GLB_strict],
-#            ylim = ylim, col = "red")
-#     points(pp[!is.na(QCv9_03_low_flag), Date],
-#            pp[!is.na(QCv9_03_low_flag), DIR_strict],
-#            ylim = ylim, col = "magenta")
-#     points(pp[!is.na(QCv9_03_low_flag), Date],
-#            pp[!is.na(QCv9_03_low_flag), GLB_strict],
-#            ylim = ylim, col = "magenta")
-#     points(pp[!is.na(QCv9_03_obs_flag), Date],
-#            pp[!is.na(QCv9_03_obs_flag), DIR_strict],
-#            ylim = ylim, col = "#BFE46C")
-#     points(pp[!is.na(QCv9_03_obs_flag), Date],
-#            pp[!is.na(QCv9_03_obs_flag), GLB_strict],
-#            ylim = ylim, col = "#BFE46C")
-#
-#     ## reset layout
-#     layout(1)
+    points(pp[QCv10_03_upp_flag %in% c("empty", "pass"), Date],
+           pp[QCv10_03_upp_flag %in% c("empty", "pass"), DIR_strict],
+           ylim = ylim, col = "red")
+    points(pp[QCv10_03_upp_flag %in% c("empty", "pass"), Date],
+           pp[QCv10_03_upp_flag %in% c("empty", "pass"), GLB_strict],
+           ylim = ylim, col = "red")
+
+    points(pp[QCv10_03_low_flag %in% c("empty", "pass"), Date],
+           pp[QCv10_03_low_flag %in% c("empty", "pass"), DIR_strict],
+           ylim = ylim, col = "magenta")
+    points(pp[QCv10_03_low_flag %in% c("empty", "pass"), Date],
+           pp[QCv10_03_low_flag %in% c("empty", "pass"), GLB_strict],
+           ylim = ylim, col = "magenta")
+
+    points(pp[QCv10_03_obs_flag %in% c("empty", "pass"), Date],
+           pp[QCv10_03_obs_flag %in% c("empty", "pass"), DIR_strict],
+           ylim = ylim, col = "#BFE46C")
+    points(pp[QCv10_03_obs_flag %in% c("empty", "pass"), Date],
+           pp[QCv10_03_obs_flag %in% c("empty", "pass"), GLB_strict],
+           ylim = ylim, col = "#BFE46C")
+
+   layout(1)
   }
 }
 rm(list = ls(pattern = "flagname_.*"))
 dummy <- gc()
 if (!interactive()) dummy <- dev.off()
 #+ echo=F, include=T
-
-
 
 
 ## clean exit
