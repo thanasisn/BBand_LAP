@@ -181,19 +181,19 @@ if (Sys.info()["nodename"] == "sagan") {
   res  <- update_table(con, ADD, "LAP", "Date")
   rm(AREF); gc()
 
-  ## create reference values for global
-  if (!any(ADD |> colnames() %in% "Global_max")) {
-    AREF <- ADD |>
-      select(Date, TSI_TOA, SZA) |>
-      collect() |> data.table()
-  } else {
-    AREF <- ADD |>
-      select(Date, TSI_TOA, SZA) |>
-      filter(is.na(Global_max)) |> collect() |> data.table()
-  }
-  AREF <- AREF[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off]
-  res  <- update_table(con, ADD, "LAP", "Date")
-  rm(AREF); gc()
+  # ## create reference values for global
+  # if (!any(ADD |> colnames() %in% "Global_max")) {
+  #   AREF <- ADD |>
+  #     select(Date, TSI_TOA, SZA) |>
+  #     collect() |> data.table()
+  # } else {
+  #   AREF <- ADD |>
+  #     select(Date, TSI_TOA, SZA) |>
+  #     filter(is.na(Global_max)) |> collect() |> data.table()
+  # }
+  # AREF <- AREF[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off]
+  # res  <- update_table(con, ADD, "LAP", "Date")
+  # rm(AREF); gc()
 
   ## __ Select data to touch  --------------------------------------------------
   ADD <- tbl(con, "LAP")             |>
@@ -261,6 +261,43 @@ if (Sys.info()["nodename"] == "sagan") {
 stop("kjk")
 
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
+
+
+
+##  Open dataset
+con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+
+
+
+## Check that flags exist
+tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
+
+
+DT <- tbl(con, "LAP") |>
+  filter(Elevat > QS$sun_elev_min)  ## sun is up
+
+DT |>
+  # filter(!!flagname_DIR != "empty") |>
+  select(!!flagname_DIR) |>
+  group_by(!!flagname_DIR) |> tally()
+
+
+DT |>
+  # filter(!is.na(!!flagname_GLB)) |>
+  select(!!flagname_GLB) |>
+  group_by(!!flagname_GLB) |> tally()
+
+dd <- DT |> head() |> collect() |> data.table()
+
+
+tbl(con, "LAP") |> colnames() %in% "Global_max"
+tbl(con, "LAP") |> filter(!is.na(Global_max))
+
+tbl(con, "LAP") |> filter(is.na(Global_max))
+
+tbl(con, "LAP") |> summarise(mean(Global_max, na.rm = T))
+tbl(con, "LAP") |> summarise(max(Global_max, na.rm = T))
+
 
 
 
