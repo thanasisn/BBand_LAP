@@ -1,44 +1,5 @@
 # /* #!/opt/R/4.2.3/bin/Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
-#' ---
-#' title:         "Create some radiometric variables"
-#' author:        "Natsis Athanasios"
-#' institute:     "AUTH"
-#' affiliation:   "Laboratory of Atmospheric Physics"
-#'
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      10pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
-#' link-citations:  yes
-#' colorlinks:      yes
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections:  no
-#'     fig_caption:      no
-#'     keep_tex:         no
-#'     keep_md:          no
-#'     latex_engine:     xelatex
-#'     toc:              yes
-#'     toc_depth:        4
-#'     fig_width:        8
-#'     fig_height:       5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  9
-#'     fig_height: 4
-#'
-#' date: "`r format(Sys.time(), '%F')`"
-#'
-#' ---
-
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -66,7 +27,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/build_duckdb/Create_60_strict.R"
+Script.Name  <- "~/BBand_LAP/build_duckdb/Build_DB_60_Create_strict.R"
 Script.ID    <- "60"
 
 if (!interactive()) {
@@ -87,7 +48,8 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Create strict radiation data  ----------------------------------------------
 if (Sys.info()["nodename"] == "sagan") {
-  cat(paste("\n Create radiometric variables", "\n\n"))
+
+  cat(Script.ID, ":", "Create radiometric variables \n\n")
 
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))

@@ -344,8 +344,6 @@ rm(temp_flag)
 #   copy = T
 # ) |> select(cm21_bad_data_flag) |> distinct()
 
-
-
 tbl(con, "LAP") |>
   group_by(cm21_bad_data_flag) |>
   tally()
@@ -365,17 +363,7 @@ tbl(con, "LAP") |>
   tally()
 
 
-
-
-
-# ## Save flagged metadata
-# BB_meta[day %in% chg_days, cm21_bad_data_flagged := cm21_exclude_mtime     ]
-# BB_meta[day %in% chg_days, chp1_bad_temp_flagged := chp1_temp_exclude_mtime]
-# BB_meta[day %in% chg_days, chp1_bad_data_flagged := chp1_exclude_mtime     ]
-
-
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
-
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
