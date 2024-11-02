@@ -70,12 +70,7 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi_v9.R"
 Script.ID    <- "Q1"
-parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v9_duck_parameters.Rds"
 
-if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
-}
 
 ## __ Load libraries  ----------------------------------------------------------
 
@@ -94,7 +89,6 @@ QS$sun_elev_min <- -2 * 0.103  ## Drop ALL radiation data when sun is below this
 
 
 ##  Execution control  ---------------------------------------------------------
-stop("this can not run")
 
 ## mostly for daily plots
 DO_PLOTS     <- TRUE
@@ -119,55 +113,7 @@ PLOT_LAST  <- as_date("2024-01-01")
 
 
 
-## 2. Extremely rare limits per BSRN  --------------------------------------
-#'
-#' ## 2. Extremely rare limits per BSRN
-#'
-#' These should be a little more restrictive than 1. in order to start
-#' catching erroneous values.
-#'
-#' The choose of those settings may be optimized with an iterative process.
 
-# Upper modeled values
-QS$Dir_SWdn_amp     <-    0.91  # Direct departure factor above the model
-QS$Dir_SWdn_off     <- -140     # Direct departure offset above the model
-QS$Glo_SWdn_amp     <-    1.18  # Global departure factor above the model
-QS$Glo_SWdn_off     <-   40     # Global departure offset above the model
-# Minimum accepted values
-QS$dir_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
-QS$glo_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
-# Ignore too low values near horizon
-QS$dir_SWdn_too_low <-    3     # Ideal w/m^2
-QS$glo_SWdn_too_low <-    3     # Ideal w/m^2
-
-if (QS$TEST_02) {
-  testN        <- 2
-  flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
-  flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
-  cat(paste("\n2. Extremely Rare Limits", flagname_DIR, flagname_GLB, "\n\n"))
-
-  # Compute reference values
-  datapart[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off]
-  datapart[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cosde(SZA)^1.2 + QS$Glo_SWdn_off]
-  # Ignore too low values near horizon
-  datapart[Direct_max < QS$dir_SWdn_too_low, Direct_max := NA]
-  datapart[Global_max < QS$glo_SWdn_too_low, Direct_max := NA]
-
-  ## __ Direct  ----------------------------------------------------------
-  datapart[DIR_strict < QS$dir_SWdn_min_ext,
-           (flagname_DIR) := "Extremely rare limits min (3)"]
-  datapart[DIR_strict > Direct_max,
-           (flagname_DIR) := "Extremely rare limits max (4)"]
-
-  ## __ Global  ----------------------------------------------------------
-  datapart[GLB_strict < QS$glo_SWdn_min_ext,
-           (flagname_GLB) := "Extremely rare limits min (3)"]
-  datapart[GLB_strict > Global_max,
-           (flagname_GLB) := "Extremely rare limits max (4)"]
-
-  rm(list = ls(pattern = "flagname_.*"))
-  dummy <- gc()
-}
 
 
 
