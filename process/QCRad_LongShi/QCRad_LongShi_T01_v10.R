@@ -88,12 +88,6 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Variables  -----------------------------------------------------------------
-# if (file.exists(parameter_fl)) {
-#   QS <<- readRDS(parameter_fl)
-# } else {
-#   stop("File not initialiazed")
-# }
-
 if (file.exists(parameter_fl)) {
   QS <<- readRDS(parameter_fl)
 } else {
@@ -182,8 +176,6 @@ if (Sys.info()["nodename"] == "sagan") {
 
 
   ## __ Flag global  -----------------------------------------------------------
-
-  ## Select some data
   ADD <- tbl(con, "LAP")                   |>
     filter(Elevat > QS$sun_elev_min)       |>
     filter(!is.na(TSI_TOA))                |>

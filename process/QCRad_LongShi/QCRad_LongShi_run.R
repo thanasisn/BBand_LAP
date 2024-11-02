@@ -9,12 +9,9 @@ Script.Name <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_run.R"
 renv::load("~/BBand_LAP")
 
 
-##  Create some new variables  -------------------------------------------------
-# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T00_v10.R"      )
-
 ##  Run test  ------------------------------------------------------------------
 source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T01_v10.R"      )
-source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R"      )
+# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R"      )
 
 
 
