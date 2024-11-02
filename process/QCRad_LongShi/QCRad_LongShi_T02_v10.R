@@ -301,41 +301,24 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
-
-
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
-
-
 
 ##  Open dataset
 con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
-
-
 ## Check that flags exist
-tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
+# tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
 
-
+## Select data to plot
+elev_limit <- 1
 DT <- tbl(con, "LAP") |>
-  filter(Elevat > QS$sun_elev_min)
+  filter(Elevat > elev_limit)
 
-
-DT |> select(!!flagname_GLB) |> distinct() |> collect()
-DT |> select(!!flagname_DIR) |> distinct()
-DT |> select(!!flagname_GLB) |> pull() |> table()
-
-
-
-
-## ~ ~ Inspect quality control results ~ ~ -------------------------------------
-#'
-#' # Inspect quality control results
-#'
-#+ include=T, echo=F
-
+# DT |> select(!!flagname_GLB) |> distinct() |> collect()
+# DT |> select(!!flagname_DIR) |> distinct()
+# DT |> select(!!flagname_GLB) |> pull() |> table()
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
-
 
 ####  2. Extremely rare limits per BSRN  ---------------------------------------
 #' \FloatBarrier
@@ -383,72 +366,59 @@ if (DO_PLOTS) {
   }
 
   ## Direct
-
-
-  stop()
   choose <- setdiff(
-    DT |> select(!!flagname_DIR) |> distinct() |> pull() |> as.character(),
+    DT |> select(QCv10_02_dir_flag) |> distinct() |> pull() |> as.character(),
     c("empty", "pass")
   )
-
-
-  DT |>
-    filter(QCv10_02_dir_flag != "pass")  |>
-    filter(QCv10_02_dir_flag != "empty") |>
-    select(!!flagname_DIR)
-
-
-  DT |> filter(QCv10_01_dir_flag != "pass")
-  DT |> filter(QCv10_01_dir_flag == "empty")
-  DT |> filter(QCv10_01_dir_flag == "Extremely rare limits max (4)") |> collect()
-
-
   test <- DT |> filter(QCv10_02_dir_flag %in% choose) |> collect() |> data.table()
-  DT |> filter(!!flagname_DIR %in% choose)
 
-  for (ad in sort(unique(as.Date(test$Date)))) {
-    pp <- data.table(
-      DT |> filter(as.Date(Date) == as.Date(ad) &
-                     Elevat > QS$sun_elev_min)   |>
-        collect()
-    )
+  for (ad in sort(unique(test$Day))) {
+    ddd <- as.Date(ad, origin = origin)
+    pp  <- DT |> filter(Day == ddd) |> collect() |> data.table()
+    setorder(pp, Date)
+
     ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
     plot(pp$Date, pp$DIR_strict, "l", col = "blue",
          ylim = ylim, xlab = "", ylab = "wattDIR")
     title(paste("#2", as.Date(ad, origin = "1970-01-01"),
-                "N:", pp[!is.na(QCv9_02_dir_flag), .N]))
+                "N:", pp[!QCv10_02_dir_flag %in% c("empty", "pass"), .N]))
+
     ## plot limits
     lines(pp$Date, pp$Direct_max, col = "red")
     ## mark offending data
-    points(pp[!is.na(QCv9_02_dir_flag), DIR_strict, Date],
+    points(pp[!QCv10_02_dir_flag %in% c("empty", "pass"),
+              DIR_strict, Date],
            col = "red", pch = 1)
   }
 
-#   ## Global
-#   test <- BB |> filter(!is.na(QCv9_02_glb_flag)) |> collect() |> as.data.table()
-#   for (ad in sort(unique(as.Date(c(test$Date))))) {
-#     pp <- data.table(
-#       BB |> filter(as.Date(Date) == as.Date(ad) &
-#                      Elevat > QS$sun_elev_min)   |>
-#         collect()
-#     )
-#     ylim <- range(pp$Global_max, pp$GLB_strict, na.rm = T)
-#     plot(pp$Date, pp$GLB_strict, "l", col = "green",
-#          ylim = ylim, xlab = "", ylab = "GLB")
-#     title(paste("#2", as.Date(ad, origin = "1970-01-01"),
-#                 "N:", pp[!is.na(QCv9_02_glb_flag), .N] ))
-#     ## plot limits
-#     lines(pp$Date, pp$Global_max, col = "red")
-#     ## mark offending data
-#     points(pp[!is.na(QCv9_02_glb_flag), GLB_strict, Date],
-#            col = "magenta", pch = 1)
-#   }
+  ## Global
+  choose <- setdiff(
+    DT |> select(QCv10_02_glb_flag) |> distinct() |> pull() |> as.character(),
+    c("empty", "pass")
+  )
+  test <- DT |> filter(QCv10_02_glb_flag %in% choose) |> collect() |> data.table()
+
+  for (ad in sort(unique(test$Day))) {
+    ddd <- as.Date(ad, origin = origin)
+    pp  <- DT |> filter(Day == ddd) |> collect() |> data.table()
+    setorder(pp, Date)
+
+    ylim <- range(pp$Global_max, pp$GLB_strict, na.rm = T)
+    plot(pp$Date, pp$GLB_strict, "l", col = "green",
+         ylim = ylim, xlab = "", ylab = "GLB")
+    title(paste("#2", as.Date(ad, origin = "1970-01-01"),
+                "N:", pp[!QCv10_02_glb_flag %in% c("empty", "pass"), .N]))
+    ## plot limits
+    lines(pp$Date, pp$Global_max, col = "red")
+    ## mark offending data
+    points(pp[!QCv10_02_glb_flag %in% c("empty", "pass"), GLB_strict, Date],
+           col = "magenta", pch = 1)
+  }
 }
 # rm(list = ls(pattern = "flagname_.*"))
 # dummy <- gc()
 if (!interactive()) dummy <- dev.off()
 #+ echo=F, include=T
-
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
