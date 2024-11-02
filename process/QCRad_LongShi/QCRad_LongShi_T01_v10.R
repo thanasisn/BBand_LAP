@@ -218,21 +218,19 @@ if (Sys.info()["nodename"] == "sagan") {
 
   #### FIXME try to do it in pure duckdb
 
-  ADD <- tbl(con, "LAP")             |>
-    filter(Elevat > QS$sun_elev_min) |>
-    filter(!is.na(TSI_TOA))          |>
+  ADD <- tbl(con, "LAP")                                   |>
+    filter(Elevat > QS$sun_elev_min)                       |>
+    filter(!is.na(TSI_TOA))                                |>
     select(Date, SZA, TSI_TOA, GLB_strict, !!flagname_GLB) |>
-    arrow::to_arrow()                |>
+    arrow::to_arrow()                                      |>
     mutate(
 
-      Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
+      Glo_max_ref := case_when(
+        TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off >  9000 ~ 9000,
+        TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off <= 9000 ~ TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
 
-      # Glo_max_ref := case_when(
-      #   TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off >  9000 ~ 9000,
-      #   TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off <= 9000 ~ TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
-      # )
-
-      ) |>
+      )
+    ) |>
     mutate(
 
       !!flagname_GLB := case_when(
