@@ -218,8 +218,31 @@ if (Sys.info()["nodename"] == "sagan") {
 
 
   ## __ Global  ----------------------------------------------------------
-  RES <- ADD |>
-    filter(Global_max > QS$glo_SWdn_too_low) |> # Ignore too low values near horizon
+  # RES <- ADD |>
+  #   filter(Global_max > QS$glo_SWdn_too_low) |> # Ignore too low values near horizon
+  #   mutate(
+  #
+  #     !!flagname_GLB := case_when(
+  #       GLB_strict <  QS$glo_SWdn_min_ext ~ "Extremely rare limits min (3)",
+  #       GLB_strict >= Global_max          ~ "Extremely rare limits max (4)",
+  #
+  #       .default = "pass"
+  #     )
+  #   )
+  # res <- update_table(con, RES, "LAP", "Date")
+
+
+  ## USe arrow
+  ADD <- tbl(con, "LAP")             |>
+    filter(Elevat > QS$sun_elev_min) |>
+    filter(!is.na(TSI_TOA))          |>
+    select(Date, SZA, TSI_TOA, GLB_strict, !!flagname_GLB) |>
+    arrow::to_arrow()                |>
+    mutate(
+
+      Global_max := TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off
+
+    ) |>
     mutate(
 
       !!flagname_GLB := case_when(
@@ -229,7 +252,8 @@ if (Sys.info()["nodename"] == "sagan") {
         .default = "pass"
       )
     )
-  res <- update_table(con, RES, "LAP", "Date")
+    ADD <- ADD |> collect() |> data.table()
+    res <- update_table(con, ADD, "LAP", "Date")
 
 }
 
