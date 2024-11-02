@@ -251,7 +251,7 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 
 
-## Check that flags
+## Check that flags exist
 tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
 
 
@@ -259,13 +259,13 @@ DT <- tbl(con, "LAP") |>
   filter(Elevat > QS$sun_elev_min)  ## sun is up
 
 DT |>
-  filter(!is.na(!!flagname_DIR)) |>
+  # filter(!!flagname_DIR != "empty") |>
   select(!!flagname_DIR) |>
   group_by(!!flagname_DIR) |> tally()
 
 
 DT |>
-  filter(!is.na(!!flagname_GLB)) |>
+  # filter(!is.na(!!flagname_GLB)) |>
   select(!!flagname_GLB) |>
   group_by(!!flagname_GLB) |> tally()
 
@@ -275,7 +275,7 @@ dd <- DT |> head() |> collect() |> data.table()
 
 
 ## should plot if there are hits
-stop("wait")
+stop("wait jj")
 
 
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
