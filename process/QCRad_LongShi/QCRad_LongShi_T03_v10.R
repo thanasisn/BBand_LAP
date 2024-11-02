@@ -253,15 +253,15 @@ DT <- tbl(con, "LAP") |>
 #+ echo=F, include=T, results="asis"
 
 cat(pander(DT |> select(!!flagname_UPP) |> pull() |> table(),
-           caption = flagname_DIR))
+           caption = flagname_UPP))
 cat(" \n \n")
 
 cat(pander(DT |> select(!!flagname_LOW) |> pull() |> table(),
-           caption = flagname_DIR))
+           caption = flagname_LOW))
 cat(" \n \n")
 
 cat(pander(DT |> select(!!flagname_OBS) |> pull() |> table(),
-           caption = flagname_DIR))
+           caption = flagname_OBS))
 cat(" \n \n")
 
 
