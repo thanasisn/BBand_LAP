@@ -5,7 +5,7 @@
 #'
 #' Fills with valid only data:
 #'
-#' - `chp1_t_cor_factor` temperature correction factor from CHP1 manual.
+#' - `chp1_t_cor_factor` temperature correction factor from CHP-1 manual.
 #' - `DIR_wpsm_temp_cor` temperature corrected direct beam radiation
 #' - `HOR_wpsm_temp_cor` temperature corrected direct radiation on level surface
 #'
@@ -98,7 +98,7 @@ for (af in filelist$names) {
 
     ## Ignore bad and missing data
     if (nrow(data_use) == 0) {
-        cat("\nNo usefull CHP-1 data in this file\n\n")
+        cat("\nNo useful CHP-1 data in this file\n\n")
         next()
     }
 

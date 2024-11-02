@@ -113,7 +113,7 @@ if (nrow(inp_filelist) > 0) {
     cat(Script.ID, ": ",
         basename(ff$fullname),
         paste(ff$Day),
-        ll,"/",nrow(inp_filelist))
+        ll, "/", nrow(inp_filelist))
 
     ## __ Check data base is ready for import  ---------------------------------
     if (tbl(con, "LAP") |> filter(Day == ff$Day) |> tally() |> pull() != 1440) {
@@ -138,8 +138,8 @@ if (nrow(inp_filelist) > 0) {
     cat(" r")
 
     day_data <- data.table(Date        = D_minutes,      # Date of the data point
-                           CM21_sig    = lap$V1,         # Raw value for CM21
-                           CM21_sig_sd = lap$V2)         # Raw SD value for CM21
+                           CM21_sig    = lap$V1,         # Raw value for CM-21
+                           CM21_sig_sd = lap$V2)         # Raw SD value for CM-21
 
     ## try to fix dates
     day_data[, Date := round_date(Date, unit = "second")]
