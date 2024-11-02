@@ -178,20 +178,33 @@ if (Sys.info()["nodename"] == "sagan") {
       ))
   res <- update_table(con, ADD, "LAP", "Date")
 
-stop("wait")
-  ## __ Flag global  -----------------------------------------------------------
-  ADD <- tbl(con, "LAP")                   |>
-    filter(Elevat > QS$sun_elev_min)       |>
-    filter(!is.na(TSI_TOA))                |>
-    select(Date, TSI_TOA, SZA, GLB_strict) |>
-    collect() |> data.table()
 
-  ## Create reference
-  # TODO create only missing although most resent TSI will change
-  ADD[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
+  ## __ Flag global  -----------------------------------------------------------
+  ADD <- tbl(con, "LAP")             |>
+    filter(Elevat > QS$sun_elev_min) |>
+    filter(!is.na(TSI_TOA))
+
+  ## create reference values for global
+  if (!any(ADD |> colnames() %in% "Glo_max_ref")) {
+    AREF <- ADD |>
+      select(Date, TSI_TOA, SZA) |>
+      collect() |> data.table()
+  } else {
+    AREF <- ADD |>
+      # filter(is.na(Glo_max_ref)) |>  ## apply only for new data, TSI and params may change
+      select(Date, TSI_TOA, SZA) |>
+      collect() |> data.table()
+  }
+  AREF <- AREF[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
+  res  <- update_table(con, ADD, "LAP", "Date")
+  rm(AREF); gc()
 
   ## Apply test
-  ADD <- ADD |>
+  ADD <- tbl(con, "LAP")                  |>
+    filter(Elevat > QS$sun_elev_min)      |>
+    filter(!is.na(Glo_max_ref))           |>
+    filter(!is.na(GLB_strict))            |>
+    select(Date, GLB_strict, Glo_max_ref) |>
     mutate(
 
       !!flagname_GLB := case_when(
@@ -209,7 +222,7 @@ stop("wait")
   # mutate(ss = QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2) |>
   # select(ss, TSI_TOA)
   # ff <- tbl(con, "LAP") |> select(TSI_TOA, SZA) |> collect() |> data.table()
-  # ## this is possible
+  # ## this is possible !!
   # ff[, test := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
   # mutate(
   # Glo_max_ref := case_when(
