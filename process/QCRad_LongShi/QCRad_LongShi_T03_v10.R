@@ -65,8 +65,8 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R"
-Script.ID    <- "Q2"
+Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T03_v10.R"
+Script.ID    <- "Q3"
 parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
@@ -113,183 +113,115 @@ PLOT_LAST  <- as_date("2024-01-01")
 
 
 
-flagname_DIR <- "QCv10_02_dir_flag"
-flagname_GLB <- "QCv10_02_glb_flag"
+flagname_UPP <- "QCv10_03_upp_flag"
+flagname_LOW <- "QCv10_03_low_flag"
+flagname_OBS <- "QCv10_03_obs_flag"
 
 if (Sys.info()["nodename"] == "sagan") {
 
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-  ## 2. Extremely rare limits per BSRN  --------------------------------------
+  ## 3. Comparison tests per BSRN “non-definitive”  --------------------------
   #'
-  #' ## 2. Extremely rare limits per BSRN
+  #' ## 3. Comparison tests per BSRN “non-definitive”
   #'
-  #' These should be a little more restrictive than 1. in order to start
-  #' catching erroneous values.
+  #' Aplies to both, but probably more relevant for global
   #'
-  #' The choose of those settings may be optimized with an iterative process.
 
-  # Upper modeled values
-  QS$Dir_SWdn_amp     <-    0.91  # Direct departure factor above the model
-  QS$Dir_SWdn_off     <- -140     # Direct departure offset above the model
-  QS$Glo_SWdn_amp     <-    1.18  # Global departure factor above the model
-  QS$Glo_SWdn_off     <-   40     # Global departure offset above the model
-  # Minimum accepted values
-  QS$dir_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
-  QS$glo_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
-  # Ignore too low values near horizon
-  QS$dir_SWdn_too_low <-    3     # Ideal w/m^2
-  QS$glo_SWdn_too_low <-    3     # Ideal w/m^2
-  # datapart[Direct_max < QS$dir_SWdn_too_low, Direct_max := NA]
-  # datapart[Global_max < QS$glo_SWdn_too_low, Direct_max := NA]
+  QS$dif_rati_min  <-  0.001 # DiffuseFraction_kd low limit this make obstacles stand out
+  QS$dif_rati_po1  <-  0.03  # DiffuseFraction_kd low limit
+  QS$dif_rati_po2  <-  0.08  # My DiffuseFraction_kd low limit
+  QS$dif_sza_break <- 75     # SZA break point
+  QS$dif_rati_pr1  <-  1.03  # DiffuseFraction_kd upper limit
+  QS$dif_rati_pr2  <-  1.06  # My DiffuseFraction_kd upper limit
+  QS$dif_watt_lim  <- 10     # Filter only when GLB is above that
 
-  cat(paste("\n2. Extremely Rare Limits", flagname_DIR, flagname_GLB, "\n\n"))
+  cat(paste("\n3. Comparison tests", flagname_UPP, flagname_LOW, flagname_OBS, "\n\n"))
 
   ## __ Make categorical columns  ----------------------------------------------
   categories <- c("empty",
                   "pass",
-                  "Extremely rare limits min (3)",
-                  "Extremely rare limits max (4)")
+                  "Diffuse ratio comp max (11)",
+                  "Diffuse ratio comp min (12)")
 
-  ## remove existing
-  remove_column(con, "LAP", flagname_DIR)
-  remove_column(con, "LAP", flagname_GLB)
+  remove_column(con, "LAP", flagname_UPP)
+  remove_column(con, "LAP", flagname_LOW)
+  make_categorical_column(flagname_UPP, categories, con, "LAP")
+  make_categorical_column(flagname_LOW, categories, con, "LAP")
 
-  ## create categorical if not existing
-  make_categorical_column(flagname_DIR, categories, con, "LAP")
-  make_categorical_column(flagname_GLB, categories, con, "LAP")
+  categories <- c("empty",
+                  "pass",
+                  "Diffuse ratio obstacle min (13)")
+
+  remove_column(con, "LAP", flagname_OBS)
+  make_categorical_column(flagname_OBS, categories, con, "LAP")
 
 
-  ## __ Create references  -----------------------------------------------------
-
-  ## Data to work on
-  # ADD <- tbl(con, "LAP")             |>
-  #   filter(Elevat > QS$sun_elev_min) |>
-  #   filter(!is.na(TSI_TOA))          |>
-  #   filter(!is.na(SZA))
-
-  ## create reference values for direct
-  # if (!any(ADD |> colnames() %in% "Direct_max")) {
-  #   AREF <- ADD |>
-  #     select(Date, TSI_TOA, SZA) |>
-  #     collect() |> data.table()
-  # } else {
-  #   AREF <- ADD |>
-  #     select(Date, TSI_TOA, SZA) |>
-  #     filter(is.na(Direct_max)) |> collect() |> data.table()
-  # }
-  # AREF <- AREF[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off]
-  # res  <- update_table(con, ADD, "LAP", "Date")
-  # rm(AREF); gc()
-
-  # ## create reference values for global
-  # if (!any(ADD |> colnames() %in% "Global_max")) {
-  #   AREF <- ADD |>
-  #     select(Date, TSI_TOA, SZA) |>
-  #     collect() |> data.table()
-  # } else {
-  #   AREF <- ADD |>
-  #     select(Date, TSI_TOA, SZA) |>
-  #     filter(is.na(Global_max)) |> collect() |> data.table()
-  # }
-  # AREF <- AREF[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off]
-  # res  <- update_table(con, ADD, "LAP", "Date")
-  # rm(AREF); gc()
-
-  ## __ Select data to touch  --------------------------------------------------
-  # ADD <- tbl(con, "LAP")             |>
-  #   filter(Elevat > QS$sun_elev_min) |>
-  #   filter(!is.na(TSI_TOA))          |>
-  #   filter(!is.na(SZA))              |>
-  #   select(TSI_TOA, SZA, Date, GLB_strict, DIR_strict, Direct_max, Global_max)
-
-  ## __ Direct  ----------------------------------------------------------
-  # RES <- ADD |>
-  #   filter(Direct_max > QS$dir_SWdn_too_low) |> # Ignore too low values near horizon
-  #   mutate(
-  #
-  #     !!flagname_DIR := case_when(
-  #       DIR_strict <  QS$dir_SWdn_min_ext ~ "Extremely rare limits min (3)",
-  #       DIR_strict >= Direct_max          ~ "Extremely rare limits max (4)",
-  #
-  #       .default = "pass"
-  #     )
-  #   )
-  # res <- update_table(con, RES, "LAP", "Date")
-
-  ADD <- tbl(con, "LAP")                                   |>
-    filter(Elevat > QS$sun_elev_min)                       |>
-    filter(!is.na(TSI_TOA))                                |>
-    select(Date, SZA, TSI_TOA, DIR_strict, !!flagname_DIR) |>
-    arrow::to_arrow()                                      |>
+  ## __ Proposed filter  -------------------------------------------------
+  ADD <- tbl(con, "LAP")                              |>
+    filter(Elevat > QS$sun_elev_min)                  |>
+    filter(!is.na(GLB_strict))                        |>
+    filter(!is.na(DiffuseFraction_kd))                |>
+    select(Date, GLB_strict, SZA, DiffuseFraction_kd) |>
     mutate(
 
-      Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off
+      !!flagname_UPP := case_when(
 
-    ) |>
-    mutate(
+        DiffuseFraction_kd  > QS$dif_rati_pr1  &
+          SZA              <= QS$dif_sza_break &
+          GLB_strict        > QS$dif_watt_lim  ~ "Diffuse ratio comp max (11)",
 
-      !!flagname_DIR := case_when(
-        DIR_strict <  QS$dir_SWdn_min_ext ~ "Extremely rare limits min (3)",
-        DIR_strict >= Direct_max          ~ "Extremely rare limits max (4)",
+        DiffuseFraction_kd  > QS$dif_rati_pr2  &
+          SZA               > QS$dif_sza_break &
+          GLB_strict        > QS$dif_watt_lim  ~ "Diffuse ratio comp max (11)",
+
+        ## test
+        SZA               > QS$dif_sza_break ~ "Diffuse ratio comp max (11)",
 
         .default = "pass"
-      )
-    )
-
-
-  ## this needs a lot of memory, can do it in batches
-  ADD <- ADD |> collect() |> data.table()
-
+      ))
   res <- update_table(con, ADD, "LAP", "Date")
-  rm(ADD); dummy <- gc()
 
 
-
-
-
-  ## __ Global  ----------------------------------------------------------
-  # RES <- ADD |>
-  #   filter(Global_max > QS$glo_SWdn_too_low) |> # Ignore too low values near horizon
-  #   mutate(
-  #
-  #     !!flagname_GLB := case_when(
-  #       GLB_strict <  QS$glo_SWdn_min_ext ~ "Extremely rare limits min (3)",
-  #       GLB_strict >= Global_max          ~ "Extremely rare limits max (4)",
-  #
-  #       .default = "pass"
-  #     )
-  #   )
-  # res <- update_table(con, RES, "LAP", "Date")
-
-
-  ## USe arrow
-  ADD <- tbl(con, "LAP")                                   |>
-    filter(Elevat > QS$sun_elev_min)                       |>
-    filter(!is.na(TSI_TOA))                                |>
-    select(Date, SZA, TSI_TOA, GLB_strict, !!flagname_GLB) |>
-    arrow::to_arrow()                                      |>
+  ## __ Extra filters by me  ---------------------------------------------
+  ADD <- tbl(con, "LAP")                              |>
+    filter(Elevat > QS$sun_elev_min)                  |>
+    filter(!is.na(GLB_strict))                        |>
+    filter(!is.na(DiffuseFraction_kd))                |>
+    select(Date, GLB_strict, SZA, DiffuseFraction_kd) |>
     mutate(
 
-      Global_max := TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off
+      !!flagname_LOW := case_when(
 
-    ) |>
-    mutate(
+        DiffuseFraction_kd  < QS$dif_rati_po1  &
+          SZA              <= QS$dif_sza_break &
+          GLB_strict        > QS$dif_watt_lim  ~ "Diffuse ratio comp min (12)",
 
-      !!flagname_GLB := case_when(
-        GLB_strict <  QS$glo_SWdn_min_ext ~ "Extremely rare limits min (3)",
-        GLB_strict >= Global_max          ~ "Extremely rare limits max (4)",
+        DiffuseFraction_kd  < QS$dif_rati_po2  &
+          SZA               > QS$dif_sza_break &
+          GLB_strict        > QS$dif_watt_lim  ~ "Diffuse ratio comp min (12)",
 
         .default = "pass"
-      )
-    )
-
-  ## this needs a lot of memory, can do it in batches
-  ADD <- ADD |> collect() |> data.table()
-
+      ))
   res <- update_table(con, ADD, "LAP", "Date")
-  rm(ADD); dummy <- gc()
+
+
+  ## __ This is good for systematic obstacle highlight  ------------------
+  ADD <- tbl(con, "LAP")               |>
+    filter(Elevat > QS$sun_elev_min)   |>
+    filter(!is.na(GLB_strict))         |>
+    filter(!is.na(DiffuseFraction_kd)) |>
+    select(Date, DiffuseFraction_kd)   |>
+    mutate(
+
+      !!flagname_OBS := case_when(
+
+        DiffuseFraction_kd  < QS$dif_rati_min  ~ "Diffuse ratio obstacle min (13)",
+
+        .default = "pass"
+      ))
+  res <- update_table(con, ADD, "LAP", "Date")
 
 
   ## __  Store used filters parameters  ----------------------------------------
@@ -298,7 +230,7 @@ if (Sys.info()["nodename"] == "sagan") {
 }
 
 
-stop("kjk")
+stop("kdfsdk")
 
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
@@ -326,10 +258,6 @@ DT |>
   # filter(!is.na(!!flagname_GLB)) |>
   select(!!flagname_GLB) |>
   group_by(!!flagname_GLB) |> tally()
-
-DT |> select(!!flagname_GLB) |> distinct()
-DT |> select(!!flagname_DIR) |> distinct()
-
 
 dd <- DT |> head() |> collect() |> data.table()
 
@@ -446,6 +374,7 @@ if (QS$TEST_02) {
   if (!interactive()) dummy <- dev.off()
 }
 #+ echo=F, include=T
+
 
 
 
