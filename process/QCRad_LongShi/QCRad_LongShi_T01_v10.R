@@ -161,8 +161,12 @@ if (Sys.info()["nodename"] == "sagan") {
 
 
   ## __ Flag direct  -----------------------------------------------------------
-  ADD <- tbl(con, "LAP")             |>
-    filter(Elevat > QS$sun_elev_min) |>
+  ADD <- tbl(con, "LAP")              |>
+    filter(Elevat > QS$sun_elev_min)  |>
+    filter(!is.na(DIR_strict))        |>
+    filter(!is.na(TSI_TOA))           |>
+    # filter(!!flagname_DIR == "empty") |>  ## apply only for non flagged
+    select(Date, TSI_TOA, DIR_strict) |>
     mutate(
 
       !!flagname_DIR := case_when(
@@ -174,12 +178,12 @@ if (Sys.info()["nodename"] == "sagan") {
       ))
   res <- update_table(con, ADD, "LAP", "Date")
 
-
+stop("wait")
   ## __ Flag global  -----------------------------------------------------------
   ADD <- tbl(con, "LAP")                   |>
     filter(Elevat > QS$sun_elev_min)       |>
     filter(!is.na(TSI_TOA))                |>
-    select(TSI_TOA, SZA, Date, GLB_strict) |>
+    select(Date, TSI_TOA, SZA, GLB_strict) |>
     collect() |> data.table()
 
   ## Create reference

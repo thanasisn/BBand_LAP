@@ -154,23 +154,20 @@ gather   <- c(gather, list(res))
 
 
 
-## for each db keep oldest day
-
+## deduplicate data
 databases <- unique(sapply(gather, "[[", "base_name"))
-
 for (adb in databases) {
   lls <- sapply(gather, "[[", "base_name") == adb
   dt  <- data.table(date = as.POSIXct(sapply(gather[lls], "[[", "date"), origin = origin))
   dt[, day := as.Date(date)]
   dt[, base_name := adb]
   setorder(dt, date)
-
   ## chose to remove
-  dt <-  dt[duplicated(dt$day, fromLast = TRUE)]
-
-
-
-
+  dt  <- dt[duplicated(dt$day, fromLast = TRUE)]
+  res <- sapply(gather, "[[", "base_name") == adb &
+    sapply(gather, "[[", "date") %in% dt$date
+  ## drop data
+  gather <- gather[!res]
 
 }
 
