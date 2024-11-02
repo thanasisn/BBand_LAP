@@ -245,7 +245,6 @@ if (Sys.info()["nodename"] == "sagan") {
   ADD <- ADD |> collect() |> data.table()
   res <- update_table(con, ADD, "LAP", "Date")
 
-
   ## __  Store used filters parameters  ----------------------------------------
   saveRDS(object = QS,
           file   = parameter_fl)
