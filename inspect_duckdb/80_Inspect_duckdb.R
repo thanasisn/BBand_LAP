@@ -109,8 +109,8 @@ duckdb_stats <- function(db_file) {
       N        = tbl(con, atbl) |> tally() |> pull()
     )
     fillness[, missing  := N - Non_na]
-    fillness[, empty_pc  := round(100 * (N - Non_na) / N, 5) ]
-    fillness[, fill_pc := round(100 * (1 - (N - Non_na) / N), 5) ]
+    fillness[, empty_pc := round(100 * (N - Non_na) / N,       5) ]
+    fillness[, fill_pc  := round(100 * (1 - (N - Non_na) / N), 5) ]
     db_stats <- rbind(db_stats, fillness)
   }
   db_sums <- db_stats[, .(Values = sum(Non_na),
@@ -131,13 +131,60 @@ duckdb_stats <- function(db_file) {
   )
 }
 
-#+ include=T, echo=T
-duckdb_stats(DB_DUCK)
 
-duckdb_stats(DB_LAP)
+## Init storage
+if (file.exists(overview_data)) {
+  gather <- readRDS(overview_data)
+} else {
+  gather <- list()
+}
+
+##  SUN location info
+res      <- duckdb_stats(DB_LAP)
+res$host <- Sys.info()["nodename"]
+res$date <- Sys.time()
+gather   <- c(gather, list(res))
+
+
+## Broadband info
+res      <- duckdb_stats(DB_DUCK)
+res$host <- Sys.info()["nodename"]
+res$date <- Sys.time()
+gather   <- c(gather, list(res))
+
+
+
+## for each db keep oldest day
+
+databases <- unique(sapply(gather, "[[", "base_name"))
+
+for (adb in databases) {
+  lls <- sapply(gather, "[[", "base_name") == adb
+  dt  <- data.table(date = as.POSIXct(sapply(gather[lls], "[[", "date"), origin = origin))
+  dt[, day := as.Date(date)]
+  dt[, base_name := adb]
+  setorder(dt, date)
+
+  ## chose to remove
+  dt <-  dt[duplicated(dt$day, fromLast = TRUE)]
+
+
+
+
+
+}
+
+
+
+saveRDS(gather, overview_data)
+
+
+
+
 
 ## TODO store data
 ## deduplicate....
+## gather....
 
 
 
