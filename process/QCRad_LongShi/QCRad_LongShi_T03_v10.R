@@ -235,7 +235,7 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 # tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
 
 ## Select data to plot
-elev_limit <- 1
+elev_limit <- 2
 DT <- tbl(con, "LAP") |>
   filter(Elevat > elev_limit)
 
@@ -353,39 +353,50 @@ if (DO_PLOTS) {
   }
 
 
-#   tmp <- BB |> filter(!is.na(QCv9_03_upp_flag) |
-#                       !is.na(QCv9_03_low_flag) |
-#                       !is.na(QCv9_03_obs_flag)) |> collect() |> as.data.table()
-#
-#   for (ad in sort(unique(c(as.Date(tmp$Date))))) {
-#
-#     pp <- data.table(
-#       BB |> filter(as.Date(Date) == as.Date(ad) &
-#                      Elevat > QS$sun_elev_min)   |>
-#         collect()
-#     )
-#
-#     layout(matrix(c(1, 2), 2, 1, byrow = TRUE))
-#     par(mar = c(2,4,2,1))
-#
-#     plot(pp$Date, pp$DiffuseFraction_kd, "l",
-#          col = "cyan", ylab = "Not Diffuse Fraction", xlab = "")
-#
-#     abline(h = QS$dif_rati_pr1, col = "red")
-#     abline(h = QS$dif_rati_pr2, col = "red",     lty = 2)
-#     abline(h = QS$dif_rati_po1, col = "blue")
-#     abline(h = QS$dif_rati_po2, col = "blue",    lty = 2)
-#     abline(h = QS$dif_rati_min, col = "#BFE46C", lty = 2)
-#
-#
-#     title(paste("#3", as.Date(ad, origin = "1970-01-01")))
-#
-#     par(mar = c(2, 4, 1, 1))
-#     ylim <- range(pp$GLB_strict, pp$DIR_strict, na.rm = T)
-#     plot( pp$Date, pp$GLB_strict, "l",
-#           ylim = ylim, col = "green", ylab = "", xlab = "")
-#     lines(pp$Date, pp$DIR_strict, col = "blue" )
-#
+  tmp <- DT |>
+    select(Day,
+           !!flagname_LOW, !!flagname_OBS, !!flagname_UPP) |>
+    filter(!QCv10_03_upp_flag %in% c("empty", "pass") |
+             !QCv10_03_low_flag %in% c("empty", "pass") |
+             !QCv10_03_obs_flag %in% c("empty", "pass") ) |>
+    select(Day) |>
+    distinct()  |> collect() |> data.table()
+  setorder(tmp, Day)
+
+  ## TEST
+  tmp <- tmp[1:10]
+
+
+  for (ad in tmp$Day) {
+    ddd <- as.Date(ad, origin = origin)
+    pp <- DT |> filter(Day == ddd) |>
+      select(Date,
+             GLB_strict, DIR_strict,
+             DiffuseFraction_kd,
+             !!flagname_LOW, !!flagname_OBS, !!flagname_UPP) |>
+      collect() |> data.table()
+    setorder(pp, Date)
+
+    layout(matrix(c(1, 2), 2, 1, byrow = TRUE))
+    par(mar = c(2,4,2,1))
+
+    plot(pp$Date, pp$DiffuseFraction_kd, "l",
+         col = "cyan", ylab = "Diffuse Fraction", xlab = "")
+
+    abline(h = QS$dif_rati_pr1, col = "red")
+    abline(h = QS$dif_rati_pr2, col = "red",     lty = 2)
+    abline(h = QS$dif_rati_po1, col = "blue")
+    abline(h = QS$dif_rati_po2, col = "blue",    lty = 2)
+    abline(h = QS$dif_rati_min, col = "#BFE46C", lty = 2)
+
+    title(paste("#3", ddd))
+
+    par(mar = c(2, 4, 1, 1))
+    ylim <- range(pp$GLB_strict, pp$DIR_strict, na.rm = T)
+    plot( pp$Date, pp$GLB_strict, "l",
+          ylim = ylim, col = "green", ylab = "", xlab = "")
+    lines(pp$Date, pp$DIR_strict, col = "blue" )
+
 #     points(pp[!is.na(QCv9_03_upp_flag), Date],
 #            pp[!is.na(QCv9_03_upp_flag), DIR_strict],
 #            ylim = ylim, col = "red")
@@ -407,7 +418,7 @@ if (DO_PLOTS) {
 #
 #     ## reset layout
 #     layout(1)
-#   }
+  }
 }
 rm(list = ls(pattern = "flagname_.*"))
 dummy <- gc()
