@@ -158,7 +158,7 @@ if (Sys.info()["nodename"] == "sagan") {
   make_categorical_column(flagname_OBS, categories, con, "LAP")
 
 
-  ## __ Proposed filter  -------------------------------------------------
+  ## __ Proposed filter  -------------------------------------------------------
   ADD <- tbl(con, "LAP")                              |>
     filter(Elevat > QS$sun_elev_min)                  |>
     filter(!is.na(GLB_strict))                        |>
@@ -176,15 +176,12 @@ if (Sys.info()["nodename"] == "sagan") {
           SZA               > QS$dif_sza_break &
           GLB_strict        > QS$dif_watt_lim  ~ "Diffuse ratio comp max (11)",
 
-        ## FIXME test
-        SZA               > QS$dif_sza_break ~ "Diffuse ratio comp max (11)",
-
         .default = "pass"
       ))
   res <- update_table(con, ADD, "LAP", "Date")
 
 
-  ## __ Extra filters by me  ---------------------------------------------
+  ## __ Extra filters by me  ---------------------------------------------------
   ADD <- tbl(con, "LAP")                              |>
     filter(Elevat > QS$sun_elev_min)                  |>
     filter(!is.na(GLB_strict))                        |>
@@ -207,7 +204,7 @@ if (Sys.info()["nodename"] == "sagan") {
   res <- update_table(con, ADD, "LAP", "Date")
 
 
-  ## __ This is good for systematic obstacle highlight  ------------------
+  ## __ This is good for systematic obstacle highlight  ------------------------
   ADD <- tbl(con, "LAP")               |>
     filter(Elevat > QS$sun_elev_min)   |>
     filter(!is.na(GLB_strict))         |>
@@ -229,170 +226,136 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
-
-stop("remove test above")
-
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
-
-
 
 ##  Open dataset
 con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
-
-
 ## Check that flags exist
-tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
+# tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
 
-
+## Select data to plot
+elev_limit <- 1
 DT <- tbl(con, "LAP") |>
-  filter(Elevat > QS$sun_elev_min)  ## sun is up
+  filter(Elevat > elev_limit)
 
-DT |>
-  # filter(!!flagname_DIR != "empty") |>
-  select(!!flagname_DIR) |>
-  group_by(!!flagname_DIR) |> tally()
-
-
-DT |>
-  # filter(!is.na(!!flagname_GLB)) |>
-  select(!!flagname_GLB) |>
-  group_by(!!flagname_GLB) |> tally()
-
-dd <- DT |> head() |> collect() |> data.table()
-
-
-tbl(con, "LAP") |> colnames() %in% "Global_max"
-tbl(con, "LAP") |> filter(!is.na(Global_max))
-
-tbl(con, "LAP") |> filter(is.na(Global_max))
-
-tbl(con, "LAP") |> summarise(mean(Global_max, na.rm = T))
-tbl(con, "LAP") |> summarise(max(Global_max, na.rm = T))
-
-
-
-
-## ~ ~ Inspect quality control results ~ ~ -------------------------------------
-#'
-#' # Inspect quality control results
-#'
-#+ include=T, echo=F
-
+# DT |> select(!!flagname_GLB) |> distinct() |> collect()
+# DT |> select(!!flagname_DIR) |> distinct()
+# DT |> select(!!flagname_GLB) |> pull() |> table()
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
+####  3. Comparison tests per BSRN “non-definitive”  ---------------------------
+#' \FloatBarrier
+#' \newpage
+#' ## 3. Comparison tests per BSRN “non-definitive”
+#'
+#+ echo=F, include=T, results="asis"
+
+cat(pander(DT |> select(!!flagname_UPP) |> pull() |> table(),
+           caption = flagname_DIR))
+cat(" \n \n")
+
+cat(pander(DT |> select(!!flagname_LOW) |> pull() |> table(),
+           caption = flagname_DIR))
+cat(" \n \n")
+
+cat(pander(DT |> select(!!flagname_OBS) |> pull() |> table(),
+           caption = flagname_DIR))
+cat(" \n \n")
 
 
-# ####  3. Comparison tests per BSRN “non-definitive”  ---------------------------
-# #' \FloatBarrier
-# #' \newpage
-# #' ## 3. Comparison tests per BSRN “non-definitive”
-# #'
-# #+ echo=F, include=T, results="asis"
-#
-# flagname_UPP <- paste0("QCv9_", sprintf("%02d", testN), "_upp_flag")
-# flagname_LOW <- paste0("QCv9_", sprintf("%02d", testN), "_low_flag")
-# flagname_OBS <- paste0("QCv9_", sprintf("%02d", testN), "_obs_flag")
-#
-# cat(pander(table(collect(select(BB, !!flagname_UPP)), useNA = "always"),
-#            caption = flagname_UPP))
-# cat(" \n \n")
-#
-# cat(pander(table(collect(select(BB, !!flagname_LOW)), useNA = "always"),
-#            caption = flagname_LOW))
-# cat(" \n \n")
-#
-# cat(pander(table(collect(select(BB, !!flagname_OBS)), useNA = "always"),
-#            caption = flagname_LOW))
-# cat(" \n \n")
-#
-# years <- (BB |> filter(!is.na(DiffuseFraction_kd)) |>
-#             select(year) |> unique() |> collect() |> pull())
-# for (ay in years) {
-#   pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
-#   ylim <- c(-30, 1.1)
-#   ylim <- c(-0.5, 1.5)
-#
-#   par(mar = c(4, 4, 2, 1))
-#
-#   ## plot limits by SZA
-#   plot(pp$SZA, pp$DiffuseFraction_kd,
-#        ylab = "Not Diffuse fraction", xlab = "SZA", ylim = ylim,
-#        cex = .1)
-#   title(paste("#3", ay))
-#
-#   segments(               0, QS$dif_rati_pr1, QS$dif_sza_break, QS$dif_rati_pr1, col = "red" )
-#   segments(QS$dif_sza_break, QS$dif_rati_pr2,               93, QS$dif_rati_pr2, col = "red" )
-#
-#   segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue")
-#   segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue")
-#
-#   points(pp[!is.na(get(flagname_UPP)), DiffuseFraction_kd, SZA],
-#          cex = .2, col = "red")
-#   points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, SZA],
-#          cex = .2, col = "cyan")
-#   points(pp[!is.na(get(flagname_OBS)), DiffuseFraction_kd, SZA],
-#          cex = .3, col = "#BFE46C")
-#   cat(" \n \n")
-#
-#
-#   ## plot limits by date
-#   plot(pp$Date, pp$DiffuseFraction_kd,
-#        ylab = "Not Diffuse fraction", xlab = "SZA", ylim = ylim,
-#        cex = .1)
-#   title(paste("#3", ay))
-#
-#   points(pp[!is.na(get(flagname_UPP)), DiffuseFraction_kd, Date],
-#          cex = .2, col = "red")
-#   points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, Date],
-#          cex = .2, col = "cyan")
-#   points(pp[!is.na(get(flagname_OBS)), DiffuseFraction_kd, Date],
-#          cex = .3, col = "#BFE46C")
-#   cat(" \n \n")
-#
-#
-#   ## plot limits by Azimuth
-#   plot(pp$Azimuth, pp$DiffuseFraction_kd,
-#        ylim = ylim,
-#        ylab = "Not Diffuse fraction", xlab = "Azimuth",
-#        cex = .1)
-#   title(paste("#3", ay))
-#
-#   points(pp[!is.na(get(flagname_UPP)), DiffuseFraction_kd, Azimuth],
-#          cex = .2, col = "red")
-#   points(pp[!is.na(get(flagname_LOW)), DiffuseFraction_kd, Azimuth],
-#          cex = .2, col = "cyan")
-#   points(pp[!is.na(get(flagname_OBS)), DiffuseFraction_kd, Azimuth],
-#          cex = .3, col = "#BFE46C")
-#   cat(" \n \n")
-#
-#
-#   ## plot by sky position
-#   plot(pp$Azimuth, pp$Elevat,
-#        ylab = "Elevation", xlab = "Azimuth",
-#        cex = .1)
-#   title(paste("#3", ay))
-#
-#   points(pp[!is.na(get(flagname_UPP)), Elevat, Azimuth],
-#          cex = .2, col = "red")
-#   points(pp[!is.na(get(flagname_LOW)), Elevat, Azimuth],
-#          cex = .3, col = "cyan")
-#   points(pp[!is.na(get(flagname_OBS)), Elevat, Azimuth],
-#          cex = .2, col = "#BFE46C")
-#   cat(" \n \n")
-#
-# }
-#
-# if (DO_PLOTS) {
-#
-#   if (!interactive()) {
-#     pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
-#   }
-#
-#   tmp <- BB |> filter(!is.na(QCv9_03_upp_flag)     |
-#                         !is.na(QCv9_03_low_flag) |
-#                         !is.na(QCv9_03_obs_flag)) |> collect() |> as.data.table()
+years <- DT |> filter(!is.na(DiffuseFraction_kd)) |> select(year) |> distinct() |> pull() |> sort()
+
+for (ay in years) {
+  pp <- DT |>
+    filter(year(Date) == ay & Elevat > 0) |>
+    select(Date, SZA, Azimuth, Elevat,
+           DiffuseFraction_kd,
+           !!flagname_LOW, !!flagname_OBS, !!flagname_UPP) |>
+    collect() |> data.table()
+  ylim <- c(-30, 1.1)
+  ylim <- c(-0.5, 1.5)
+
+  par(mar = c(4, 4, 2, 1))
+
+  ## plot limits by SZA
+  plot(pp$SZA, pp$DiffuseFraction_kd,
+       ylab = "Not Diffuse fraction", xlab = "SZA", ylim = ylim,
+       cex = .1)
+  title(paste("#3", ay))
+
+  segments(               0, QS$dif_rati_pr1, QS$dif_sza_break, QS$dif_rati_pr1, col = "red" )
+  segments(QS$dif_sza_break, QS$dif_rati_pr2,               93, QS$dif_rati_pr2, col = "red" )
+
+  segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue")
+  segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue")
+
+  points(pp[!QCv10_03_upp_flag %in% c("empty", "pass"), DiffuseFraction_kd, SZA],
+         cex = .2, col = "red")
+  points(pp[!QCv10_03_low_flag %in% c("empty", "pass"), DiffuseFraction_kd, SZA],
+         cex = .2, col = "cyan")
+  points(pp[!QCv10_03_obs_flag %in% c("empty", "pass"), DiffuseFraction_kd, SZA],
+         cex = .3, col = "#BFE46C")
+  cat(" \n \n")
+
+  ## plot limits by date
+  plot(pp$Date, pp$DiffuseFraction_kd,
+       ylab = "Not Diffuse fraction", xlab = "SZA", ylim = ylim,
+       cex = .1)
+  title(paste("#3", ay))
+
+  points(pp[!QCv10_03_upp_flag %in% c("empty", "pass"), DiffuseFraction_kd, Date],
+         cex = .2, col = "red")
+  points(pp[!QCv10_03_low_flag %in% c("empty", "pass"), DiffuseFraction_kd, Date],
+         cex = .2, col = "cyan")
+  points(pp[!QCv10_03_obs_flag %in% c("empty", "pass"), DiffuseFraction_kd, Date],
+         cex = .3, col = "#BFE46C")
+  cat(" \n \n")
+
+  ## plot limits by Azimuth
+  plot(pp$Azimuth, pp$DiffuseFraction_kd,
+       ylim = ylim,
+       ylab = "Not Diffuse fraction", xlab = "Azimuth",
+       cex = .1)
+  title(paste("#3", ay))
+
+  points(pp[!QCv10_03_upp_flag %in% c("empty", "pass"), DiffuseFraction_kd, Azimuth],
+         cex = .2, col = "red")
+  points(pp[!QCv10_03_low_flag %in% c("empty", "pass"), DiffuseFraction_kd, Azimuth],
+         cex = .2, col = "cyan")
+  points(pp[!QCv10_03_obs_flag %in% c("empty", "pass"), DiffuseFraction_kd, Azimuth],
+         cex = .3, col = "#BFE46C")
+  cat(" \n \n")
+
+  ## plot by sky position
+  plot(pp$Azimuth, pp$Elevat,
+       ylab = "Elevation", xlab = "Azimuth",
+       cex = .1)
+  title(paste("#3", ay))
+
+  points(pp[!QCv10_03_upp_flag %in% c("empty", "pass"), Elevat, Azimuth],
+         cex = .2, col = "red")
+  points(pp[!QCv10_03_low_flag %in% c("empty", "pass"), Elevat, Azimuth],
+         cex = .2, col = "cyan")
+  points(pp[!QCv10_03_obs_flag %in% c("empty", "pass"), Elevat, Azimuth],
+         cex = .3, col = "#BFE46C")
+  cat(" \n \n")
+}
+
+if (DO_PLOTS) {
+
+  if (!interactive()) {
+    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
+                    sub("\\.R$", "", basename(Script.Name)),
+                    ".pdf")
+    pdf(file = afile)
+  }
+
+
+#   tmp <- BB |> filter(!is.na(QCv9_03_upp_flag) |
+#                       !is.na(QCv9_03_low_flag) |
+#                       !is.na(QCv9_03_obs_flag)) |> collect() |> as.data.table()
 #
 #   for (ad in sort(unique(c(as.Date(tmp$Date))))) {
 #
@@ -445,11 +408,11 @@ tbl(con, "LAP") |> summarise(max(Global_max, na.rm = T))
 #     ## reset layout
 #     layout(1)
 #   }
-# }
-# rm(list = ls(pattern = "flagname_.*"))
-# dummy <- gc()
-# if (!interactive()) dummy <- dev.off()
-# #+ echo=F, include=T
+}
+rm(list = ls(pattern = "flagname_.*"))
+dummy <- gc()
+if (!interactive()) dummy <- dev.off()
+#+ echo=F, include=T
 
 
 
