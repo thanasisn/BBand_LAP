@@ -317,33 +317,12 @@ tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
 
 
 DT <- tbl(con, "LAP") |>
-  filter(Elevat > QS$sun_elev_min)  ## sun is up
-
-DT |>
-  # filter(!!flagname_DIR != "empty") |>
-  select(!!flagname_DIR) |>
-  group_by(!!flagname_DIR) |> tally()
+  filter(Elevat > QS$sun_elev_min)
 
 
-DT |>
-  # filter(!is.na(!!flagname_GLB)) |>
-  select(!!flagname_GLB) |>
-  group_by(!!flagname_GLB) |> tally()
-
-DT |> select(!!flagname_GLB) |> distinct()
+DT |> select(!!flagname_GLB) |> distinct() |> collect()
 DT |> select(!!flagname_DIR) |> distinct()
-
-
-dd <- DT |> head() |> collect() |> data.table()
-
-
-tbl(con, "LAP") |> colnames() %in% "Global_max"
-tbl(con, "LAP") |> filter(!is.na(Global_max))
-
-tbl(con, "LAP") |> filter(is.na(Global_max))
-
-tbl(con, "LAP") |> summarise(mean(Global_max, na.rm = T))
-tbl(con, "LAP") |> summarise(max(Global_max, na.rm = T))
+DT |> select(!!flagname_GLB) |> pull() |> table()
 
 
 
@@ -358,68 +337,93 @@ tbl(con, "LAP") |> summarise(max(Global_max, na.rm = T))
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
 
-# ####  2. Extremely rare limits per BSRN  ---------------------------------------
-# #' \FloatBarrier
-# #' \newpage
-# #' ## 2. Extremely rare limits per BSRN
-# #'
-# #+ echo=F, include=T, results="asis"
-#
-# cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
-#            caption = flagname_DIR))
-# cat(" \n \n")
-#
-# cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always"),
-#            caption = flagname_GLB))
-# cat("\n \n")
-#
-# test <- BB |>
-#   mutate(dir = Direct_max - DIR_strict,
-#          glo = Global_max - GLB_strict) |>
-#   select(dir, glo) |> collect()
-#
-# cat("\n", range(test$dir, na.rm = TRUE), "\n")
-#
-# hist(test$dir, breaks = 100,
-#      main = "Direct_max - DIR_strict")
-# abline(v = QS$dir_SWdn_too_low)
-# abline(v = QS$dir_SWdn_min_ext, col = "red")
-# cat("\n \n")
-#
-# cat("\n", range(test$glo, na.rm = TRUE), "\n")
-#
-# hist(test$glo, breaks = 100,
-#      main = "Global_max - GLB_strict")
-# abline(v = QS$glo_SWdn_too_low)
-# abline(v = QS$glo_SWdn_min_ext, col = "red")
-# cat("\n \n")
-#
-# if (DO_PLOTS) {
-#
-#   if (!interactive()) {
-#     pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
-#   }
-#
-#   ## Direct
-#   test <- BB |> filter(!is.na(QCv9_02_dir_flag)) |> collect() |> as.data.table()
-#   for (ad in sort(unique(as.Date(test$Date)))) {
-#     pp <- data.table(
-#       BB |> filter(as.Date(Date) == as.Date(ad) &
-#                      Elevat > QS$sun_elev_min)   |>
-#         collect()
-#     )
-#     ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
-#     plot(pp$Date, pp$DIR_strict, "l", col = "blue",
-#          ylim = ylim, xlab = "", ylab = "wattDIR")
-#     title(paste("#2", as.Date(ad, origin = "1970-01-01"),
-#                 "N:", pp[!is.na(QCv9_02_dir_flag), .N]))
-#     ## plot limits
-#     lines(pp$Date, pp$Direct_max, col = "red")
-#     ## mark offending data
-#     points(pp[!is.na(QCv9_02_dir_flag), DIR_strict, Date],
-#            col = "red", pch = 1)
-#   }
-#
+####  2. Extremely rare limits per BSRN  ---------------------------------------
+#' \FloatBarrier
+#' \newpage
+#' ## 2. Extremely rare limits per BSRN
+#'
+#+ echo=F, include=T, results="asis"
+
+cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
+           caption = flagname_DIR))
+cat(" \n \n")
+
+cat(pander(DT |> select(!!flagname_GLB) |> pull() |> table(),
+           caption = flagname_GLB))
+cat("\n \n")
+
+test <- DT |>
+  mutate(dir = Direct_max - DIR_strict,
+         glo = Global_max - GLB_strict) |>
+  select(dir, glo) |> collect()
+
+cat("\n", range(test$dir, na.rm = TRUE), "\n")
+
+hist(test$dir, breaks = 100,
+     main = "Direct_max - DIR_strict")
+abline(v = QS$dir_SWdn_too_low)
+abline(v = QS$dir_SWdn_min_ext, col = "red")
+cat("\n \n")
+
+cat("\n", range(test$glo, na.rm = TRUE), "\n")
+
+hist(test$glo, breaks = 100,
+     main = "Global_max - GLB_strict")
+abline(v = QS$glo_SWdn_too_low)
+abline(v = QS$glo_SWdn_min_ext, col = "red")
+cat("\n \n")
+
+if (DO_PLOTS) {
+
+  if (!interactive()) {
+    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
+                    sub("\\.R$", "", basename(Script.Name)),
+                    ".pdf")
+    pdf(file = afile)
+  }
+
+  ## Direct
+
+
+  stop()
+  choose <- setdiff(
+    DT |> select(!!flagname_DIR) |> distinct() |> pull() |> as.character(),
+    c("empty", "pass")
+  )
+
+
+  DT |>
+    filter(QCv10_02_dir_flag != "pass")  |>
+    filter(QCv10_02_dir_flag != "empty") |>
+    select(!!flagname_DIR)
+
+
+  DT |> filter(QCv10_01_dir_flag != "pass")
+  DT |> filter(QCv10_01_dir_flag == "empty")
+  DT |> filter(QCv10_01_dir_flag == "Extremely rare limits max (4)") |> collect()
+
+
+  test <- DT |> filter(QCv10_02_dir_flag %in% choose) |> collect() |> data.table()
+  DT |> filter(!!flagname_DIR %in% choose)
+
+  for (ad in sort(unique(as.Date(test$Date)))) {
+    pp <- data.table(
+      DT |> filter(as.Date(Date) == as.Date(ad) &
+                     Elevat > QS$sun_elev_min)   |>
+        collect()
+    )
+    ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
+    plot(pp$Date, pp$DIR_strict, "l", col = "blue",
+         ylim = ylim, xlab = "", ylab = "wattDIR")
+    title(paste("#2", as.Date(ad, origin = "1970-01-01"),
+                "N:", pp[!is.na(QCv9_02_dir_flag), .N]))
+    ## plot limits
+    lines(pp$Date, pp$Direct_max, col = "red")
+    ## mark offending data
+    points(pp[!is.na(QCv9_02_dir_flag), DIR_strict, Date],
+           col = "red", pch = 1)
+  }
+
 #   ## Global
 #   test <- BB |> filter(!is.na(QCv9_02_glb_flag)) |> collect() |> as.data.table()
 #   for (ad in sort(unique(as.Date(c(test$Date))))) {
@@ -439,11 +443,11 @@ tbl(con, "LAP") |> summarise(max(Global_max, na.rm = T))
 #     points(pp[!is.na(QCv9_02_glb_flag), GLB_strict, Date],
 #            col = "magenta", pch = 1)
 #   }
-# }
+}
 # rm(list = ls(pattern = "flagname_.*"))
 # dummy <- gc()
-# if (!interactive()) dummy <- dev.off()
-# #+ echo=F, include=T
+if (!interactive()) dummy <- dev.off()
+#+ echo=F, include=T
 
 
 ## clean exit
