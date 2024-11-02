@@ -225,8 +225,10 @@ if (Sys.info()["nodename"] == "sagan") {
     arrow::to_arrow()                                      |>
     mutate(
 
-      Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off
-
+      Direct_max := case_when(
+        TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off > 9000 ~ 9000,
+        TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off < 9000 ~ TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off
+      )
     ) |>
     mutate(
 
@@ -272,8 +274,10 @@ if (Sys.info()["nodename"] == "sagan") {
     arrow::to_arrow()                                      |>
     mutate(
 
-      Global_max := TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off
-
+      Global_max := case_when(
+        TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off > 9000 ~ 9000,
+        TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off < 9000 ~ TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off,
+      )
     ) |>
     mutate(
 
@@ -298,7 +302,6 @@ if (Sys.info()["nodename"] == "sagan") {
 }
 
 
-stop("kjk")
 
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
@@ -355,98 +358,92 @@ tbl(con, "LAP") |> summarise(max(Global_max, na.rm = T))
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
 
-####  2. Extremely rare limits per BSRN  ---------------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 2. Extremely rare limits per BSRN
-#'
-#+ echo=F, include=T, results="asis"
-if (QS$TEST_02) {
-  testN        <- 2
-  flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
-  flagname_GLB <- paste0("QCv9_", sprintf("%02d", testN), "_glb_flag")
-
-  cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
-             caption = flagname_DIR))
-  cat(" \n \n")
-
-  cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always"),
-             caption = flagname_GLB))
-  cat("\n \n")
-
-  test <- BB |>
-    mutate(dir = Direct_max - DIR_strict,
-           glo = Global_max - GLB_strict) |>
-    select(dir, glo) |> collect()
-
-  cat("\n", range(test$dir, na.rm = TRUE), "\n")
-
-  hist(test$dir, breaks = 100,
-       main = "Direct_max - DIR_strict")
-  abline(v = QS$dir_SWdn_too_low)
-  abline(v = QS$dir_SWdn_min_ext, col = "red")
-  cat("\n \n")
-
-  cat("\n", range(test$glo, na.rm = TRUE), "\n")
-
-  hist(test$glo, breaks = 100,
-       main = "Global_max - GLB_strict")
-  abline(v = QS$glo_SWdn_too_low)
-  abline(v = QS$glo_SWdn_min_ext, col = "red")
-  cat("\n \n")
-
-  if (DO_PLOTS) {
-
-    if (!interactive()) {
-      pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
-    }
-
-    ## Direct
-    test <- BB |> filter(!is.na(QCv9_02_dir_flag)) |> collect() |> as.data.table()
-    for (ad in sort(unique(as.Date(test$Date)))) {
-      pp <- data.table(
-        BB |> filter(as.Date(Date) == as.Date(ad) &
-                       Elevat > QS$sun_elev_min)   |>
-          collect()
-      )
-      ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
-      plot(pp$Date, pp$DIR_strict, "l", col = "blue",
-           ylim = ylim, xlab = "", ylab = "wattDIR")
-      title(paste("#2", as.Date(ad, origin = "1970-01-01"),
-                  "N:", pp[!is.na(QCv9_02_dir_flag), .N]))
-      ## plot limits
-      lines(pp$Date, pp$Direct_max, col = "red")
-      ## mark offending data
-      points(pp[!is.na(QCv9_02_dir_flag), DIR_strict, Date],
-             col = "red", pch = 1)
-    }
-
-    ## Global
-    test <- BB |> filter(!is.na(QCv9_02_glb_flag)) |> collect() |> as.data.table()
-    for (ad in sort(unique(as.Date(c(test$Date))))) {
-      pp <- data.table(
-        BB |> filter(as.Date(Date) == as.Date(ad) &
-                       Elevat > QS$sun_elev_min)   |>
-          collect()
-      )
-      ylim <- range(pp$Global_max, pp$GLB_strict, na.rm = T)
-      plot(pp$Date, pp$GLB_strict, "l", col = "green",
-           ylim = ylim, xlab = "", ylab = "GLB")
-      title(paste("#2", as.Date(ad, origin = "1970-01-01"),
-                  "N:", pp[!is.na(QCv9_02_glb_flag), .N] ))
-      ## plot limits
-      lines(pp$Date, pp$Global_max, col = "red")
-      ## mark offending data
-      points(pp[!is.na(QCv9_02_glb_flag), GLB_strict, Date],
-             col = "magenta", pch = 1)
-    }
-  }
-  rm(list = ls(pattern = "flagname_.*"))
-  dummy <- gc()
-  if (!interactive()) dummy <- dev.off()
-}
-#+ echo=F, include=T
-
+# ####  2. Extremely rare limits per BSRN  ---------------------------------------
+# #' \FloatBarrier
+# #' \newpage
+# #' ## 2. Extremely rare limits per BSRN
+# #'
+# #+ echo=F, include=T, results="asis"
+#
+# cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
+#            caption = flagname_DIR))
+# cat(" \n \n")
+#
+# cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always"),
+#            caption = flagname_GLB))
+# cat("\n \n")
+#
+# test <- BB |>
+#   mutate(dir = Direct_max - DIR_strict,
+#          glo = Global_max - GLB_strict) |>
+#   select(dir, glo) |> collect()
+#
+# cat("\n", range(test$dir, na.rm = TRUE), "\n")
+#
+# hist(test$dir, breaks = 100,
+#      main = "Direct_max - DIR_strict")
+# abline(v = QS$dir_SWdn_too_low)
+# abline(v = QS$dir_SWdn_min_ext, col = "red")
+# cat("\n \n")
+#
+# cat("\n", range(test$glo, na.rm = TRUE), "\n")
+#
+# hist(test$glo, breaks = 100,
+#      main = "Global_max - GLB_strict")
+# abline(v = QS$glo_SWdn_too_low)
+# abline(v = QS$glo_SWdn_min_ext, col = "red")
+# cat("\n \n")
+#
+# if (DO_PLOTS) {
+#
+#   if (!interactive()) {
+#     pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
+#   }
+#
+#   ## Direct
+#   test <- BB |> filter(!is.na(QCv9_02_dir_flag)) |> collect() |> as.data.table()
+#   for (ad in sort(unique(as.Date(test$Date)))) {
+#     pp <- data.table(
+#       BB |> filter(as.Date(Date) == as.Date(ad) &
+#                      Elevat > QS$sun_elev_min)   |>
+#         collect()
+#     )
+#     ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
+#     plot(pp$Date, pp$DIR_strict, "l", col = "blue",
+#          ylim = ylim, xlab = "", ylab = "wattDIR")
+#     title(paste("#2", as.Date(ad, origin = "1970-01-01"),
+#                 "N:", pp[!is.na(QCv9_02_dir_flag), .N]))
+#     ## plot limits
+#     lines(pp$Date, pp$Direct_max, col = "red")
+#     ## mark offending data
+#     points(pp[!is.na(QCv9_02_dir_flag), DIR_strict, Date],
+#            col = "red", pch = 1)
+#   }
+#
+#   ## Global
+#   test <- BB |> filter(!is.na(QCv9_02_glb_flag)) |> collect() |> as.data.table()
+#   for (ad in sort(unique(as.Date(c(test$Date))))) {
+#     pp <- data.table(
+#       BB |> filter(as.Date(Date) == as.Date(ad) &
+#                      Elevat > QS$sun_elev_min)   |>
+#         collect()
+#     )
+#     ylim <- range(pp$Global_max, pp$GLB_strict, na.rm = T)
+#     plot(pp$Date, pp$GLB_strict, "l", col = "green",
+#          ylim = ylim, xlab = "", ylab = "GLB")
+#     title(paste("#2", as.Date(ad, origin = "1970-01-01"),
+#                 "N:", pp[!is.na(QCv9_02_glb_flag), .N] ))
+#     ## plot limits
+#     lines(pp$Date, pp$Global_max, col = "red")
+#     ## mark offending data
+#     points(pp[!is.na(QCv9_02_glb_flag), GLB_strict, Date],
+#            col = "magenta", pch = 1)
+#   }
+# }
+# rm(list = ls(pattern = "flagname_.*"))
+# dummy <- gc()
+# if (!interactive()) dummy <- dev.off()
+# #+ echo=F, include=T
 
 
 ## clean exit
