@@ -185,26 +185,50 @@ if (Sys.info()["nodename"] == "sagan") {
     filter(!is.na(TSI_TOA))
 
   ## create reference values for global
-  if (!any(ADD |> colnames() %in% "Glo_max_ref")) {
-    AREF <- ADD |>
-      select(Date, TSI_TOA, SZA) |>
-      collect() |> data.table()
-  } else {
-    AREF <- ADD |>
-      # filter(is.na(Glo_max_ref)) |>  ## apply only for new data, TSI and params may change
-      select(Date, TSI_TOA, SZA) |>
-      collect() |> data.table()
-  }
-  AREF <- AREF[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
-  res  <- update_table(con, ADD, "LAP", "Date")
-  rm(AREF); gc()
+  # if (!any(ADD |> colnames() %in% "Glo_max_ref")) {
+  #   AREF <- ADD |>
+  #     select(Date, TSI_TOA, SZA) |>
+  #     collect() |> data.table()
+  # } else {
+  #   AREF <- ADD |>
+  #     # filter(is.na(Glo_max_ref)) |>  ## apply only for new data, TSI and params may change
+  #     select(Date, TSI_TOA, SZA) |>
+  #     collect() |> data.table()
+  # }
+  # AREF <- AREF[, Glo_max_ref := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
+  # res  <- update_table(con, ADD, "LAP", "Date")
+  # rm(AREF); gc()
+  #
+  # ## Apply test
+  # ADD <- tbl(con, "LAP")                  |>
+  #   filter(Elevat > QS$sun_elev_min)      |>
+  #   filter(!is.na(Glo_max_ref))           |>
+  #   filter(!is.na(GLB_strict))            |>
+  #   select(Date, GLB_strict, Glo_max_ref) |>
+  #   mutate(
+  #
+  #     !!flagname_GLB := case_when(
+  #
+  #       GLB_strict < QS$glo_SWdn_min ~ "Physical possible limit min (5)",
+  #       GLB_strict > Glo_max_ref     ~ "Physical possible limit max (6)",
+  #
+  #       .default = "pass"
+  #     ))
+  # res <- update_table(con, ADD, "LAP", "Date")
 
-  ## Apply test
-  ADD <- tbl(con, "LAP")                  |>
-    filter(Elevat > QS$sun_elev_min)      |>
-    filter(!is.na(Glo_max_ref))           |>
-    filter(!is.na(GLB_strict))            |>
-    select(Date, GLB_strict, Glo_max_ref) |>
+  #### FIXME try to do it in pure duckdb
+
+  ADD <- tbl(con, "LAP")             |>
+    filter(Elevat > QS$sun_elev_min) |>
+    filter(!is.na(TSI_TOA))          |>
+    select(Date, SZA, TSI_TOA, GLB_strict, !!flagname_GLB) |>
+    arrow::to_arrow()                |>
+    mutate(
+
+      Glo_max_ref := case_when(
+        TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off >  9000 ~ 9000,
+        TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off <= 9000 ~ TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
+      )) |>
     mutate(
 
       !!flagname_GLB := case_when(
@@ -214,27 +238,9 @@ if (Sys.info()["nodename"] == "sagan") {
 
         .default = "pass"
       ))
+  ADD <- ADD |> collect() |> data.table()
   res <- update_table(con, ADD, "LAP", "Date")
 
-  #### FIXME try to do it in pure duckdb
-  #
-  # arrow::to_arrow() |>
-  # mutate(ss = QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2) |>
-  # select(ss, TSI_TOA)
-  # ff <- tbl(con, "LAP") |> select(TSI_TOA, SZA) |> collect() |> data.table()
-  # ## this is possible !!
-  # ff[, test := TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off]
-  # mutate(
-  # Glo_max_ref := case_when(
-  #   TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off >  9000 ~ 9000,
-  #   TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off <= 9000 ~ TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
-  # ))
-  # |>
-  #   mutate(
-  #     Glo_max_ref :=
-  #       TSI_TOA * QS$glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$glo_SWdn_off
-  #     ) |>
-  #   arrow::to_duckdb()
 
   ## __  Store used filters parameters  ----------------------------------------
   saveRDS(object = QS,
@@ -272,7 +278,10 @@ DT |>
 dd <- DT |> head() |> collect() |> data.table()
 
 
+tbl(con, "LAP") |> colnames() %in% "Glo_max_ref"
+tbl(con, "LAP") |> filter(!is.na(Glo_max_ref))
 
+tbl(con, "LAP") |> filter(is.na(Glo_max_ref))
 
 ## should plot if there are hits
 stop("wait jj")
