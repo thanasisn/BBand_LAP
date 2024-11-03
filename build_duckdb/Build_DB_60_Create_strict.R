@@ -132,6 +132,7 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       DIFF_strict = case_when(
+
         DIFF_strict <  0 ~ NA,               ## diffuse only positive
         DIFF_strict >= 0 ~ DIFF_strict
 
@@ -159,12 +160,12 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
 
-  ## __ Transmittance  ---------------------------------------------------------
+  ## __  Global Transmittance  -------------------------------------------------
   ## was in the old implementation ClearnessIndex_kt
   ## or Solar insolation ratio, Solar insolation factor
   make_null_column(con, "LAP", "Transmittance_GLB") ## Always create empty column
 
-  ##  Prepare strict transmittance
+  ##  Prepare strict global transmittance
   ADD <- tbl(con, "LAP") |>
     filter(Elevat > 0)                     |>  ## can compute only when sun is up
     filter(!is.na(GLB_strict))             |>
@@ -174,6 +175,7 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       Transmittance_GLB = case_when(
+
         GLB_strict / (cos(SZA * pi / 180) * TSI_TOA) >  9000 ~ 9000,
         GLB_strict / (cos(SZA * pi / 180) * TSI_TOA) <= 9000 ~ GLB_strict / (cos(SZA * pi / 180) * TSI_TOA)
 
@@ -181,6 +183,30 @@ if (Sys.info()["nodename"] == "sagan") {
     )
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
+
+
+  ## TODO test
+  ## __  Direct Transmittance  -------------------------------------------------
+
+  ##  Prepare strict direct transmittance
+  ADD <- tbl(con, "LAP") |>
+    filter(Elevat > 0)                     |>  ## can compute only when sun is up
+    filter(!is.na(GLB_strict))             |>
+    filter(GLB_strict >= 0)                |>  ## only for positive global
+    filter(!is.na(TSI_TOA))                |>
+    select(Date, GLB_strict, SZA, TSI_TOA) |>
+    mutate(
+
+      Transmittance_DIR = case_when(
+
+        DIR_strict / TSI_TOA >  9000 ~ 9000,
+        DIR_strict / TSI_TOA <= 9000 ~ DIR_strict / TSI_TOA
+
+      )
+    )
+
+  cat("\nTODO do some test plots\n\n")
+
 }
 
 

@@ -44,7 +44,7 @@
 #'
 #' ---
 
-#' **QCRad T02**
+#' **QCRad T04**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -184,6 +184,9 @@ if (Sys.info()["nodename"] == "sagan") {
       )
     )
 
+  res <- update_table(con, ADD, "LAP", "Date")
+  rm(ADD); dummy <- gc()
+
 
   ## __ Global -----------------------------------------------------------------
   ADD <- tbl(con, "LAP")                                   |>
@@ -214,6 +217,9 @@ if (Sys.info()["nodename"] == "sagan") {
       )
     )
 
+  res <- update_table(con, ADD, "LAP", "Date")
+  rm(ADD); dummy <- gc()
+
   ## __  Store used filters parameters  ----------------------------------------
   saveRDS(object = QS,
           file   = parameter_fl)
@@ -229,9 +235,9 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 ## Select data to plot
 DT <- tbl(con, "LAP")                  |>
-  filter(Elevat > QCrad_plot_elev_T4)  |>
-  filter(Day    > QCrad_plot_date_min) |>
-  filter(Day    < QCrad_plot_date_max)
+  # filter(Day    > QCrad_plot_date_min) |>
+  # filter(Day    < QCrad_plot_date_max) |>
+  filter(Elevat > QCrad_plot_elev_T4)
 
 # DT |> select(!!flagname_GLB) |> distinct() |> collect()
 # DT |> select(!!flagname_DIR) |> distinct()

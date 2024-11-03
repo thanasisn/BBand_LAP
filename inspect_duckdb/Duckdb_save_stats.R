@@ -175,6 +175,8 @@ saveRDS(gather, overview_data)
 ## TODO plots
 
 
+varstat   <- data.table()
+datstat   <- data.table()
 
 databases <- unique(sapply(gather, "[[", "base_name"))
 for (adb in databases) {
@@ -183,24 +185,42 @@ for (adb in databases) {
   temp <- data.frame(
     Date     = data.table(date = as.POSIXct(sapply(gather[lls], "[[", "date"), origin = origin)),
     Size     = sapply(gather[lls], "[[", "file_sise"),
-    Densisty = sapply(gather[lls], "[[", "data_density")
+    Densisty = sapply(gather[lls], "[[", "data_density"),
+    Data     = adb
   )
+
+  datstat <- rbind(datstat, temp)
 
   chosen <- gather[lls]
   for (il in 1:length(chosen)) {
     ll <- chosen[il][[1]]
-    ll$db_stats
+
+    varstat <- rbind(varstat,
+                     data.frame(ll$db_stats,
+                                Date = ll$date,
+                                Data = adb))
   }
-
-
 }
 
 
+library(ggplot2)
+
+ggplot(data = datstat) +
+ geom_line(aes(x = date, y = Size, colour = Data))
+
+ggplot(data = datstat) +
+  geom_line(aes(x = date, y = Densisty, colour = Data))
 
 
+varstat <- varstat[missing != 0]
+setorder(varstat, Variable, Date)
 
-
-
+for (at in unique(varstat$Table)) {
+  pp <- varstat[Table == at]
+  p <- ggplot(data = pp) +
+    geom_line(aes(x = Date, y = fill_pc, colour = Variable))
+  show(p)
+}
 
 #' **END**
 #+ include=T, echo=F
