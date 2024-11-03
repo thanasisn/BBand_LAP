@@ -194,10 +194,10 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Prepare strict direct transmittance
   ADD <- tbl(con, "LAP") |>
     filter(Elevat > 0)                     |>  ## can compute only when sun is up
-    filter(!is.na(GLB_strict))             |>
-    filter(GLB_strict >= 0)                |>  ## only for positive global
+    filter(!is.na(DIR_strict))             |>
+    filter(DIR_strict >= 0)                |>  ## only for positive direct
     filter(!is.na(TSI_TOA))                |>
-    select(Date, GLB_strict, SZA, TSI_TOA) |>
+    select(Date, DIR_strict, SZA, TSI_TOA) |>
     mutate(
 
       Transmittance_DIR = case_when(
