@@ -12,6 +12,7 @@
 #'  - DIFF_strict
 #'  - DiffuseFraction_kd
 #'  - Transmittance_GLB
+#'  - Transmittance_DIR
 #'
 #+ echo=F, include=T
 
@@ -70,6 +71,7 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       GLB_strict = case_when(
+
         GLB_wpsm <  0 ~        0,  ## Negative values set to zero
         GLB_wpsm >= 0 ~ GLB_wpsm   ## All other selected values as is
 
@@ -91,6 +93,7 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       DIR_strict = case_when(
+
         DIR_wpsm <  0 ~        0,   ## Negative values set to zero
         DIR_wpsm >= 0 ~ DIR_wpsm    ## All other selected values as is
 
@@ -204,7 +207,8 @@ if (Sys.info()["nodename"] == "sagan") {
 
       )
     )
-
+  ##  Write data in the data base
+  res <- update_table(con, ADD, "LAP", "Date")
   cat("\nTODO do some test plots\n\n")
 
 }
