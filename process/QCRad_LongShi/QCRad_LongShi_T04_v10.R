@@ -105,14 +105,6 @@ DO_PLOTS       <- TRUE
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 IGNORE_FLAGGED <- FALSE
 
-## __ Select a part of data to plot  -------------------------------------------
-PARTIAL    <- FALSE
-PARTIAL    <- TRUE
-PLOT_FIRST <- as_date("1993-01-01")
-PLOT_LAST  <- as_date("2024-01-01")
-
-
-
 flagname_DIR <- "QCv10_04_dir_flag"
 flagname_GLB <- "QCv10_04_glb_flag"
 
@@ -227,7 +219,6 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
-stop("ddddddfw")
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
@@ -263,6 +254,7 @@ cat(pander(DT |> select(!!flagname_GLB) |> pull() |> table(),
            caption = flagname_GLB))
 cat(" \n \n")
 
+stop("ddddddfw")
 
 DT |>
   filter(!QCv10_04_dir_flag %in% c("empty", "pass") |
