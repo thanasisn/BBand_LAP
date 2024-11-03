@@ -105,14 +105,6 @@ DO_PLOTS       <- TRUE
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 IGNORE_FLAGGED <- FALSE
 
-## __ Select a part of data to plot  -------------------------------------------
-PARTIAL    <- FALSE
-PARTIAL    <- TRUE
-PLOT_FIRST <- as_date("1993-01-01")
-PLOT_LAST  <- as_date("2024-01-01")
-
-
-
 flagname_DIR <- "QCv10_02_dir_flag"
 flagname_GLB <- "QCv10_02_glb_flag"
 

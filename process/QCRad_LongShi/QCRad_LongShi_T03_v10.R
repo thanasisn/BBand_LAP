@@ -105,14 +105,6 @@ DO_PLOTS       <- TRUE
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 IGNORE_FLAGGED <- FALSE
 
-## __ Select a part of data to plot  -------------------------------------------
-PARTIAL    <- FALSE
-PARTIAL    <- TRUE
-PLOT_FIRST <- as_date("1993-01-01")
-PLOT_LAST  <- as_date("2024-01-01")
-
-
-
 flagname_UPP <- "QCv10_03_upp_flag"
 flagname_LOW <- "QCv10_03_low_flag"
 flagname_OBS <- "QCv10_03_obs_flag"
@@ -267,7 +259,10 @@ cat(pander(DT |> select(!!flagname_OBS) |> pull() |> table(),
 cat(" \n \n")
 
 
-years <- DT |> filter(!is.na(DiffuseFraction_kd)) |> select(year) |> distinct() |> pull() |> sort()
+years <- DT                          |>
+  filter(!is.na(DiffuseFraction_kd)) |>
+  select(year)                       |>
+  distinct() |> pull() |> sort()
 
 for (ay in years) {
   pp <- DT |>
@@ -395,25 +390,25 @@ if (DO_PLOTS) {
           ylim = ylim, col = "green", ylab = "", xlab = "")
     lines(pp$Date, pp$DIR_strict, col = "blue" )
 
-    points(pp[QCv10_03_upp_flag %in% c("empty", "pass"), Date],
-           pp[QCv10_03_upp_flag %in% c("empty", "pass"), DIR_strict],
+    points(pp[!QCv10_03_upp_flag %in% c("empty", "pass"), Date],
+           pp[!QCv10_03_upp_flag %in% c("empty", "pass"), DIR_strict],
            ylim = ylim, col = "red")
-    points(pp[QCv10_03_upp_flag %in% c("empty", "pass"), Date],
-           pp[QCv10_03_upp_flag %in% c("empty", "pass"), GLB_strict],
+    points(pp[!QCv10_03_upp_flag %in% c("empty", "pass"), Date],
+           pp[!QCv10_03_upp_flag %in% c("empty", "pass"), GLB_strict],
            ylim = ylim, col = "red")
 
-    points(pp[QCv10_03_low_flag %in% c("empty", "pass"), Date],
-           pp[QCv10_03_low_flag %in% c("empty", "pass"), DIR_strict],
+    points(pp[!QCv10_03_low_flag %in% c("empty", "pass"), Date],
+           pp[1QCv10_03_low_flag %in% c("empty", "pass"), DIR_strict],
            ylim = ylim, col = "magenta")
-    points(pp[QCv10_03_low_flag %in% c("empty", "pass"), Date],
-           pp[QCv10_03_low_flag %in% c("empty", "pass"), GLB_strict],
+    points(pp[!QCv10_03_low_flag %in% c("empty", "pass"), Date],
+           pp[!QCv10_03_low_flag %in% c("empty", "pass"), GLB_strict],
            ylim = ylim, col = "magenta")
 
-    points(pp[QCv10_03_obs_flag %in% c("empty", "pass"), Date],
-           pp[QCv10_03_obs_flag %in% c("empty", "pass"), DIR_strict],
+    points(pp[!QCv10_03_obs_flag %in% c("empty", "pass"), Date],
+           pp[!QCv10_03_obs_flag %in% c("empty", "pass"), DIR_strict],
            ylim = ylim, col = "#BFE46C")
-    points(pp[QCv10_03_obs_flag %in% c("empty", "pass"), Date],
-           pp[QCv10_03_obs_flag %in% c("empty", "pass"), GLB_strict],
+    points(pp[!QCv10_03_obs_flag %in% c("empty", "pass"), Date],
+           pp[!QCv10_03_obs_flag %in% c("empty", "pass"), GLB_strict],
            ylim = ylim, col = "#BFE46C")
 
    layout(1)
@@ -423,7 +418,6 @@ rm(list = ls(pattern = "flagname_.*"))
 dummy <- gc()
 if (!interactive()) dummy <- dev.off()
 #+ echo=F, include=T
-
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
