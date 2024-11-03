@@ -138,7 +138,6 @@ if (Sys.info()["nodename"] == "sagan") {
   QS$clim_lim_S1_fct <-  1.32
   QS$clim_lim_S1_off <- 60
 
-
   cat("\n4. Climatological (configurable) Limits", flagname_DIR, flagname_GLB, "\n\n")
 
   ## __ Make categorical columns  ----------------------------------------------
@@ -159,7 +158,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ADD <- tbl(con, "LAP")                                   |>
     filter(Elevat > QS$sun_elev_min)                       |>
     filter(!is.na(TSI_TOA))                                |>
-    select(Date, SZA, TSI_TOA, DIR_strict, !!flagname_DIR) |>
+    select(Date, SZA, TSI_TOA, DIR_strict, "QCv10_04_dir_flag") |>
     arrow::to_arrow()                                      |>
     mutate(
 
@@ -176,7 +175,7 @@ if (Sys.info()["nodename"] == "sagan") {
     ) |>
     mutate(
 
-      !!flagname_DIR := case_when(
+      QCv10_04_dir_flag := case_when(
         DIR_strict > Dir_First_Clim_lim ~ "First climatological limit (17)",
         DIR_strict > Dir_Secon_Clim_lim ~ "Second climatological limit (16)",
 
@@ -187,6 +186,7 @@ if (Sys.info()["nodename"] == "sagan") {
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
 
+cat("111111")
 
   ## __ Global -----------------------------------------------------------------
   ADD <- tbl(con, "LAP")                                   |>
@@ -226,7 +226,7 @@ if (Sys.info()["nodename"] == "sagan") {
 }
 
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
-
+cat("ffffff")
 ##  Open dataset
 con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
