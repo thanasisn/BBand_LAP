@@ -122,7 +122,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-  ## 3. Comparison tests per BSRN “non-definitive”  --------------------------
+  ## 3. Comparison tests per BSRN “non-definitive”  ----------------------------
   #'
   #' ## 3. Comparison tests per BSRN “non-definitive”
   #'
@@ -235,9 +235,11 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 # tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
 
 ## Select data to plot
-elev_limit <- 2
-DT <- tbl(con, "LAP") |>
-  filter(Elevat > elev_limit)
+DT <- tbl(con, "LAP")                  |>
+  filter(Elevat > QCrad_plot_elev_T3)  |>
+  filter(Day    > QCrad_plot_date_min) |>
+  filter(Day    < QCrad_plot_date_max)
+
 
 # DT |> select(!!flagname_GLB) |> distinct() |> collect()
 # DT |> select(!!flagname_DIR) |> distinct()
