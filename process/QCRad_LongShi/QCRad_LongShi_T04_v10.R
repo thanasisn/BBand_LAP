@@ -121,7 +121,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-  ## 4. Climatological (configurable) Limits  --------------------------------
+  ## 4. Climatological (configurable) Limits  ----------------------------------
   #'
   #' ## 4. Climatological (configurable) Limits
   #'
@@ -163,15 +163,7 @@ if (Sys.info()["nodename"] == "sagan") {
   make_categorical_column(flagname_DIR, categories, con, "LAP")
   make_categorical_column(flagname_GLB, categories, con, "LAP")
 
-  ## __ Direct -----------------------------------------------------------
-  # datapart[, Dir_First_Clim_lim := TSI_TOA * QS$clim_lim_F3_fct * cos(SZA*pi/180)^0.2 + QS$clim_lim_F3_off]
-  # datapart[DIR_strict > Dir_First_Clim_lim,
-  #          (flagname_DIR) := "First climatological limit (17)"]
-  #
-  # datapart[, Dir_Secon_Clim_lim := TSI_TOA * QS$clim_lim_S3_fct * cos(SZA*pi/180)^0.2 + QS$clim_lim_S3_off]
-  # datapart[DIR_strict > Dir_Secon_Clim_lim,
-  #          (flagname_DIR) := "Second climatological limit (16)"]
-
+  ## __ Direct -----------------------------------------------------------------
   ADD <- tbl(con, "LAP")                                   |>
     filter(Elevat > QS$sun_elev_min)                       |>
     filter(!is.na(TSI_TOA))                                |>
@@ -201,15 +193,7 @@ if (Sys.info()["nodename"] == "sagan") {
     )
 
 
-  ## __ Global -----------------------------------------------------------
-  # datapart[, Glo_First_Clim_lim := TSI_TOA * QS$clim_lim_F1_fct * cos(SZA*pi/180)^1.2 + QS$clim_lim_F1_off]
-  # datapart[GLB_strict > Glo_First_Clim_lim,
-  #          (flagname_GLB) := "First climatological limit (17)"]
-  #
-  # datapart[, Glo_Secon_Clim_lim := TSI_TOA * QS$clim_lim_S1_fct * cos(SZA*pi/180)^1.2 + QS$clim_lim_S1_off]
-  # datapart[GLB_strict > Glo_Secon_Clim_lim,
-  #          (flagname_GLB) := "Second climatological limit (16)"]
-
+  ## __ Global -----------------------------------------------------------------
   ADD <- tbl(con, "LAP")                                   |>
     filter(Elevat > QS$sun_elev_min)                       |>
     filter(!is.na(TSI_TOA))                                |>
@@ -243,7 +227,7 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
-  stop("ddddddfw")
+stop("ddddddfw")
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
@@ -253,9 +237,10 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 # tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
 
 ## Select data to plot
-elev_limit <- 1
-DT <- tbl(con, "LAP") |>
-  filter(Elevat > elev_limit)
+DT <- tbl(con, "LAP")                  |>
+  filter(Elevat > QCrad_plot_elev_T4)  |>
+  filter(Day    > QCrad_plot_date_min) |>
+  filter(Day    < QCrad_plot_date_max)
 
 # DT |> select(!!flagname_GLB) |> distinct() |> collect()
 # DT |> select(!!flagname_DIR) |> distinct()
@@ -270,13 +255,25 @@ DT <- tbl(con, "LAP") |>
 #'
 #+ echo=F, include=T, results="asis"
 
-cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
+cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
            caption = flagname_DIR))
 cat(" \n \n")
 
-cat(pander(table(collect(select(BB, !!flagname_GLB)), useNA = "always"),
+cat(pander(DT |> select(!!flagname_GLB) |> pull() |> table(),
            caption = flagname_GLB))
 cat(" \n \n")
+
+
+DT |>
+  filter(!QCv10_04_dir_flag %in% c("empty", "pass") |
+         !QCv10_04_glb_flag %in% c("empty", "pass") ) |>
+  select(Date,
+         DIR_strict,
+         GLB_strict,
+         Dir_First_Clim_lim, Dir_Secon_Clim_lim,
+         Glo_First_Clim_lim, Glo_Secon_Clim_lim,
+         !!flagname_DIR, !!flagname_GLB)
+
 
 test <- data.table(BB |>
                      filter(!is.na(get(flagname_DIR)) |
@@ -479,7 +476,10 @@ for (ay in years) {
 if (DO_PLOTS) {
 
   if (!interactive()) {
-    pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
+    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
+                    sub("\\.R$", "", basename(Script.Name)),
+                    ".pdf")
+    pdf(file = afile)
   }
 
   ## test direct limits

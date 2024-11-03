@@ -121,7 +121,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-  ## 2. Extremely rare limits per BSRN  --------------------------------------
+  ## 2. Extremely rare limits per BSRN  ----------------------------------------
   #'
   #' ## 2. Extremely rare limits per BSRN
   #'
@@ -161,63 +161,7 @@ if (Sys.info()["nodename"] == "sagan") {
   make_categorical_column(flagname_GLB, categories, con, "LAP")
 
 
-  ## __ Create references  -----------------------------------------------------
-
-  ## Data to work on
-  # ADD <- tbl(con, "LAP")             |>
-  #   filter(Elevat > QS$sun_elev_min) |>
-  #   filter(!is.na(TSI_TOA))          |>
-  #   filter(!is.na(SZA))
-
-  ## create reference values for direct
-  # if (!any(ADD |> colnames() %in% "Direct_max")) {
-  #   AREF <- ADD |>
-  #     select(Date, TSI_TOA, SZA) |>
-  #     collect() |> data.table()
-  # } else {
-  #   AREF <- ADD |>
-  #     select(Date, TSI_TOA, SZA) |>
-  #     filter(is.na(Direct_max)) |> collect() |> data.table()
-  # }
-  # AREF <- AREF[, Direct_max := TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off]
-  # res  <- update_table(con, ADD, "LAP", "Date")
-  # rm(AREF); gc()
-
-  # ## create reference values for global
-  # if (!any(ADD |> colnames() %in% "Global_max")) {
-  #   AREF <- ADD |>
-  #     select(Date, TSI_TOA, SZA) |>
-  #     collect() |> data.table()
-  # } else {
-  #   AREF <- ADD |>
-  #     select(Date, TSI_TOA, SZA) |>
-  #     filter(is.na(Global_max)) |> collect() |> data.table()
-  # }
-  # AREF <- AREF[, Global_max := TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off]
-  # res  <- update_table(con, ADD, "LAP", "Date")
-  # rm(AREF); gc()
-
-  ## __ Select data to touch  --------------------------------------------------
-  # ADD <- tbl(con, "LAP")             |>
-  #   filter(Elevat > QS$sun_elev_min) |>
-  #   filter(!is.na(TSI_TOA))          |>
-  #   filter(!is.na(SZA))              |>
-  #   select(TSI_TOA, SZA, Date, GLB_strict, DIR_strict, Direct_max, Global_max)
-
-  ## __ Direct  ----------------------------------------------------------
-  # RES <- ADD |>
-  #   filter(Direct_max > QS$dir_SWdn_too_low) |> # Ignore too low values near horizon
-  #   mutate(
-  #
-  #     !!flagname_DIR := case_when(
-  #       DIR_strict <  QS$dir_SWdn_min_ext ~ "Extremely rare limits min (3)",
-  #       DIR_strict >= Direct_max          ~ "Extremely rare limits max (4)",
-  #
-  #       .default = "pass"
-  #     )
-  #   )
-  # res <- update_table(con, RES, "LAP", "Date")
-
+  ## __ Direct  ----------------------------------------------------------------
   ADD <- tbl(con, "LAP")                                   |>
     filter(Elevat > QS$sun_elev_min)                       |>
     filter(!is.na(TSI_TOA))                                |>
@@ -240,33 +184,14 @@ if (Sys.info()["nodename"] == "sagan") {
       )
     )
 
-
-  ## this needs a lot of memory, can do it in batches
+  ## this needs a lot of memory, could do it in batches
   ADD <- ADD |> collect() |> data.table()
 
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
 
 
-
-
-
-  ## __ Global  ----------------------------------------------------------
-  # RES <- ADD |>
-  #   filter(Global_max > QS$glo_SWdn_too_low) |> # Ignore too low values near horizon
-  #   mutate(
-  #
-  #     !!flagname_GLB := case_when(
-  #       GLB_strict <  QS$glo_SWdn_min_ext ~ "Extremely rare limits min (3)",
-  #       GLB_strict >= Global_max          ~ "Extremely rare limits max (4)",
-  #
-  #       .default = "pass"
-  #     )
-  #   )
-  # res <- update_table(con, RES, "LAP", "Date")
-
-
-  ## USe arrow
+  ## __ Global  ----------------------------------------------------------------
   ADD <- tbl(con, "LAP")                                   |>
     filter(Elevat > QS$sun_elev_min)                       |>
     filter(!is.na(TSI_TOA))                                |>
@@ -289,7 +214,7 @@ if (Sys.info()["nodename"] == "sagan") {
       )
     )
 
-  ## this needs a lot of memory, can do it in batches
+  ## this needs a lot of memory, could do it in batches
   ADD <- ADD |> collect() |> data.table()
 
   res <- update_table(con, ADD, "LAP", "Date")
@@ -310,9 +235,10 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 # tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
 
 ## Select data to plot
-elev_limit <- 1
-DT <- tbl(con, "LAP") |>
-  filter(Elevat > elev_limit)
+DT <- tbl(con, "LAP")                  |>
+  filter(Elevat > QCrad_plot_elev_T2)  |>
+  filter(Day    > QCrad_plot_date_min) |>
+  filter(Day    < QCrad_plot_date_max)
 
 # DT |> select(!!flagname_GLB) |> distinct() |> collect()
 # DT |> select(!!flagname_DIR) |> distinct()
