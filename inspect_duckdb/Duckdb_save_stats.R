@@ -131,7 +131,6 @@ duckdb_stats <- function(db_file) {
   )
 }
 
-
 ## Init storage
 if (file.exists(overview_data)) {
   gather <- readRDS(overview_data)
@@ -139,22 +138,21 @@ if (file.exists(overview_data)) {
   gather <- list()
 }
 
-##  SUN location info
+##  SUN location info  ---------------------------------------------------------
 res      <- duckdb_stats(DB_LAP)
 res$host <- Sys.info()["nodename"]
 res$date <- Sys.time()
 gather   <- c(gather, list(res))
 
 
-## Broadband info
+##  Broadband info  ------------------------------------------------------------
 res      <- duckdb_stats(DB_DUCK)
 res$host <- Sys.info()["nodename"]
 res$date <- Sys.time()
 gather   <- c(gather, list(res))
 
 
-
-## deduplicate data
+##  Deduplicate data  ----------------------------------------------------------
 databases <- unique(sapply(gather, "[[", "base_name"))
 for (adb in databases) {
   lls <- sapply(gather, "[[", "base_name") == adb
@@ -165,23 +163,42 @@ for (adb in databases) {
   ## chose to remove
   dt  <- dt[duplicated(dt$day, fromLast = TRUE)]
   res <- sapply(gather, "[[", "base_name") == adb &
-    sapply(gather, "[[", "date") %in% dt$date
+         sapply(gather, "[[", "date") %in% dt$date
   ## drop data
   gather <- gather[!res]
+}
+
+## Save data
+saveRDS(gather, overview_data)
+
+
+## TODO plots
+
+
+
+databases <- unique(sapply(gather, "[[", "base_name"))
+for (adb in databases) {
+  lls <- sapply(gather, "[[", "base_name") == adb
+
+  temp <- data.frame(
+    Date     = data.table(date = as.POSIXct(sapply(gather[lls], "[[", "date"), origin = origin)),
+    Size     = sapply(gather[lls], "[[", "file_sise"),
+    Densisty = sapply(gather[lls], "[[", "data_density")
+  )
+
+  chosen <- gather[lls]
+  for (il in 1:length(chosen)) {
+    ll <- chosen[il][[1]]
+    ll$db_stats
+  }
+
 
 }
 
 
 
-saveRDS(gather, overview_data)
 
 
-
-
-
-## TODO store data
-## deduplicate....
-## gather....
 
 
 
