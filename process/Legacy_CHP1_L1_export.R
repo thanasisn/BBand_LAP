@@ -67,7 +67,7 @@ knitr::opts_chunk$set(fig.pos    = '!h'    )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/process/Legacy_CHP1_L0_export.R"
+Script.Name <- "~/BBand_LAP/process/Legacy_CHP1_L1_export.R"
 renv::load("~/BBand_LAP")
 
 source("~/BBand_LAP/DEFINITIONS.R")
