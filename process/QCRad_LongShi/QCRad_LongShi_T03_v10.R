@@ -398,7 +398,7 @@ if (DO_PLOTS) {
            ylim = ylim, col = "red")
 
     points(pp[!QCv10_03_low_flag %in% c("empty", "pass"), Date],
-           pp[1QCv10_03_low_flag %in% c("empty", "pass"), DIR_strict],
+           pp[!QCv10_03_low_flag %in% c("empty", "pass"), DIR_strict],
            ylim = ylim, col = "magenta")
     points(pp[!QCv10_03_low_flag %in% c("empty", "pass"), Date],
            pp[!QCv10_03_low_flag %in% c("empty", "pass"), GLB_strict],
