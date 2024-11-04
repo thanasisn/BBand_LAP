@@ -233,18 +233,15 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
-## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
+##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
 con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
-## Check that flags exist
-# tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
-
 ## Select data to plot
 DT <- tbl(con, "LAP")                  |>
-  # filter(Day    > QCrad_plot_date_min) |>
-  # filter(Day    < QCrad_plot_date_max) |>
+  filter(Day    > QCrad_plot_date_min) |>
+  filter(Day    < QCrad_plot_date_max) |>
   filter(Elevat > QCrad_plot_elev_T4)
 
 # DT |> select(!!flagname_GLB) |> distinct() |> collect()
@@ -253,12 +250,15 @@ DT <- tbl(con, "LAP")                  |>
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
-####  4. Climatological (configurable) Limits  ---------------------------------
 #' \FloatBarrier
 #' \newpage
 #' ## 4. Climatological (configurable) Limits
 #'
-#+ echo=F, include=T, results="asis"
+#+ echo=F, include=T
+
+## __  Stats  ------------------------------------------------------------------
+#' ### Stats
+#+ echo=F, include=T, sesults="asis"
 
 cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
            caption = flagname_DIR))
@@ -297,12 +297,16 @@ hist(test[, GLB_strict - Glo_Secon_Clim_lim], breaks = 100,
 cat(" \n \n")
 
 
+## __  Yearly plots  -----------------------------------------------------------
+#' ### Yearly plots
+#+ echo=F, include=T
+
 ## Yearly plots for Direct
-years <- DT |> filter(!is.na(DIR_wpsm)) |>
+years <- DT |> filter(!is.na(DIR_strict)) |>
             select(year) |> distinct() |> pull()
 
 ## common scale for plots
-vars <- c("Dir_First_Clim_lim", "Dir_Secon_Clim_lim", "DIR_wpsm")
+vars <- c("Dir_First_Clim_lim", "Dir_Secon_Clim_lim", "DIR_strict")
 ylim <- c(DT |> summarise(across(all_of(vars), ~ min(., na.rm = T))) |> collect() |> min(na.rm = T),
           DT |> summarise(across(all_of(vars), ~ max(., na.rm = T))) |> collect() |> max(na.rm = T))
 
@@ -311,13 +315,13 @@ for (ay in years) {
     filter(Elevat > 0)  |>
     filter(year == ay)  |>
     select(Date, SZA, Azimuth,
-           DIR_wpsm,
+           DIR_strict,
            Dir_Secon_Clim_lim, Dir_First_Clim_lim,
            !!flagname_DIR) |>
     collect() |> data.table()
 
   ## plot direct by SZA
-  plot(pp$SZA, pp$DIR_wpsm,
+  plot(pp$SZA, pp$DIR_strict,
        cex  = .1,
        ylim = ylim,
        xlab = "SZA",
@@ -329,8 +333,8 @@ for (ay in years) {
   points(pp$SZA, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
-  points(pp[get(flagname_DIR) == "First climatological limit (17)",  DIR_wpsm, SZA], cex = .7, col = "cyan"   )
-  points(pp[get(flagname_DIR) == "Second climatological limit (16)", DIR_wpsm, SZA], cex = .7, col = "magenta")
+  points(pp[get(flagname_DIR) == "First climatological limit (17)",  DIR_strict, SZA], cex = .7, col = "cyan"   )
+  points(pp[get(flagname_DIR) == "Second climatological limit (16)", DIR_strict, SZA], cex = .7, col = "magenta")
 
   title(main = paste("Direct Beam climatological test 4.", ay))
   legend("topright",
@@ -341,7 +345,7 @@ for (ay in years) {
 
 
   ## plot direct by Azimuth
-  plot(pp$Azimuth, pp$DIR_wpsm,
+  plot(pp$Azimuth, pp$DIR_strict,
        cex  = .1,
        ylim = ylim,
        xlab = "Azimuth",
@@ -353,8 +357,8 @@ for (ay in years) {
   points(pp$Azimuth, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
-  points(pp[get(flagname_DIR) == "First climatological limit (17)",  DIR_wpsm, Azimuth], cex = .7, col = "cyan"   )
-  points(pp[get(flagname_DIR) == "Second climatological limit (16)", DIR_wpsm, Azimuth], cex = .7, col = "magenta")
+  points(pp[get(flagname_DIR) == "First climatological limit (17)",  DIR_strict, Azimuth], cex = .7, col = "cyan"   )
+  points(pp[get(flagname_DIR) == "Second climatological limit (16)", DIR_strict, Azimuth], cex = .7, col = "magenta")
 
   title(main = paste("Direct Beam climatological test 4.", ay))
   legend("topright",
@@ -365,7 +369,7 @@ for (ay in years) {
 
 
   ## plot direct by Date
-  plot(pp$Date, pp$DIR_wpsm,
+  plot(pp$Date, pp$DIR_strict,
        cex  = .1,
        ylim = ylim,
        xlab = "",
@@ -377,8 +381,8 @@ for (ay in years) {
   points(pp$Date, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
-  points(pp[get(flagname_DIR) == "First climatological limit (17)",  DIR_wpsm, Date], cex = .7, col = "cyan"   )
-  points(pp[get(flagname_DIR) == "Second climatological limit (16)", DIR_wpsm, Date], cex = .7, col = "magenta")
+  points(pp[get(flagname_DIR) == "First climatological limit (17)",  DIR_strict, Date], cex = .7, col = "cyan"   )
+  points(pp[get(flagname_DIR) == "Second climatological limit (16)", DIR_strict, Date], cex = .7, col = "magenta")
 
   title(main = paste("Direct Beam climatological test 4.", ay))
   legend("topright",
@@ -391,11 +395,11 @@ for (ay in years) {
 
 
 ## Yearly plots for Global
-years <- DT |> filter(!is.na(GLB_strict)) |>
+years <- DT |> filter(!is.na(DIR_strict)) |>
   select(year) |> distinct() |> pull()
 
 ## common scale
-vars <- c("Glo_First_Clim_lim", "Glo_Secon_Clim_lim", "GLB_wpsm")
+vars <- c("Glo_First_Clim_lim", "Glo_Secon_Clim_lim", "DIR_strict")
 ylim <- c(DT |> summarise(across(all_of(vars), ~ min(., na.rm = T))) |> collect() |> min(na.rm = T),
           DT |> summarise(across(all_of(vars), ~ max(., na.rm = T))) |> collect() |> max(na.rm = T))
 
@@ -404,13 +408,13 @@ for (ay in years) {
     filter(Elevat > 0)  |>
     filter(year == ay)  |>
     select(Date, SZA, Azimuth,
-           GLB_wpsm,
+           DIR_strict,
            Glo_Secon_Clim_lim, Glo_First_Clim_lim,
            !!flagname_GLB) |>
     collect() |> data.table()
 
   ## plot direct by SZA
-  plot(pp$SZA, pp$GLB_wpsm,
+  plot(pp$SZA, pp$DIR_strict,
        cex  = .1,
        ylim = ylim,
        xlab = "SZA",
@@ -422,8 +426,8 @@ for (ay in years) {
   points(pp$SZA, pp$Glo_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
-  points(pp[get(flagname_GLB) == "First climatological limit (17)",  GLB_wpsm, SZA], cex = .7, col = "cyan"   )
-  points(pp[get(flagname_GLB) == "Second climatological limit (16)", GLB_wpsm, SZA], cex = .7, col = "magenta")
+  points(pp[get(flagname_GLB) == "First climatological limit (17)",  DIR_strict, SZA], cex = .7, col = "cyan"   )
+  points(pp[get(flagname_GLB) == "Second climatological limit (16)", DIR_strict, SZA], cex = .7, col = "magenta")
 
   title(main = paste("Global climatological test 4.", ay))
   legend("topright",
@@ -434,7 +438,7 @@ for (ay in years) {
 
 
   ## plot direct by Azimuth
-  plot(pp$Azimuth, pp$GLB_wpsm,
+  plot(pp$Azimuth, pp$DIR_strict,
        cex  = .1,
        ylim = ylim,
        xlab = "Azimuth",
@@ -446,8 +450,8 @@ for (ay in years) {
   points(pp$Azimuth, pp$Glo_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
-  points(pp[get(flagname_GLB) == "First climatological limit (17)",  GLB_wpsm, Azimuth], cex = .7, col = "cyan"   )
-  points(pp[get(flagname_GLB) == "Second climatological limit (16)", GLB_wpsm, Azimuth], cex = .7, col = "magenta")
+  points(pp[get(flagname_GLB) == "First climatological limit (17)",  DIR_strict, Azimuth], cex = .7, col = "cyan"   )
+  points(pp[get(flagname_GLB) == "Second climatological limit (16)", DIR_strict, Azimuth], cex = .7, col = "magenta")
 
   title(main = paste("Global Beam climatological test 4.", ay))
   legend("topright",
@@ -458,7 +462,7 @@ for (ay in years) {
 
 
   ## plot direct by Date
-  plot(pp$Date, pp$GLB_wpsm,
+  plot(pp$Date, pp$DIR_strict,
        cex  = .1,
        ylim = ylim,
        xlab = "",
@@ -470,8 +474,8 @@ for (ay in years) {
   points(pp$Date, pp$Glo_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
-  points(pp[get(flagname_GLB) == "First climatological limit (17)",  GLB_wpsm, Date], cex = .7, col = "cyan"   )
-  points(pp[get(flagname_GLB) == "Second climatological limit (16)", GLB_wpsm, Date], cex = .7, col = "magenta")
+  points(pp[get(flagname_GLB) == "First climatological limit (17)",  DIR_strict, Date], cex = .7, col = "cyan"   )
+  points(pp[get(flagname_GLB) == "Second climatological limit (16)", DIR_strict, Date], cex = .7, col = "magenta")
 
   title(main = paste("Direct Beam climatological test 4.", ay))
   legend("topright",
@@ -481,7 +485,10 @@ for (ay in years) {
   cat(" \n \n")
 }
 
-stop("dd")
+
+## __  Daily plots  -----------------------------------------------------------
+#' ### Daily plots
+#+ echo=F, include=T
 
 if (DO_PLOTS) {
 
@@ -493,86 +500,83 @@ if (DO_PLOTS) {
   }
 
   ## test direct limits
-  DT |>
-    filter()
-
   choose <- setdiff(
     DT |> select(!!flagname_DIR) |> distinct() |> pull() |> as.character(),
     c("empty", "pass")
   )
-  test <- DT |> filter(QCv10_04_dir_flag %in% choose) |> collect() |> data.table()
+  temp1 <- DT |>
+    filter(QCv10_04_dir_flag %in% choose) |>
+    filter(!is.na(DIR_strict)) |>
+    select(Day) |>
+    distinct()  |> collect() |> data.table()
 
-  temp1 <- data.table(BB |>
-                        filter(!is.na(get(flagname_DIR))) |>
-                        select(Date,
-                               DIR_strict,
-                               Dir_First_Clim_lim, Dir_Secon_Clim_lim,
-                               !!flagname_DIR) |>
-                        collect())
+  for (ad in sort(unique(temp1$Day))) {
+    ad <- as.Date(ad, origin = origin)
+    pp <- DT |>
+      filter(Day == ad) |>
+      # filter(!is.na(DIR_strict)) |>
+      select(Date,
+             DIR_strict,
+             Dir_First_Clim_lim, Dir_Secon_Clim_lim,
+             !!flagname_DIR) |>
+      collect() |> data.table()
+    setorder(pp, Date)
 
-  for (ad in sort(unique(as.Date(temp1$Date)))) {
-    pp <- data.table(
-      BB |> filter(as.Date(Date) == as.Date(ad) &
-                     Elevat > QS$sun_elev_min)   |>
-        collect()
-    )
-    if (any(!is.na(pp$DIR_strict))) {
-      ylim <- range(pp$Dir_First_Clim_lim,
-                    pp$Dir_Secon_Clim_lim,
-                    pp$DIR_strict, na.rm = T)
-      plot(pp$Date, pp$DIR_strict, "l", col = "blue",
-           ylim = ylim, xlab = "", ylab = "wattDIR")
-      title(paste("#4", as.Date(ad, origin = "1970-01-01")))
-      ## plot limits
-      lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
-      lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
-      ## mark offending data
-      points(pp[!is.na(get(flagname_DIR)), DIR_strict, Date],
-             col = "red", pch = 1)
-    }
+    ylim <- range(pp$Dir_First_Clim_lim,
+                  pp$Dir_Secon_Clim_lim,
+                  pp$DIR_strict, na.rm = T)
+    plot(pp$Date, pp$DIR_strict, "l", col = "blue",
+         ylim = ylim, ylab = "DIR_strict", xlab = "")
+    title(paste("#4", as.Date(ad, origin = "1970-01-01")))
+    ## plot limits
+    lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
+    lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
+    ## mark offending data
+    points(pp[!get(flagname_DIR) %in% c("empty", "pass"), DIR_strict, Date],
+           col = "red", pch = 1)
   }
 
 
   ## test global first limit
-  temp1 <- data.table(BB |>
-                        filter(!is.na(get(flagname_GLB))) |>
-                        select(Date,
-                               GLB_strict,
-                               Glo_First_Clim_lim, Glo_Secon_Clim_lim,
-                               !!flagname_GLB) |>
-                        collect())
+  choose <- setdiff(
+    DT |> select(!!flagname_GLB) |> distinct() |> pull() |> as.character(),
+    c("empty", "pass")
+  )
+  temp1 <- DT |>
+    filter(QCv10_04_glb_flag %in% choose) |>
+    filter(!is.na(GLB_strict)) |>
+    select(Day) |>
+    distinct()  |> collect() |> data.table()
 
-  for (ad in sort(unique(as.Date(temp1$Date)))) {
-    pp <- data.table(
-      BB |> filter(as.Date(Date) == as.Date(ad) &
-                     Elevat > QS$sun_elev_min)   |>
-        collect()
-    )
-    if (any(!is.na(pp$GLB_strict))) {
-      ylim <- range(pp$Glo_First_Clim_lim,
-                    pp$Glo_Secon_Clim_lim,
-                    pp$GLB_strict, na.rm = T)
+  for (ad in sort(unique(temp1$Day))) {
+    ad <- as.Date(ad, origin = origin)
+    pp <- DT |>
+      filter(Day == ad) |>
+      # filter(!is.na(GLB_strict)) |>
+      select(Date,
+             GLB_strict,
+             Glo_First_Clim_lim, Glo_Secon_Clim_lim,
+             !!flagname_GLB) |>
+      collect() |> data.table()
+    setorder(pp, Date)
 
-      plot(pp$Date, pp$GLB_strict, "l", col = "green",
-           ylim = ylim, xlab = "", ylab = "wattGLB")
-      title(paste("#4", as.Date(ad, origin = "1970-01-01")))
-      ## plot limits
-      lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink")
-      lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
-      ## mark offending data
-      points(pp[!is.na(get(flagname_GLB)), GLB_strict, Date],
-             col = "red", pch = 1)
-    }
+    ylim <- range(pp$Glo_First_Clim_lim,
+                  pp$Glo_Secon_Clim_lim,
+                  pp$GLB_strict, na.rm = T)
+
+    plot(pp$Date, pp$GLB_strict, "l", col = "green",
+         ylim = ylim, xlab = "", ylab = "GLB_strict")
+    title(paste("#4", as.Date(ad, origin = "1970-01-01")))
+    ## plot limits
+    lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink")
+    lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
+    ## mark offending data
+    points(pp[!get(flagname_GLB) %in% c("empty", "pass"), GLB_strict, Date],
+           col = "red", pch = 1)
   }
 }
-rm(list = ls(pattern = "flagname_.*"))
-dummy <- gc()
 if (!interactive()) dummy <- dev.off()
 #+ echo=F, include=T
-
-
-
-
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
