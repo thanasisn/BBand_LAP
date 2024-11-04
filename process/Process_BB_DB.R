@@ -21,8 +21,6 @@ if (!interactive()) {
 
 cat("\n\nCheck legacy export\n")
 
-# render(input      = "~/BBand_LAP/process/Legacy_CHP1_L0_export.R",
-#        output_dir = "~/BBand_LAP/REPORTS/REPORTS")
 
 try({
     render(input      = "~/BBand_LAP/process/Legacy_CHP1_L1_export.R",

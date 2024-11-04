@@ -288,7 +288,10 @@ if (DO_PLOTS) {
     DT |> select(QCv10_02_dir_flag) |> distinct() |> pull() |> as.character(),
     c("empty", "pass")
   )
-  test <- DT |> filter(QCv10_02_dir_flag %in% choose) |> collect() |> data.table()
+  test <- DT |>
+    filter(QCv10_02_dir_flag %in% choose) |>
+    select(Day) |>
+    collect() |> data.table()
 
   for (ad in sort(unique(test$Day))) {
     ddd <- as.Date(ad, origin = origin)

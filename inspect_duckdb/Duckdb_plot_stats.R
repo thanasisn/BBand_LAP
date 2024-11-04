@@ -61,7 +61,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_duckdb/Duckdb_save_stats.R"
+Script.Name <- "~/BBand_LAP/inspect_duckdb/Duckdb_plot_stats.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -70,13 +70,13 @@ if (!interactive()) {
 
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
-require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 panderOptions("table.alignment.default", "right")
@@ -84,95 +84,64 @@ panderOptions("table.split.table",        120   )
 
 overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size_duckdb.Rds"
 
-#'
-#' ##  Statistics of the databases
-#'
-#+ echo=F
-duckdb_stats <- function(db_file) {
-  con <- dbConnect(duckdb(dbdir = db_file, read_only = TRUE))
-  db_stats <- data.table()
-  for (atbl in  dbListTables(con)) {
-    ## count NAs
-    fillness <- tbl(con, atbl) |>
-      summarise_all(
-        ~ sum(case_match(!is.na(.x),
-                         TRUE  ~1L,
-                         FALSE ~0L),
-              na.rm = TRUE)
-      ) |> collect() |> data.table()
-
-    ## number of vars?
-    # Nvar <- tbl(con, atbl) |> colnames() |> length()
-
-    ## compute
-    fillness <- data.table(
-      Table    = atbl,
-      Variable = names(fillness),
-      Non_na   = as.vector(fillness |> t()),
-      N        = tbl(con, atbl) |> tally() |> pull()
-    )
-    fillness[, missing  := N - Non_na]
-    fillness[, empty_pc := round(100 * (N - Non_na) / N,       5) ]
-    fillness[, fill_pc  := round(100 * (1 - (N - Non_na) / N), 5) ]
-    db_stats <- rbind(db_stats, fillness)
-  }
-  db_sums <- db_stats[, .(Values = sum(Non_na),
-                          Total  = sum(N)), by = Table]
-  ## bytes per value
-  data_density <- db_sums[, file.size(db_file) / sum(Values)]
-
-  dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
-
-  return(
-    list(data_base    = db_file,
-         base_name    = basename(db_file),
-         db_stats     = db_stats,
-         db_sums      = db_sums,
-         file_sise    = file.size(db_file),
-         file_sise_h  = fs::as_fs_bytes(file.size(db_file)),
-         data_density = data_density)
-  )
-}
-
-## Init storage
-if (file.exists(overview_data)) {
-  gather <- readRDS(overview_data)
-} else {
-  gather <- list()
-}
-
-##  SUN location info  ---------------------------------------------------------
-res      <- duckdb_stats(DB_LAP)
-res$host <- Sys.info()["nodename"]
-res$date <- Sys.time()
-gather   <- c(gather, list(res))
+gather <- readRDS(overview_data)
 
 
-##  Broadband info  ------------------------------------------------------------
-res      <- duckdb_stats(DB_DUCK)
-res$host <- Sys.info()["nodename"]
-res$date <- Sys.time()
-gather   <- c(gather, list(res))
 
+## TODO plots
 
-##  Deduplicate data  ----------------------------------------------------------
+varstat   <- data.table()
+datstat   <- data.table()
+
 databases <- unique(sapply(gather, "[[", "base_name"))
 for (adb in databases) {
   lls <- sapply(gather, "[[", "base_name") == adb
-  dt  <- data.table(date = as.POSIXct(sapply(gather[lls], "[[", "date"), origin = origin))
-  dt[, day := as.Date(date)]
-  dt[, base_name := adb]
-  setorder(dt, date)
-  ## chose to remove
-  dt  <- dt[duplicated(dt$day, fromLast = TRUE)]
-  res <- sapply(gather, "[[", "base_name") == adb &
-         sapply(gather, "[[", "date") %in% dt$date
-  ## drop data
-  gather <- gather[!res]
+
+  temp <- data.frame(
+    Date     = data.table(date = as.POSIXct(sapply(gather[lls], "[[", "date"), origin = origin)),
+    Size     = sapply(gather[lls], "[[", "file_sise"),
+    Densisty = sapply(gather[lls], "[[", "data_density"),
+    Data     = adb
+  )
+
+  datstat <- rbind(datstat, temp)
+
+  chosen <- gather[lls]
+
+  for (il in 1:length(chosen)) {
+    ll <- chosen[il][[1]]
+
+    varstat <- rbind(varstat,
+                     data.frame(ll$db_stats,
+                                Date = ll$date,
+                                Data = adb))
+  }
 }
 
-## Save data
-saveRDS(gather, overview_data)
+colstat <- varstat[, .N ,by = .(Data, Date, Table)]
+
+library(ggplot2)
+
+ggplot(data = datstat) +
+ geom_step(aes(x = date, y = Size, colour = Data))
+
+ggplot(data = datstat) +
+  geom_step(aes(x = date, y = Densisty, colour = Data))
+
+ggplot(data = colstat) +
+  geom_step(aes(x = Date, y = N, colour = Table))
+
+
+varstat <- varstat[missing != 0]
+setorder(varstat, Variable, Date)
+
+for (at in unique(varstat$Table)) {
+  pp <- varstat[Table == at]
+  p <- ggplot(data = pp) +
+    geom_step(aes(x = Date, y = fill_pc, colour = Variable))
+  show(p)
+}
+
 
 
 #' **END**
