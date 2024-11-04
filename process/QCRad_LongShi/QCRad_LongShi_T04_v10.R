@@ -78,13 +78,14 @@ if (!interactive()) {
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
+library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
-library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Variables  -----------------------------------------------------------------
 if (file.exists(parameter_fl)) {
@@ -154,12 +155,14 @@ if (Sys.info()["nodename"] == "sagan") {
   make_categorical_column(flagname_DIR, categories, con, "LAP")
   make_categorical_column(flagname_GLB, categories, con, "LAP")
 
+
   ## __ Direct -----------------------------------------------------------------
   ADD <- tbl(con, "LAP")                                   |>
     filter(Elevat > QS$sun_elev_min)                       |>
     filter(!is.na(TSI_TOA))                                |>
-    select(Date, SZA, TSI_TOA, DIR_strict, "QCv10_04_dir_flag") |>
-    arrow::to_arrow()                                      |>
+    select(Date, SZA, TSI_TOA,
+           DIR_strict, !!flagname_DIR)                     |>
+    to_arrow()                                             |>
     mutate(
 
       Dir_First_Clim_lim := case_when(
@@ -175,7 +178,7 @@ if (Sys.info()["nodename"] == "sagan") {
     ) |>
     mutate(
 
-      QCv10_04_dir_flag := case_when(
+      !!flagname_DIR := case_when(
         DIR_strict > Dir_First_Clim_lim ~ "First climatological limit (17)",
         DIR_strict > Dir_Secon_Clim_lim ~ "Second climatological limit (16)",
 
@@ -183,17 +186,20 @@ if (Sys.info()["nodename"] == "sagan") {
       )
     )
 
+  ## this needs a lot of memory, could do it in batches
+  ADD <- ADD |> collect() |> data.table()
+
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
 
-cat("111111")
 
   ## __ Global -----------------------------------------------------------------
   ADD <- tbl(con, "LAP")                                   |>
     filter(Elevat > QS$sun_elev_min)                       |>
     filter(!is.na(TSI_TOA))                                |>
-    select(Date, SZA, TSI_TOA, GLB_strict, !!flagname_DIR) |>
-    arrow::to_arrow()                                      |>
+    select(Date, SZA, TSI_TOA,
+           GLB_strict, !!flagname_GLB)                     |>
+    to_arrow()                                             |>
     mutate(
 
       Glo_First_Clim_lim := case_when(
@@ -217,6 +223,8 @@ cat("111111")
       )
     )
 
+  ## this needs a lot of memory, could do it in batches
+  ADD <- ADD |> collect() |> data.table()
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
 
@@ -226,7 +234,7 @@ cat("111111")
 }
 
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
-cat("ffffff")
+
 ##  Open dataset
 con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
