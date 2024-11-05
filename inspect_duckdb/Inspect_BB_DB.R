@@ -17,9 +17,8 @@ renv::load("~/BBand_LAP")
 
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS_duck/"
 
-cat("\n\nwrite it in shell to parallelize\n\n")
 
-
+## __ Check inputs  ------------------------------------------------------------
 try({
     cat("\n\n 0. Check files\n")
     rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/00_Check_input_files.R",
@@ -41,8 +40,6 @@ try({
                       output_file = "01_Inspect_CHP1_sig_snc_temp_DIRTY.pdf",
                       output_dir  = output_dir)
 })
-
-
 
 
 try({
@@ -77,6 +74,16 @@ try({
 #                       output_file = "03_Inspect_CM21INC_sig_DIRTY.pdf",
 #                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 # })
+
+
+## __ Check Radiation  ---------------------------------------------------------
+
+
+
+
+
+## __ Plots  -------------------------------------------------------------------
+
 
 
 
