@@ -44,6 +44,8 @@ info "##  Parse uwyo ground data for Thessaloniki"
 
 info "##  Upload uwyo data for Thessaloniki"
 "${rclone}" ${otheropt} ${bwlimit} --config "$config" copy --include "LGTS_soundings.*" "$HOME/DATA/WEATHER/" "lapauththanasis:/Public"
+"${rclone}" ${otheropt} ${bwlimit} --config "$config" sync "$HOME/DATA_RAW/uwyo" "lapauththanasis:/Public/uwyo"
+
 
 info "#### END $0 ####"
 TAC=$(date +"%s"); dura="$( echo "scale=6; ($TAC-$TIC)/60" | bc)"
