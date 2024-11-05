@@ -3,7 +3,7 @@
 #### Get data from sirena and commit to github.
 ## Radmon is synced elsewhere
 
-## Run rsync if mounted ----------------------------------------------
+## Run rsync if mounted  -------------------------------------------------------
 SOURCE="/media/sirena_lapdata_ro"
 if mountpoint -q "$SOURCE" ; then
 
@@ -53,7 +53,6 @@ if mountpoint -q "$SOURCE" ; then
         "$SOURCE/products/Bband/AC21_lap.GLB/"     \
         "$HOME/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
 
-
     echo "- - - - - - - - - - - - - - - - - - - -"
     echo "get other relative files"
     rsync -arvt                                    \
@@ -78,7 +77,7 @@ else
 fi
 
 
-## Commit data to github to preserve manual edits --------------------
+## Commit data to github to preserve manual edits  -----------------------------
 folders=(
     "$HOME/DATA_RAW/Bband"
     "$HOME/DATA_RAW/tracker_chp1"
@@ -101,15 +100,13 @@ for i in "${folders[@]}"; do
     git maintenance run --auto
 done
 
-
-## Incremental copy in case of deleted files from source location ----
+## Incremental copy in case of deleted files from source location  -------------
 rsync -ar --exclude='.git/' "$HOME/DATA_RAW/Bband/"        "$HOME/DATA_RAW/.Bband_capture"
 rsync -ar --exclude='.git/' "$HOME/DATA_RAW/tracker_chp1/" "$HOME/DATA_RAW/.tracker_chp1_capture"
 rsync -ar --exclude='.git/' "$HOME/DATA_RAW/Raddata"       "$HOME/DATA_RAW/.Raddata"
 
-
 echo
 echo "  ---------------------"
-echo "  -- FIN SIRENA SYNC --"
+echo "  -- SIRENA SYNC END --"
 echo "  ---------------------"
 exit 0
