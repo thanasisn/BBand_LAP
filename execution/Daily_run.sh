@@ -30,12 +30,25 @@ echo "###################################"
 set +e
 pids=()
 
-
 (
   info "##  Start uwyo  ##"
   "$HOME/BBand_LAP/execution/P01_uwyo.sh"
-  info "##  End uwyo  ##"
+  info "##  End uwyo STATUS:$?  ##"
 ) & pids+=($!)
+
+(
+  info "## Start Get source files from Sirena ##"
+  "$HOME/BBand_LAP/tools/Get_data_from_sirena.sh"
+  info "## End Get source files from Sirena STATUS:$?  ##"
+) & pids+=($!)
+
+(
+  info "## Start Get source files from Radmon ##"
+  "$HOME/BBand_LAP/tools/Get_data_from_radmon.sh"
+  info "## End Get source files from Radmon STATUS:$?  ##"
+) & pids+=($!)
+
+wait "${pids[@]}"; pids=()
 
 
 (
@@ -45,8 +58,8 @@ pids=()
 ) & pids+=($!)
 
 
-
 wait "${pids[@]}"; pids=()
+
 
 
 
