@@ -139,25 +139,52 @@ if (Sys.info()["nodename"] == "sagan") {
   remove_column(con, "LAP", flagname_DIR)
   make_categorical_column(flagname_DIR, categories, con, "LAP")
 
-  stop("kkkkkkk")
+  ## __ Direct -----------------------------------------------------------------
+  ADD <- tbl(con, "LAP")                        |>
+    filter(Elevat > QS$sun_elev_min)            |>
+    select(Date, SZA, Sun_Dist_Astropy,
+           DIR_strict, DIFF_strict, GLB_strict,
+           !!flagname_DIR)                      |>
+    to_arrow()                                  |>
+    mutate(
 
-  ## Clear Sky Sort-Wave model
-  datapart[, ClrSW_ref2 := (QS$ClrSW_a / Sun_Dist_Astropy^2) * cosde(SZA)^QS$ClrSW_b]
+      ## Clear Sky Sort-Wave model
+      ClrSW_ref2 := case_when(
+        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b > 9000
+        ~ 9000,
+        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b < 9000
+        ~ (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b
+      ),
 
-  ## __ Direct -----------------------------------------------------------
-  datapart[GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim &
-             DIFF_strict / GLB_strict > QS$ClrSW_lim &
-             GLB_strict               > QS$glo_min   &
-             Elevat                   > QS$Tracking_min_elev,
-           (flagname_DIR) := "Possible no tracking (24)"]
+    ) |>
+    mutate(
 
+      !!flagname_DIR := case_when(
+        GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim           &
+          DIFF_strict / GLB_strict > QS$ClrSW_lim         &
+          GLB_strict               > QS$glo_min           &
+          Elevat                   > QS$Tracking_min_elev ~ "Possible no tracking (24)",
 
-
+        .default = "pass"
+      )
+    )
 
   ## this needs a lot of memory, could do it in batches
   ADD <- ADD |> collect() |> data.table()
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
+
+  stop("kkkkkkk")
+
+  datapart[, ClrSW_ref2 := (QS$ClrSW_a / Sun_Dist_Astropy^2) * cosde(SZA)^QS$ClrSW_b]
+
+  ## __ Direct -----------------------------------------------------------
+  datapart[GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim &
+           DIFF_strict / GLB_strict > QS$ClrSW_lim &
+           GLB_strict               > QS$glo_min   &
+           Elevat                   > QS$Tracking_min_elev,
+           (flagname_DIR) := "Possible no tracking (24)"]
+
 
   ## __  Store used filters parameters  ----------------------------------------
   saveRDS(object = QS,

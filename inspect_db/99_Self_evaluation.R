@@ -8,7 +8,7 @@
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+#' geometry:      "left=0.3in,right=0.3in,top=0.5in,bottom=0.5in"
 #'
 #' link-citations:  yes
 #' colorlinks:      yes
@@ -69,7 +69,6 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
-# source("~/CODE/FUNCTIONS/R/execlock.R")
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
@@ -78,16 +77,15 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(gdata,      warn.conflicts = FALSE, quietly = TRUE)
 
 
-
-
 ##  Evaluate data sizes  -------------------------------------------------------
 
 ## _ Gather data size ----------------------------------------------------------
 #'
 #' # Data size overview
 #'
+#' \footnotesize
+#'
 #+ echo=F, include=T
-
 
 overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size.Rds"
 
@@ -107,7 +105,7 @@ gather <- data.frame(
 )
 rm(BB)
 
-## Broad band parquete data base meta data
+## Broad band parquet data base meta data
 BB <- open_dataset(DB_META_fl)
 gather <- rbind(gather,
                 data.frame(
@@ -127,7 +125,7 @@ rm(BB)
 
 
 
-## Tracker parqute data base
+## Tracker parquet data base
 BB <- open_dataset(DB_Steps_DIR)
 gather <- rbind(gather,
                 data.frame(
@@ -243,6 +241,8 @@ cat(" \n \n")
 #'
 #' ## Data size plots
 #'
+#' \footnotesize
+#'
 #+ echo=F, include=T, results = "asis"
 vars <- grep("Name|Date", names(DATA), value = TRUE, invert = TRUE)
 
@@ -331,14 +331,19 @@ DATA[, V3 := NULL]
 
 ## Show only stats for the main machine
 DATA <- DATA[Host == "sagan"]
-xlim <- range(DATA$Date)
 
+## Limit date range
+DATA <- DATA[Date > Sys.time() - (370 * 24 * 3600)]
+
+xlim <- range(DATA$Date)
 
 ## _ Last executions time  -----------------------------------------------------
 #' \newpage
 #' # Execution times overview
 #'
 #' ## Last run
+#'
+#' \footnotesize
 #'
 #+ echo=F, include=T, results="asis"
 # last <- DATA[DATA[, .I[which.max(Date)], by = .(Script, Category)]$V1]
@@ -353,6 +358,8 @@ cat(" \n \n")
 ## _ Executions statistics  ----------------------------------------------------
 #' \newpage
 #' ## Executions times statistics
+#'
+#' \footnotesize
 #'
 #+ echo=F, include=T, results="asis"
 stats <-
@@ -373,6 +380,8 @@ cat(" \n \n")
 ## _ Total Executions times  ---------------------------------------------------
 #' \newpage
 #' ## Total Executions
+#'
+#' \footnotesize
 #'
 #+ echo=F, include=T
 DATA[, G   := 0]
@@ -434,6 +443,8 @@ for (as in unique(partial$Category)) {
 ## _ Script time statistics  ---------------------------------------------------
 #' \newpage
 #' ## Script statistics
+#'
+#' \footnotesize
 #'
 #+ echo=F, include=T, results = "asis", out.height = "30%"
 for (as in last$Script_2) {
