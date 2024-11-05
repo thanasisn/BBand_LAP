@@ -20,6 +20,13 @@ TIC=$(date +"%s")
 : "${ID:=$(hostname)}"
 SCRIPT="$(basename "$0")"
 
+## rclone options
+bwlim=500
+rclone="$HOME/PROGRAMS/rclone"
+config="$HOME/Documents/rclone.conf"
+otheropt=" --checkers=20 --delete-before --stats=300s "
+bwlimit=" --bwlimit=${bwlim}k "
+
 info() { echo ; echo "$(date +'%F %T') ::${SCRIPT}::${ID}:: $* ::" ; echo ; }
 
 echo "###################################"
@@ -33,17 +40,9 @@ info "##  Scrap uwyo data for Thessaloniki"
 "$HOME/BBand_LAP/parameters/uwyo/scrap_uwyo.sh"
 
 info "##  Parse uwyo ground data for Thessaloniki"
-"$HOME/BBand_LAP/parameters/uwyo/scrap_uwyo.sh"
+"$HOME/BBand_LAP/parameters/uwyo/parse_uwyo.R"
 
 info "##  Upload uwyo data for Thessaloniki"
-
-## rclone options
-bwlim=500
-rclone="$HOME/PROGRAMS/rclone"
-config="$HOME/Documents/rclone.conf"
-otheropt=" --checkers=20 --delete-before --stats=300s "
-bwlimit=" --bwlimit=${bwlim}k "
-
 "${rclone}" ${otheropt} ${bwlimit} --config "$config" copy --include "LGTS_soundings.*" "$HOME/DATA/WEATHER/" "lapauththanasis:/Public"
 
 info "#### END $0 ####"
