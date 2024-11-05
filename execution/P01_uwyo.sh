@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## created on 2024-11-05
 
-#### Start the daily execution of Broadband dependent scripts
+####  Get parse and upload LGTS sounding data from uwyo
 
 exec 9>"/dev/shm/$(basename $0).lock"
 if ! flock -n 9  ; then
@@ -9,7 +9,7 @@ if ! flock -n 9  ; then
     exit 1
 fi
 
-ldir="$HOME/BBand_LAP/REPORTS/LOGs/$(basename "$0")"
+ldir="$HOME/BBand_LAP/REPORTS/LOGs/uwyo"
 mkdir -p "$ldir"
 LOG_FILE="$ldir/$(basename "$0")_$(date +%F_%R).log"
 ERR_FILE="$ldir/$(basename "$0")_$(date +%F_%R).err"
@@ -28,31 +28,24 @@ echo "###################################"
 
 ## ignore errors
 set +e
-pids=()
 
+info "##  Scrap uwyo data for Thessaloniki"
+"$HOME/BBand_LAP/parameters/uwyo/scrap_uwyo.sh"
 
-(
-  info "##  Start uwyo  ##"
-  "$HOME/BBand_LAP/execution/P01_uwyo.sh"
-  info "##  End uwyo  ##"
-) & pids+=($!)
+info "##  Parse uwyo ground data for Thessaloniki"
+"$HOME/BBand_LAP/parameters/uwyo/scrap_uwyo.sh"
 
+info "##  Upload uwyo data for Thessaloniki"
 
-(
-  info "##  Start build_duckdb  ##"
-  "$HOME/BBand_LAP/build_duckdb/Build_BB_DB.R"
-  info "##  End build_duckdb  ##"
-) & pids+=($!)
+## rclone options
+bwlim=500
+rclone="$HOME/PROGRAMS/rclone"
+config="$HOME/Documents/rclone.conf"
+otheropt=" --checkers=20 --delete-before --stats=300s "
+bwlimit=" --bwlimit=${bwlim}k "
 
-
-
-wait "${pids[@]}"; pids=()
-
-
+"${rclone}" ${otheropt} ${bwlimit} --config "$config" copy --include "LGTS_soundings.*" "$HOME/DATA/WEATHER/" "lapauththanasis:/Public"
 
 info "#### END $0 ####"
-
-##  END  ##
 TAC=$(date +"%s"); dura="$( echo "scale=6; ($TAC-$TIC)/60" | bc)"
 printf "%s %-10s %-10s %-10s %f\n" "$(date +"%F %H:%M:%S")" "$HOSTNAME" "$USER" "$(basename $0)" "$dura"
-exit 0 
