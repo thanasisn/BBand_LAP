@@ -81,8 +81,22 @@ wait "${pids[@]}"; pids=()
 wait "${pids[@]}"; pids=()
 
 
+(
+  info "##  Start inspect_duckdb  ##"
+  "$HOME/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R"
+  info "##  End inspect_duckdb STATUS:$?  ##"
+) & pids+=($!)
+
+
+wait "${pids[@]}"; pids=()
+
+
+
+
+
+
 
 info "#### END $0 ####"
 TAC=$(date +"%s"); dura="$( echo "scale=6; ($TAC-$TIC)/60" | bc)"
 printf "%s %-10s %-10s %-10s %f\n" "$(date +"%F %H:%M:%S")" "$HOSTNAME" "$USER" "$(basename $0)" "$dura"
-exit 0 
+exit 0

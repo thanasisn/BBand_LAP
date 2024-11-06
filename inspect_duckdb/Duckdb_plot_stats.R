@@ -65,12 +65,12 @@ Script.Name <- "~/BBand_LAP/inspect_duckdb/Duckdb_plot_stats.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+    # sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
-source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
+
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
@@ -83,12 +83,10 @@ panderOptions("table.alignment.default", "right")
 panderOptions("table.split.table",        120   )
 
 overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size_duckdb.Rds"
-
-gather <- readRDS(overview_data)
-
+gather        <- readRDS(overview_data)
 
 
-## TODO plots
+
 
 varstat   <- data.table()
 datstat   <- data.table()
@@ -119,6 +117,7 @@ for (adb in databases) {
 }
 
 colstat <- varstat[, .N ,by = .(Data, Date, Table)]
+
 
 library(ggplot2)
 
