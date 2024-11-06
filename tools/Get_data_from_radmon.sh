@@ -52,15 +52,11 @@ rsync -avhr "$SOURCE/1" "${TRACKER_STORE}/Raddata/"
 rsync -avhr "${TRACKER_MOUNT}/source/"   "/home/athan/Aerosols/source_production/"
 rsync -avhr "${TRACKER_MOUNT}/Aerosols"  "/home/athan/Aerosols/Dell/"
 
-
 ##  Get tracker and temperature data  ------------------------------------------
 rsync -avhr "${TRACKER_MOUNT}/tracker_LOGs"  "${TRACKER_STORE}/tracker_chp1/"
 rsync -avhr "${TRACKER_MOUNT}/tracker_SYNC"  "${TRACKER_STORE}/tracker_chp1/"
 rsync -avhr "${TRACKER_MOUNT}/Tracker_STEP"  "${TRACKER_STORE}/tracker_chp1/"
 rsync -avhr "${TRACKER_MOUNT}/Tracker_THERM" "${TRACKER_STORE}/tracker_chp1/"
-
-
-
 
 echo
 echo "  ---------------------"
