@@ -34,8 +34,8 @@ config="$HOME/Documents/rclone.conf"
 otheropt=" --checkers=20 --delete-before --stats=300s "
 bwlimit=" --bwlimit=${bwlim}k "
 
-"${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$TARGET_DB"                                          "lapauththanasis:/Public"
-"${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$TARGET_FL"                                          "lapauththanasis:/Public"
-"${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$HOME/DATA_RAW/LAPWeath/LAP_roof/LAP_AUTH_davis.md"  "lapauththanasis:/Public"
+"${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$TARGET_DB"                                          "lapauththanasis:/Public/LAP_Davis"
+"${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$TARGET_FL"                                          "lapauththanasis:/Public/LAP_Davis"
+"${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$HOME/DATA_RAW/LAPWeath/LAP_roof/LAP_AUTH_davis.md"  "lapauththanasis:/Public/LAP_Davis"
 
 exit 0
