@@ -15,12 +15,12 @@ TRACKER_STORE="/home/athan/DATA_RAW/"
 ##  Run rsync if mounted  ------------------------------------------------------
 SOURCE="/media/raddata"
 if mountpoint -q "$SOURCE" ; then
-  echo "Radmon is mounted"
+  echo "$SOURCE is mounted"
 else
     echo ""
-    echo "No DATA mount point found!!"
-    notify-send          -u critical "1: SIRENA NOT MOUNTED" "Can not get source files"
-    pub_notifications.py -u critical "2: SIRENA NOT MOUNTED" "Can not get source files"
+    echo "NOT MOUNTED $SOURCE !!"
+    notify-send          -u critical "1: $SOURCE NOT MOUNTED" "Can not get source files"
+    # pub_notifications.py -u critical "2: RADMON NOT MOUNTED" "Can not get source files"
     exit 1
 fi
 
@@ -47,6 +47,11 @@ rsync -avhr "$SOURCE/2" "${TRACKER_STORE}/Raddata/"
 
 ##  CM-21 INC  ##
 rsync -avhr "$SOURCE/1" "${TRACKER_STORE}/Raddata/"
+
+SOURCE="/media/raddata"
+if mountpoint -q "$TRACKER_MOUNT" ; then
+  echo "$TRACKER_MOUNT is mounted"
+fi
 
 ##  Get running code  ----------------------------------------------------------
 rsync -avhr "${TRACKER_MOUNT}/source/"   "/home/athan/Aerosols/source_production/"
