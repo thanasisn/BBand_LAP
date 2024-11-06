@@ -29,6 +29,7 @@ echo "###################################"
 ## ignore errors
 set +e
 pids=()
+MAXWAIT=10
 
 (
   info "##  Start uwyo  ##"
@@ -37,15 +38,24 @@ pids=()
 ) & pids+=($!)
 
 (
+  sleep $((RANDOM % MAXWAIT))
   info "## Start Get source files from Sirena ##"
   "$HOME/BBand_LAP/tools/Get_data_from_sirena.sh"
   info "## End Get source files from Sirena STATUS:$?  ##"
 ) & pids+=($!)
 
 (
+  sleep $((RANDOM % MAXWAIT))
   info "## Start Get source files from Radmon ##"
   "$HOME/BBand_LAP/tools/Get_data_from_radmon.sh"
   info "## End Get source files from Radmon STATUS:$?  ##"
+) & pids+=($!)
+
+(
+  sleep $((RANDOM % MAXWAIT))
+  info "## Start Get data from davis ##"
+  "$HOME/BBand_LAP/tools/Get_data_from_davis.sh"
+  info "## End Get data from davis STATUS:$?  ##"
 ) & pids+=($!)
 
 wait "${pids[@]}"; pids=()
@@ -54,7 +64,17 @@ wait "${pids[@]}"; pids=()
 (
   info "##  Start build_duckdb  ##"
   "$HOME/BBand_LAP/build_duckdb/Build_BB_DB.R"
-  info "##  End build_duckdb  ##"
+  info "##  End build_duckdb STATUS:$?  ##"
+) & pids+=($!)
+
+
+wait "${pids[@]}"; pids=()
+
+
+(
+  info "##  Start QCRad  ##"
+  "$HOME/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_run.R"
+  info "##  End QCRad STATUS:$?  ##"
 ) & pids+=($!)
 
 
@@ -62,10 +82,7 @@ wait "${pids[@]}"; pids=()
 
 
 
-
 info "#### END $0 ####"
-
-##  END  ##
 TAC=$(date +"%s"); dura="$( echo "scale=6; ($TAC-$TIC)/60" | bc)"
 printf "%s %-10s %-10s %-10s %f\n" "$(date +"%F %H:%M:%S")" "$HOSTNAME" "$USER" "$(basename $0)" "$dura"
 exit 0 
