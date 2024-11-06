@@ -57,8 +57,8 @@ source("~/BBand_LAP/build_duckdb/Build_DB_60_Create_strict.R"   )
 ## __ Keep some stats on data bases  -------------------------------------------
 source("~/BBand_LAP/inspect_duckdb/Duckdb_save_stats.R"         )
 
-# cat("\n\nEND of Building the DB\n\n")
+cat("\n\nEND of Building the DB\n\n")
 
-# ## __ Describe environment -----------------------------------------------------
-# source("~/BBand_LAP/tools/List_dependencies.R")
+## __ Describe environment -----------------------------------------------------
+source("~/BBand_LAP/tools/List_dependencies.R")
 
