@@ -86,6 +86,7 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
+require(scales,     warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Variables  -----------------------------------------------------------------
 if (file.exists(parameter_fl)) {
