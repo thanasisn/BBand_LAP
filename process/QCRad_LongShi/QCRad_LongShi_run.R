@@ -36,7 +36,7 @@ try({
                     output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
-source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T05_v10.R")
+# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T05_v10.R")
 try({
   rmarkdown::render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T05_v10.R",
                     params      = list(CLEAN = TRUE),
@@ -44,7 +44,13 @@ try({
                     output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 })
 
-
+source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T06_v10.R")
+try({
+  rmarkdown::render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T06_v10.R",
+                    params      = list(CLEAN = TRUE),
+                    output_file = "QCRad_LongShi_T06_v10_B",
+                    output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+})
 
 
 
