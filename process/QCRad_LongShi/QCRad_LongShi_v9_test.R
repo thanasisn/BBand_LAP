@@ -99,47 +99,6 @@ PLOT_LAST  <- as_date("2024-01-01")
 
 
 
-
-
-
-
-## 5. Tracker is off test  -------------------------------------------------
-#'
-#' ## 5. Tracker is off test
-#'
-#' This test use a diffuse model. A better one will be implemented when one
-#' is produced and accepted.
-#'
-
-## criteria
-QS$Tracking_min_elev <-    5
-QS$ClrSW_lim         <-    0.85
-QS$glo_min           <-   25
-## Global Clear SW model
-QS$ClrSW_a           <- 1050.5
-QS$ClrSW_b           <-    1.095
-
-if (QS$TEST_05) {
-  testN        <- 5
-  flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
-  cat(paste("\n5. Tracking test", flagname_DIR, "\n\n"))
-
-  ## Clear Sky Sort-Wave model
-  datapart[, ClrSW_ref2 := (QS$ClrSW_a / Sun_Dist_Astropy^2) * cosde(SZA)^QS$ClrSW_b]
-
-  ## __ Direct -----------------------------------------------------------
-  datapart[GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim &
-             DIFF_strict / GLB_strict > QS$ClrSW_lim &
-             GLB_strict               > QS$glo_min   &
-             Elevat                   > QS$Tracking_min_elev,
-           (flagname_DIR) := "Possible no tracking (24)"]
-
-  rm(list = ls(pattern = "flagname_.*"))
-  dummy <- gc()
-}
-
-
-
 ## 6. Rayleigh Limit Diffuse Comparison  -----------------------------------
 #'
 #' ## 6. Rayleigh Limit Diffuse Comparison
@@ -360,84 +319,6 @@ if (QS$TEST_10) {
 
 
 
-
-####  5. Tracker is off test  --------------------------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 5. Tracker is off test
-#'
-#+ echo=F, include=T, results="asis"
-if (QS$TEST_05) {
-    testN        <- 5
-    flagname_DIR <- paste0("QCv9_", sprintf("%02d", testN), "_dir_flag")
-
-    cat(pander(table(collect(select(BB, !!flagname_DIR)), useNA = "always"),
-               caption = flagname_DIR))
-    cat(" \n \n")
-
-    test <- data.table(BB |>
-                           filter(Elevat > 0) |>
-                           select(Date,
-                                  DIR_strict, GLB_strict, DIFF_strict,
-                                  ClrSW_ref2, !!flagname_DIR) |>
-                           collect())
-
-    hist(test[GLB_strict / ClrSW_ref2 < 2,
-              GLB_strict / ClrSW_ref2], breaks = 100)
-    abline(v = QS$ClrSW_lim, col = "red", lty = 3)
-    cat(" \n \n")
-
-    hist(test[DIFF_strict / GLB_strict > -0.5,
-              DIFF_strict / GLB_strict], breaks = 100)
-    abline(v = QS$ClrSW_lim, col = "red", lty = 3)
-    cat(" \n \n")
-
-    hist(test[, GLB_strict], breaks = 100)
-    abline(v = QS$glo_min, col = "red", lty = 3)
-    cat(" \n \n")
-
-
-    if (DO_PLOTS) {
-
-
-      if (!interactive()) {
-        afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
-                        sub("\\.R$", "", basename(Script.Name)),
-                        ".pdf")
-        pdf(file = afile)
-      }
-
-        tmp <- BB |>
-            filter(!is.na(get(flagname_DIR))) |>
-            select(Date) |>
-            collect() |>
-            as.data.table()
-
-        for (ad in sort(unique(as.Date(tmp$Date)))) {
-            pp <- data.table(
-                BB |> filter(as.Date(Date) == as.Date(ad) &
-                                 Elevat > QS$sun_elev_min)   |>
-                    collect()
-            )
-            ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = T)
-            plot(pp$Date, pp$DIR_strict, "l", col = "blue",
-                 ylim = ylim, xlab = "", ylab = "wattDIR")
-            lines(pp$Date, pp$GLB_strict, col = "green")
-            lines(pp$Date, pp$HOR_strict, col = "cyan")
-            title(paste("#5", as.Date(ad, origin = "1970-01-01")))
-            ## plot limits
-            # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
-            lines(pp$Date, pp$ClrSW_ref2, col = "magenta")
-            ## mark offending data
-            points(pp[!is.na(get(flagname_DIR)), DIR_strict, Date],
-                   col = "red", pch = 1)
-        }
-    }
-    rm(list = ls(pattern = "flagname_.*"))
-    dummy <- gc()
-    if (!interactive()) dummy <- dev.off()
-}
-#+ echo=F, include=T
 
 
 ####  6. Rayleigh Limit Diffuse Comparison  ------------------------------------
