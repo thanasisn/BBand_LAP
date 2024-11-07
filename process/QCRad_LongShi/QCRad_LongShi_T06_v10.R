@@ -141,7 +141,7 @@ if (Sys.info()["nodename"] == "sagan") {
     d    <-  -911.2
     e    <-   287.85
     f    <-     0.046725
-    mu_0 <- cosde(SZA)
+    mu_0 <- cos(SZA*pi/180)
     return( a * mu_0      +
               b * mu_0^2 +
               c * mu_0^3 +
@@ -150,25 +150,62 @@ if (Sys.info()["nodename"] == "sagan") {
               f * mu_0 * Pressure)
   }
 
-    cat(paste("\n6. Rayleigh Limit Diffuse Comparison", flagname_BTH, "\n\n"))
+  cat(paste("\n6. Rayleigh Limit Diffuse Comparison", flagname_BTH, "\n\n"))
 
-    ## __ Make categorical columns  --------------------------------------------
-    categories <- c("empty",
-                    "pass",
-                    "Rayleigh diffuse limit upper (18)",
-                    "Rayleigh diffuse limit lower broad (18)",
-                    "Rayleigh diffuse limit lower narrow (18)")
+  ## __ Make categorical columns  --------------------------------------------
+  categories <- c("empty",
+                  "pass",
+                  "Rayleigh diffuse limit upper (18)",
+                  "Rayleigh diffuse limit lower broad (18)",
+                  "Rayleigh diffuse limit lower narrow (18)")
 
-    remove_column(con, "LAP", flagname_DIR)
-    make_categorical_column(flagname_DIR, categories, con, "LAP")
+  remove_column(con, "LAP", flagname_BTH)
+  make_categorical_column(flagname_BTH, categories, con, "LAP")
 
 
 
-    stop("kkkkk")
 
-    datapart[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = Pressure)]
 
     ## __ Both  ------------------------------------------------------------
+
+  ADD <- tbl(con, "LAP")                                   |>
+    filter(Elevat > QS$sun_elev_min)                       |>
+    filter(!is.na(TSI_TOA))                                |>
+    filter(!is.na(Pressure))                               |>
+    select(Date, SZA, TSI_TOA, Pressure,
+           DIFF_strict, GLB_strict, !!flagname_BTH)                     |>
+    to_arrow()                                             |>
+    mutate(
+
+      RaylDIFF := case_when(
+        Rayleigh_diff(SZA = SZA, Pressure = Pressure) > 9000 ~ 9000,
+        Rayleigh_diff(SZA = SZA, Pressure = Pressure) < 9000 ~ 
+          Rayleigh_diff(SZA = SZA, Pressure = Pressure)
+      ),
+
+    ) |>
+    mutate(
+
+      !!flagname_BTH := case_when(
+        DIFF_strict - RaylDIFF > QS$Rayleigh_upper_lim ~
+          "Rayleigh diffuse limit upper (18)",
+        DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim ~
+          "Rayleigh diffuse limit lower broad (18)",
+        DIFF_strict - RaylDIFF     < QS$Rayleigh_lower_lim &
+          DIFF_strict / GLB_strict < QS$Rayleigh_dif_glo_r &
+          GLB_strict               > QS$Rayleigh_glo_min ~
+          "Rayleigh diffuse limit lower narrow (18)",
+
+        .default = "pass"
+      )
+    )
+
+   ADD <- ADD |> collect() |> data.table() 
+   res <- update_table(con, ADD, "LAP", "Date")
+   
+  stop("kkkkk")
+    datapart[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = Pressure)]
+
     datapart[DIFF_strict - RaylDIFF > QS$Rayleigh_upper_lim,
              (flagname_BTH) := "Rayleigh diffuse limit upper (18)"]
     datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
