@@ -142,7 +142,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ## __ Direct -----------------------------------------------------------------
   ADD <- tbl(con, "LAP")                        |>
     filter(Elevat > QS$sun_elev_min)            |>
-    select(Date, SZA, Sun_Dist_Astropy,
+    select(Date, SZA, Sun_Dist_Astropy, Elevat,
            DIR_strict, DIFF_strict, GLB_strict,
            !!flagname_DIR)                      |>
     to_arrow()                                  |>
@@ -174,16 +174,14 @@ if (Sys.info()["nodename"] == "sagan") {
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
 
-  stop("kkkkkkk")
-
-  datapart[, ClrSW_ref2 := (QS$ClrSW_a / Sun_Dist_Astropy^2) * cosde(SZA)^QS$ClrSW_b]
-
-  ## __ Direct -----------------------------------------------------------
-  datapart[GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim &
-           DIFF_strict / GLB_strict > QS$ClrSW_lim &
-           GLB_strict               > QS$glo_min   &
-           Elevat                   > QS$Tracking_min_elev,
-           (flagname_DIR) := "Possible no tracking (24)"]
+  # datapart[, ClrSW_ref2 := (QS$ClrSW_a / Sun_Dist_Astropy^2) * cosde(SZA)^QS$ClrSW_b]
+  #
+  # ## __ Direct -----------------------------------------------------------
+  # datapart[GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim &
+  #          DIFF_strict / GLB_strict > QS$ClrSW_lim &
+  #          GLB_strict               > QS$glo_min   &
+  #          Elevat                   > QS$Tracking_min_elev,
+  #          (flagname_DIR) := "Possible no tracking (24)"]
 
 
   ## __  Store used filters parameters  ----------------------------------------
