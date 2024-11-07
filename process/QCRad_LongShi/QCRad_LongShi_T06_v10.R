@@ -65,8 +65,8 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T05_v10.R"
-Script.ID    <- "Q5"
+Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T06_v10.R"
+Script.ID    <- "Q6"
 parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
@@ -106,82 +106,84 @@ DO_PLOTS       <- TRUE
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 IGNORE_FLAGGED <- FALSE
 
-flagname_DIR <- "QCv10_05_dir_flag"
+flagname_BTH <- "QCv10_06_bth_flag"
 
 if (Sys.info()["nodename"] == "sagan") {
 
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-  ## 5. Tracker is off test  -------------------------------------------------
+  ## 6. Rayleigh Limit Diffuse Comparison  -----------------------------------
   #'
-  #' ## 5. Tracker is off test
+  #' ## 6. Rayleigh Limit Diffuse Comparison
   #'
-  #' This test use a diffuse model. A better one will be implemented when one
-  #' is produced and accepted.
+  #' Compare inferred diffuse radiation with a modeled value of diffuse,
+  #' based on SZA and atmospheric pressure.
+  #'
+  #' The upper limit denotes no tracking of CHP-1.
+  #'
+  #' Reasons:
+  #' - Difference of Sun observation angle due to different instruments location.
+  #' - Cases of instrument windows cleaning
   #'
 
-  ## criteria
-  QS$Tracking_min_elev <-    5
-  QS$ClrSW_lim         <-    0.85
-  QS$glo_min           <-   25
-  ## Global Clear SW model
-  QS$ClrSW_a           <- 1050.5
-  QS$ClrSW_b           <-    1.095
+  # criteria
+  QS$Rayleigh_upper_lim <- 500    # Upper departure diffuse limit
+  QS$Rayleigh_lower_lim <-  -1    # Lower departure diffuse limit
+  QS$Rayleigh_dif_glo_r <-   0.8  # Low limit diffuse/global < threshold
+  QS$Rayleigh_glo_min   <-  50    # Low limit minimum global
 
-  cat(paste("\n5. Tracking test", flagname_DIR, "\n\n"))
+  # Reference model
+  Rayleigh_diff <- function(SZA, Pressure) {
+    a    <-   209.3
+    b    <-  -708.3
+    c    <-  1128.7
+    d    <-  -911.2
+    e    <-   287.85
+    f    <-     0.046725
+    mu_0 <- cosde(SZA)
+    return( a * mu_0      +
+              b * mu_0^2 +
+              c * mu_0^3 +
+              d * mu_0^4 +
+              e * mu_0^5 +
+              f * mu_0 * Pressure)
+  }
 
-  ## __ Make categorical columns  ----------------------------------------------
-  categories <- c("empty",
-                  "pass",
-                  "Possible no tracking (24)")
+    cat(paste("\n6. Rayleigh Limit Diffuse Comparison", flagname_BTH, "\n\n"))
 
-  remove_column(con, "LAP", flagname_DIR)
-  make_categorical_column(flagname_DIR, categories, con, "LAP")
+    ## __ Make categorical columns  --------------------------------------------
+    categories <- c("empty",
+                    "pass",
+                    "Rayleigh diffuse limit upper (18)",
+                    "Rayleigh diffuse limit lower broad (18)",
+                    "Rayleigh diffuse limit lower narrow (18)")
 
-  ## __ Direct -----------------------------------------------------------------
-  ADD <- tbl(con, "LAP")                        |>
-    filter(Elevat > QS$sun_elev_min)            |>
-    select(Date, SZA, Sun_Dist_Astropy, Elevat,
-           DIR_strict, DIFF_strict, GLB_strict,
-           !!flagname_DIR)                      |>
-    to_arrow()                                  |>
-    mutate(
+    remove_column(con, "LAP", flagname_DIR)
+    make_categorical_column(flagname_DIR, categories, con, "LAP")
 
-      ## Clear Sky Sort-Wave model
-      ClrSW_ref2 := case_when(
-        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b > 9000
-        ~ 9000,
-        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b < 9000
-        ~ (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b
-      ),
 
-    ) |>
-    mutate(
 
-      !!flagname_DIR := case_when(
-        GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim           &
-          DIFF_strict / GLB_strict > QS$ClrSW_lim         &
-          GLB_strict               > QS$glo_min           &
-          Elevat                   > QS$Tracking_min_elev ~ "Possible no tracking (24)",
+    stop("kkkkk")
 
-        .default = "pass"
-      )
-    )
+    datapart[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = Pressure)]
 
-  ## this needs a lot of memory, could do it in batches
-  ADD <- ADD |> collect() |> data.table()
-  res <- update_table(con, ADD, "LAP", "Date")
-  rm(ADD); dummy <- gc()
+    ## __ Both  ------------------------------------------------------------
+    datapart[DIFF_strict - RaylDIFF > QS$Rayleigh_upper_lim,
+             (flagname_BTH) := "Rayleigh diffuse limit upper (18)"]
+    datapart[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
+             (flagname_BTH) := "Rayleigh diffuse limit lower broad (18)"]
 
-  # datapart[, ClrSW_ref2 := (QS$ClrSW_a / Sun_Dist_Astropy^2) * cosde(SZA)^QS$ClrSW_b]
-  #
-  # ## __ Direct -----------------------------------------------------------
-  # datapart[GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim &
-  #          DIFF_strict / GLB_strict > QS$ClrSW_lim &
-  #          GLB_strict               > QS$glo_min   &
-  #          Elevat                   > QS$Tracking_min_elev,
-  #          (flagname_DIR) := "Possible no tracking (24)"]
+    ## extra restrictions by me
+    datapart[DIFF_strict - RaylDIFF     < QS$Rayleigh_lower_lim &
+               DIFF_strict / GLB_wpsm < QS$Rayleigh_dif_glo_r &
+               GLB_wpsm               > QS$Rayleigh_glo_min,
+             (flagname_BTH) := "Rayleigh diffuse limit lower narrow (18)"]
+
+
+
+
+
 
 
   ## __  Store used filters parameters  ----------------------------------------
@@ -212,79 +214,13 @@ DT <- tbl(con, "LAP")                  |>
 ## __  Statistics  -------------------------------------------------------------
 #' ### Statistics
 #+ echo=F, include=T
-cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
-           caption = flagname_DIR))
-cat(" \n \n")
 
-test <- DT |>
-  select(DIR_strict, GLB_strict, DIFF_strict, ClrSW_ref2) |>
-  collect() |> data.table()
-
-
-hist(test[GLB_strict / ClrSW_ref2 < 2,
-          GLB_strict / ClrSW_ref2], breaks = 100)
-abline(v = QS$ClrSW_lim, col = "red", lty = 3)
-cat(" \n \n")
-
-hist(test[DIFF_strict / GLB_strict > -0.5,
-          DIFF_strict / GLB_strict], breaks = 100)
-abline(v = QS$ClrSW_lim, col = "red", lty = 3)
-cat(" \n \n")
-
-hist(test[, GLB_strict], breaks = 100)
-abline(v = QS$glo_min, col = "red", lty = 3)
-cat(" \n \n")
 
 
 ## __  Daily plots  ------------------------------------------------------------
 #' ### Daily plots
 #+ echo=F, include=T
-if (DO_PLOTS) {
 
-  if (!interactive()) {
-    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
-                    sub("\\.R$", "", basename(Script.Name)),
-                    ".pdf")
-    pdf(file = afile)
-  }
-
-  choose <- setdiff(
-    DT |> select(!!flagname_DIR) |> distinct() |> pull() |> as.character(),
-    c("empty", "pass")
-  )
-  tmp <- DT |>
-    filter(QCv10_05_dir_flag %in% choose) |>
-    filter(!is.na(DIR_strict)) |>
-    select(Day) |>
-    distinct()  |> collect() |> data.table()
-
-  for (ad in sort(unique(tmp$Day))) {
-    ad <- as.Date(ad, origin = origin)
-    pp <- DT |>
-      filter(Day == ad) |>
-      select(Date,
-             DIR_strict, GLB_strict, HOR_strict,
-             ClrSW_ref2,
-             !!flagname_DIR) |>
-      collect() |> data.table()
-    setorder(pp, Date)
-
-    ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = T)
-    plot(pp$Date, pp$DIR_strict, "l", col = "blue",
-         ylim = ylim, xlab = "", ylab = "wattDIR")
-    lines(pp$Date, pp$GLB_strict, col = "green")
-    lines(pp$Date, pp$HOR_strict, col = "cyan")
-    title(paste("#5", as.Date(ad, origin = "1970-01-01")))
-    ## plot limits
-    # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
-    lines(pp$Date, pp$ClrSW_ref2, col = "magenta")
-    ## mark offending data
-    points(pp[!get(flagname_DIR) %in% c("empty", "pass"), DIR_strict, Date],
-           col = "red", pch = 1)
-  }
-}
-if (!interactive()) dummy <- dev.off()
-#+ echo=F, include=T
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
