@@ -228,14 +228,9 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 ## Select data to plot
 DT <- tbl(con, "LAP")                  |>
-  filter(Elevat > QCrad_plot_elev_T3)  |>
+  filter(Elevat > QCrad_plot_elev_T03) |>
   filter(Day    > QCrad_plot_date_min) |>
   filter(Day    < QCrad_plot_date_max)
-
-
-# DT |> select(!!flagname_GLB) |> distinct() |> collect()
-# DT |> select(!!flagname_DIR) |> distinct()
-# DT |> select(!!flagname_GLB) |> pull() |> table()
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
