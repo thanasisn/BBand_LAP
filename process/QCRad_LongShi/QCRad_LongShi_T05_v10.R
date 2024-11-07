@@ -198,11 +198,8 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 DT <- tbl(con, "LAP")                  |>
   filter(Day    > QCrad_plot_date_min) |>
   filter(Day    < QCrad_plot_date_max) |>
-  filter(Elevat > QCrad_plot_elev_T4)
+  filter(Elevat > QCrad_plot_elev_T05)
 
-# DT |> select(!!flagname_GLB) |> distinct() |> collect()
-# DT |> select(!!flagname_DIR) |> distinct()
-# DT |> select(!!flagname_GLB) |> pull() |> table()
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
@@ -212,15 +209,99 @@ DT <- tbl(con, "LAP")                  |>
 #'
 #+ echo=F, include=T
 
-## __  Stats  ------------------------------------------------------------------
-#' ### Stats
+## __  Statistics  -------------------------------------------------------------
+#' ### Statistics
+#+ echo=F, include=T
+cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
+           caption = flagname_DIR))
+cat(" \n \n")
+
+
+
+
+
+
+## __  Daily plots  ------------------------------------------------------------
+#' ### Daily plots
 #+ echo=F, include=T
 
 
-## __  Yearly plots  -----------------------------------------------------------
-#' ### Yearly plots
-#+ echo=F, include=T
+# test <- DT |>
+#   filter(!QCv10_04_dir_flag %in% c("empty", "pass") |
+#            !QCv10_04_glb_flag %in% c("empty", "pass") ) |>
+#   select(Date,
+#          DIR_strict,
+#          GLB_strict,
+#          Dir_First_Clim_lim, Dir_Secon_Clim_lim,
+#          Glo_First_Clim_lim, Glo_Secon_Clim_lim,
+#          !!flagname_DIR, !!flagname_GLB) |>
+#   collect() |> data.table()
 
+
+DT |>
+  select(DIR_strict, GLB_strict, ClrSW_ref2)
+
+if (QS$TEST_05) {
+
+  test <- data.table(BB |>
+                       filter(Elevat > 0) |>
+                       select(Date,
+                              DIR_strict, GLB_strict, DIFF_strict,
+                              ClrSW_ref2, !!flagname_DIR) |>
+                       collect())
+
+  hist(test[GLB_strict / ClrSW_ref2 < 2,
+            GLB_strict / ClrSW_ref2], breaks = 100)
+  abline(v = QS$ClrSW_lim, col = "red", lty = 3)
+  cat(" \n \n")
+
+  hist(test[DIFF_strict / GLB_strict > -0.5,
+            DIFF_strict / GLB_strict], breaks = 100)
+  abline(v = QS$ClrSW_lim, col = "red", lty = 3)
+  cat(" \n \n")
+
+  hist(test[, GLB_strict], breaks = 100)
+  abline(v = QS$glo_min, col = "red", lty = 3)
+  cat(" \n \n")
+
+
+  if (DO_PLOTS) {
+
+    if (!interactive()) {
+      pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
+    }
+
+    tmp <- BB |>
+      filter(!is.na(get(flagname_DIR))) |>
+      select(Date) |>
+      collect() |>
+      as.data.table()
+
+    for (ad in sort(unique(as.Date(tmp$Date)))) {
+      pp <- data.table(
+        BB |> filter(as.Date(Date) == as.Date(ad) &
+                       Elevat > QS$sun_elev_min)   |>
+          collect()
+      )
+      ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = T)
+      plot(pp$Date, pp$DIR_strict, "l", col = "blue",
+           ylim = ylim, xlab = "", ylab = "wattDIR")
+      lines(pp$Date, pp$GLB_strict, col = "green")
+      lines(pp$Date, pp$HOR_strict, col = "cyan")
+      title(paste("#5", as.Date(ad, origin = "1970-01-01")))
+      ## plot limits
+      # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
+      lines(pp$Date, pp$ClrSW_ref2, col = "magenta")
+      ## mark offending data
+      points(pp[!is.na(get(flagname_DIR)), DIR_strict, Date],
+             col = "red", pch = 1)
+    }
+  }
+  rm(list = ls(pattern = "flagname_.*"))
+  dummy <- gc()
+  if (!interactive()) dummy <- dev.off()
+}
+#+ echo=F, include=T
 
 
 #+ echo=F, include=T
