@@ -257,8 +257,8 @@ DT <- tbl(con, "LAP")                  |>
 #'
 #+ echo=F, include=T
 
-## __  Stats  ------------------------------------------------------------------
-#' ### Stats
+## __  Statistics  -------------------------------------------------------------
+#' ### Statistics
 #+ echo=F, include=T, sesults="asis"
 
 cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
