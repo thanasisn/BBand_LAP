@@ -399,9 +399,13 @@ if (QS$TEST_05) {
 
     if (DO_PLOTS) {
 
-        if (!interactive()) {
-            pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
-        }
+
+      if (!interactive()) {
+        afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
+                        sub("\\.R$", "", basename(Script.Name)),
+                        ".pdf")
+        pdf(file = afile)
+      }
 
         tmp <- BB |>
             filter(!is.na(get(flagname_DIR))) |>
