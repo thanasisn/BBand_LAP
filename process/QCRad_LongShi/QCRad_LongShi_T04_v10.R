@@ -107,8 +107,9 @@ DO_PLOTS       <- TRUE
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 IGNORE_FLAGGED <- FALSE
 
-flagname_DIR <- "QCv10_04_dir_flag"
-flagname_GLB <- "QCv10_04_glb_flag"
+flagname_DIR     <- "QCv10_04_dir_flag"
+flagname_GLB     <- "QCv10_04_glb_flag"
+QS$plot_elev_T04 <- 2
 
 if (Sys.info()["nodename"] == "sagan") {
 
@@ -189,7 +190,6 @@ if (Sys.info()["nodename"] == "sagan") {
 
   ## this needs a lot of memory, could do it in batches
   ADD <- ADD |> collect() |> data.table()
-
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
 
@@ -243,7 +243,7 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 DT <- tbl(con, "LAP")                  |>
   filter(Day    > QCrad_plot_date_min) |>
   filter(Day    < QCrad_plot_date_max) |>
-  filter(Elevat > QCrad_plot_elev_T04)
+  filter(Elevat > QS$plot_elev_T04)
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
@@ -251,12 +251,11 @@ DT <- tbl(con, "LAP")                  |>
 #' \newpage
 #' ## 4. Climatological (configurable) Limits
 #'
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 
 ## __  Statistics  -------------------------------------------------------------
 #' ### Statistics
 #+ echo=F, include=T, sesults="asis"
-
 cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
            caption = flagname_DIR))
 cat(" \n \n")
@@ -296,7 +295,7 @@ cat(" \n \n")
 
 ## __  Yearly plots  -----------------------------------------------------------
 #' ### Yearly plots
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 
 ## Yearly plots for Direct
 years <- DT |> filter(!is.na(DIR_strict)) |>
@@ -485,8 +484,7 @@ for (ay in years) {
 
 ## __  Daily plots  -----------------------------------------------------------
 #' ### Daily plots
-#+ echo=F, include=T
-
+#+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
   if (!interactive()) {
@@ -496,7 +494,6 @@ if (DO_PLOTS) {
     pdf(file = afile)
   }
 
-  ## test direct limits
   choose <- setdiff(
     DT |> select(!!flagname_DIR) |> distinct() |> pull() |> as.character(),
     c("empty", "pass")

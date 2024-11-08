@@ -105,8 +105,9 @@ DO_PLOTS       <- TRUE
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 IGNORE_FLAGGED <- FALSE
 
-flagname_DIR <- "QCv10_02_dir_flag"
-flagname_GLB <- "QCv10_02_glb_flag"
+flagname_DIR     <- "QCv10_02_dir_flag"
+flagname_GLB     <- "QCv10_02_glb_flag"
+QS$plot_elev_T02 <- 2
 
 if (Sys.info()["nodename"] == "sagan") {
 
@@ -212,25 +213,21 @@ if (Sys.info()["nodename"] == "sagan") {
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
 
-
   ## __  Store used filters parameters  ----------------------------------------
   saveRDS(object = QS,
           file   = parameter_fl)
 }
 
-## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
+##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
 con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
-## Check that flags exist
-# tbl(con, "LAP") |> colnames() %in% c(flagname_GLB, flagname_DIR)
-
 ## Select data to plot
 DT <- tbl(con, "LAP")                  |>
-  filter(Elevat > QCrad_plot_elev_T02) |>
   filter(Day    > QCrad_plot_date_min) |>
-  filter(Day    < QCrad_plot_date_max)
+  filter(Day    < QCrad_plot_date_max) |>
+  filter(Elevat > QS$plot_elev_T02)
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
@@ -270,6 +267,9 @@ abline(v = QS$glo_SWdn_too_low)
 abline(v = QS$glo_SWdn_min_ext, col = "red")
 cat("\n \n")
 
+## __  Daily plots  -----------------------------------------------------------
+#' ### Daily plots
+#+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
   if (!interactive()) {
@@ -332,8 +332,6 @@ if (DO_PLOTS) {
            col = "magenta", pch = 1)
   }
 }
-# rm(list = ls(pattern = "flagname_.*"))
-# dummy <- gc()
 if (!interactive()) dummy <- dev.off()
 #+ echo=F, include=T
 
