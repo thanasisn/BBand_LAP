@@ -29,7 +29,6 @@ echo "###################################"
 ## ignore errors
 set +e
 pids=()
-MAXWAIT=3
 
 (
   info "##  Start uwyo  ##"
@@ -38,21 +37,21 @@ MAXWAIT=3
 ) &
 
 (
-  sleep $((1 + RANDOM % MAXWAIT))
+  sleep 1
   info "## Start Get source files from Sirena ##"
   "$HOME/BBand_LAP/tools/Get_data_from_sirena.sh"
   info "## End Get source files from Sirena STATUS:$?  ##"
 ) & pids+=($!)
 
 (
-  sleep $((3 + RANDOM % MAXWAIT))
+  sleep 3
   info "## Start Get source files from Radmon ##"
   "$HOME/BBand_LAP/tools/Get_data_from_radmon.sh"
   info "## End Get source files from Radmon STATUS:$?  ##"
 ) & pids+=($!)
 
 (
-  sleep $((5 + RANDOM % MAXWAIT))
+  sleep 5
   info "## Start Get data from davis ##"
   "$HOME/BBand_LAP/tools/Get_data_from_davis.sh"
   info "## End Get data from davis STATUS:$?  ##"
