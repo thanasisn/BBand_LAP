@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2024-11-07 
+At: 2024-11-08 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -29,8 +29,8 @@ At: 2024-11-07
          foreach:  1.5.2   
       reticulate:  1.39.0  
            Hmisc:  5.2.0   
-          digest:  0.6.37  
           scales:  1.3.0   
+          digest:  0.6.37  
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
           plotly:  4.10.4  

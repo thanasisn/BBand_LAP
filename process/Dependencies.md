@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/process/ 
-At: 2024-11-07 
+At: 2024-11-08 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -19,5 +19,5 @@ At: 2024-11-07
            tools:  4.2.3   
           dbplyr:  2.5.0   
           duckdb:  1.1.2   
-          digest:  0.6.37  
           scales:  1.3.0   
+          digest:  0.6.37  
