@@ -41,7 +41,7 @@
 #' ---
 
 #'
-#'  **SIG**
+#' **DB Stats**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -52,7 +52,7 @@
 #+ echo=F, include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
-knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(dev       = "pdf"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
@@ -78,6 +78,7 @@ library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
+library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
 panderOptions("table.alignment.default", "right")
 panderOptions("table.split.table",        120   )
@@ -90,6 +91,7 @@ gather        <- readRDS(overview_data)
 
 varstat   <- data.table()
 datstat   <- data.table()
+rowstat   <- data.table()
 
 databases <- unique(sapply(gather, "[[", "base_name"))
 for (adb in databases) {
@@ -109,6 +111,11 @@ for (adb in databases) {
   for (il in 1:length(chosen)) {
     ll <- chosen[il][[1]]
 
+    tt <- ll$db_stats
+    tt <- tt[, .(Rows = unique(N)), by = Table]
+    tt[, Date := ll$date ]
+    rowstat <- rbind(rowstat, tt)
+
     varstat <- rbind(varstat,
                      data.frame(ll$db_stats,
                                 Date = ll$date,
@@ -118,8 +125,9 @@ for (adb in databases) {
 
 colstat <- varstat[, .N ,by = .(Data, Date, Table)]
 
-
-library(ggplot2)
+## __ Data density and size  ---------------------------------------------------
+#' ## Data density and size
+#+ echo=F, include=T, results="asis"
 
 ggplot(data = datstat) +
  geom_step(aes(x = date, y = Size, colour = Data))
@@ -131,8 +139,16 @@ ggplot(data = colstat) +
   geom_step(aes(x = Date, y = N, colour = Table))
 
 
+
+## __ Data fill  ---------------------------------------------------
+#' ## Data fill
+#+ echo=F, include=T, results="asis"
+
 varstat <- varstat[missing != 0]
 setorder(varstat, Variable, Date)
+
+## to do break plot to max quantile for each var
+
 
 for (at in unique(varstat$Table)) {
   pp <- varstat[Table == at]
@@ -140,6 +156,20 @@ for (at in unique(varstat$Table)) {
     geom_step(aes(x = Date, y = fill_pc, colour = Variable))
   show(p)
 }
+
+
+
+## __ Data Rows  ---------------------------------------------------
+#' ## Data Rows
+#+ echo=F, include=T, results="asis"
+ggplot(data = rowstat[Table == "META"]) +
+  geom_step(aes(x = Date, y = Rows, colour = Table))
+
+ggplot(data = rowstat[Table == "LAP"]) +
+  geom_step(aes(x = Date, y = Rows, colour = Table))
+
+ggplot(data = rowstat[Table == "params"]) +
+  geom_step(aes(x = Date, y = Rows, colour = Table))
 
 
 
