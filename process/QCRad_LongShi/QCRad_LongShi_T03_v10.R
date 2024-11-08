@@ -252,6 +252,9 @@ cat(pander(DT |> select(!!flagname_OBS) |> pull() |> table(),
 cat(" \n \n")
 
 
+## __  Yearly plots  -----------------------------------------------------------
+#' ### Yearly plots
+#+ echo=F, include=T, results="asis"
 years <- DT                          |>
   filter(!is.na(DiffuseFraction_kd)) |>
   select(year)                       |>

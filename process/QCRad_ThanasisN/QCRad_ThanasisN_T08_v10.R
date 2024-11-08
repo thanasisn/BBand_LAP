@@ -65,8 +65,8 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T05_v10.R"
-Script.ID    <- "Q5"
+Script.Name  <- "~/BBand_LAP/process/QCRad_ThanasisN/QCRad_ThanasisN_T08_v10.R"
+Script.ID    <- "Q8"
 parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
@@ -86,6 +86,7 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
+require(scales,     warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Variables  -----------------------------------------------------------------
 if (file.exists(parameter_fl)) {
@@ -104,77 +105,94 @@ if (interactive()) {
 DO_PLOTS       <- TRUE
 # Ignore previous flagged points in plots (not fully implemented yet)
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
-IGNORE_FLAGGED <- FALSE
+# IGNORE_FLAGGED <- FALSE
 
-flagname_DIR     <- "QCv10_05_dir_flag"
-QS$plot_elev_T05 <- 2
+flagname_BTH     <- "QCv10_08_bth_flag"
+QS$plot_elev_T08 <- 2
 
 if (Sys.info()["nodename"] == "sagan") {
 
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-  ## 5. Tracker is off test  -------------------------------------------------
+  ## 8. Test for inverted values  --------------------------------------------
   #'
-  #' ## 5. Tracker is off test
+  #' ## 8. Test for inverted values
   #'
-  #' This test use a diffuse model. A better one will be implemented when one
-  #' is produced and accepted.
+  #' Test the ratio of Diffuse / Global radiation.
+  #' When the Diffuse is too lower than Global, (less than a % limit).
+  #'
+  #' This denotes obstacles on the mornings mostly, or very low
+  #' signals when Sun is near the horizon.
+  #' Due to the time difference of sun shine, due to geometry, location and
+  #' obstacles.
+  #'
+  #' And possible cases of Instrument windows cleaning shadowing.
+  #'
+  #' Probably these value should be removed for CS when occurring on low
+  #' elevation angles, as the measurements can not be considered to reflect
+  #' the same condition of Sun visibility.
+  #'
+  #' Additional criteria is needed for any data drop.
   #'
   #+ echo=F, include=T, results="asis"
 
-  ## criteria
-  QS$Tracking_min_elev <-    5
-  QS$ClrSW_lim         <-    0.85
-  QS$glo_min           <-   25
-  ## Global Clear SW model
-  QS$ClrSW_a           <- 1050.5
-  QS$ClrSW_b           <-    1.095
+  QS$dir_glo_invert  <- 0.05  # Diffuse Inversion threshold factor
+  QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
 
-  cat(paste("\n5. Tracking test", flagname_DIR, "\n\n"))
+  cat(paste("\n8. Inversion test.\n\n"))
 
   ## __ Make categorical columns  ----------------------------------------------
   categories <- c("empty",
                   "pass",
-                  "Possible no tracking (24)")
+                  "Direct > global soft (14)",
+                  "Direct > global hard (15)")
 
-  remove_column(con, "LAP", flagname_DIR)
-  make_categorical_column(flagname_DIR, categories, con, "LAP")
+  remove_column(con, "LAP", flagname_BTH)
+  make_categorical_column(flagname_GLB, categories, con, "LAP")
 
-  ## __ Direct -----------------------------------------------------------------
-  ADD <- tbl(con, "LAP")                        |>
-    filter(Elevat > QS$sun_elev_min)            |>
-    select(Date, SZA, Sun_Dist_Astropy, Elevat,
-           DIR_strict, DIFF_strict, GLB_strict,
-           !!flagname_DIR)                      |>
-    to_arrow()                                  |>
+
+
+
+
+  stop("d")
+  ## __ Both  ------------------------------------------------------------
+  ADD <- tbl(con, "LAP")                              |>
+    filter(Elevat > QS$sun_elev_min)                  |>
+    filter(!is.na(DIFF_strict))                        |>
+    filter(!is.na(DiffuseFraction_kd))                |>
+    select(Date, GLB_strict, SZA, DiffuseFraction_kd) |>
     mutate(
 
-      ## Clear Sky Sort-Wave model
-      ClrSW_ref2 := case_when(
-        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b > 9000
-        ~ 9000,
-        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b < 9000
-        ~ (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b
-      ),
+      !!flagname_UPP := case_when(
 
-    ) |>
-    mutate(
+        DiffuseFraction_kd  > QS$dif_rati_pr1  &
+          SZA              <= QS$dif_sza_break &
+          GLB_strict        > QS$dif_watt_lim  ~ "Diffuse ratio comp max (11)",
 
-      !!flagname_DIR := case_when(
-        GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim           &
-          DIFF_strict / GLB_strict > QS$ClrSW_lim         &
-          GLB_strict               > QS$glo_min           &
-          Elevat                   > QS$Tracking_min_elev ~ "Possible no tracking (24)",
+        DiffuseFraction_kd  > QS$dif_rati_pr2  &
+          SZA               > QS$dif_sza_break &
+          GLB_strict        > QS$dif_watt_lim  ~ "Diffuse ratio comp max (11)",
 
         .default = "pass"
-      )
-    )
-
-  ## this needs a lot of memory, could do it in batches
-  ADD <- ADD |> collect() |> data.table()
+      ))
   res <- update_table(con, ADD, "LAP", "Date")
-  rm(ADD); dummy <- gc()
+
+
+
+
+  datapart[, Relative_diffuse := 100 * (HOR_strict  - GLB_strict) / GLB_strict ]
+  datapart[ is.infinite(Relative_diffuse), Relative_diffuse := NA]
+
+  datapart[Relative_diffuse > QS$dir_glo_invert  &
+             GLB_strict       > QS$dir_glo_glo_off,
+           (flagname_BTH) := "Direct > global soft (14)"]
+  datapart[Relative_diffuse > QS$dir_glo_invert,
+           (flagname_BTH) := "Direct > global hard (15)"]
+
+  rm(list = ls(pattern = "flagname_.*"))
+  dummy <- gc()
+
 
   ## __  Store used filters parameters  ----------------------------------------
   saveRDS(object = QS,
@@ -190,92 +208,73 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 DT <- tbl(con, "LAP")                  |>
   filter(Day    > QCrad_plot_date_min) |>
   filter(Day    < QCrad_plot_date_max) |>
-  filter(Elevat > QS$plot_elev_T05)
+  filter(Elevat > QS$plot_elev_T08)
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
-#' \FloatBarrier
-#' \newpage
-#' ## 4. Climatological (configurable) Limits
-#'
-#+ echo=F, include=T, results="asis"
 
 ## __  Statistics  -------------------------------------------------------------
 #' ### Statistics
 #+ echo=F, include=T, sesults="asis"
-cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
-           caption = flagname_DIR))
+
+stop()
+
+cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always"),
+           caption = flagname_BTH))
 cat(" \n \n")
 
-test <- DT |>
-  select(DIR_strict, GLB_strict, DIFF_strict, ClrSW_ref2) |>
+test <- BB |>
+  filter(Elevat > 0) |>
+  select(!!flagname_BTH, Relative_diffuse, Elevat, GLB_strict, HOR_strict) |>
   collect() |> data.table()
 
-
-hist(test[GLB_strict / ClrSW_ref2 < 2,
-          GLB_strict / ClrSW_ref2], breaks = 100)
-abline(v = QS$ClrSW_lim, col = "red", lty = 3)
-cat(" \n \n")
-
-hist(test[DIFF_strict / GLB_strict > -0.5,
-          DIFF_strict / GLB_strict], breaks = 100)
-abline(v = QS$ClrSW_lim, col = "red", lty = 3)
-cat(" \n \n")
-
-hist(test[, GLB_strict], breaks = 100)
-abline(v = QS$glo_min, col = "red", lty = 3)
+hist(test[Relative_diffuse < 10, Relative_diffuse], breaks = 100)
+abline(v = QS$dir_glo_invert, lty = 3, col = "red")
 cat(" \n \n")
 
 
-## __  Daily plots  ------------------------------------------------------------
-#' ### Daily plots
+
+pp <- DT |>
+  filter(Elevat > QS$plot_elev_T08) |>
+  filter(!is.na(GLB_wpsm))   |>
+  filter(!is.na(DIR_wpsm))   |>
+  select(
+    Elevat, SZA,
+    Transmittance_DIR, Transmittance_GLB, DiffuseFraction_kd,
+    GLB_wpsm, DIR_wpsm, DIR_strict, GLB_strict,
+    DIFF_strict) |>
+  collect() |> data.table()
+
+## create dirty diffuse
+pp[, HOR_wpsm  := DIR_strict * cos(SZA * pi / 180)]
+# pp[, DIFF_wpsm := GLB_wpsm - HOR_wpsm]
+pp[, DIFF_wpsm := GLB_strict - HOR_wpsm]
+pp[, kd_wpsm   := DIFF_wpsm / GLB_strict]
+
+
+hist(pp$Transmittance_DIR , breaks = 100)
+hist(pp$Transmittance_GLB , breaks = 100)
+hist(pp$DiffuseFraction_kd, breaks = 100)
+hist(pp$DIFF_wpsm         , breaks = 100)
+hist(pp[, kd_wpsm]       , breaks = 100)
+
+pp[kd_wpsm < QS$dir_glo_invert, ]
+
+hist(test[Relative_diffuse > QS$dir_glo_invert & Elevat  > 3, Elevat], breaks = 100)
+hist(test[Relative_diffuse > QS$dir_glo_invert & Elevat  > 3, HOR_strict - GLB_strict], breaks = 100)
+hist(test[Relative_diffuse > QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, Elevat], breaks = 100)
+hist(test[Relative_diffuse > QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, HOR_strict - GLB_strict], breaks = 100)
+
+
+
+
+stop()
+
+
+## __  Yearly plots  -----------------------------------------------------------
+#' ### Yearly plots
 #+ echo=F, include=T, results="asis"
-if (DO_PLOTS) {
 
-  if (!interactive()) {
-    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
-                    sub("\\.R$", "", basename(Script.Name)),
-                    ".pdf")
-    pdf(file = afile)
-  }
-
-  choose <- setdiff(
-    DT |> select(!!flagname_DIR) |> distinct() |> pull() |> as.character(),
-    c("empty", "pass")
-  )
-  tmp <- DT |>
-    filter(QCv10_05_dir_flag %in% choose) |>
-    filter(!is.na(DIR_strict)) |>
-    select(Day) |>
-    distinct()  |> collect() |> data.table()
-
-  for (ad in sort(unique(tmp$Day))) {
-    ad <- as.Date(ad, origin = origin)
-    pp <- DT |>
-      filter(Day == ad) |>
-      select(Date,
-             DIR_strict, GLB_strict, HOR_strict,
-             ClrSW_ref2,
-             !!flagname_DIR) |>
-      collect() |> data.table()
-    setorder(pp, Date)
-
-    ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = T)
-    plot(pp$Date, pp$DIR_strict, "l", col = "blue",
-         ylim = ylim, xlab = "", ylab = "wattDIR")
-    lines(pp$Date, pp$GLB_strict, col = "green")
-    lines(pp$Date, pp$HOR_strict, col = "cyan")
-    title(paste("#5", as.Date(ad, origin = "1970-01-01")))
-    ## plot limits
-    # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
-    lines(pp$Date, pp$ClrSW_ref2, col = "magenta")
-    ## mark offending data
-    points(pp[!get(flagname_DIR) %in% c("empty", "pass"), DIR_strict, Date],
-           col = "red", pch = 1)
-  }
-}
-if (!interactive()) dummy <- dev.off()
-#+ echo=F, include=T
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()

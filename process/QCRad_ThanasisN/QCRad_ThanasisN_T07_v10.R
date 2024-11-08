@@ -65,8 +65,8 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T05_v10.R"
-Script.ID    <- "Q5"
+Script.Name  <- "~/BBand_LAP/process/QCRad_ThanasisN/QCRad_ThanasisN_T07_v10.R"
+Script.ID    <- "Q7"
 parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
@@ -86,6 +86,7 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
+require(scales,     warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Variables  -----------------------------------------------------------------
 if (file.exists(parameter_fl)) {
@@ -104,81 +105,52 @@ if (interactive()) {
 DO_PLOTS       <- TRUE
 # Ignore previous flagged points in plots (not fully implemented yet)
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
-IGNORE_FLAGGED <- FALSE
+# IGNORE_FLAGGED <- FALSE
 
-flagname_DIR     <- "QCv10_05_dir_flag"
-QS$plot_elev_T05 <- 2
+flagname_BTH     <- "QCv10_07_bth_flag"
+QS$plot_elev_T07 <- 2
 
 if (Sys.info()["nodename"] == "sagan") {
 
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-  ## 5. Tracker is off test  -------------------------------------------------
+  ## 7. Test for obstacles  --------------------------------------------------
   #'
-  #' ## 5. Tracker is off test
+  #' ## 7. Test for obstacles
   #'
-  #' This test use a diffuse model. A better one will be implemented when one
-  #' is produced and accepted.
+  #' This is deactivated
   #'
-  #+ echo=F, include=T, results="asis"
 
-  ## criteria
-  QS$Tracking_min_elev <-    5
-  QS$ClrSW_lim         <-    0.85
-  QS$glo_min           <-   25
-  ## Global Clear SW model
-  QS$ClrSW_a           <- 1050.5
-  QS$ClrSW_b           <-    1.095
+  ## . . . Direct --------------------------------------------------------
 
-  cat(paste("\n5. Tracking test", flagname_DIR, "\n\n"))
+  # source("./QCRad_Obstacles_definition_v2.R")
 
-  ## __ Make categorical columns  ----------------------------------------------
-  categories <- c("empty",
-                  "pass",
-                  "Possible no tracking (24)")
+  ## get biology building tag
+  # biol     <- biolog_build(DATA$Azimuth, DATA$Elevat )
+  # ## apply filter for biology building
+  # ## this is not pretty we are using the indexes to mark data
+  # ## have to parse all the original data although the filter is applicable
+  # ## for a specific range of Azimuth angles
+  # building <- which(biol$type == "bellow")
+  # existing <- which(is.na(DATA_year$QCF_DIR))
+  # exclude  <- building %in% existing
+  #
+  # DATA_year$QCF_DIR[    building[exclude] ] <- "Biology Building (22)"
+  # DATA_year$QCF_DIR_07[ building[exclude] ] <- "Biology Building (22)"
+  #
+  # ## Pole abstraction is a possibility, should combine with Direct to decide
+  # suspects <- DATA_year$Azimuth > Pole_az_lim[1] & DATA_year$Azimuth < Pole_az_lim[2]
+  # DATA_year$QCF_DIR[    suspects ]          <- "Possible Direct Obstruction (23)"
+  # DATA_year$QCF_DIR_07[ suspects ]          <- "Possible Direct Obstruction (23)"
 
-  remove_column(con, "LAP", flagname_DIR)
-  make_categorical_column(flagname_DIR, categories, con, "LAP")
 
-  ## __ Direct -----------------------------------------------------------------
-  ADD <- tbl(con, "LAP")                        |>
-    filter(Elevat > QS$sun_elev_min)            |>
-    select(Date, SZA, Sun_Dist_Astropy, Elevat,
-           DIR_strict, DIFF_strict, GLB_strict,
-           !!flagname_DIR)                      |>
-    to_arrow()                                  |>
-    mutate(
 
-      ## Clear Sky Sort-Wave model
-      ClrSW_ref2 := case_when(
-        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b > 9000
-        ~ 9000,
-        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b < 9000
-        ~ (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b
-      ),
 
-    ) |>
-    mutate(
-
-      !!flagname_DIR := case_when(
-        GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim           &
-          DIFF_strict / GLB_strict > QS$ClrSW_lim         &
-          GLB_strict               > QS$glo_min           &
-          Elevat                   > QS$Tracking_min_elev ~ "Possible no tracking (24)",
-
-        .default = "pass"
-      )
-    )
-
-  ## this needs a lot of memory, could do it in batches
-  ADD <- ADD |> collect() |> data.table()
-  res <- update_table(con, ADD, "LAP", "Date")
-  rm(ADD); dummy <- gc()
 
   ## __  Store used filters parameters  ----------------------------------------
-  saveRDS(object = QS,
-          file   = parameter_fl)
+  # saveRDS(object = QS,
+          # file   = parameter_fl)
 }
 
 ##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
@@ -190,92 +162,27 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 DT <- tbl(con, "LAP")                  |>
   filter(Day    > QCrad_plot_date_min) |>
   filter(Day    < QCrad_plot_date_max) |>
-  filter(Elevat > QS$plot_elev_T05)
+  filter(Elevat > QS$plot_elev_T07)
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
-#' \FloatBarrier
+####  7. Test for obstacles  ---------------------------------------------------
+#'
 #' \newpage
-#' ## 4. Climatological (configurable) Limits
+#' ## 7. Test for obstacles
 #'
 #+ echo=F, include=T, results="asis"
 
 ## __  Statistics  -------------------------------------------------------------
 #' ### Statistics
 #+ echo=F, include=T, sesults="asis"
-cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
-           caption = flagname_DIR))
-cat(" \n \n")
-
-test <- DT |>
-  select(DIR_strict, GLB_strict, DIFF_strict, ClrSW_ref2) |>
-  collect() |> data.table()
 
 
-hist(test[GLB_strict / ClrSW_ref2 < 2,
-          GLB_strict / ClrSW_ref2], breaks = 100)
-abline(v = QS$ClrSW_lim, col = "red", lty = 3)
-cat(" \n \n")
 
-hist(test[DIFF_strict / GLB_strict > -0.5,
-          DIFF_strict / GLB_strict], breaks = 100)
-abline(v = QS$ClrSW_lim, col = "red", lty = 3)
-cat(" \n \n")
-
-hist(test[, GLB_strict], breaks = 100)
-abline(v = QS$glo_min, col = "red", lty = 3)
-cat(" \n \n")
-
-
-## __  Daily plots  ------------------------------------------------------------
-#' ### Daily plots
+## __  Yearly plots  -----------------------------------------------------------
+#' ### Yearly plots
 #+ echo=F, include=T, results="asis"
-if (DO_PLOTS) {
 
-  if (!interactive()) {
-    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
-                    sub("\\.R$", "", basename(Script.Name)),
-                    ".pdf")
-    pdf(file = afile)
-  }
-
-  choose <- setdiff(
-    DT |> select(!!flagname_DIR) |> distinct() |> pull() |> as.character(),
-    c("empty", "pass")
-  )
-  tmp <- DT |>
-    filter(QCv10_05_dir_flag %in% choose) |>
-    filter(!is.na(DIR_strict)) |>
-    select(Day) |>
-    distinct()  |> collect() |> data.table()
-
-  for (ad in sort(unique(tmp$Day))) {
-    ad <- as.Date(ad, origin = origin)
-    pp <- DT |>
-      filter(Day == ad) |>
-      select(Date,
-             DIR_strict, GLB_strict, HOR_strict,
-             ClrSW_ref2,
-             !!flagname_DIR) |>
-      collect() |> data.table()
-    setorder(pp, Date)
-
-    ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = T)
-    plot(pp$Date, pp$DIR_strict, "l", col = "blue",
-         ylim = ylim, xlab = "", ylab = "wattDIR")
-    lines(pp$Date, pp$GLB_strict, col = "green")
-    lines(pp$Date, pp$HOR_strict, col = "cyan")
-    title(paste("#5", as.Date(ad, origin = "1970-01-01")))
-    ## plot limits
-    # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
-    lines(pp$Date, pp$ClrSW_ref2, col = "magenta")
-    ## mark offending data
-    points(pp[!get(flagname_DIR) %in% c("empty", "pass"), DIR_strict, Date],
-           col = "red", pch = 1)
-  }
-}
-if (!interactive()) dummy <- dev.off()
-#+ echo=F, include=T
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
