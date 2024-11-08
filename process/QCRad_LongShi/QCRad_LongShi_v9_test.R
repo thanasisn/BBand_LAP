@@ -328,12 +328,6 @@ if (QS$TEST_10) {
 #'
 #+ echo=F, include=T, results="asis"
 if (QS$TEST_06) {
-    testN        <- 6
-    flagname_BTH <- paste0("QCv9_", sprintf("%02d", testN), "_bth_flag")
-
-    cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always"),
-               caption = flagname_BTH))
-    cat(" \n \n")
 
     test <- BB |> select(DIFF_strict, RaylDIFF) |> collect() |> as.data.table()
     hist(test[, DIFF_strict - RaylDIFF ], breaks = 100)
