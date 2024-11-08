@@ -86,6 +86,7 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
+require(scales,     warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Variables  -----------------------------------------------------------------
 if (file.exists(parameter_fl)) {
@@ -233,12 +234,12 @@ cat(pander(DT |> select(!!flagname_BTH) |> pull() |> table(),
            caption = flagname_BTH))
 cat(" \n \n")
 
-test <- DT |>
+pp <- DT |>
   filter(!is.na(DIFF_strict)) |>
   filter(!is.na(RaylDIFF))   |>
   select(DIFF_strict, RaylDIFF) |> collect() |> data.table()
 
-hist(test[, DIFF_strict - RaylDIFF ], breaks = 100)
+hist(pp[, DIFF_strict - RaylDIFF ], breaks = 100)
 abline(v = QS$Rayleigh_lower_lim, lty = 3, col = "red")
 abline(v = QS$Rayleigh_upper_lim, lty = 3, col = "red")
 cat(" \n \n")
@@ -249,30 +250,60 @@ cat(" \n \n")
 #' ### Daily plots
 #+ echo=F, include=T
 
-stop("dd")
+
 
 
 ## Info flags to ignore in plots
 if (IGNORE_FLAGGED) {
-  ignore <- grep(paste0("QCv9_0[1-", testN - 1 ,"]"), names(BB), value = T)
+  ignore <- grep("QCv10_0[1-5]" ,DT |> colnames(), value = T)
   cat("**Plots will ignore previoysly flaged points: ", ignore, "**\n")
 }
 
 ## Yearly plots for Diffuse
-years <- (BB |> filter(!is.na(DIFF_strict)) |>
-            select(year) |> unique() |> collect() |> pull())
+years <- DT |>
+  filter(!is.na(DIFF_strict)) |>
+  select(year) |> distinct()  |>
+  collect()    |> pull()
 
 for (ay in years) {
-  pp <- data.table(BB |> filter(year(Date) == ay & Elevat > 0) |> collect())
+
+  pp <- DT |>
+    filter(year == ay) |>
+    select(Date, SZA, Azimuth,
+           DIFF_strict,
+           !!flagname_BTH,
+           all_of(ignore)) |>
+    collect() |> data.table()
+
+stop("dd")
+
 
   ## Ignore previously flagged
   pp[, Ignore := FALSE]
   if (IGNORE_FLAGGED) {
+
     pp[
-      pp[, rowSums(!is.na(.SD)) > 0 &
-           !is.na(get(flagname_BTH)), .SDcols = patterns("^QCv9_0[1-5]")],
-      Ignore := TRUE
-    ]
+      !QCv10_01_dir_flag %in% c("empty", "pass") |
+        !QCv10_01_glb_flag %in% c("empty", "pass") |
+        !QCv10_02_dir_flag %in% c("empty", "pass") |
+        !QCv10_02_glb_flag %in% c("empty", "pass") |
+        !QCv10_03_upp_flag %in% c("empty", "pass") |
+        !QCv10_03_low_flag %in% c("empty", "pass") |
+        !QCv10_03_obs_flag %in% c("empty", "pass") |
+        !QCv10_04_dir_flag %in% c("empty", "pass") |
+        !QCv10_04_glb_flag %in% c("empty", "pass") |
+        !QCv10_05_dir_flag %in% c("empty", "pass") ,
+    Ignore := FALSE]
+
+    pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore]
+    pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  &  Ignore]
+
+
+    # pp[
+    #   pp[, rowSums(!is.na(.SD)) > 0 &
+    #        !is.na(get(flagname_BTH)), .SDcols = patterns("^QCv9_0[1-5]")],
+    #   Ignore := TRUE
+    # ]
   }
 
   ## plot by SZA

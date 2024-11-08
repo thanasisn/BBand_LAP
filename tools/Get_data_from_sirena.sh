@@ -94,15 +94,17 @@ rsync -arvt -u                                 \
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "get Sky camera files"
-rsync -arvt                                   \
-  --exclude "Thumns.db"                       \
-  "$SOURCE/products/skycam"                   \
-  "/home/single/LAP_skycam/"
-rsync -arvt                                   \
-  --exclude "Thumns.db"                       \
-  "$SOURCE/products/skycam_old"               \
-  "/home/single/LAP_skycam/"
-
+## Don't need to wait for this
+(
+  rsync -arvt                                 \
+    --exclude "Thumns.db"                     \
+    "$SOURCE/products/skycam"                 \
+    "/home/single/LAP_skycam/"
+  rsync -arvt                                 \
+    --exclude "Thumns.db"                     \
+    "$SOURCE/products/skycam_old"             \
+    "/home/single/LAP_skycam/"
+) &
 
 ##  Commit data to github to preserve manual edits  ----------------------------
 folders=(
