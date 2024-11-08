@@ -60,38 +60,24 @@ pids=()
 wait "${pids[@]}"; pids=()
 
 
-(
-  info "##  Start build_duckdb  ##"
-  "$HOME/BBand_LAP/build_duckdb/Build_BB_DB.R"
-  info "##  End build_duckdb STATUS:$?  ##"
-) & pids+=($!)
+info "##  Start build_duckdb  ##"
+"$HOME/BBand_LAP/build_duckdb/Build_BB_DB.R"
+info "##  End build_duckdb STATUS:$?  ##"
 
 
-wait "${pids[@]}"; pids=()
+info "##  Start QCRad LongShi  ##"
+"$HOME/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_run.R"
+info "##  End QCRad LongShi STATUS:$?  ##"
 
 
-(
-  info "##  Start QCRad  ##"
-  "$HOME/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_run.R"
-  info "##  End QCRad STATUS:$?  ##"
-) & pids+=($!)
+info "##  Start QCRad ThanaisN  ##"
+"$HOME/BBand_LAP/process/QCRad_ThanasisN/QCRad_ThanasisN_run.R"
+info "##  End QCRad ThanaisN STATUS:$?  ##"
 
 
-wait "${pids[@]}"; pids=()
-
-
-(
-  info "##  Start inspect_duckdb  ##"
-  "$HOME/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R"
-  info "##  End inspect_duckdb STATUS:$?  ##"
-) & pids+=($!)
-
-
-wait "${pids[@]}"; pids=()
-
-
-
-
+info "##  Start inspect_duckdb  ##"
+"$HOME/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R"
+info "##  End inspect_duckdb STATUS:$?  ##"
 
 
 

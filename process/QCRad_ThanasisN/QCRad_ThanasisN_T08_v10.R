@@ -110,7 +110,7 @@ IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 flagname_BTH     <- "QCv10_08_bth_flag"
 QS$plot_elev_T08 <- 2
 
-if (Sys.info()["nodename"] == "sagan") {
+if (FALSE | Sys.info()["nodename"] == "sagan") {
 
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))
@@ -138,7 +138,7 @@ if (Sys.info()["nodename"] == "sagan") {
   #+ echo=F, include=T, results="asis"
 
   QS$dir_glo_invert  <- 0.05  # Diffuse Inversion threshold factor
-  QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
+  QS$dir_glo_glo_off <- 5     # Global min to use
 
   cat(paste("\n8. Inversion test.\n\n"))
 
@@ -212,63 +212,91 @@ DT <- tbl(con, "LAP")                  |>
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
+QS$dir_glo_invert  <- 0.05  # Diffuse Inversion threshold factor
+QS$dir_glo_glo_off <- 5     # Global min to use
 
 ## __  Statistics  -------------------------------------------------------------
 #' ### Statistics
 #+ echo=F, include=T, sesults="asis"
 
-stop()
 
-cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always"),
-           caption = flagname_BTH))
-cat(" \n \n")
+# cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always"),
+#            caption = flagname_BTH))
+# cat(" \n \n")
 
-test <- BB |>
-  filter(Elevat > 0) |>
-  select(!!flagname_BTH, Relative_diffuse, Elevat, GLB_strict, HOR_strict) |>
+
+
+test <- DT |>
+  filter(Elevat > QS$plot_elev_T08) |>
+  filter(!is.na(GLB_wpsm))   |>
+  filter(!is.na(DIR_wpsm))   |>
+  select(
+    Elevat, SZA, Day,
+    GLB_wpsm, DIR_wpsm, DIR_strict, GLB_strict, HOR_strict,
+    DIFF_strict) |>
   collect() |> data.table()
 
-hist(test[Relative_diffuse < 10, Relative_diffuse], breaks = 100)
+
+## create dirty diffuse
+test[, HOR_wpsm  := DIR_strict * cos(SZA * pi / 180)]
+# test[, DIFF_wpsm := GLB_wpsm - HOR_wpsm]
+test[, DIFF_wpsm := GLB_strict - HOR_wpsm]
+test[, kd_wpsm   := DIFF_wpsm / GLB_strict]
+
+hist(test[kd_wpsm < 0.2, kd_wpsm], breaks = 100)
 abline(v = QS$dir_glo_invert, lty = 3, col = "red")
 cat(" \n \n")
 
 
 
-pp <- DT |>
-  filter(Elevat > QS$plot_elev_T08) |>
-  filter(!is.na(GLB_wpsm))   |>
-  filter(!is.na(DIR_wpsm))   |>
-  select(
-    Elevat, SZA,
-    Transmittance_DIR, Transmittance_GLB, DiffuseFraction_kd,
-    GLB_wpsm, DIR_wpsm, DIR_strict, GLB_strict,
-    DIFF_strict) |>
-  collect() |> data.table()
+hist(test$DIFF_wpsm         , breaks = 100)
+hist(test[, kd_wpsm]        , breaks = 100)
 
-## create dirty diffuse
-pp[, HOR_wpsm  := DIR_strict * cos(SZA * pi / 180)]
-# pp[, DIFF_wpsm := GLB_wpsm - HOR_wpsm]
-pp[, DIFF_wpsm := GLB_strict - HOR_wpsm]
-pp[, kd_wpsm   := DIFF_wpsm / GLB_strict]
+test[kd_wpsm < QS$dir_glo_invert,
+   flagname_BTH := "Hit"]
+
+hist(test[kd_wpsm < QS$dir_glo_invert & Elevat  > 3, Elevat],    breaks = 100)
+hist(test[kd_wpsm < QS$dir_glo_invert & Elevat  > 3, DIFF_wpsm], breaks = 100)
+hist(test[kd_wpsm < QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, Elevat],    breaks = 100)
+hist(test[kd_wpsm < QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, DIFF_wpsm], breaks = 100)
 
 
-hist(pp$Transmittance_DIR , breaks = 100)
-hist(pp$Transmittance_GLB , breaks = 100)
-hist(pp$DiffuseFraction_kd, breaks = 100)
-hist(pp$DIFF_wpsm         , breaks = 100)
-hist(pp[, kd_wpsm]       , breaks = 100)
-
-pp[kd_wpsm < QS$dir_glo_invert, ]
-
-hist(test[Relative_diffuse > QS$dir_glo_invert & Elevat  > 3, Elevat], breaks = 100)
-hist(test[Relative_diffuse > QS$dir_glo_invert & Elevat  > 3, HOR_strict - GLB_strict], breaks = 100)
-hist(test[Relative_diffuse > QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, Elevat], breaks = 100)
-hist(test[Relative_diffuse > QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, HOR_strict - GLB_strict], breaks = 100)
+test <- test[!is.na(flagname_BTH) & (!is.na(HOR_strict) | !is.na(GLB_strict) ) ]
 
 
+for (ad in sort(unique(test$Day))) {
+  ddd <- as.Date(ad, origin = origin)
+  pp  <- DT |>
+    filter(Day == ddd) |>
+    select(
+      Elevat, SZA, Date, Azimuth,
+      GLB_wpsm, DIR_wpsm, DIR_strict, GLB_strict, HOR_strict,
+      DIFF_strict) |>
+    collect() |> data.table()
+  setorder(pp, Date)
+  ## create dirty diffuse
+  pp[, HOR_wpsm  := DIR_strict * cos(SZA * pi / 180)]
+  # test[, DIFF_wpsm := GLB_wpsm - HOR_wpsm]
+  pp[, DIFF_wpsm := GLB_strict - HOR_wpsm]
+  pp[, kd_wpsm   := DIFF_wpsm / GLB_strict]
+
+  pp[kd_wpsm < QS$dir_glo_invert,
+       flagname_BTH := "Hit"]
+
+  ylim <- range(pp[, HOR_strict, GLB_strict], na.rm = T)
+  plot( pp$Azimuth, pp$HOR_strict, "l",
+        ylim = ylim, col = "blue", ylab = "", xlab = "")
+  lines(pp$Azimuth, pp$GLB_strict, col = "green")
+  title(paste("#8", as.Date(ad, origin = "1970-01-01")))
+
+  points(pp[!is.na(flagname_BTH), HOR_strict, Azimuth],
+         col = "red")
+  points(pp[!is.na(flagname_BTH), GLB_strict, Azimuth],
+         col = "magenta")
+
+}
 
 
-stop()
 
 
 ## __  Yearly plots  -----------------------------------------------------------
