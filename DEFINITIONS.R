@@ -91,9 +91,3 @@ Sun_elev_MIN <- -2 * 0.103
 ##  QCRad Long Shi options  ----------------------------------------------------
 QCrad_plot_date_min <- as.Date("1992-01-01")
 QCrad_plot_date_max <- as.Date("2025-01-01")
-
-QCrad_plot_elev_T02  <- 2
-QCrad_plot_elev_T03  <- 2
-QCrad_plot_elev_T04  <- 2
-QCrad_plot_elev_T05  <- 2
-QCrad_plot_elev_T06  <- 2
