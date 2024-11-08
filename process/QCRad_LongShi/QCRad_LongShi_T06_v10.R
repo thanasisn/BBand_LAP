@@ -105,9 +105,10 @@ if (interactive()) {
 DO_PLOTS       <- TRUE
 # Ignore previous flagged points in plots (not fully implemented yet)
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
-IGNORE_FLAGGED <- FALSE
+# IGNORE_FLAGGED <- FALSE
 
-flagname_BTH <- "QCv10_06_bth_flag"
+flagname_BTH     <- "QCv10_06_bth_flag"
+QS$plot_elev_T06 <- 2
 
 if (Sys.info()["nodename"] == "sagan") {
 
@@ -118,7 +119,7 @@ if (Sys.info()["nodename"] == "sagan") {
   #'
   #' ## 6. Rayleigh Limit Diffuse Comparison
   #'
-  #' Compare inferred diffuse radiation with a modeled value of diffuse,
+  #' Compare inferred diffuse radiation with a modelled value of diffuse,
   #' based on SZA and atmospheric pressure.
   #'
   #' The upper limit denotes no tracking of CHP-1.
@@ -172,7 +173,7 @@ if (Sys.info()["nodename"] == "sagan") {
     filter(!is.na(TSI_TOA))                                |>
     filter(!is.na(Pressure))                               |>
     select(Date, SZA, TSI_TOA, Pressure,
-           DIFF_strict, GLB_strict, !!flagname_BTH)                     |>
+           DIFF_strict, GLB_strict, !!flagname_BTH)        |>
     to_arrow()                                             |>
     mutate(
 
@@ -199,6 +200,7 @@ if (Sys.info()["nodename"] == "sagan") {
       )
     )
 
+  ## this needs a lot of memory, could do it in batches
   ADD <- ADD |> collect() |> data.table()
   res <- update_table(con, ADD, "LAP", "Date")
 
@@ -216,8 +218,7 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 DT <- tbl(con, "LAP")                  |>
   filter(Day    > QCrad_plot_date_min) |>
   filter(Day    < QCrad_plot_date_max) |>
-  filter(Elevat > QCrad_plot_elev_T06)
-
+  filter(Elevat > QS$plot_elev_T06)
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
@@ -229,7 +230,7 @@ DT <- tbl(con, "LAP")                  |>
 
 ## __  Statistics  -------------------------------------------------------------
 #' ### Statistics
-#+ echo=F, include=T
+#+ echo=F, include=T, sesults="asis"
 cat(pander(DT |> select(!!flagname_BTH) |> pull() |> table(),
            caption = flagname_BTH))
 cat(" \n \n")
@@ -246,18 +247,12 @@ cat(" \n \n")
 
 
 
-## __  Daily plots  ------------------------------------------------------------
-#' ### Daily plots
-#+ echo=F, include=T
-
-
-
+## __  Yearly plots  -----------------------------------------------------------
+#' ### Yearly plots
+#+ echo=F, include=T, results="asis"
 
 ## Info flags to ignore in plots
-if (IGNORE_FLAGGED) {
-  ignore <- grep("QCv10_0[1-5]" ,DT |> colnames(), value = T)
-  cat("**Plots will ignore previoysly flaged points: ", ignore, "**\n")
-}
+ignore <- grep("QCv10_0[1-5]", DT |> colnames(), value = T)
 
 ## Yearly plots for Diffuse
 years <- DT |>
@@ -275,13 +270,9 @@ for (ay in years) {
            all_of(ignore)) |>
     collect() |> data.table()
 
-stop("dd")
-
-
   ## Ignore previously flagged
   pp[, Ignore := FALSE]
   if (IGNORE_FLAGGED) {
-
     pp[
       !QCv10_01_dir_flag %in% c("empty", "pass") |
         !QCv10_01_glb_flag %in% c("empty", "pass") |
@@ -293,11 +284,10 @@ stop("dd")
         !QCv10_04_dir_flag %in% c("empty", "pass") |
         !QCv10_04_glb_flag %in% c("empty", "pass") |
         !QCv10_05_dir_flag %in% c("empty", "pass") ,
-    Ignore := FALSE]
+      Ignore := TRUE]
 
-    pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore]
-    pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  &  Ignore]
-
+    # ni <- pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore]
+    # ig <- pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  &  Ignore]
 
     # pp[
     #   pp[, rowSums(!is.na(.SD)) > 0 &
@@ -314,11 +304,13 @@ stop("dd")
 
   ## plot flagged
   points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIFF_strict, SZA], cex = .7, col = alpha("magenta", 0.09))
-  points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIFF_strict, SZA], cex = .7, col = alpha("red", 0.4))
+  points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIFF_strict, SZA], cex = .7, col = alpha("red",     0.4))
+  points(pp[get(flagname_BTH) == "Rayleigh diffuse limit upper (18)"        & !Ignore, DIFF_strict, SZA], cex = .7, col = alpha("blue",    0.5))
+
 
   legend("topright",
-         legend = c("Diffuse (inferred)", "Rayleigh limit broad", "Rayleigh limit narrow"),
-         col    = c("black",              "magenta",             "red"),
+         legend = c("Diffuse (inferred)", "Rayleigh limit broad", "Rayleigh limit narrow", "Rayleigh limit upper"),
+         col    = c("black",              "magenta",              "red",                   "blue"),
          pch = 19, bty = "n", cex = 0.8 )
   cat(" \n \n")
 
@@ -331,13 +323,13 @@ stop("dd")
 
   ## plot flagged
   points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIFF_strict, Azimuth], cex = .7, col = alpha("magenta", 0.09))
-  points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIFF_strict, Azimuth], cex = .7, col = alpha("red", 0.7))
+  points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIFF_strict, Azimuth], cex = .7, col = alpha("red",     0.7))
+  points(pp[get(flagname_BTH) == "Rayleigh diffuse limit upper (18)"        & !Ignore, DIFF_strict, Azimuth], cex = .7, col = alpha("blue",    0.5))
 
   legend("topright",
-         legend = c("Diffuse (inferred)", "Rayleigh limit broad", "Rayleigh limit narrow"),
-         col    = c("black",              "magenta",             "red"),
+         legend = c("Diffuse (inferred)", "Rayleigh limit broad", "Rayleigh limit narrow", "Rayleigh limit upper"),
+         col    = c("black",              "magenta",              "red",                   "blue"),
          pch = 19, bty = "n", cex = 0.8 )
-  cat(" \n \n")
 
 
   ## plot by Date
@@ -348,50 +340,68 @@ stop("dd")
 
   ## plot flagged
   points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIFF_strict, Date], cex = .7, col = alpha("magenta", 0.09))
-  points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIFF_strict, Date], cex = .7, col = alpha("red", 0.7))
+  points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIFF_strict, Date], cex = .7, col = alpha("red",     0.7))
+  points(pp[get(flagname_BTH) == "Rayleigh diffuse limit upper (18)"        & !Ignore, DIFF_strict, Date], cex = .7, col = alpha("blue",    0.5))
 
   legend("topright",
-         legend = c("Diffuse (inferred)", "Rayleigh limit broad", "Rayleigh limit narrow"),
-         col    = c("black",              "magenta",             "red"),
+         legend = c("Diffuse (inferred)", "Rayleigh limit broad", "Rayleigh limit narrow", "Rayleigh limit upper"),
+         col    = c("black",              "magenta",              "red",                   "blue"),
          pch = 19, bty = "n", cex = 0.8 )
-  cat(" \n \n")
 
 }
 
 
-## Daily plots
+## __  Daily plots  ------------------------------------------------------------
+#' ### Daily plots
+#+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
   if (!interactive()) {
-    pdf(paste0("~/BBand_LAP/REPORTS/REPORTS/QCRad_V9_F", testN, ".pdf"))
+    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
+                    sub("\\.R$", "", basename(Script.Name)),
+                    ".pdf")
+    pdf(file = afile)
   }
 
-  ## plot on upper limit
+  choose <- setdiff(
+    DT |> select(!!flagname_BTH) |> distinct() |> pull() |> as.character(),
+    c("empty", "pass")
+  )
+  tmp <- DT |>
+    filter(QCv10_06_bth_flag %in% choose) |>
+    filter(!is.na(DIR_strict)) |>
+    select(Day) |>
+    distinct()  |> collect() |> data.table()
 
-  tmp <- BB |>
-    filter(get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)") |>
-    select(Date) |>
-    collect() |>
-    as.data.table()
-
-  for (ad in sort(unique(c(as.Date(tmp$Date))))) {
-
-    pp <- data.table(
-      BB |> filter(as.Date(Date) == as.Date(ad) &
-                     Elevat > QS$sun_elev_min)   |>
-        collect()
-    )
+  for (ad in sort(unique(tmp$Day))) {
+    ad <- as.Date(ad, origin = origin)
+    pp <- DT |>
+      filter(Day == ad) |>
+      select(Date, SZA, Azimuth,
+             RaylDIFF,
+             DIFF_strict, DIR_strict, GLB_strict,
+             !!flagname_BTH,
+             all_of(ignore)) |>
+      collect() |> data.table()
+    setorder(pp, Date)
 
     ## Ignore previously flagged
     pp[, Ignore := FALSE]
     if (IGNORE_FLAGGED) {
       pp[
-        pp[, rowSums(!is.na(.SD)) > 0 &
-             !is.na(get(flagname_BTH)),
-           .SDcols = patterns(paste0("^QCv9_0[1-", testN - 1, "]"))],
-        Ignore := TRUE
-      ]
+        !QCv10_01_dir_flag %in% c("empty", "pass") |
+          !QCv10_01_glb_flag %in% c("empty", "pass") |
+          !QCv10_02_dir_flag %in% c("empty", "pass") |
+          !QCv10_02_glb_flag %in% c("empty", "pass") |
+          !QCv10_03_upp_flag %in% c("empty", "pass") |
+          !QCv10_03_low_flag %in% c("empty", "pass") |
+          !QCv10_03_obs_flag %in% c("empty", "pass") |
+          !QCv10_04_dir_flag %in% c("empty", "pass") |
+          !QCv10_04_glb_flag %in% c("empty", "pass") |
+          !QCv10_05_dir_flag %in% c("empty", "pass") ,
+        Ignore := TRUE]
     }
+
 
     ## skip if all points are ignored
     if (all(pp$Ignore) == TRUE) next()
@@ -401,7 +411,7 @@ if (DO_PLOTS) {
     par(mar = c(2, 4, 2, 1))
 
     ## plot limits
-    ylim <- range(pp$DIFF_strict, pp$RaylDIFF, na.rm = T)
+    ylim <- range(pp$DIFF_strict, pp$RaylDIFF + QS$Rayleigh_upper_lim, na.rm = T)
     if (ylim[1] < -10) ylim[1] <- -10
     plot(pp$Date, pp$DIFF_strict, "l",
          ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
@@ -417,20 +427,18 @@ if (DO_PLOTS) {
          ylim = ylim, col = "green", ylab = "", xlab = "")
     lines(pp$Date, pp$DIR_strict, col = "blue" )
 
-    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIR_strict, Date], ylim = ylim, col = alpha("magenta", 0.5))
-    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, GLB_strict, Date], ylim = ylim, col = alpha("magenta", 0.5))
-    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIR_strict, Date], ylim = ylim, col = "red")
-    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, GLB_strict, Date], ylim = ylim, col = "red")
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIR_strict, Date], ylim = ylim, col = alpha("magenta", 0.4))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, GLB_strict, Date], ylim = ylim, col = alpha("magenta", 0.4))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIR_strict, Date], ylim = ylim, col = alpha("red",     0.5))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIR_strict, Date], ylim = ylim, col = alpha("red",     0.5))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit upper (18)"        & !Ignore, GLB_strict, Date], ylim = ylim, col = alpha("blue",    0.5))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit upper (18)"        & !Ignore, GLB_strict, Date], ylim = ylim, col = alpha("blue",    0.5))
 
     layout(1, 1)
   }
 }
-
 if (!interactive()) dummy <- dev.off()
-
-
-
-
+#+ echo=F, include=T
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()

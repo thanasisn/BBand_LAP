@@ -106,7 +106,8 @@ DO_PLOTS       <- TRUE
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 IGNORE_FLAGGED <- FALSE
 
-flagname_DIR <- "QCv10_05_dir_flag"
+flagname_DIR     <- "QCv10_05_dir_flag"
+QS$plot_elev_T05 <- 2
 
 if (Sys.info()["nodename"] == "sagan") {
 
@@ -198,8 +199,7 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 DT <- tbl(con, "LAP")                  |>
   filter(Day    > QCrad_plot_date_min) |>
   filter(Day    < QCrad_plot_date_max) |>
-  filter(Elevat > QCrad_plot_elev_T05)
-
+  filter(Elevat > QS$plot_elev_T05)
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
@@ -211,7 +211,7 @@ DT <- tbl(con, "LAP")                  |>
 
 ## __  Statistics  -------------------------------------------------------------
 #' ### Statistics
-#+ echo=F, include=T
+#+ echo=F, include=T, sesults="asis"
 cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
            caption = flagname_DIR))
 cat(" \n \n")
@@ -238,7 +238,7 @@ cat(" \n \n")
 
 ## __  Daily plots  ------------------------------------------------------------
 #' ### Daily plots
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
   if (!interactive()) {
