@@ -13,8 +13,11 @@ ldir="$HOME/BBand_LAP/REPORTS/LOGs/uwyo"
 mkdir -p "$ldir"
 LOG_FILE="$ldir/$(basename "$0")_$(date +%F_%R).log"
 ERR_FILE="$ldir/$(basename "$0")_$(date +%F_%R).err"
-exec  > >(tee -i "${LOG_FILE}")
-exec 2> >(tee -i "${ERR_FILE}" >&2)
+# exec  > >(tee -i "${LOG_FILE}")
+# exec 2> >(tee -i "${ERR_FILE}" >&2)
+## send output directly to files
+exec  > "${LOG_FILE}"
+exec 2> "${ERR_FILE}"
 TIC=$(date +"%s")
 
 : "${ID:=$(hostname)}"
