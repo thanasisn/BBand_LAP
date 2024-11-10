@@ -129,8 +129,15 @@ colstat <- varstat[, .N ,by = .(Data, Date, Table)]
 #' ## Data density and size
 #+ echo=F, include=T, results="asis"
 
-ggplot(data = datstat) +
+ggplot(data = datstat[Data == "LAP_SUN.duckdb"]) +
  geom_step(aes(x = date, y = Size, colour = Data))
+
+ggplot(data = datstat[Data == "Broad_Band_LAP.duckdb"]) +
+  geom_step(aes(x = date, y = Size, colour = Data))
+
+ggplot(data = datstat) +
+  geom_step(aes(x = date, y = Size, colour = Data))
+
 
 ggplot(data = datstat) +
   geom_step(aes(x = date, y = Densisty, colour = Data))
@@ -149,13 +156,34 @@ setorder(varstat, Variable, Date)
 
 ## to do break plot to max quantile for each var
 
+# for (at in unique(varstat$Table)) {
+#   pp <- varstat[Table == at]
+#
+#   p <- ggplot(data = pp) +
+#     geom_step(aes(x = Date, y = fill_pc, colour = Variable))
+#   show(p)
+# }
+
+# quantile(pp$fill_pc)
+#
+# tt <- pp[, last(fill_pc), by = .(Variable, day = as.Date(Date))]
+# tt[, max(day), by = Variable]
+
 
 for (at in unique(varstat$Table)) {
   pp <- varstat[Table == at]
-  p <- ggplot(data = pp) +
-    geom_step(aes(x = Date, y = fill_pc, colour = Variable))
-  show(p)
+
+  for (av in unique(pp$Variable)) {
+    tt <- pp[Variable == av, ]
+    p <- ggplot(data = tt) +
+      geom_step(aes(x = Date, y = fill_pc)) +
+      labs(title = paste(at, av)) +
+      ylab("Date fill [%]") +
+      xlab(element_blank())
+    show(p)
+  }
 }
+
 
 
 
