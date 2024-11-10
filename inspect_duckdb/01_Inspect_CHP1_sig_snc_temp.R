@@ -64,7 +64,7 @@ Script.Name <- "~/BBand_LAP/inspect_duckdb/01_Inspect_CHP1_sig_snc_temp.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+    # sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -118,7 +118,7 @@ datayears <- tbl(con, "LAP") |>
 years_to_do <- datayears
 
 # TEST
-years_to_do <- 2018
+# years_to_do <- 2018
 
 #'
 #' ## Intro
@@ -161,7 +161,7 @@ for (YYYY in sort(years_to_do)) {
         Date, SZA, Day, Elevat, Azimuth,
         Async_tracker_flag,
         contains("chp1", ignore.case = T)
-        ) |>
+      ) |>
       collect() |> data.table()
     setorder(year_data, Date)
 
@@ -171,27 +171,25 @@ for (YYYY in sort(years_to_do)) {
 
     ## Choose what to plot (data.table slicing dong work)
     if (CLEAN) {
-        year_data[!is.na(CHP1_sig), ]
-
         cat("\nRemove bad data regions\n")
         cat(year_data[!chp1_bad_data_flag %in% c("empty", "pass"), .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CHP1_sig   [!year_data$chp1_bad_data_flag %in% c("empty", "pass")] <- NA
-        year_data$CHP1_sig_sd[!year_data$chp1_bad_data_flag %in% c("empty", "pass")] <- NA
+        year_data[!chp1_bad_data_flag %in% c("empty", "pass"), CHP1_sig    := NA]
+        year_data[!chp1_bad_data_flag %in% c("empty", "pass"), CHP1_sig_sd := NA]
 
         cat("\nRemove tracker async cases\n")
         cat(year_data[Async_tracker_flag == TRUE, .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CHP1_sig   [year_data$Async_tracker_flag == TRUE] <- NA
-        year_data$CHP1_sig_sd[year_data$Async_tracker_flag == TRUE] <- NA
+        year_data[Async_tracker_flag == TRUE, CHP1_sig    := NA]
+        year_data[Async_tracker_flag == TRUE, CHP1_sig_sd := NA]
 
         cat("\nRemove data above physical limits\n")
         cat(year_data[chp1_sig_limit_flag == "Abnormal HIGH signal", .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CHP1_sig   [year_data$CHP1_sig > year_data$sig_upplim] <- NA
-        year_data$CHP1_sig_sd[year_data$CHP1_sig > year_data$sig_upplim] <- NA
+        year_data[chp1_sig_limit_flag == "Abnormal HIGH signal", CHP1_sig    := NA]
+        year_data[chp1_sig_limit_flag == "Abnormal HIGH signal", CHP1_sig_sd := NA]
 
         cat("\nRemove data below physical limits\n")
         cat(year_data[chp1_sig_limit_flag == "Abnormal LOW signal", .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CHP1_sig   [year_data$CHP1_sig < year_data$sig_lowlim] <- NA
-        year_data$CHP1_sig_sd[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
+        year_data[chp1_sig_limit_flag == "Abnormal LOW signal", CHP1_sig    := NA]
+        year_data[chp1_sig_limit_flag == "Abnormal LOW signal", CHP1_sig_sd := NA]
 
         cat("\nRemove bad temperatrue data\n")
         year_data[!chp1_bad_temp_flag %in% c("empty", "pass"), chp1_temperature    := NA]
@@ -392,11 +390,6 @@ for (YYYY in sort(years_to_do)) {
         cat("\n\n\\FloatBarrier\n\n")
         cat("\n## Temperature data:", YYYY, "\n\n")
 
-        if (CLEAN) {
-            year_data[!chp1_bad_temp_flag %in% c("empty", "pass"), chp1_temperature := NA]
-            year_data[!chp1_bad_temp_flag %in% c("empty", "pass"), chp1_temperature_SD := NA]
-        }
-
         suppressWarnings({
             ## Try to find outliers
             yearlims <- data.table()
@@ -411,26 +404,26 @@ for (YYYY in sort(years_to_do)) {
 
         cat("\n**Days with outliers:**\n\n")
         cat(format(
-            year_data[chp1_temperature > yearlims[ an == "chp1_temperature", upe], unique(as.Date(Date))]
+            year_data[chp1_temperature > yearlims[an == "chp1_temperature", upe], unique(as.Date(Date))]
         ))
         cat("\n\n")
         cat(format(
-            year_data[chp1_temperature < yearlims[ an == "chp1_temperature", low], unique(as.Date(Date))]
+            year_data[chp1_temperature < yearlims[an == "chp1_temperature", low], unique(as.Date(Date))]
         ))
         cat("\n\n")
 
         hist(year_data$chp1_temperature,
              breaks = 50,
              main   = paste("CHP1 temperature ",  YYYY))
-        abline(v = yearlims[ an == "chp1_temperature", low], lty = 3, col = "red")
-        abline(v = yearlims[ an == "chp1_temperature", upe], lty = 3, col = "red")
+        abline(v = yearlims[an == "chp1_temperature", low], lty = 3, col = "red")
+        abline(v = yearlims[an == "chp1_temperature", upe], lty = 3, col = "red")
         cat('\n\n')
 
         hist(year_data$chp1_temperature_SD,
              breaks = 50,
              main   = paste("CHP1 temperature SD", YYYY))
-        abline(v = yearlims[ an == "chp1_temperature_SD", low], lty = 3, col = "red")
-        abline(v = yearlims[ an == "chp1_temperature_SD", upe], lty = 3, col = "red")
+        abline(v = yearlims[an == "chp1_temperature_SD", low], lty = 3, col = "red")
+        abline(v = yearlims[an == "chp1_temperature_SD", upe], lty = 3, col = "red")
         cat('\n\n')
 
         plot(year_data$Date, year_data$chp1_temperature,
@@ -453,9 +446,9 @@ for (YYYY in sort(years_to_do)) {
         abline(h = yearlims[ an == "chp1_temperature_SD", upe], lty = 3, col = "red")
         cat('\n\n')
 
-    }
+    } ## if as temperature
 
-}
+} ## for every year
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
