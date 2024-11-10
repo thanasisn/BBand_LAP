@@ -118,7 +118,7 @@ datayears <- tbl(con, "LAP") |>
 years_to_do <- datayears
 
 # TEST
-# years_to_do <- 2016
+years_to_do <- 2018
 
 #'
 #' ## Intro
@@ -155,7 +155,14 @@ for (YYYY in sort(years_to_do)) {
 
     ## load data for year
     ## FIXME this draws all data in memory, could use only database
-    year_data <- tbl(con, "LAP") |> filter(year == YYYY) |> collect() |> data.table()
+    DT <- tbl(con, "LAP") |> filter(year == YYYY)
+    year_data <- DT |>
+      select(
+        Date, SZA, Day, Elevat, Azimuth,
+        Async_tracker_flag,
+        contains("chp1", ignore.case = T)
+        ) |>
+      collect() |> data.table()
     setorder(year_data, Date)
 
     ## Recording limits
@@ -167,9 +174,9 @@ for (YYYY in sort(years_to_do)) {
         year_data[!is.na(CHP1_sig), ]
 
         cat("\nRemove bad data regions\n")
-        cat(year_data[chp1_bad_data_flag %in% c("empty", "pass"), .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
-        year_data$CHP1_sig   [year_data$chp1_bad_data_flag %in% c("empty", "pass")] <- NA
-        year_data$CHP1_sig_sd[year_data$chp1_bad_data_flag %in% c("empty", "pass")] <- NA
+        cat(year_data[!chp1_bad_data_flag %in% c("empty", "pass"), .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
+        year_data$CHP1_sig   [!year_data$chp1_bad_data_flag %in% c("empty", "pass")] <- NA
+        year_data$CHP1_sig_sd[!year_data$chp1_bad_data_flag %in% c("empty", "pass")] <- NA
 
         cat("\nRemove tracker async cases\n")
         cat(year_data[Async_tracker_flag == TRUE, .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
@@ -177,24 +184,24 @@ for (YYYY in sort(years_to_do)) {
         year_data$CHP1_sig_sd[year_data$Async_tracker_flag == TRUE] <- NA
 
         cat("\nRemove data above physical limits\n")
-        cat(year_data[chp1_sig_limit_flag == 2, .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
+        cat(year_data[chp1_sig_limit_flag == "Abnormal HIGH signal", .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
         year_data$CHP1_sig   [year_data$CHP1_sig > year_data$sig_upplim] <- NA
         year_data$CHP1_sig_sd[year_data$CHP1_sig > year_data$sig_upplim] <- NA
 
         cat("\nRemove data below physical limits\n")
-        cat(year_data[chp1_sig_limit_flag == 1, .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
+        cat(year_data[chp1_sig_limit_flag == "Abnormal LOW signal", .N], "/", year_data[!is.na(CHP1_sig), .N], "\n\n")
         year_data$CHP1_sig   [year_data$CHP1_sig < year_data$sig_lowlim] <- NA
         year_data$CHP1_sig_sd[year_data$CHP1_sig < year_data$sig_lowlim] <- NA
 
         cat("\nRemove bad temperatrue data\n")
-        year_data[!is.na(chp1_bad_temp_flag), chp1_temperature    := NA]
-        year_data[!is.na(chp1_bad_temp_flag), chp1_temperature_SD := NA]
+        year_data[!chp1_bad_temp_flag %in% c("empty", "pass"), chp1_temperature    := NA]
+        year_data[!chp1_bad_temp_flag %in% c("empty", "pass"), chp1_temperature_SD := NA]
     }
 
     ## Missing days
-    cat("\n**Days without any CHP-1 data:**\n\n")
-    dwd <- year_data[!is.na(CHP1_sig), unique(as.Date(Date))]
-    empty_days <- days_of_year[!days_of_year %in% dwd]
+    dwod <- year_data[is.na(CHP1_sig), .N == 1440, by = Day]
+    empty_days <- dwod[V1 == T, Day]
+    cat("\n**", length(empty_days), "days without any CHP-1 data:**\n\n")
     cat(format(empty_days), " ")
     cat("\n\n")
 
@@ -250,15 +257,15 @@ for (YYYY in sort(years_to_do)) {
     hist(year_data$CHP1_sig,
          breaks = 50,
          main   = paste("CHP1 signal ",  YYYY))
-    abline(v = yearlims[ an == "CHP1_sig", low], lty = 3, col = "red")
-    abline(v = yearlims[ an == "CHP1_sig", upe], lty = 3, col = "red")
+    abline(v = yearlims[an == "CHP1_sig", low], lty = 3, col = "red")
+    abline(v = yearlims[an == "CHP1_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
     hist(year_data$CHP1_sig_sd,
          breaks = 50,
          main   = paste("CHP1 signal SD", YYYY))
-    abline(v = yearlims[ an == "CHP1_sig_sd", low], lty = 3, col = "red")
-    abline(v = yearlims[ an == "CHP1_sig_sd", upe], lty = 3, col = "red")
+    abline(v = yearlims[an == "CHP1_sig_sd", low], lty = 3, col = "red")
+    abline(v = yearlims[an == "CHP1_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
 
     plot(year_data$Elevat, year_data$CHP1_sig,
@@ -279,8 +286,8 @@ for (YYYY in sort(years_to_do)) {
          ylab = "CHP1 signal")
     points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
-    abline(h = yearlims[ an == "CHP1_sig", low], lty = 3, col = "red")
-    abline(h = yearlims[ an == "CHP1_sig", upe], lty = 3, col = "red")
+    abline(h = yearlims[an == "CHP1_sig", low], lty = 3, col = "red")
+    abline(h = yearlims[an == "CHP1_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
     plot(year_data$Elevat, year_data$CHP1_sig_sd,
@@ -386,8 +393,8 @@ for (YYYY in sort(years_to_do)) {
         cat("\n## Temperature data:", YYYY, "\n\n")
 
         if (CLEAN) {
-            year_data$chp1_temperature[!is.na(year_data$chp1_temp_bad_data)]    <- NA
-            year_data$chp1_temperature_SD[!is.na(year_data$chp1_temp_bad_data)] <- NA
+            year_data[!chp1_bad_temp_flag %in% c("empty", "pass"), chp1_temperature := NA]
+            year_data[!chp1_bad_temp_flag %in% c("empty", "pass"), chp1_temperature_SD := NA]
         }
 
         suppressWarnings({
