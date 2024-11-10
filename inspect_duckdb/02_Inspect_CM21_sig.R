@@ -64,7 +64,7 @@ Script.Name <- "~/BBand_LAP/inspect_duckdb/02_Inspect_CM21_sig.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+    # sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -83,12 +83,10 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 panderOptions("table.alignment.default", "right")
 panderOptions("table.split.table",        120   )
 
-
 ## __  Variables  --------------------------------------------------------------
 OutliersPlot <- 4
 CLEAN        <- TRUE
 # CLEAN        <- FALSE
-
 
 ## __ Execution control  -------------------------------------------------------
 ## When knitting
@@ -107,7 +105,7 @@ if (length(args) > 0) {
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 ## years in the data base
 datayears <- tbl(con, "LAP") |>
@@ -120,7 +118,7 @@ datayears <- tbl(con, "LAP") |>
 years_to_do <- datayears
 
 # TEST
-# years_to_do <- 2015
+# years_to_do <- 2018
 
 #'
 #' ## Intro
@@ -156,7 +154,13 @@ for (YYYY in sort(years_to_do)) {
 
     ## load data for year
     ## FIXME this draws all data in memory, could use only database
-    year_data <- tbl(con, "LAP") |> filter(year == YYYY) |> collect() |> data.table()
+    DT <- tbl(con, "LAP") |> filter(year == YYYY)
+    year_data <- DT |>
+      select(
+        Date, SZA, Day, Elevat, Azimuth,
+        contains("cm21", ignore.case = T)
+      ) |>
+      collect() |> data.table()
     setorder(year_data, Date)
 
     ## Recording limits
@@ -165,11 +169,10 @@ for (YYYY in sort(years_to_do)) {
 
     ## Choose what to plot (data.table slicing dong work)
     if (CLEAN) {
-        year_data[!is.na(CM21_sig), .N]
         cat("\nRemove bad data regions\n")
-        cat(year_data[!is.na(cm21_bad_data_flag), .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
-        year_data$CM21_sig   [!is.na(year_data$cm21_bad_data_flag)] <- NA
-        year_data$CM21_sig_sd[!is.na(year_data$cm21_bad_data_flag)] <- NA
+        cat(year_data[!cm21_bad_data_flag %in% c("empty", "pass"), .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
+        year_data[!cm21_bad_data_flag %in% c("empty", "pass"), CM21_sig    := NA]
+        year_data[!cm21_bad_data_flag %in% c("empty", "pass"), CM21_sig_sd := NA]
 
         cat("\nRemove data above physical limits\n")
         cat(year_data[cm21_sig_limit_flag == "Abnormal HIGH signal", .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
@@ -183,9 +186,9 @@ for (YYYY in sort(years_to_do)) {
     }
 
     ## Missing days
-    cat("\n**Days without any CM-21 data:**\n\n")
-    dwd <- year_data[!is.na(CM21_sig), unique(as.Date(Date))]
-    empty_days <- days_of_year[!days_of_year %in% dwd]
+    dwod <- year_data[is.na(CM21_sig), .N == 1440, by = Day]
+    empty_days <- dwod[V1 == T, Day]
+    cat("\n**", length(empty_days), "days without any CM-21 data:**\n\n")
     cat(format(empty_days), " ")
     cat("\n\n")
 
@@ -324,7 +327,7 @@ for (YYYY in sort(years_to_do)) {
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM-21 sd ",  YYYY))
+         main = paste("Cum Sum of CM-21 SD ",  YYYY))
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -469,13 +472,14 @@ for (YYYY in sort(years_to_do)) {
         points(part$Date, part$tot_glb / cm21factor(part$Date), pch = ".", col = "cyan")
     }
 
-}
+} ## for every year
 
-#' **END**
-#+ include=T, echo=F
-# myunlock(DB_lock)
+## clean exit
+dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+
+#+ include=T, echo=F, results="asis"
 tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
 
