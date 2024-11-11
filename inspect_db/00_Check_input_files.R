@@ -54,7 +54,6 @@
 #'
 #+ echo=F, include=T
 
-
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment    = ""      )
@@ -62,7 +61,6 @@ knitr::opts_chunk$set(dev        = "png"   )
 knitr::opts_chunk$set(out.width  = "100%"  )
 knitr::opts_chunk$set(fig.align  = "center")
 knitr::opts_chunk$set(fig.pos    = '!h'    )
-
 
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
@@ -72,7 +70,6 @@ renv::load("~/BBand_LAP")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
