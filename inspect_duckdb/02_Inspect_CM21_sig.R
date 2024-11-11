@@ -64,7 +64,6 @@ Script.Name <- "~/BBand_LAP/inspect_duckdb/02_Inspect_CM21_sig.R"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    # sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -118,7 +117,7 @@ datayears <- tbl(con, "LAP") |>
 years_to_do <- datayears
 
 # TEST
-# years_to_do <- 2018
+#years_to_do <- 1995
 
 #'
 #' ## Intro
@@ -158,6 +157,7 @@ for (YYYY in sort(years_to_do)) {
     year_data <- DT |>
       select(
         Date, SZA, Day, Elevat, Azimuth,
+        tot_glb,
         contains("cm21", ignore.case = T)
       ) |>
       collect() |> data.table()
@@ -371,9 +371,9 @@ for (YYYY in sort(years_to_do)) {
     if (YYYY == 1995) {
         cat("\n### Year:", YYYY, " exceptions \n\n")
 
-        part <- year_data[Date > as.POSIXct("1995-10-8") &
+        part <- year_data[Date > as.POSIXct("1995-10-08") &
                           Date < as.POSIXct("1995-11-15") ]
-        plot(part$Date,   part$CM21_sig, pch = ".", ylim = c(-2,3),
+        plot(part$Date,   part$CM21_sig, pch = ".", ylim = c(-2, 3),
              xlab = "", ylab = "CM-21 signal")
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
@@ -383,7 +383,7 @@ for (YYYY in sort(years_to_do)) {
 
         part <- year_data[Date > as.POSIXct("1995-11-15") &
                           Date < as.POSIXct("1995-12-31") ]
-        plot(  part$Date, part$CM21_sig,   pch = ".", ylim = c(-1,2))
+        plot(  part$Date, part$CM21_sig,   pch = ".", ylim = c(-1, 2))
         points(part$Date, part$sig_lowlim, pch = ".", col = "red")
         points(part$Date, part$sig_upplim, pch = ".", col = "red")
         ## plot config changes

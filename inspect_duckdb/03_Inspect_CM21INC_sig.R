@@ -45,8 +45,7 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
-#'
+#' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
 #+ echo=F, include=T
 
@@ -68,30 +67,25 @@ if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
-
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
-# source("~/BBand_LAP/functions/Functions_CM21.R")
-source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
-source("~/CODE/FUNCTIONS/R/execlock.R")
-# mylock(DB_lock)
+source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
-library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
+library(data.table, warn.conflicts = FALSE, quietly = TRUE)
+library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
-library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
+require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 panderOptions("table.alignment.default", "right")
 panderOptions("table.split.table",        120   )
 
-
 ## __  Variables  --------------------------------------------------------------
 OutliersPlot <- 4
 CLEAN        <- TRUE
-CLEAN        <- FALSE
-
+# CLEAN        <- FALSE
 
 ## __ Execution control  -------------------------------------------------------
 ## When knitting
@@ -108,6 +102,9 @@ if (length(args) > 0) {
 }
 
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
+
+##  Open dataset  --------------------------------------------------------------
+con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 ## years in the data base
 datayears <- opendata() |>
@@ -142,7 +139,6 @@ years_to_do <- datayears
 #' **mean(variable) -/+ `r OutliersPlot` * sd(variable)**
 #'
 #' This is just a report it doesn't alter the data.
-#'
 #'
 
 #+ include=TRUE, echo=FALSE, results="asis"
