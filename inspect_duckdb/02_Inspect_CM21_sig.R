@@ -243,7 +243,7 @@ for (YYYY in sort(years_to_do)) {
 
     hist(year_data$CM21_sig,
          breaks = 50,
-         main   = paste("CM21 signal ",  YYYY))
+         main   = paste("CM21 signal ", YYYY))
     abline(v = yearlims[ an == "CM21_sig", low], lty = 3, col = "red")
     abline(v = yearlims[ an == "CM21_sig", upe], lty = 3, col = "red")
     cat('\n\n')
@@ -346,15 +346,15 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
     month_vec <- strftime(  year_data$Date, format = "%m")
-    dd        <- aggregate( year_data[, .(CM21_sig, CM21_sig_sd, Elevat, Azimuth)],
-                            list(month_vec), FUN = summary, digits = 6 )
+    dd        <- aggregate(year_data[, .(CM21_sig, CM21_sig_sd, Elevat, Azimuth)],
+                           list(month_vec), FUN = summary, digits = 6 )
 
     boxplot(year_data$CM21_sig ~ month_vec )
-    title(main = paste("CM21value by month", YYYY))
+    title(main = paste("CM21 signal by month", YYYY))
     cat('\n\n')
 
     boxplot(year_data$CM21_sig_sd ~ month_vec)
-    title(main = paste("CM21sd by month", YYYY))
+    title(main = paste("CM21 sd by month", YYYY))
     cat('\n\n')
 
     # boxplot(year_data$Elevat ~ month_vec )

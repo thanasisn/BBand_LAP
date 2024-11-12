@@ -107,18 +107,17 @@ cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 ## years in the data base
-datayears <- opendata() |>
-    filter(!is.na(CM21INC_sig)) |>
-    select(year) |> unique() |> collect() |> pull()
-
-BB_meta   <- read_parquet(DB_META_fl)
-
+datayears <- tbl(con, "LAP")  |>
+  filter(!is.na(CM21INC_sig)) |>
+  select(year)                |>
+  distinct()                  |>
+  pull()
 
 ## TODO compare output files with parsed dates from meta
 years_to_do <- datayears
 
 # TEST
-# years_to_do <- 2015
+#years_to_do <- 1995
 
 #'
 #' ## Intro
@@ -153,11 +152,17 @@ for (YYYY in sort(years_to_do)) {
     cat("\n## Year:", YYYY, "\n\n")
 
     ## load data for year
-    year_data <- data.table(opendata() |> filter(year == YYYY) |> collect())
+    ## FIXME this draws all data in memory, could use only database
+    DT <- tbl(con, "LAP") |> filter(year == YYYY)
+    year_data <- DT |>
+      select(
+        Date, SZA, Day, Elevat, Azimuth,
+        contains("cm21inc", ignore.case = T)
+      ) |>
+      collect() |> data.table()
     setorder(year_data, Date)
 
-
-    ## Recording limits
+    ## No Recording limits have been set
     # year_data[, sig_lowlim := cm21INC_signal_lower_limit(Date)]
     # year_data[, sig_upplim := cm21INC_signal_upper_limit(Date)]
     year_data[, sig_lowlim := -20]
@@ -183,12 +188,11 @@ for (YYYY in sort(years_to_do)) {
     # }
 
     ## Missing days
-    cat("\n**Days without any CM-21 INCLINED data:**\n\n")
-    dwd <- year_data[!is.na(CM21INC_sig), unique(as.Date(Date))]
-    empty_days <- days_of_year[!days_of_year %in% dwd]
+    dwod <- year_data[is.na(CM21INC_sig), .N == 1440, by = Day]
+    empty_days <- dwod[V1 == T, Day]
+    cat("\n**", length(empty_days), "days without any CM-21 data:**\n\n")
     cat(format(empty_days), " ")
     cat("\n\n")
-
 
     ## Get outliers limits
     suppressWarnings({
@@ -210,7 +214,7 @@ for (YYYY in sort(years_to_do)) {
 
     cat("\n**Days with outliers:**\n\n")
     cat(format(
-        year_data[CM21INC_sig > yearlims[ an == "CM21INC_sig", upe], unique(as.Date(Date))]
+        year_data[CM21INC_sig > yearlims[an == "CM21INC_sig", upe], unique(as.Date(Date))]
         ))
     cat("\n\n")
     cat(format(
@@ -279,7 +283,6 @@ for (YYYY in sort(years_to_do)) {
     abline(h = yearlims[ an == "CM21INC_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
-
     plot(year_data$Elevat, year_data$CM21INC_sig_sd,
          pch  = 19,
          cex  = .1,
@@ -289,7 +292,6 @@ for (YYYY in sort(years_to_do)) {
     abline(h = yearlims[ an == "CM21INC_sig_sd", low], lty = 3, col = "red")
     abline(h = yearlims[ an == "CM21INC_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
-
 
     all    <- cumsum(tidyr::replace_na(year_data$CM21INC_sig, 0))
     pos    <- year_data[ CM21INC_sig > 0 ]
@@ -320,7 +322,6 @@ for (YYYY in sort(years_to_do)) {
            col = c("blue", "red", "black"))
     cat('\n\n')
 
-
     all    <- cumsum(tidyr::replace_na(year_data$CM21INC_sig_sd, 0))
     pos    <- year_data[ CM21INC_sig > 0 ]
     pos$V1 <- cumsum(tidyr::replace_na(pos$CM21INC_sig_sd, 0))
@@ -349,7 +350,6 @@ for (YYYY in sort(years_to_do)) {
            lty = 1, bty = "n", cex = 0.8,
            col = c("red", "blue", "black"))
     cat('\n\n')
-
 
     month_vec <- strftime( year_data$Date, format = "%m")
     dd        <- aggregate(year_data[, .(CM21INC_sig, CM21INC_sig_sd, Elevat, Azimuth)],
@@ -396,13 +396,8 @@ for (YYYY in sort(years_to_do)) {
 }
 
 
-
-
-
-#' **END**
-#+ include=T, echo=F
-# myunlock(DB_lock)
+#+ include=T, echo=F, results="asis"
 tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
