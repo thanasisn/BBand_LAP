@@ -71,7 +71,6 @@ parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
-    # sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -152,11 +151,12 @@ if (FALSE | Sys.info()["nodename"] == "sagan") {
   make_categorical_column(flagname_BTH, categories, con, "LAP")
 
   ## __ Both  ------------------------------------------------------------
-  ADD <- tbl(con, "LAP")                              |>
-    filter(Elevat > QS$sun_elev_min)                  |>
-    filter(!is.na(DIFF_strict))                        |>
-    filter(!is.na(DiffuseFraction_kd))                |>
-    select(Date, GLB_strict, SZA, DiffuseFraction_kd) |>
+  ADD <- tbl(con, "LAP")               |>
+    filter(Elevat > QS$sun_elev_min)   |>
+    filter(!is.na(GLB_strict))         |>
+    filter(!is.na(HOR_strict))         |>
+    select(Date,
+           GLB_strict, HOR_strict)     |>
     mutate(
 
       !!flagname_BTH := case_when(
