@@ -137,8 +137,8 @@ if (FALSE | Sys.info()["nodename"] == "sagan") {
   #'
   #+ echo=F, include=T, results="asis"
 
-  QS$dir_glo_invert  <- 0.05  # Diffuse Inversion threshold factor
-  QS$dir_glo_glo_off <- 5     # Global min to use
+  QS$dir_glo_invert   <- 0.05  # Diffuse Inversion threshold factor
+  QS$invert_glo_limit <- 5     # Global minimum for this test to work
 
   cat(paste("\n8. Inversion test.\n\n"))
 
@@ -149,13 +149,8 @@ if (FALSE | Sys.info()["nodename"] == "sagan") {
                   "Direct > global hard (15)")
 
   remove_column(con, "LAP", flagname_BTH)
-  make_categorical_column(flagname_GLB, categories, con, "LAP")
+  make_categorical_column(flagname_BTH, categories, con, "LAP")
 
-
-
-
-
-  stop("d")
   ## __ Both  ------------------------------------------------------------
   ADD <- tbl(con, "LAP")                              |>
     filter(Elevat > QS$sun_elev_min)                  |>
@@ -164,35 +159,29 @@ if (FALSE | Sys.info()["nodename"] == "sagan") {
     select(Date, GLB_strict, SZA, DiffuseFraction_kd) |>
     mutate(
 
-      !!flagname_UPP := case_when(
+      !!flagname_BTH := case_when(
 
-        DiffuseFraction_kd  > QS$dif_rati_pr1  &
-          SZA              <= QS$dif_sza_break &
-          GLB_strict        > QS$dif_watt_lim  ~ "Diffuse ratio comp max (11)",
+        ## case with direct too close to global
+        HOR_strict / GLB_strict >= 1 - QS$dir_glo_invert  &
+          GLB_strict > QS$invert_glo_limit  ~ "Direct > global soft (14)",
 
-        DiffuseFraction_kd  > QS$dif_rati_pr2  &
-          SZA               > QS$dif_sza_break &
-          GLB_strict        > QS$dif_watt_lim  ~ "Diffuse ratio comp max (11)",
+        ## case with direct greater than global
+        HOR_strict / GLB_strict >= 1  &
+          GLB_strict > QS$invert_glo_limit  ~ "Direct > global hard (15)",
 
         .default = "pass"
       ))
   res <- update_table(con, ADD, "LAP", "Date")
 
 
-
-
-  datapart[, Relative_diffuse := 100 * (HOR_strict  - GLB_strict) / GLB_strict ]
-  datapart[ is.infinite(Relative_diffuse), Relative_diffuse := NA]
-
-  datapart[Relative_diffuse > QS$dir_glo_invert  &
-             GLB_strict       > QS$dir_glo_glo_off,
-           (flagname_BTH) := "Direct > global soft (14)"]
-  datapart[Relative_diffuse > QS$dir_glo_invert,
-           (flagname_BTH) := "Direct > global hard (15)"]
-
-  rm(list = ls(pattern = "flagname_.*"))
-  dummy <- gc()
-
+  # datapart[, Relative_diffuse := 100 * (HOR_strict  - GLB_strict) / GLB_strict ]
+  # datapart[ is.infinite(Relative_diffuse), Relative_diffuse := NA]
+  #
+  # datapart[Relative_diffuse > QS$dir_glo_invert  &
+  #            GLB_strict       > QS$dir_glo_glo_off,
+  #          (flagname_BTH) := "Direct > global soft (14)"]
+  # datapart[Relative_diffuse > QS$dir_glo_invert,
+  #          (flagname_BTH) := "Direct > global hard (15)"]
 
   ## __  Store used filters parameters  ----------------------------------------
   saveRDS(object = QS,
@@ -212,9 +201,6 @@ DT <- tbl(con, "LAP")                  |>
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
-QS$dir_glo_invert  <- 0.05  # Diffuse Inversion threshold factor
-QS$dir_glo_glo_off <- 5     # Global min to use
-
 ## __  Statistics  -------------------------------------------------------------
 #' ### Statistics
 #+ echo=F, include=T, sesults="asis"
@@ -224,6 +210,9 @@ QS$dir_glo_glo_off <- 5     # Global min to use
 #            caption = flagname_BTH))
 # cat(" \n \n")
 
+# ## TEST
+# DT <- DT |>
+#   filter(year %in% c(2018:2020))
 
 
 test <- DT |>
@@ -232,8 +221,9 @@ test <- DT |>
   filter(!is.na(DIR_wpsm))   |>
   select(
     Elevat, SZA, Day,
-    GLB_wpsm, DIR_wpsm, DIR_strict, GLB_strict, HOR_strict,
-    DIFF_strict) |>
+    GLB_wpsm, DIR_wpsm,
+    DIR_strict, GLB_strict, HOR_strict, DIFF_strict
+    ) |>
   collect() |> data.table()
 
 
@@ -242,6 +232,23 @@ test[, HOR_wpsm  := DIR_strict * cos(SZA * pi / 180)]
 # test[, DIFF_wpsm := GLB_wpsm - HOR_wpsm]
 test[, DIFF_wpsm := GLB_strict - HOR_wpsm]
 test[, kd_wpsm   := DIFF_wpsm / GLB_strict]
+test[, Relative_diffuse := 100 * (GLB_strict - HOR_strict) / GLB_strict]
+
+test[, Relative := HOR_strict / GLB_strict]
+
+plot(test[, GLB_strict, HOR_strict])
+plot(test[, Relative])
+
+test[HOR_strict / GLB_strict > 1  &
+       GLB_strict > QS$invert_glo_limit, ]
+
+test[HOR_strict / GLB_strict > 1 - QS$dir_glo_invert  &
+       GLB_strict > QS$invert_glo_limit, ]
+
+
+
+hist(test$Relative, breaks = 100)
+
 
 hist(test[kd_wpsm < 0.2, kd_wpsm], breaks = 100)
 abline(v = QS$dir_glo_invert, lty = 3, col = "red")
