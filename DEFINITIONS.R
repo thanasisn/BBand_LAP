@@ -18,6 +18,7 @@ SIRENA_TOT   <- "~/DATA/cm21_data_validation/AC21_lap.GLB_TOT/"
 RADMON_DIR   <- "~/DATA_RAW/Raddata/3/"
 RADMON_GLB   <- "~/DATA_RAW/Raddata/6/"
 RADMON_INC   <- "~/DATA_RAW/Raddata/1/"
+RADMON_PIR   <- "~/DATA_RAW/Raddata/2/"
 ASTROPY_FL   <- "~/DATA_RAW/SUN/Astropy_LAP.Rds"
 
 
