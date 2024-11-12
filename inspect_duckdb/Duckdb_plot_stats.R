@@ -135,14 +135,16 @@ ggplot(data = datstat[Data == "LAP_SUN.duckdb"]) +
 ggplot(data = datstat[Data == "Broad_Band_LAP.duckdb"]) +
   geom_step(aes(x = date, y = Size, colour = Data))
 
-ggplot(data = datstat) +
-  geom_step(aes(x = date, y = Size, colour = Data))
-
-
-ggplot(data = datstat) +
+ggplot(data = datstat[Data == "LAP_SUN.duckdb"]) +
   geom_step(aes(x = date, y = Densisty, colour = Data))
 
-ggplot(data = colstat) +
+ggplot(data = datstat[Data == "Broad_Band_LAP.duckdb"]) +
+  geom_step(aes(x = date, y = Densisty, colour = Data))
+
+ggplot(data = colstat[Data == "LAP_SUN.duckdb"]) +
+  geom_step(aes(x = Date, y = N, colour = Table))
+
+ggplot(data = colstat[Data == "Broad_Band_LAP.duckdb"]) +
   geom_step(aes(x = Date, y = N, colour = Table))
 
 
