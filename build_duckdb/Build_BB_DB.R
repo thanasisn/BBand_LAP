@@ -28,6 +28,7 @@ source("~/BBand_LAP/build_duckdb/Build_DB_03_chp1.R"            )
 source("~/BBand_LAP/build_duckdb/Build_DB_04_chp1_SNC.R"        )
 source("~/BBand_LAP/build_duckdb/Build_DB_05_chp1_TMP.R"        )
 source("~/BBand_LAP/build_duckdb/Build_DB_06_cm21inclined.R"    )
+source("~/BBand_LAP/build_duckdb/Build_DB_07_pir.R"             )
 source("~/BBand_LAP/build_duckdb/Build_DB_16_cm21_TOT.R"        )
 
 ##  Flag bad data  -------------------------------------------------------------
