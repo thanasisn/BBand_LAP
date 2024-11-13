@@ -24,7 +24,7 @@ fi
 ##  Get data  ------------------------------------------------------------------
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "Get signal files 'LAP' of CM-21 global"
-rsync -arvt                                    \
+rsync -arvth                                   \
     --include '*/'                             \
     --include '*.LAP'                          \
     --include '*.lap'                          \
@@ -35,7 +35,7 @@ rsync -arvt                                    \
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "Get signal files 'LAP' of CM-21 inclined"
-rsync -arvt                                    \
+rsync -arvth                                   \
     --include '*/'                             \
     --include '*.LAP'                          \
     --include '*.lap'                          \
@@ -46,7 +46,7 @@ rsync -arvt                                    \
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "Get signal files 'LAP' of ECO UVA? inclined"
-rsync -arvt                                    \
+rsync -arvth                                   \
     --include '*/'                             \
     --include '*.LAP'                          \
     --include '*.lap'                          \
@@ -57,20 +57,20 @@ rsync -arvt                                    \
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "Get CHP1 signal files"
-rsync -arvt                                    \
+rsync -arvth                                   \
     "$SOURCE/archive/Bband/CHP1_lap.DIR/"      \
     "$HOME/DATA_RAW/Bband/CHP1_lap.DIR"
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "Get total radiation files 'TOT.DAT'"
-rsync -arvt                                    \
+rsync -arvth                                   \
     --delete                                   \
     "$SOURCE/products/Bband/AC21_lap.GLB/"     \
     "$HOME/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "get other relative files"
-rsync -arvt                                    \
+rsync -arvth                                   \
     --include '*/'                             \
     --include '*.txt'                          \
     --include '*.bas'                          \
@@ -87,7 +87,7 @@ rsync -arvt                                    \
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "get Brewer files"
-rsync -arvt -u                                 \
+rsync -arvth -u                                 \
   "$SOURCE/products/Dsc"                       \
   "$HOME/DATA_RAW/Brewer_005"
 
@@ -96,11 +96,11 @@ echo "- - - - - - - - - - - - - - - - - - - -"
 echo "get Sky camera files"
 ## Don't need to wait for this
 (
-  rsync -arvt                                 \
+  rsync -arvth                                \
     --exclude "Thumns.db"                     \
     "$SOURCE/products/skycam"                 \
     "/home/single/LAP_skycam/"
-  rsync -arvt                                 \
+  rsync -arvth                                \
     --exclude "Thumns.db"                     \
     "$SOURCE/products/skycam_old"             \
     "/home/single/LAP_skycam/"
