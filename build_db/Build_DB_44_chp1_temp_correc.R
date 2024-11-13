@@ -62,9 +62,7 @@ if (file.exists(DB_META_fl)) {
     BB_meta <- read_parquet(DB_META_fl)
     ## add more days
     BB_meta <- merge(BB_meta,
-                     data.table(day = seq(max(BB_meta$day),
-                                          Sys.Date(),
-                                          by = "day")),
+                     data.table(day = as.Date(max(BB_meta$day):Sys.Date(), origin = origin)),
                      by  = "day",
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
