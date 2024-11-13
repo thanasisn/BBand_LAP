@@ -57,9 +57,8 @@ cat("\n Import  CM-21  data\n\n")
 if (file.exists(DB_META_fl)) {
     BB_meta <- read_parquet(DB_META_fl)
     BB_meta <- merge(BB_meta,
-                     data.table(day = seq(max(BB_meta$day), Sys.Date(),
-                                          by = "day")),
-                     by = "day",
+                     data.table(day = as.Date(max(BB_meta$day):Sys.Date(), origin = origin)),
+                                by = "day",
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
 } else {
@@ -92,7 +91,6 @@ cat("\n**Found:",paste(nrow(inp_filelist), "CM-21 files**\n"))
 inp_filelist <- inp_filelist[!inp_filelist$cm21_basename %in% BB_meta$cm21_basename]
 inp_filelist <- inp_filelist[inp_filelist$day %in% BB_meta$day]
 cat("\n**Parse:",paste(nrow(inp_filelist), "CM-21 files**\n\n"))
-
 
 
 ##  Import CM-21 files  --------------------------------------------------------
