@@ -81,6 +81,12 @@ info "##  End inspect_duckdb STATUS:$?  ##"
 
 
 
+
+info "##  Upload results  ##"
+"$HOME/BBand_LAP/tools/Upload_reports.sh"
+info "##  Upload results STATUS:$?  ##"
+
+
 info "#### END $0 ####"
 TAC=$(date +"%s"); dura="$( echo "scale=6; ($TAC-$TIC)/60" | bc)"
 printf "%s %-10s %-10s %-10s %f\n" "$(date +"%F %H:%M:%S")" "$HOSTNAME" "$USER" "$(basename $0)" "$dura"
