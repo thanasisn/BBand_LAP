@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Inspect raw CM-21 INCLINED data **SIG** "
+#' title:         "Inspect raw ERPPLEY PIR data **SIG** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -41,7 +41,7 @@
 #' ---
 
 #'
-#'  **CM-21 Inclined SIG**
+#'  **PIR SIG**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -60,7 +60,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_duckdb//03_Inspect_CM21INC_sig.R"
+Script.Name <- "~/BBand_LAP/inspect_duckdb/04_Inspect_PIR_sig.R"
 renv::load("~/BBand_LAP")
 
 if (!interactive()) {
@@ -104,11 +104,11 @@ if (length(args) > 0) {
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 ## years in the data base
 datayears <- tbl(con, "LAP")  |>
-  filter(!is.na(CM21INC_sig)) |>
+  filter(!is.na(PIR_sig))     |>
   select(year)                |>
   distinct() |> pull() |> sort()
 
@@ -116,12 +116,12 @@ datayears <- tbl(con, "LAP")  |>
 years_to_do <- datayears
 
 # TEST
-#years_to_do <- 1995
+# years_to_do <- 2020
 
 #'
 #' ## Intro
 #'
-#' Produce yearly plots for **CM-21 INCLINED**.
+#' Produce yearly plots for **EPPLEY PIR**.
 #'
 #' Shows only **raw data** aspects.
 #'
@@ -129,8 +129,8 @@ years_to_do <- datayears
 #'
 #' For 'CLEAN' data, it removes from view:
 #'
-#' - Bad recordings ranges `cm21INC_bad_data_flag`
-#' - Physical recording limits `cm21INC_signal_lower_limit()` and `cm21INC_signal_upper_limit()`
+#' - Bad recordings ranges `PIR_bad_data_flag`
+#' - Physical recording limits `PIR_signal_lower_limit()` and `PIR_signal_upper_limit()`
 #'
 #' Mark outliers for signal and SD with:
 #'
@@ -156,40 +156,40 @@ for (YYYY in sort(years_to_do)) {
     year_data <- DT |>
       select(
         Date, SZA, Day, Elevat, Azimuth,
-        contains("cm21inc", ignore.case = T)
+        contains("PIR", ignore.case = T)
       ) |>
       collect() |> data.table()
     setorder(year_data, Date)
 
     ## No Recording limits have been set
-    # year_data[, sig_lowlim := cm21INC_signal_lower_limit(Date)]
-    # year_data[, sig_upplim := cm21INC_signal_upper_limit(Date)]
+    # year_data[, sig_lowlim := PIR_signal_lower_limit(Date)]
+    # year_data[, sig_upplim := PIR_signal_upper_limit(Date)]
     year_data[, sig_lowlim := -20]
     year_data[, sig_upplim := +60]
 
     ## Choose what to plot (data.table slicing dong work)
     # if (CLEAN) {
-    #     year_data[!is.na(CM21INC_sig), .N]
+    #     year_data[!is.na(PIR_sig), .N]
     #     cat("\nRemove bad data regions\n")
-    #     cat(year_data[!is.na(cm21INC_bad_data_flag), .N], year_data[!is.na(CM21INC_sig), .N], "\n\n")
-    #     year_data$CM21INC_sig   [!is.na(year_data$cm21INC_bad_data_flag)] <- NA
-    #     year_data$CM21INC_sig_sd[!is.na(year_data$cm21INC_bad_data_flag)] <- NA
+    #     cat(year_data[!is.na(PIR_bad_data_flag), .N], year_data[!is.na(PIR_sig), .N], "\n\n")
+    #     year_data$PIR_sig   [!is.na(year_data$PIR_bad_data_flag)] <- NA
+    #     year_data$PIR_sig_sd[!is.na(year_data$PIR_bad_data_flag)] <- NA
     #
     #     cat("\nRemove data above physical limits\n")
-    #     cat(year_data[CM21INC_sig > sig_upplim, .N], year_data[!is.na(CM21INC_sig), .N], "\n\n")
-    #     year_data$CM21INC_sig   [year_data$CM21INC_sig > year_data$sig_upplim] <- NA
-    #     year_data$CM21INC_sig_sd[year_data$CM21INC_sig > year_data$sig_upplim] <- NA
+    #     cat(year_data[PIR_sig > sig_upplim, .N], year_data[!is.na(PIR_sig), .N], "\n\n")
+    #     year_data$PIR_sig   [year_data$PIR_sig > year_data$sig_upplim] <- NA
+    #     year_data$PIR_sig_sd[year_data$PIR_sig > year_data$sig_upplim] <- NA
     #
     #     cat("\nRemove data below physical limits\n")
-    #     cat(year_data[CM21INC_sig < sig_lowlim, .N], year_data[!is.na(CM21INC_sig), .N], "\n\n")
-    #     year_data$CM21INC_sig   [year_data$CM21INC_sig < year_data$sig_lowlim] <- NA
-    #     year_data$CM21INC_sig_sd[year_data$CM21INC_sig < year_data$sig_lowlim] <- NA
+    #     cat(year_data[PIR_sig < sig_lowlim, .N], year_data[!is.na(PIR_sig), .N], "\n\n")
+    #     year_data$PIR_sig   [year_data$PIR_sig < year_data$sig_lowlim] <- NA
+    #     year_data$PIR_sig_sd[year_data$PIR_sig < year_data$sig_lowlim] <- NA
     # }
 
     ## Missing days
-    dwod <- year_data[is.na(CM21INC_sig), .N == 1440, by = Day]
+    dwod <- year_data[is.na(PIR_sig), .N == 1440, by = Day]
     empty_days <- dwod[V1 == T, Day]
-    cat("\n**", length(empty_days), "days without any CM-21 data:**\n\n")
+    cat("\n**", length(empty_days), "days without any PIR data:**\n\n")
     cat(format(empty_days), " ")
     cat("\n\n")
 
@@ -197,7 +197,7 @@ for (YYYY in sort(years_to_do)) {
     suppressWarnings({
         ## Try to find outliers
         yearlims <- data.table()
-        for (an in grep("CM21INC_sig", names(year_data), value = TRUE)) {
+        for (an in grep("PIR_sig", names(year_data), value = TRUE)) {
             daily <- year_data[, .(dmin = min(get(an),na.rm = T),
                                    dmax = max(get(an),na.rm = T)), by = as.Date(Date)]
             low <- daily[!is.infinite(dmin), mean(dmin) - OutliersPlot * sd(dmin)]
@@ -213,97 +213,97 @@ for (YYYY in sort(years_to_do)) {
 
     cat("\n**Days with outliers:**\n\n")
     cat(format(
-        year_data[CM21INC_sig > yearlims[an == "CM21INC_sig", upe], unique(as.Date(Date))]
+        year_data[PIR_sig > yearlims[an == "PIR_sig", upe], unique(as.Date(Date))]
         ))
     cat("\n\n")
     cat(format(
-        year_data[CM21INC_sig < yearlims[ an == "CM21INC_sig", low], unique(as.Date(Date))]
+        year_data[PIR_sig < yearlims[ an == "PIR_sig", low], unique(as.Date(Date))]
     ))
     cat("\n\n")
     cat(format(
-        year_data[CM21INC_sig_sd > yearlims[ an == "CM21INC_sig_sd", upe], unique(as.Date(Date))]
+        year_data[PIR_sig_sd > yearlims[ an == "PIR_sig_sd", upe], unique(as.Date(Date))]
     ))
     cat("\n\n")
     cat(format(
-        year_data[CM21INC_sig_sd < yearlims[ an == "CM21INC_sig_sd", low], unique(as.Date(Date))]
+        year_data[PIR_sig_sd < yearlims[ an == "PIR_sig_sd", low], unique(as.Date(Date))]
     ))
     cat("\n\n")
 
     cat("\n**Days hitting physical limit:**\n\n")
     cat(format(
-        year_data[CM21INC_sig > sig_upplim, unique(as.Date(Date))]
+        year_data[PIR_sig > sig_upplim, unique(as.Date(Date))]
     ))
     cat("\n\n")
     cat(format(
-        year_data[CM21INC_sig < sig_lowlim, unique(as.Date(Date))]
+        year_data[PIR_sig < sig_lowlim, unique(as.Date(Date))]
     ))
 
     cat('\n\n\\footnotesize\n\n')
-    cat(pander(summary(year_data[, .(Date, SZA, CM21INC_sig, CM21INC_sig_sd)])))
+    cat(pander(summary(year_data[, .(Date, SZA, PIR_sig, PIR_sig_sd)])))
     cat('\n\n\\normalsize\n\n')
 
 
-    hist(year_data$CM21INC_sig,
+    hist(year_data$PIR_sig,
          breaks = 50,
-         main   = paste("INCLINED CM-21 signal ", YYYY))
-    abline(v = yearlims[ an == "CM21INC_sig", low], lty = 3, col = "red")
-    abline(v = yearlims[ an == "CM21INC_sig", upe], lty = 3, col = "red")
+         main   = paste("PIR signal ", YYYY))
+    abline(v = yearlims[ an == "PIR_sig", low], lty = 3, col = "red")
+    abline(v = yearlims[ an == "PIR_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
 
-    hist(year_data$CM21INC_sig_sd,
+    hist(year_data$PIR_sig_sd,
          breaks = 50,
-         main   = paste("INCLINED CM-21 signal SD", YYYY))
-    abline(v = yearlims[ an == "CM21INC_sig_sd", low], lty = 3, col = "red")
-    abline(v = yearlims[ an == "CM21INC_sig_sd", upe], lty = 3, col = "red")
+         main   = paste("PIR signal SD", YYYY))
+    abline(v = yearlims[ an == "PIR_sig_sd", low], lty = 3, col = "red")
+    abline(v = yearlims[ an == "PIR_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
 
 
-    plot(year_data$Elevat, year_data$CM21INC_sig,
+    plot(year_data$Elevat, year_data$PIR_sig,
          pch  = 19,
          cex  = .1,
-         main = paste("INCLINED CM-21 signal ", YYYY),
+         main = paste("PIR signal ", YYYY),
          xlab = "Elevation",
-         ylab = "INCLINED CM-21 signal")
+         ylab = "PIR signal")
     points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
     cat('\n\n')
 
 
-    plot(year_data$Date, year_data$CM21INC_sig,
+    plot(year_data$Date, year_data$PIR_sig,
          pch  = 19,
          cex  = .1,
-         main = paste("INCLINED CM-21 signal ", YYYY ),
+         main = paste("PIR signal ", YYYY ),
          xlab = "",
-         ylab = "INCLINED CM-21 signal" )
+         ylab = "PIR signal" )
     points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
     points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
-    abline(h = yearlims[ an == "CM21INC_sig", low], lty = 3, col = "red")
-    abline(h = yearlims[ an == "CM21INC_sig", upe], lty = 3, col = "red")
+    abline(h = yearlims[ an == "PIR_sig", low], lty = 3, col = "red")
+    abline(h = yearlims[ an == "PIR_sig", upe], lty = 3, col = "red")
     cat('\n\n')
 
-    plot(year_data$Elevat, year_data$CM21INC_sig_sd,
+    plot(year_data$Elevat, year_data$PIR_sig_sd,
          pch  = 19,
          cex  = .1,
-         main = paste("INCLINED CM-21 signal SD", YYYY),
+         main = paste("PIR signal SD", YYYY),
          xlab = "Elevation",
-         ylab = "INCLINED CM-21 signal SD")
-    abline(h = yearlims[ an == "CM21INC_sig_sd", low], lty = 3, col = "red")
-    abline(h = yearlims[ an == "CM21INC_sig_sd", upe], lty = 3, col = "red")
+         ylab = "PIR signal SD")
+    abline(h = yearlims[ an == "PIR_sig_sd", low], lty = 3, col = "red")
+    abline(h = yearlims[ an == "PIR_sig_sd", upe], lty = 3, col = "red")
     cat('\n\n')
 
-    all    <- cumsum(tidyr::replace_na(year_data$CM21INC_sig, 0))
-    pos    <- year_data[ CM21INC_sig > 0 ]
-    pos$V1 <- cumsum(tidyr::replace_na(pos$CM21INC_sig, 0))
-    neg    <- year_data[ CM21INC_sig < 0 ]
-    neg$V1 <- cumsum(tidyr::replace_na(neg$CM21INC_sig, 0))
+    all    <- cumsum(tidyr::replace_na(year_data$PIR_sig, 0))
+    pos    <- year_data[ PIR_sig > 0 ]
+    pos$V1 <- cumsum(tidyr::replace_na(pos$PIR_sig, 0))
+    neg    <- year_data[ PIR_sig < 0 ]
+    neg$V1 <- cumsum(tidyr::replace_na(neg$PIR_sig, 0))
     xlim   <- range(year_data$Date)
     plot(year_data$Date, all,
          type = "l",
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM-21 INCLINED signal ",  YYYY))
+         main = paste("Cum Sum of PIR signal ",  YYYY))
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -321,18 +321,18 @@ for (YYYY in sort(years_to_do)) {
            col = c("blue", "red", "black"))
     cat('\n\n')
 
-    all    <- cumsum(tidyr::replace_na(year_data$CM21INC_sig_sd, 0))
-    pos    <- year_data[ CM21INC_sig > 0 ]
-    pos$V1 <- cumsum(tidyr::replace_na(pos$CM21INC_sig_sd, 0))
-    neg    <- year_data[ CM21INC_sig < 0 ]
-    neg$V1 <- cumsum(tidyr::replace_na(neg$CM21INC_sig_sd, 0))
+    all    <- cumsum(tidyr::replace_na(year_data$PIR_sig_sd, 0))
+    pos    <- year_data[ PIR_sig > 0 ]
+    pos$V1 <- cumsum(tidyr::replace_na(pos$PIR_sig_sd, 0))
+    neg    <- year_data[ PIR_sig < 0 ]
+    neg$V1 <- cumsum(tidyr::replace_na(neg$PIR_sig_sd, 0))
     xlim   <- range(year_data$Date)
     plot(year_data$Date, all,
          type = "l",
          xlim = xlim,
          ylab = "",
          yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM-21 INCLINED sd ",  YYYY))
+         main = paste("Cum Sum of PIR sd ",  YYYY))
     par(new = TRUE)
     plot(pos$Date, pos$V1,
          xlim = xlim,
@@ -351,14 +351,14 @@ for (YYYY in sort(years_to_do)) {
     cat('\n\n')
 
     month_vec <- strftime( year_data$Date, format = "%m")
-    dd        <- aggregate(year_data[, .(CM21INC_sig, CM21INC_sig_sd, Elevat, Azimuth)],
+    dd        <- aggregate(year_data[, .(PIR_sig, PIR_sig_sd, Elevat, Azimuth)],
                         list(month_vec), FUN = summary, digits = 6 )
 
-    boxplot(year_data$CM21INC_sig ~ month_vec )
+    boxplot(year_data$PIR_sig ~ month_vec )
     title(main = paste("CM21 INC signal by month", YYYY))
     cat('\n\n')
 
-    boxplot(year_data$CM21INC_sig_sd ~ month_vec)
+    boxplot(year_data$PIR_sig_sd ~ month_vec)
     title(main = paste("CM21 INC sd by month", YYYY))
     cat('\n\n')
 
@@ -382,8 +382,8 @@ for (YYYY in sort(years_to_do)) {
     #                       Date < as.POSIXct("2005-12-31") ]
     #     ylim <- range(-1, 2, part$sig_lowlim, part$sig_upplim)
     #
-    #     plot(  part$Date, part$CM21INC_sig,  pch = ".", ylim = ylim,
-    #            xlab = "", ylab = "CM-21 INCLINED signal")
+    #     plot(  part$Date, part$PIR_sig,  pch = ".", ylim = ylim,
+    #            xlab = "", ylab = "PIR signal")
     #     points(part$Date, part$sig_lowlim, pch = ".", col = "red")
     #     points(part$Date, part$sig_upplim, pch = ".", col = "red")
     #     ## plot config changes

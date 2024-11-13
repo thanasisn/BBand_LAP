@@ -41,7 +41,7 @@
 #' ---
 
 #'
-#'  **SIG**
+#'  **CM-21 SIG**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -110,8 +110,7 @@ con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 datayears <- tbl(con, "LAP") |>
   filter(!is.na(CM21_sig))   |>
   select(year)               |>
-  distinct()                 |>
-  pull()
+  distinct() |> pull() |> sort()
 
 ## TODO compare output files with parsed dates from meta
 years_to_do <- datayears
