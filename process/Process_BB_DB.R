@@ -49,8 +49,5 @@ try({
 })
 
 
-system("$HOME/BBand_LAP/process/Upload_reports.sh")
-
-
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

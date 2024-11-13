@@ -8,7 +8,7 @@
 #' documentclass: article
 #' classoption:   a4paper,oneside
 #' fontsize:      10pt
-#' geometry:      "left=0.3in,right=0.3in,top=0.5in,bottom=0.5in"
+#' geometry:      "left=0.1in,right=0.1in,top=0.5in,bottom=0.5in"
 #'
 #' link-citations:  yes
 #' colorlinks:      yes
@@ -351,6 +351,8 @@ setorder(last, Date)
 cat(pander(last, justify = "lllr"),"\n")
 cat(" \n \n")
 
+last[, .(Script_2, Date, Minutes)]
+round.Date(last$Date)
 
 ## _ Executions statistics  ----------------------------------------------------
 #' \newpage
