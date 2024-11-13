@@ -23,6 +23,8 @@ At: 2024-11-13
            gdata:  3.0.1   
        rmarkdown:  2.29    
          ggplot2:  3.5.1   
+        bookdown:  0.41    
+           shiny:  1.9.1   
             doMC:  1.3.8   
          foreach:  1.5.2   
       reticulate:  1.39.0  
