@@ -83,6 +83,14 @@ try({
 })
 
 
+# try({
+#     cat("\n\n 10. Plot daily CHP-1 signals\n")
+#     source("~/BBand_LAP/inspect_duckdb/10_Plot_daily_CHP1_sig.R")
+# })
+# try({
+#     cat("\n\n 11. Plot daily CM-21 signals\n")
+#     source("~/BBand_LAP/inspect_duckdb/11_Plot_daily_CM21_sig.R")
+# })
 
 
 ## __ Check Radiation  ---------------------------------------------------------
@@ -97,18 +105,6 @@ try({
 
 
 
-# try({
-#     cat("\n\n 10. Plot daily CHP-1 signals\n")
-#     source("~/BBand_LAP/inspect_duckdb/10_Plot_daily_CHP1_sig.R")
-# })
-# try({
-#     cat("\n\n 11. Plot daily CM-21 signals\n")
-#     source("~/BBand_LAP/inspect_duckdb/11_Plot_daily_CM21_sig.R")
-# })
-#
-#
-#
-#
 # try({
 #     cat("\n\n 20. Inspect CHP-1 radiation\n")
 #     rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/20_Inspect_CHP1_rad_temp.R",
