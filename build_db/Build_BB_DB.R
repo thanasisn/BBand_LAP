@@ -10,10 +10,6 @@ Script.Name <- "~/BBand_LAP/build_db/Build_DB.R"
 renv::load("~/BBand_LAP")
 
 
-
-## Update input files ----------------------------------------------------------
-system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
-
 ## Build tracker database ------------------------------------------------------
 ## TODO: Under development
 try(

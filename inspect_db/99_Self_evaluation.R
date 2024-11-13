@@ -348,11 +348,13 @@ last <- DATA[DATA[, .I[which.max(Date)], by = .(Script_2)]$V1]
 last <- last[, .(Script_2, Category, Date, Minutes)]
 last$Minutes <- round(last$Minutes, 2)
 setorder(last, Date)
-cat(pander(last, justify = "lllr"),"\n")
+cat(pander(
+  last[, .(Script_2, Date = lubridate::round_date(Date, unit = "min"), Minutes)],
+  justify = "llr"),"\n")
 cat(" \n \n")
 
-last[, .(Script_2, Date, Minutes)]
-round.Date(last$Date)
+
+
 
 ## _ Executions statistics  ----------------------------------------------------
 #' \newpage
@@ -366,12 +368,12 @@ stats <-
         Median = round(median(Minutes), 2),
         Min    = round(min(Minutes)   , 2),
         Max    = round(max(Minutes)   , 2),
-        Mean   = round(mean(Minutes)  , 2),
+        # Mean   = round(mean(Minutes)  , 2),
         .N
     ),
     by = Script_2]
 stats <- stats[order(match(Script_2, last$Script_2))]
-pander(stats, justify = "lrrrrr")
+pander(stats, justify = "lrrrr")
 cat(" \n \n")
 
 
