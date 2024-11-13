@@ -155,7 +155,7 @@ IGNORE_FLAGGED <- FALSE
 ## __ Select a part of data to plot  -------------------------------------------
 PARTIAL    <- FALSE
 PARTIAL    <- TRUE
-PLOT_FIRST <- as_date("2023-01-01")
+PLOT_FIRST <- as_date("2020-01-01")
 PLOT_LAST  <- as_date("2024-01-01")
 
 
