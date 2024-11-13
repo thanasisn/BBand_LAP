@@ -45,6 +45,7 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
+source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 mylock(DB_lock)
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
@@ -191,6 +192,15 @@ inp_days <- pysolar |>
 
 inp_days <- inp_days[!inp_days %in% BB_meta$day]
 
+LAP <- opendata()
+LAP |> colnames()
+  select(day)
+
+SUN <- anti_join(pysolar,
+                 tbl(con, "LAP") |> select(Date) |> filter(!is.na(Date)) |> collect(),
+                 by = "Date",
+                 copy = TRUE)
+
 ##  Import PySolar files  ------------------------------------------------------
 # for (YYYY in unique(year(inp_filelist$day))) {
 for (YYYY in unique(year(inp_days))) {
@@ -236,8 +246,9 @@ for (YYYY in unique(year(inp_days))) {
             # names(sun_temp)[names(sun_temp) == "AZIM"] <- "Azimuth"
             # names(sun_temp)[names(sun_temp) == "ELEV"] <- "Elevat"
 
+
             sun_temp <- pysolar |>
-              filter(as.Date(Date) == ad)      |>
+              filter(as.Date(Date) == ad )     |>
               rename(Azimuth = PySo_Azimuth)   |>
               rename(Elevat  = PySo_Elevation) |>
               arrange(Date) |>
