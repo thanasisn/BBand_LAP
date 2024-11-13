@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/build_duckdb/ 
-At: 2024-11-12 
+At: 2024-11-13 
 
  R version 4.2.3 (2023-03-15) 
 
