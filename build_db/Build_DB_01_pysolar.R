@@ -190,20 +190,27 @@ inp_days <- pysolar |>
   mutate(day = as.Date(Date)) |>
   distinct(day) |> pull()
 
-inp_days <- inp_days[!inp_days %in% BB_meta$day]
+# inp_days <- inp_days[!inp_days %in% BB_meta$day]
 
 LAP <- opendata()
-LAP |> colnames()
-  select(day)
+LAPdays <- LAP |>
+  filter(!is.na(SZA))         |>
+  mutate(Day = as.Date(Date)) |>
+  select(Day) |> distinct()   |> collect() |> data.table()
 
-SUN <- anti_join(pysolar,
-                 tbl(con, "LAP") |> select(Date) |> filter(!is.na(Date)) |> collect(),
-                 by = "Date",
-                 copy = TRUE)
+inp_days <- inp_days[!inp_days %in% LAPdays$Day]
+
+# LAP  |> select(SZA)
+# stop()
+#
+# SUN <- anti_join(pysolar,
+#                  LAPdays,
+#                  by = "Date",
+#                  copy = TRUE)
 
 ##  Import PySolar files  ------------------------------------------------------
 # for (YYYY in unique(year(inp_filelist$day))) {
-for (YYYY in unique(year(inp_days))) {
+for (YYYY in sort(unique(year(inp_days)))) {
     # subyear <- inp_filelist[year(day) == YYYY]
     subyear_days <- inp_days[year(inp_days) == YYYY]
     # subyear <- inp_filelist[year(day) == YYYY]
