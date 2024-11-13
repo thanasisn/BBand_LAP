@@ -316,7 +316,8 @@ for (YYYY in unique(year(inp_filelist$day))) {
             names(dt_elev)[names(dt_elev) == av] <- paste0(av, "_Elev")
         }
 
-        sync_temp <- merge(dt_azim, dt_elev, all = TRUE)
+        # sync_temp <- merge(dt_azim, dt_elev, all = TRUE)
+        sync_temp <- rbind(dt_azim, dt_elev, fill = TRUE)
         sync_temp[, year          := year( Date)]
         sync_temp[, month         := month(Date)]
         sync_temp[, Tracker_event := "Async"]

@@ -43,9 +43,9 @@ source("~/CODE/FUNCTIONS/R/execlock.R")
 mylock(DB_lock)
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
+library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
-library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 
 TEST <- FALSE
@@ -57,8 +57,7 @@ cat("\n Import  CHP-1 temperature data\n\n")
 if (file.exists(DB_META_fl)) {
     BB_meta <- read_parquet(DB_META_fl)
     BB_meta <- merge(BB_meta,
-                     data.table(day = seq(max(BB_meta$day), Sys.Date(),
-                                          by = "day")),
+                     data.table(day = as.Date(max(BB_meta$day):Sys.Date(), origin = origin)),
                      by = "day",
                      all = TRUE)
     stopifnot(sum(duplicated(BB_meta$day)) == 0)
