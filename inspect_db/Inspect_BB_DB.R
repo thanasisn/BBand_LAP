@@ -18,11 +18,6 @@ renv::load("~/BBand_LAP")
 
 
 
-
-
-cat("\n\nwrite it in shell to parallelize\n\n")
-
-
 try({
     cat("\n\n 0. Check files\n")
     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/00_Check_input_files.R",
@@ -87,10 +82,6 @@ try({
 
 
 
-try({
-    cat("\n\n 10. Plot daily CHP-1 signals\n")
-    source("~/BBand_LAP/inspect_db/10_Plot_daily_CHP1_sig.R")
-})
 try({
     cat("\n\n 11. Plot daily CM-21 signals\n")
     source("~/BBand_LAP/inspect_db/11_Plot_daily_CM21_sig.R")
