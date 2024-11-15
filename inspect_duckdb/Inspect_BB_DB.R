@@ -82,27 +82,25 @@ try({
                       output_dir  = output_dir)
 })
 
+## _  Plot daily signal  -------------------------------------------------------
+
+try({
+    cat("\n\n 10. Plot daily CHP-1 signals\n")
+    source("~/BBand_LAP/inspect_duckdb/10_Plot_daily_CHP1_sig.R")
+})
+try({
+    cat("\n\n 11. Plot daily CM-21 signals\n")
+    source("~/BBand_LAP/inspect_duckdb/11_Plot_daily_CM21_sig.R")
+})
 
 # try({
-#     cat("\n\n 10. Plot daily CHP-1 signals\n")
-#     source("~/BBand_LAP/inspect_duckdb/10_Plot_daily_CHP1_sig.R")
+#     cat("\n\n 12. Plot daily PIR signals\n")
+#     source("~/BBand_LAP/inspect_duckdb/12_Plot_daily_PIR_sig.R")
 # })
-# try({
-#     cat("\n\n 11. Plot daily CM-21 signals\n")
-#     source("~/BBand_LAP/inspect_duckdb/11_Plot_daily_CM21_sig.R")
-# })
+
 
 
 ## __ Check Radiation  ---------------------------------------------------------
-
-
-
-
-
-## __ Plots  -------------------------------------------------------------------
-
-
-
 
 
 # try({
@@ -119,8 +117,9 @@ try({
 #                       output_dir  = output_dir)
 # })
 #
-#
-#
+
+
+
 #
 # try({
 #     cat("\n\n 30. Plot daily radiation\n")
