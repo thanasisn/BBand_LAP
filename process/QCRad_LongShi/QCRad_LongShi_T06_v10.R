@@ -237,8 +237,9 @@ cat(" \n \n")
 
 pp <- DT |>
   filter(!is.na(DIFF_strict)) |>
-  filter(!is.na(RaylDIFF))   |>
-  select(DIFF_strict, RaylDIFF) |> collect() |> data.table()
+  filter(!is.na(RaylDIFF))    |>
+  select(DIFF_strict, RaylDIFF) |>
+  collect() |> data.table()
 
 hist(pp[, DIFF_strict - RaylDIFF ], breaks = 100)
 abline(v = QS$Rayleigh_lower_lim, lty = 3, col = "red")
