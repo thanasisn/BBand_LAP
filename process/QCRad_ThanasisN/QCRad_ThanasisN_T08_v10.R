@@ -126,6 +126,8 @@ if (FALSE | Sys.info()["nodename"] == "sagan") {
   #' Due to the time difference of sun shine, due to geometry, location and
   #' obstacles.
   #'
+  #' Mornings before inversion only diffuse radiation can be measured
+  #'
   #' And possible cases of Instrument windows cleaning shadowing.
   #'
   #' Probably these value should be removed for CS when occurring on low
@@ -204,15 +206,20 @@ DT <- tbl(con, "LAP")                  |>
 ## __  Statistics  -------------------------------------------------------------
 #' ### Statistics
 #+ echo=F, include=T, sesults="asis"
+cat(pander(DT |> select(!!flagname_BTH) |> pull() |> table(),
+           caption = flagname_BTH))
+cat(" \n \n")
 
 
-# cat(pander(table(collect(select(BB, !!flagname_BTH)), useNA = "always"),
-#            caption = flagname_BTH))
-# cat(" \n \n")
 
-# ## TEST
-# DT <- DT |>
-#   filter(year %in% c(2018:2020))
+if (FALSE | Sys.info()["nodename"] == "tyler") {
+  ## TEST
+  DT <- DT |>
+    filter(year %in% c(2018:2020))
+  # QS$dir_glo_invert   <- 0.05  # Diffuse Inversion threshold factor
+  # QS$invert_glo_limit <- 5     # Global minimum for this test to work
+
+}
 
 
 test <- DT |>
@@ -220,9 +227,10 @@ test <- DT |>
   filter(!is.na(GLB_wpsm))   |>
   filter(!is.na(DIR_wpsm))   |>
   select(
-    Elevat, SZA, Day,
+    Elevat, SZA, Day, Azimuth,
     GLB_wpsm, DIR_wpsm,
-    DIR_strict, GLB_strict, HOR_strict, DIFF_strict
+    DIR_strict, GLB_strict, HOR_strict, DIFF_strict,
+    !!flagname_BTH
     ) |>
   collect() |> data.table()
 
@@ -236,6 +244,10 @@ test[, Relative_diffuse := 100 * (GLB_strict - HOR_strict) / GLB_strict]
 
 test[, Relative := HOR_strict / GLB_strict]
 
+test[kd_wpsm < QS$dir_glo_invert,
+     temp_flag := "Hit"]
+
+
 plot(test[, GLB_strict, HOR_strict])
 plot(test[, Relative])
 
@@ -244,7 +256,6 @@ test[HOR_strict / GLB_strict > 1  &
 
 test[HOR_strict / GLB_strict > 1 - QS$dir_glo_invert  &
        GLB_strict > QS$invert_glo_limit, ]
-
 
 
 hist(test$Relative, breaks = 100)
@@ -259,16 +270,21 @@ cat(" \n \n")
 hist(test$DIFF_wpsm         , breaks = 100)
 hist(test[, kd_wpsm]        , breaks = 100)
 
-test[kd_wpsm < QS$dir_glo_invert,
-   flagname_BTH := "Hit"]
+
+
+plot(test[temp_flag == "Hit", Elevat, Azimuth])
+
+plot(test[!get(flagname_BTH) %in% c("empty", "pass"), Elevat, Azimuth])
+
+
 
 hist(test[kd_wpsm < QS$dir_glo_invert & Elevat  > 3, Elevat],    breaks = 100)
 hist(test[kd_wpsm < QS$dir_glo_invert & Elevat  > 3, DIFF_wpsm], breaks = 100)
-hist(test[kd_wpsm < QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, Elevat],    breaks = 100)
-hist(test[kd_wpsm < QS$dir_glo_invert & GLB_strict > QS$dir_glo_glo_off, DIFF_wpsm], breaks = 100)
+hist(test[kd_wpsm < QS$dir_glo_invert & GLB_strict > QS$invert_glo_limit, Elevat],    breaks = 100)
+hist(test[kd_wpsm < QS$dir_glo_invert & GLB_strict > QS$invert_glo_limit, DIFF_wpsm], breaks = 100)
 
 
-test <- test[!is.na(flagname_BTH) & (!is.na(HOR_strict) | !is.na(GLB_strict) ) ]
+test <- test[!is.na(temp_flag) & (!is.na(HOR_strict) | !is.na(GLB_strict) ) ]
 
 
 for (ad in sort(unique(test$Day))) {
@@ -278,9 +294,11 @@ for (ad in sort(unique(test$Day))) {
     select(
       Elevat, SZA, Date, Azimuth,
       GLB_wpsm, DIR_wpsm, DIR_strict, GLB_strict, HOR_strict,
-      DIFF_strict) |>
+      DIFF_strict,
+      !!flagname_BTH) |>
     collect() |> data.table()
   setorder(pp, Date)
+
   ## create dirty diffuse
   pp[, HOR_wpsm  := DIR_strict * cos(SZA * pi / 180)]
   # test[, DIFF_wpsm := GLB_wpsm - HOR_wpsm]
@@ -288,7 +306,7 @@ for (ad in sort(unique(test$Day))) {
   pp[, kd_wpsm   := DIFF_wpsm / GLB_strict]
 
   pp[kd_wpsm < QS$dir_glo_invert,
-       flagname_BTH := "Hit"]
+       temp_flag := "Hit"]
 
   ylim <- range(pp[, HOR_strict, GLB_strict], na.rm = T)
   plot( pp$Azimuth, pp$HOR_strict, "l",
@@ -296,10 +314,13 @@ for (ad in sort(unique(test$Day))) {
   lines(pp$Azimuth, pp$GLB_strict, col = "green")
   title(paste("#8", as.Date(ad, origin = "1970-01-01")))
 
-  points(pp[!is.na(flagname_BTH), HOR_strict, Azimuth],
+  points(pp[!is.na(temp_flag), HOR_strict, Azimuth],
          col = "red")
-  points(pp[!is.na(flagname_BTH), GLB_strict, Azimuth],
+  points(pp[!is.na(temp_flag), GLB_strict, Azimuth],
          col = "magenta")
+
+  points(pp[!get(flagname_BTH) %in% c("empty", "pass"), GLB_strict, Azimuth], col = alpha("blue", 0.5), cex = 1.5)
+  points(pp[!get(flagname_BTH) %in% c("empty", "pass"), HOR_strict, Azimuth], col = alpha("blue", 0.5), cex = 1.5)
 
 }
 
