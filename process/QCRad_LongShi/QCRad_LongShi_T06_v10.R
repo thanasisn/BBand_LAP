@@ -428,12 +428,12 @@ if (DO_PLOTS) {
          ylim = ylim, col = "green", ylab = "", xlab = "")
     lines(pp$Date, pp$DIR_strict, col = "blue" )
 
-    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIR_strict, Date], ylim = ylim, col = alpha("magenta", 0.4))
-    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, GLB_strict, Date], ylim = ylim, col = alpha("magenta", 0.4))
-    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIR_strict, Date], ylim = ylim, col = alpha("red",     0.5))
-    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIR_strict, Date], ylim = ylim, col = alpha("red",     0.5))
-    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit upper (18)"        & !Ignore, GLB_strict, Date], ylim = ylim, col = alpha("blue",    0.5))
-    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit upper (18)"        & !Ignore, GLB_strict, Date], ylim = ylim, col = alpha("blue",    0.5))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIR_strict, Date], col = alpha("magenta", 0.4))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, GLB_strict, Date], col = alpha("magenta", 0.4))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIR_strict, Date], col = alpha("red",     0.5))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower narrow (18)" & !Ignore, DIR_strict, Date], col = alpha("red",     0.5))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit upper (18)"        & !Ignore, GLB_strict, Date], col = alpha("blue",    0.5))
+    points(pp[get(flagname_BTH) == "Rayleigh diffuse limit upper (18)"        & !Ignore, GLB_strict, Date], col = alpha("blue",    0.5))
 
     layout(1, 1)
   }
