@@ -128,6 +128,9 @@ if (FALSE | Sys.info()["nodename"] == "sagan") {
   #'
   #' Mornings before inversion only diffuse radiation can be measured
   #'
+  #' SEE: https://stats.stackexchange.com/questions/143622/fitting-an-envelope-to-x-y-data-in-r
+  #' SEE: https://cran.r-project.org/web/packages/GET/vignettes/pointpatterns.pdf
+  #'
   #' And possible cases of Instrument windows cleaning shadowing.
   #'
   #' Probably these value should be removed for CS when occurring on low
