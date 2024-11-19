@@ -79,9 +79,21 @@ library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(scales,     warn.conflicts = FALSE, quietly = TRUE)
+library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
+con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
+tt <- tbl(con, "LAP")
 
+ex <- tt |>
+  select(Date, SZA, Azimuth, Day,
+         DIFF_strict, DIR_strict, GLB_strict) |>
+  filter(Day %in% c("2024-05-06", "2023-06-21")) |>
+  collect() |> data.table()
+
+write.csv2(ex, "DimitrisK.csv")
+
+stop()
 
 ## . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
