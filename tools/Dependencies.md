@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/tools/ 
-At: 2024-11-18 
+At: 2024-11-19 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -10,7 +10,7 @@ At: 2024-11-18
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
           plotly:  4.10.4  
-      reticulate:  1.39.0  
+      reticulate:  1.40.0  
        lubridate:  1.9.3   
             renv:  1.0.11  
          ggplot2:  3.5.1   
