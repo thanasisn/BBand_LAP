@@ -77,47 +77,83 @@ ncfiles <- data.table(
   prelimi = grepl("preliminary", ncfiles)
 )
 
-test <- ncfiles[, max(created) , by = .(start, end)]
+## Check if preliminary are old and remove them
+prelimin <- ncfiles[prelimi == T,  ]
+for (af in 1:nrow(prelimin)) {
+  ll <- prelimin[af]
+  if (nrow(ncfiles[prelimi != TRUE & ll$start >= start & ll$end <= end ]) != 0) {
+    cat("Remove old preliminary file", ll$file)
+    file.remove(ll$file)
+    ncfiles <- ncfiles[ file != ll$file]
+  }
+}
+
+## Get the last version of files only
+ncfiles <- ncfiles[version == last(sort(unique(ncfiles$version)))]
 
 
 
 
+## __ Parse data  --------------------------------------------------------------
+gather <- data.table()
+for (af in 1:nrow(ncfiles)) {
+  ll <- ncfiles[af]
 
-stop()
+  anc  <- open.nc(ll$file, write  = FALSE)
+  data <- read.nc(anc, unpack = TRUE )
+  # print.nc(anc)
+
+  data <- data.table(TSI      = as.vector(data$TSI),
+                     Time     = as.vector(data$time),
+                     TSI_UNC  = as.vector(data$TSI_UNC),
+                     time_low = as.vector(data$time_bnds[1,]),
+                     time_upp = as.vector(data$time_bnds[2,]) )
+  ## check sanity
+  dateorigin <- "1610-01-01 00:00:00"
+  stopifnot(grepl(dateorigin, att.get.nc(anc, "time",      "units")))
+  stopifnot(grepl(dateorigin, att.get.nc(anc, "time",      "units")))
+  stopifnot(grepl(dateorigin, att.get.nc(anc, "time_bnds", "units")))
+  ## format data
+  data$Time          <- as.Date(    data$Time,     origin = dateorigin)
+  data$Time          <- as.POSIXct( data$Time ) + 12 * 3600
+  data$time_low      <- as.Date(    data$time_low, origin = dateorigin)
+  data$time_upp      <- as.Date(    data$time_upp, origin = dateorigin)
+  data$file          <- ll$file
+  data$file_Version  <- ll$version
+  data$file_Creation <- ll$created
+  data$file_mtime    <- file.mtime(ll$file)
+
+  gather <- rbind(gather, data)
+}
+setorder(gather, Time)
+
+
 
 TABLE <- "TSI_NOAA"
 if (!dbExistsTable(con, TABLE)) {
   cat("Initialize table\n")
 
-
-  stop()
   ## create table and date variable with pure SQL call
-  dbExecute(con, paste("CREATE TABLE", TABLE,  "(Date TIMESTAMP)")) ## this is better than TIMESTAMP_S
-  ## Create all dates
-  DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
-  DT[ , Date := round_date(Date, unit = "second")]
-  setorder(DT, Date)
-  res <- insert_table(con, DT, "params", "Date")
+  dbExecute(con, paste("CREATE TABLE", TABLE,  "(Time TIMESTAMP)")) ## this is better than TIMESTAMP_S
+  res <- insert_table(con, gather, TABLE, "Time")
 } else {
-  stop()
-  ## Extend days, add from last date
-  start_date <- tbl(con, "params") |> summarise(max(Date, na.rm = T)) |> pull()
-
-  ## temporary fix
-  if (end_date < start_date) { end_date <- start_date}
-
-  DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
-  DT[ , Date := round_date(Date, unit = "second")]
-  setorder(DT, Date)
-  if (nrow(DT) > 1) {
-    cat(Script.ID, ": Dates", paste(range(DT$Date)), "\n")
-    res <- insert_table(con, DT, "params", "Date")
-  } else {
-    cat("No new dates to add\n")
-  }
+  # ## Extend days, add from last date
+  # DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
+  # DT[ , Date := round_date(Date, unit = "second")]
+  # setorder(DT, Date)
+  # if (nrow(DT) > 1) {
+  #   cat(Script.ID, ": Dates", paste(range(DT$Date)), "\n")
+  #   res <- insert_table(con, DT, "params", "Date")
+  # } else {
+  #   cat("No new dates to add\n")
+  # }
 }
 
+stop()
 
+upsert_table(con, gather, TABLE, "Time")
+
+stop()
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
