@@ -37,6 +37,7 @@ CHP1_TEMP_EX <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CHP1_Temp.dat"
 # DB_LAP              <- "~/DATA_RAW/LAP/LAP_parameters.duckdb"
 DB_LAP              <- "~/DATA_RAW/SUN/LAP_SUN.duckdb"
 DB_DUCK             <- "~/DATA/Broad_Band/Broad_Band_LAP.duckdb"
+DB_TSI              <- "~/DATA/SUN/TSI.duckdb"
 DB_DIR              <- "~/DATA/Broad_Band/Broad_Band_DB"
 DB_META_fl          <- "~/DATA/Broad_Band/Broad_Band_DB_metadata.parquet"
 DB_Steps_DIR        <- "~/DATA/Broad_Band/CHP1_Tracker_steps_DB/"
@@ -92,3 +93,11 @@ Sun_elev_MIN <- -2 * 0.103
 ##  QCRad Long Shi options  ----------------------------------------------------
 QCrad_plot_date_min <- as.Date("1992-01-01")
 QCrad_plot_date_max <- as.Date("2025-01-01")
+
+
+
+##  NOAA TSI  ------------------------------------------------------------------
+##  https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00828
+##  Cite as: Odele Coddington, Judith L. Lean, Doug Lindholm, Peter Pilewskie, Martin Snow, and NOAA CDR Program (2015): NOAA Climate Data Record (CDR) of Total Solar Irradiance (TSI), NRLTSI Version 2. [indicate subset used]. NOAA National Centers for Environmental Information. doi:10.7289/V55B00C1 [access date].
+FROM_NOAA  <- "https://www.ncei.noaa.gov/data/total-solar-irradiance/access/daily/"
+DEST_NOAA  <- "~/DATA/SUN/TSI_model_NOAA/"
