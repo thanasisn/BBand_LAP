@@ -57,15 +57,13 @@ sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 ##  Select Astropy data  -------------------------------------------------------
 SUN <- tbl(sun, "params") |>
   filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
-  # rename(Sun_Dist_Astropy = "AsPy_Dist")       |>
-  # rename(Elevat           = "AsPy_Elevation")  |>
-  # mutate(SZA              = 90 - Elevat)       |>
-  select(Date)          |>
+  rename(Elevat           = "AsPy_Elevation")  |>
+  filter(Elevat > -5)                          |> ## Don't need night LAP
+  select(Date)                                 |>
   arrange(Date)
 
 ## TEST
-SUN <- SUN |> filter(Date < "2020-01-02")
-
+# SUN <- SUN |> filter(Date < "2020-01-03")
 # print(SUN |> summarise(min(Date), max(Date)))
 
 ##  Add Dates  -----------------------------------------------------------------
@@ -104,6 +102,9 @@ if (!dbExistsTable(con, TABLE)) {
 
 ## TODO detect new data
 tbl(con, "TSI_NOAA") |> summarise(max(file_Creation, na.rm = T))
+tbl(con, "TSI_NOAA")   |>
+  filter(prelimi == T) |> summarise(min(Time))
+
 
 ## ADD row values for LAP
 RAW <- tbl(con, "TSI_NOAA")   |>
@@ -116,6 +117,13 @@ update_table(con, RAW, TABLE, "Date")
 
 ## Fill raw with interpolation
 NEW <- tbl(con, TABLE)
+
+
+NEW |> filter(is.na(TSI)) |> summarise(min(Date), max(Date))
+NEW |> filter(!is.na(TSI)) |> summarise(min(Date), max(Date))
+
+
+ff <- NEW |> filter(Date > "2024-06-29") |> collect()
 
 ### Create interpolation function
 tt <- NEW |> filter(Source == "NOAA_RAW") |>
@@ -147,24 +155,56 @@ for (ay in yearstofill) {
 }
 
 
-## Fill TOA and LAP
+## Fill TOA and LAP ground
+make_new_column(con = con, table = TABLE, "TSI_TOA")
+make_new_column(con = con, table = TABLE, "TSI_GRN")
 NEW <- tbl(con, TABLE)
 
+yearstofill <- NEW |>
+  filter(is.na(TSI_TOA) | is.na(TSI_GRN)) |>
+  mutate(year = year(Date))  |>
+  select(year) |> distinct() |> pull()
 
-NEW           |>
-  filter(is.na(TSI_TOA))         |>
+for (ay in yearstofill) {
+  some <- NEW |> filter(year(Date) == ay) |>
+    filter(is.na(TSI_TOA) | is.na(TSI_GRN)) |>
+    select(Date, TSI)
+
+  SUN <- tbl(sun, "params") |>
+    filter(year(Date) == ay) |>
+    filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
+    rename(Sun_Dist_Astropy = "AsPy_Dist")       |>
+    rename(Elevat           = "AsPy_Elevation")  |>
+    mutate(SZA              = 90 - Elevat)       |>
+    select(Date, Sun_Dist_Astropy, SZA)
+
+  ADD <- left_join(some, SUN, copy = T) |>
+    mutate(
+      TSI_TOA = TSI / Sun_Dist_Astropy^2,  ## TSI on LAP TOA
+      TSI_GRN = TSI_TOA * cos(SZA*pi/180)  ## TSI on LAP ground
+    ) |>
+    select(Date, TSI_TOA, TSI_GRN) |>
+    filter(!is.na(TSI_TOA) & !is.na(TSI_GRN))
+
+  ## write only when needed
+  if (ADD |> tally() |> pull() > 0) {
+    cat(paste(Script.ID, ":",
+              "TOA and Ground TSI for", ay), "\n")
+    res <- update_table(con, ADD, TABLE, "Date")
+  }
+}
+
+
+# test <- NEW |> filter(year(Date) == 1993) |> collect() |> data.table()
+#
+# plot(test$Date, test$TSI)
+# points(test[Source == "NOAA_RAW", TSI, Date], col = "red")
+#
+# plot(test$Date, test$TSI_TOA)
+# plot(test$Date, test$TSI_GRN)
 
 
 
-stop()
-
-test <- NEW |> filter(year(Date) == 1993) |> collect() |> data.table()
-
-plot(test$Date, test$TSI)
-points(test[Source == "NOAA_RAW", TSI, Date], col = "red")
-
-
-stop()
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
