@@ -29,7 +29,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/parameters/TSI/Read_raw_TSI_NOAA.R"
+Script.Name <- "~/BBand_LAP/parameters/TSI/Create_LAP_TSI.R"
 Script.ID   <- "0B"
 
 if (!interactive()) {
@@ -64,9 +64,7 @@ SUN <- tbl(sun, "params") |>
   arrange(Date)
 
 ## TEST
-SUN <- SUN |> filter(Date < "2023-01-02")
-
-
+SUN <- SUN |> filter(Date < "2020-01-02")
 
 # print(SUN |> summarise(min(Date), max(Date)))
 
@@ -101,71 +99,69 @@ if (!dbExistsTable(con, TABLE)) {
                       TABLE, "Date")
 }
 
-stop()
+
 ## Fill with TSI DATA  ---------------------------------------------------------
+
+## TODO detect new data
+tbl(con, "TSI_NOAA") |> summarise(max(file_Creation, na.rm = T))
 
 ## ADD row values for LAP
 RAW <- tbl(con, "TSI_NOAA")   |>
-  mutate(Source = "RAW_NOAA") |>
+  mutate(Source = "NOAA_RAW") |>
   select(Time, TSI, Source)   |>
   rename(Date = "Time")
 
-## Add row values
+## Add raw values
 update_table(con, RAW, TABLE, "Date")
 
-
-## Fill values with interpolation
-library(tidyverse)
-left_join(
-  tibble(x = seq(min(data.raw$x), max(data.raw$x))),
-  data.raw) %>%
-  mutate(S = if_else(is.na(S), approx(x, S, x)$y, S))
-
-NEW |>
-  mutate(TSI = if_else(is.na(TSI), approx(Date, TSI, Date)$y, TSI))
-
-
+## Fill raw with interpolation
 NEW <- tbl(con, TABLE)
-NEW |> filter(!is.na(TSI))
+
+### Create interpolation function
+tt <- NEW |> filter(Source == "NOAA_RAW") |>
+  collect() |> data.table()
+tsi_fun <- approxfun(x      = tt$Date,
+                     y      = tt$TSI,
+                     method = "linear",
+                     rule   = 1,
+                     ties   = mean )
+
+## Fill with interpolated data
+yearstofill <- NEW           |>
+  filter(is.na(TSI))         |>
+  mutate(year = year(Date))  |>
+  select(year) |> distinct() |> pull()
+
+for (ay in yearstofill) {
+  some <- NEW |> filter(year(Date) == ay) |>
+    filter(is.na(TSI)) |> select(Date) |> collect() |> data.table()
+  some[, TSI    := tsi_fun(Date)]
+  some[, Source := "NOAA_INTERP"]
+  ## write only when needed
+  some <- some[!is.na(TSI)]
+  if (nrow(some) > 0) {
+    cat(paste(Script.ID, ":",
+              "Interpolate TSI for", ay), "\n")
+    res <- update_table(con, some, TABLE, "Date")
+  }
+}
 
 
-SUN <- tbl(sun, "params") |>
-  filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
-  rename(Sun_Dist_Astropy = "AsPy_Dist")       |>
-  rename(Elevat           = "AsPy_Elevation")  |>
-  mutate(SZA              = 90 - Elevat)       |>
-  select(Date, SZA, Sun_Dist_Astropy)          |>
-  arrange(Date)
+## Fill TOA and LAP
+NEW <- tbl(con, TABLE)
 
 
-dbExecute(con,
-paste("
-SELECT
-Date,
-COALESCE(
-  TSI,
-  (
-    SELECT
-    prev.TSI + ( (next.TSI - prev.TSI) * (parent.Date - prev.Date) / (next.Date - prev.Date) )
-    FROM
-    ( SELECT Date, TSI, ROW_NUMBER() OVER (ORDER BY Date DESC) as rn FROM df WHERE Date <= parent.Date and TSI is not null ) AS prev
-    CROSS JOIN
-    ( SELECT Date, TSI, ROW_NUMBER() OVER (ORDER BY Date ASC) as rn FROM df WHERE Date >= parent.Date and TSI is not null ) AS next
-    WHERE
-    prev.rn = next.rn
-  )
-) AS TSI
-FROM
-LAP_TSI parent
-")
-)
+NEW           |>
+  filter(is.na(TSI_TOA))         |>
+
+
 
 stop()
 
+test <- NEW |> filter(year(Date) == 1993) |> collect() |> data.table()
 
-
-
-
+plot(test$Date, test$TSI)
+points(test[Source == "NOAA_RAW", TSI, Date], col = "red")
 
 
 stop()
