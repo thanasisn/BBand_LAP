@@ -67,9 +67,8 @@ SUN <- tbl(sun, "params") |>
 SUN <- SUN |> filter(Date < "2023-01-02")
 
 
-stop()
 
-print(SUN |> summarise(min(Date), max(Date)))
+# print(SUN |> summarise(min(Date), max(Date)))
 
 ##  Add Dates  -----------------------------------------------------------------
 TABLE <- "LAP_TSI"
@@ -102,7 +101,34 @@ if (!dbExistsTable(con, TABLE)) {
                       TABLE, "Date")
 }
 
+stop()
 ## Fill with TSI DATA  ---------------------------------------------------------
+
+## ADD row values for LAP
+RAW <- tbl(con, "TSI_NOAA")   |>
+  mutate(Source = "RAW_NOAA") |>
+  select(Time, TSI, Source)   |>
+  rename(Date = "Time")
+
+## Add row values
+update_table(con, RAW, TABLE, "Date")
+
+
+## Fill values with interpolation
+library(tidyverse)
+left_join(
+  tibble(x = seq(min(data.raw$x), max(data.raw$x))),
+  data.raw) %>%
+  mutate(S = if_else(is.na(S), approx(x, S, x)$y, S))
+
+NEW |>
+  mutate(TSI = if_else(is.na(TSI), approx(Date, TSI, Date)$y, TSI))
+
+
+NEW <- tbl(con, TABLE)
+NEW |> filter(!is.na(TSI))
+
+
 SUN <- tbl(sun, "params") |>
   filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
   rename(Sun_Dist_Astropy = "AsPy_Dist")       |>
@@ -112,12 +138,32 @@ SUN <- tbl(sun, "params") |>
   arrange(Date)
 
 
+dbExecute(con,
+paste("
+SELECT
+Date,
+COALESCE(
+  TSI,
+  (
+    SELECT
+    prev.TSI + ( (next.TSI - prev.TSI) * (parent.Date - prev.Date) / (next.Date - prev.Date) )
+    FROM
+    ( SELECT Date, TSI, ROW_NUMBER() OVER (ORDER BY Date DESC) as rn FROM df WHERE Date <= parent.Date and TSI is not null ) AS prev
+    CROSS JOIN
+    ( SELECT Date, TSI, ROW_NUMBER() OVER (ORDER BY Date ASC) as rn FROM df WHERE Date >= parent.Date and TSI is not null ) AS next
+    WHERE
+    prev.rn = next.rn
+  )
+) AS TSI
+FROM
+LAP_TSI parent
+")
+)
+
+stop()
 
 
 
-
-TSI <- tbl(con, "TSI_NOAA")
-TSI |> mutate(Time + 30)
 
 
 

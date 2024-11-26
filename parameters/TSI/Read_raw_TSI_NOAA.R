@@ -1,17 +1,7 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Compute sun vector for LAP with standard tools
-#'
-#' Populates:
-#'  - Date
-#'  - AsPy_Azimuth
-#'  - AsPy_Elevatation
-#'  - AsPy_Dist
-#'  - PySo_Azimuth
-#'  - PySo_Elevation
-#'  - LAP_SZA_start
-#'  - LAP_SZA_middle
+#' Download and import TSI from NOAA
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
