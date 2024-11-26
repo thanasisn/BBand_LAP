@@ -104,6 +104,7 @@ for (af in 1:nrow(ncfiles)) {
   # data$file          <- ll$file
   data$file_Version  <- ll$version
   data$file_Creation <- ll$created
+  data$prelimi       <- ll$prelimi
   # data$file_mtime    <- file.mtime(ll$file)
 
   gather <- rbind(gather, data)
@@ -117,6 +118,9 @@ if (length(unique(gather$time_low - gather$time_upp)) == 1 &
 }
 
 
+
+
+
 TABLE <- "TSI_NOAA"
 if (!dbExistsTable(con, TABLE)) {
   cat("Initialize table\n")
@@ -125,6 +129,16 @@ if (!dbExistsTable(con, TABLE)) {
   setorder(gather, Time)
   res <- insert_table(con, gather, TABLE, "Time")
 } else {
+  ## always drop preliminar data from DB
+  CCC <- tbl(con, TABLE) |>
+    filter(prelimi == T) |>
+    mutate(TSI           = NA,
+           TSI_UNC       = NA,
+           file_Version  = NA,
+           file_Creation = NA,
+           prelimi       = NA)
+  res <- update_table(con, CCC, TABLE, "Time")
+
   ## Keep most recent data every time
   DT   <- tbl(con, TABLE) |> collect() |> data.table()
   Keep <- full_join(
