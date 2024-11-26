@@ -148,6 +148,13 @@ res$date <- Sys.time()
 gather   <- c(gather, list(res))
 
 
+##  TSI info  ------------------------------------------------------------------
+res      <- duckdb_stats(DB_TSI)
+res$host <- Sys.info()["nodename"]
+res$date <- Sys.time()
+gather   <- c(gather, list(res))
+
+
 ##  Broadband info  ------------------------------------------------------------
 res      <- duckdb_stats(DB_DUCK)
 res$host <- Sys.info()["nodename"]
