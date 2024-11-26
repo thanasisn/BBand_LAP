@@ -29,7 +29,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/parameters/TSI/Read_TSI_data.R"
+Script.Name <- "~/BBand_LAP/parameters/TSI/Read_raw_TSI_NOAA.R"
 Script.ID   <- "0B"
 
 if (!interactive()) {
@@ -45,7 +45,6 @@ library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
-library(reticulate, warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(RNetCDF,    warn.conflicts = FALSE, quietly = TRUE)
 
@@ -53,9 +52,6 @@ cat("\n Initialize params DB and/or import TSI data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_TSI))
-
-##  TSI from NOAA  -------------------------------------------------------------
-
 
 ## __ Get data  ----------------------------------------------------------------
 if (Sys.info()["nodename"] == "sagan") {
@@ -70,9 +66,9 @@ ncfiles <- list.files(path       = DEST_NOAA,
 
 ncfiles <- data.table(
   file    = ncfiles,
-  start   = strptime(regmatches(ncfiles, regexpr("s[0-9]+", ncfiles)), "s%Y%m%d"),
-  end     = strptime(regmatches(ncfiles, regexpr("e[0-9]+", ncfiles)), "e%Y%m%d"),
-  created = strptime(regmatches(ncfiles, regexpr("c[0-9]+", ncfiles)), "c%Y%m%d"),
+  start   = as.POSIXct(strptime(regmatches(ncfiles, regexpr("s[0-9]+", ncfiles)), "s%Y%m%d")),
+  end     = as.POSIXct(strptime(regmatches(ncfiles, regexpr("e[0-9]+", ncfiles)), "e%Y%m%d")),
+  created = as.POSIXct(strptime(regmatches(ncfiles, regexpr("c[0-9]+", ncfiles)), "c%Y%m%d")),
   version = regmatches(ncfiles, regexpr("v[0-9]+r[0-9]+", ncfiles)),
   prelimi = grepl("preliminary", ncfiles)
 )
@@ -90,9 +86,6 @@ for (af in 1:nrow(prelimin)) {
 
 ## Get the last version of files only
 ncfiles <- ncfiles[version == last(sort(unique(ncfiles$version)))]
-
-
-
 
 ## __ Parse data  --------------------------------------------------------------
 gather <- data.table()
@@ -115,45 +108,45 @@ for (af in 1:nrow(ncfiles)) {
   stopifnot(grepl(dateorigin, att.get.nc(anc, "time_bnds", "units")))
   ## format data
   data$Time          <- as.Date(    data$Time,     origin = dateorigin)
-  data$Time          <- as.POSIXct( data$Time ) + 12 * 3600
+  data$Time          <- as.POSIXct( data$Time ) + 12 * 3600 + 30 ## shift to match LAP
   data$time_low      <- as.Date(    data$time_low, origin = dateorigin)
   data$time_upp      <- as.Date(    data$time_upp, origin = dateorigin)
-  data$file          <- ll$file
+  # data$file          <- ll$file
   data$file_Version  <- ll$version
   data$file_Creation <- ll$created
-  data$file_mtime    <- file.mtime(ll$file)
+  # data$file_mtime    <- file.mtime(ll$file)
 
   gather <- rbind(gather, data)
 }
-setorder(gather, Time)
 
+## Drop non meaningful data
+if (length(unique(gather$time_low - gather$time_upp)) == 1 &
+    length(unique(gather$Time - as.POSIXct(gather$time_upp))) == 1) {
+  gather[, time_low := NULL]
+  gather[, time_upp := NULL]
+}
 
 
 TABLE <- "TSI_NOAA"
 if (!dbExistsTable(con, TABLE)) {
   cat("Initialize table\n")
-
   ## create table and date variable with pure SQL call
   dbExecute(con, paste("CREATE TABLE", TABLE,  "(Time TIMESTAMP)")) ## this is better than TIMESTAMP_S
+  setorder(gather, Time)
   res <- insert_table(con, gather, TABLE, "Time")
 } else {
-  # ## Extend days, add from last date
-  # DT <- data.table(Date = seq(start_date, end_date, by = "mins"))
-  # DT[ , Date := round_date(Date, unit = "second")]
-  # setorder(DT, Date)
-  # if (nrow(DT) > 1) {
-  #   cat(Script.ID, ": Dates", paste(range(DT$Date)), "\n")
-  #   res <- insert_table(con, DT, "params", "Date")
-  # } else {
-  #   cat("No new dates to add\n")
-  # }
+  ## Keep most recent data every time
+  DT   <- tbl(con, TABLE) |> collect() |> data.table()
+  Keep <- full_join(
+    DT,
+    gather) |>
+    group_by(Time) |>
+    slice(which.max(file_Creation))
+  setorder(Keep, Time)
+  cat(Script.ID, ": Update", nrow(Keep), "rows of raw", TABLE, "\n")
+  res <- update_table(con, Keep, TABLE, "Time")
 }
 
-stop()
-
-upsert_table(con, gather, TABLE, "Time")
-
-stop()
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
