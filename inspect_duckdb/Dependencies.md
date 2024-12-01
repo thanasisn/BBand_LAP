@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/inspect_duckdb/ 
-At: 2024-11-30 
+At: 2024-12-01 
 
  R version 4.2.3 (2023-03-15) 
 
