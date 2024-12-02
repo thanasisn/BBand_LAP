@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Inspect CHP-1 radiation data **DNI/DHI L1** "
+#' title:         "Inspect CM-21 radiation data **GHI L1** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -91,32 +91,98 @@ DT  <- tbl(con, "LAP")
 DT <- DT |>
   select(
     Date, SZA, Elevat, year, Azimuth, preNoon,
-    contains(c("DIR", "HOR", "chp1")))
+    contains(c("GLB", "cm21")))
+
+
+##  Overall statistics  --------------------------------------------------------
+
+## variables for stats
+vars <- c("GLB_wpsm", "GLB_SD_wpsm")
+
+
+#'
+#' ## Stats on whole data set.
+#'
+#'
+#+ include=T, echo=F
+
+## histogram of GHI SD
+hist(
+  DT |> select("GLB_SD_wpsm") |> collect() |> pull(),
+  breaks = 100,
+  xlab   =  expression(W %.% m^-2),
+  main   = "Distribution of GHI SD"
+)
+
+## histogram of GHI
+hist(
+  DT |> select("GLB_wpsm") |> collect() |> pull(),
+  breaks = 100,
+  xlab   =  expression(W %.% m^-2),
+  main   = "Distribution of GHI"
+)
+
+
+## extreme SD to check
+SD_outliers <- DT |> filter(GLB_SD_wpsm > 400) |> select(Date) |> collect()
+pander(SD_outliers)
+
+SD_negative <- DT |> filter(GLB_SD_wpsm < 0) |> select(Date) |> collect()
+pander(SD_negative)
+
+
+## extreme values to check
+GHI_negative <- DT |> filter(GLB_wpsm < -20) |> select(Date) |> collect()
+pander(GHI_negative)
 
 
 
-DT |> colnames()
+## get daily ranges
+extreme <- DT |>
+  filter(!is.na(GLB_wpsm))      |>
+  group_by(Day = as.Date(Date)) |>
+  summarise(
+    across(
+      all_of(vars),
+      list(max = ~ max(., na.rm = TRUE),
+           min = ~ min(., na.rm = TRUE)))) |>
+  collect() |> data.table()
 
 
+plot(extreme[, GLB_wpsm_max, Day])
+plot(extreme[, GLB_wpsm_min, Day])
+
+plot(extreme[, GLB_SD_wpsm_max, Day])
+plot(extreme[, GLB_SD_wpsm_min, Day])
+
+pander(
+  head(extreme[order(extreme$GLB_SD_wpsm_min, decreasing = T)], 30)
+)
+
+
+
+##  Yearly plots  --------------------------------------------------------------
 
 ## years in the data base
 datayears <- DT |>
-  filter(!is.na(DIR_wpsm)) |>
+  filter(!is.na(GLB_wpsm)) |>
   select(year) |>
-  distinct()   |>
-  pull()
+  distinct()   |> pull() |> sort()
+
+
 
 ## TODO compare output files with parsed dates from meta
 years_to_do <- datayears
 
+# TEST
 if (TEST) {
-    years_to_do <- 2023
+  years_to_do <- 1995
 }
 
 #'
 #' ## Intro
 #'
-#' Produce yearly plots for **CHP-1**.
+#' Produce yearly plots for **CM-21**.
 #'
 #'
 
@@ -134,23 +200,18 @@ for (YYYY in sort(years_to_do)) {
   ## load data for year
   year_data <- DT |> filter(year == YYYY) |> collect() |> data.table()
 
-  ## do some cleaning for displaying
-  year_data[!chp1_bad_temp_flag %in% c("empty", "pass"), chp1_temperature    := NA]
-  year_data[!chp1_bad_temp_flag %in% c("empty", "pass"), chp1_temperature_SD := NA]
-
   ## _ Check for night time extreme values -----------------------------------
   #'
   #' Problems in the night signal especially bellow DARK_ELEV can be spotted
   #' and corrected with exclusions to protect the dark signal calculation.
   #'
 
-  ## __ Dynamic outliers limits ----
+  ## __ Dynamic outliers limits --------------------------------------------
   OutliersUP   <- 3.5
   OutliersDOWN <- 4.5
 
-
   ## _ Dark data Global ------------------------------------------------------
-  av  <- "DIR_wpsm"
+  av  <- "GLB_wpsm"
   ppD <- data.table(year_data[Elevat < DARK_ELEV, get(av), Date])
   pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
                   dmax = max(V1, na.rm = T)),
@@ -176,13 +237,13 @@ for (YYYY in sort(years_to_do)) {
   if (nrow(offend) > 0) {
     cat("\n### Dark outlier days\n\n")
     cat(pander(
-      offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date)]
+      offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
     ))
     cat('\n\n')
   }
 
   ## _ Dark data Global SD ---------------------------------------------------
-  av  <- "DIR_SD_wpsm"
+  av  <- "GLB_SD_wpsm"
   ppD <- data.table(year_data[Elevat < DARK_ELEV, get(av), Date])
   pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
                   dmax = max(V1, na.rm = T)),
@@ -208,13 +269,13 @@ for (YYYY in sort(years_to_do)) {
   if (nrow(offend) > 0) {
     cat("\n### Dark SD outlier days\n\n")
     cat(pander(
-      offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date)]
+      offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
     ))
     cat('\n\n')
   }
 
   ## _ Night data Global -----------------------------------------------------
-  av  <- "DIR_wpsm"
+  av  <- "GLB_wpsm"
   ppD <- data.table(year_data[Elevat < 0, get(av), Date])
   pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
                   dmax = max(V1, na.rm = T)),
@@ -240,14 +301,14 @@ for (YYYY in sort(years_to_do)) {
   if (nrow(offend) > 0) {
     cat("\n### Night outlier days\n\n")
     cat(pander(
-      offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date)]
+      offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
     ))
     cat('\n\n')
   }
 
 
   ## _ Night data Global SD --------------------------------------------------
-  av  <- "DIR_SD_wpsm"
+  av  <- "GLB_SD_wpsm"
   ppD <- data.table(year_data[Elevat < 0, get(av), Date])
   pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
                   dmax = max(V1, na.rm = T)),
@@ -273,67 +334,74 @@ for (YYYY in sort(years_to_do)) {
   if (nrow(offend) > 0) {
     cat("\n### Night SD outlier days\n\n")
     cat(pander(
-      offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date)]
+      offend[, .(Max = max(V1), Min = min(V1), N = .N), by = as.Date(Date) ]
     ))
     cat('\n\n')
   }
 
 
   ## _ Distribution of direct and SD -----------------------------------------
-  wattlimit <- 50
-  hist(year_data[ DIR_wpsm > wattlimit, DIR_wpsm],
-       main = paste(YYYY, "Direct  >", wattlimit, "[Watt/m^2]"),
-       breaks = 100 , las = 1, probability = T, xlab = "[Watt/m^2]")
-  lines(density(year_data$DIR_wpsm, na.rm = T), col = "orange", lwd = 3)
-  cat('\n\n')
-
-  hist(year_data$DIR_SD_wpsm,
-       main = paste(YYYY, "Direct SD"),
-       breaks = 100 , las = 1, probability = T, xlab = "[Watt/m^2]")
-  lines(density(year_data$DIR_SD_wpsm, na.rm = T), col = "orange", lwd = 3)
+  hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
+       main = paste(YYYY, "GHI Elevat <", DARK_ELEV, "°"),
+       breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
+  abline(v = CM21_MAXnightLIM, col = "red", lty = 3)
+  abline(v = CM21_MINnightLIM, col = "red", lty = 3)
   cat('\n\n')
 
 
-  ## Scatter points by sun position ------------------------------------------
+  ## _ Plots of SD -----------------------------------------------------------
   plot(
-    year_data$Elevat,
-    year_data$DIR_wpsm,
+    year_data[Elevat > 0, GLB_SD_wpsm, Date],
     pch  = 19,
     cex  = .1,
-    main = paste("Direct Beam ", YYYY),
+    main = paste(YYYY, "GHI SD, Elevat >", 0, "°"),
+    xlab = "",
+    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+  )
+  cat('\n\n')
+
+
+  ## _ Distribution of Global and SD -----------------------------------------
+  wattlimit <- 50
+  hist(
+    year_data[GLB_wpsm > wattlimit, GLB_wpsm],
+    main = paste(YYYY, "GHI >", wattlimit, "[Watt/m^2]"),
+    breaks = 100,
+    las = 1,
+    probability = T,
+    xlab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+  )
+  lines(density(year_data$GLB_wpsm, na.rm = T), col = "orange", lwd = 3)
+  cat('\n\n')
+
+  hist(
+    year_data$GLB_SD_wpsm,
+    main = paste(YYYY, "GHI SD"),
+    breaks = 100,
+    las = 1,
+    probability = T,
+    xlab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+  )
+  lines(density(year_data$GLB_SD_wpsm, na.rm = T), col = "orange", lwd = 3)
+  cat('\n\n')
+
+
+  ## _ Scatter points by sun position ----------------------------------------
+  plot(
+    year_data[, GLB_wpsm, Elevat],
+    pch  = 19,
+    cex  = .1,
+    main = paste("Global radiation ", YYYY),
     xlab = "Elevation [°]",
     ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
   )
   cat('\n\n')
 
   plot(
-    year_data$Azimuth,
-    year_data$DIR_wpsm,
+    year_data[, GLB_wpsm, Azimuth],
     pch  = 19,
     cex  = .1,
-    main = paste("Direct Beam ", YYYY),
-    xlab = "Azimuth [°]",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
-  )
-  cat('\n\n')
-
-
-  ## Scatter points by date --------------------------------------------------
-  plot(
-    year_data[, DIR_wpsm, Date],
-    pch  = 19,
-    cex  = .1,
-    main = paste("Direct Beam ", YYYY),
-    xlab = "",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
-  )
-  cat('\n\n')
-
-  plot(
-    year_data[, HOR_strict, Azimuth],
-    pch  = 19,
-    cex  = .1,
-    main = paste("Direct Horizontal strict ", YYYY),
+    main = paste("Global radiation ", YYYY),
     xlab = "Azimuth [°]",
     ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
   )
@@ -342,10 +410,10 @@ for (YYYY in sort(years_to_do)) {
 
   ## _ Scatter points by date ------------------------------------------------
   plot(
-    year_data[, HOR_strict, Date],
+    year_data[, GLB_wpsm, Date],
     pch  = 19,
     cex  = .1,
-    main = paste("Direct Horizontal strict", YYYY),
+    main = paste("Global radiation ", YYYY),
     xlab = "",
     ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
   )
@@ -354,108 +422,101 @@ for (YYYY in sort(years_to_do)) {
 
   ## _ Scatter points by time of day -----------------------------------------
   plot(
-    year_data[preNoon == TRUE & !is.na(HOR_strict), HOR_strict, Elevat],
+    year_data[preNoon == TRUE, GLB_wpsm, Elevat],
     pch  = 19,
     cex  = .1,
     col  = "blue",
-    main = paste("Direct Horizontal strict", YYYY),
+    main = paste("Global ", YYYY),
     xlab = "Elevation [°]",
     ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
   )
   points(
-    year_data[preNoon == FALSE & !is.na(HOR_strict), HOR_strict, Elevat],
+    year_data[preNoon == TRUE, GLB_wpsm, Elevat],
     pch = 19,
     cex = 0.1,
-    col = "green")
+    col = "green"
+  )
   legend("topleft",
          legend = c("Before noon", "After noon"),
          col    = c("blue",        "green"),
          pch    = 19, bty = "n")
-  cat('\n\n')
+  cat(" \n \n")
 
 
   minelevet <- -1
-  xlim <- range(year_data$Elevat, na.rm = TRUE)
-  gap  <- 1
+  xlim      <- range(year_data$Elevat, na.rm = TRUE)
+  gap       <- 1
   xlim[2] <- xlim[2] + abs(diff(range(year_data[Elevat > minelevet, Elevat], na.rm = TRUE))) + gap
   xlim[1] <- minelevet
 
   plot(
-    year_data[preNoon == TRUE & Elevat > minelevet, HOR_strict, Elevat],
+    year_data[preNoon == TRUE & Elevat > minelevet,
+              GLB_wpsm, Elevat],
     xlim = xlim,
     pch  = 19,
     cex  = .05,
     col  = "blue",
-    main = paste("DHI morning/evening balance", YYYY),
+    main = paste("GHI morning/evening balance", YYYY),
     xaxt = "n",
     xlab = "Sun Elevation",
-    ylab = expression(W %.% m^-2))
+    ylab = expression(W %.% m^-2)
+  )
 
-  points(
-    year_data[preNoon == FALSE & Elevat > minelevet,
-              HOR_strict,
-              -Elevat + gap + abs(diff(range(year_data$Elevat))) ],
-    pch = 19,
-    cex = 0.05,
-    col = "green")
-  cat('\n\n')
+  points(-year_data[preNoon == FALSE & Elevat > minelevet, Elevat] + gap + abs(diff(range(year_data$Elevat, na.rm = TRUE))),
+         year_data[preNoon == FALSE & Elevat > minelevet, GLB_wpsm],
+         pch = 19,
+         cex = 0.05,
+         col = "green")
+  cat(" \n \n")
+
+  plot(year_data[preNoon == TRUE & Elevat > minelevet, Elevat],
+       year_data[preNoon == TRUE & Elevat > minelevet, GLB_wpsm],
+       xlim = xlim,
+       pch  = 19,
+       cex  = .05,
+       col  = "green",
+       main = paste("GHI morning/evening balance", YYYY),
+       xaxt = "n",
+       xlab = "Sun Elevation",
+       ylab = expression(W %.% m^-2))
+
+  points(year_data[preNoon == FALSE & Elevat > minelevet,
+                   GLB_wpsm,
+                   -Elevat + gap + abs(diff(range(year_data$Elevat))) ],
+         pch = 19,
+         cex = 0.05,
+         col = "blue")
+  cat(" \n \n")
+
 
 
   ## _ Box plots by week -----------------------------------------------------
   year_data[ , weekn := week(Date)]
 
-  boxplot(year_data[Elevat > 0, HOR_strict] ~ year_data[Elevat > 0, weekn],
+  boxplot(year_data[Elevat > 0, GLB_wpsm] ~ year_data[Elevat > 0, weekn],
           xlab = "Week", ylab = "[Watt/m^2]")
-  title(main = paste(YYYY, "DHI (Elevation > 0)"))
+  title(main = paste(YYYY, "GHI (Elevation > 0)"))
   cat('\n\n')
 
-  # boxplot(year_data[Elevat > 0, HOR_SD_wpsm] ~ year_data[Elevat > 0, weekn],
-  #         xlab = "Week", ylab = "[Watt/m^2]")
-  # title(main = paste(YYYY, "DHI SD (Elevation > 0)"))
-  # cat('\n\n')
+  boxplot(year_data[Elevat > 0, GLB_SD_wpsm] ~ year_data[Elevat > 0, weekn],
+          xlab = "Week", ylab = "[Watt/m^2]")
+  title(main = paste(YYYY, "GHI SD (Elevation > 0)"))
+  cat('\n\n')
 
-  boxplot(year_data[, CHP1_sig - CHP1_sig_wo_dark] ~ year_data[, weekn],
+  boxplot(year_data[, CM21_sig - CM21_sig_wo_dark] ~ year_data[, weekn],
           xlab = "Week", ylab = "[V]")
   title(main = paste(YYYY, "Dark correction"))
   cat('\n\n')
 
+
   cat('\n\n\\footnotesize\n\n')
-  cat(pander(summary(year_data[, .(Date, SZA, DIR_wpsm, DIR_SD_wpsm, HOR_strict, chp1_temperature)])))
+  cat(pander(summary(year_data[, .(Date, SZA, GLB_wpsm, GLB_SD_wpsm)])))
   cat('\n\n\\normalsize\n\n')
 
-
-  ## Temperature data --------------------------------------------------------
-  if (year_data[!is.na(chp1_temperature), .N] > 0) {
-    cat("\n\n\\FloatBarrier\n\n")
-    cat("\n## Temperature data:", YYYY, "\n\n")
-
-    hist(year_data$chp1_temperature,
-         breaks = 50,
-         main   = paste("CHP1 temperature ",  YYYY))
-    cat('\n\n')
-
-    hist(year_data$chp1_temperature_SD,
-         breaks = 50,
-         main   = paste("CHP1 temperature SD", YYYY))
-    cat('\n\n')
-
-    plot(year_data$Date, year_data$chp1_temperature,
-         pch  = 19,
-         cex  = .5,
-         main = paste("CHP1 temperature ", YYYY),
-         xlab = "",
-         ylab = "CHP1 temperature [C]" )
-    cat('\n\n')
-
-    plot(year_data$Elevat, year_data$chp1_temperature_SD,
-         pch  = 19,
-         cex  = .5,
-         main = paste("CHP1 temperature SD", YYYY),
-         xlab = "Elevation [°]",
-         ylab = "CHP1 temperature SD [C°]")
-    cat('\n\n')
-  }
 }
+
+
+
 
 
 #' **END**
