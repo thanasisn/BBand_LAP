@@ -227,7 +227,7 @@ parthash <- read_parquet(DB_META_fl) |>
 parthash$pysolar_mtime    <- NULL
 parthash$pysolar_basename <- NULL
 ## unify variables
-parthash <- melt(data = parthash,
+parthash <- melt(data    = parthash,
                  measure = patterns("_mtime$",
                                     "_md5sum$",
                                     "_basename$",
@@ -251,10 +251,10 @@ if (!file.exists(DB_HASH_fl)) {
 
     ## merge stored with current in DB
     parthash <- unique(rbind(parthash, mainhash))
-    ## order to keep most resent afte deduplication
-    setorder(parthash, md5sum, -parsed )
+    ## order to keep most resent after deduplication
+    setorder(parthash, md5sum, -parsed)
     ## keep unique combination of md5sum and basenames
-    mainhash <- mainhash[!duplicated(mainhash[ , md5sum, basename]), ]
+    mainhash <- mainhash[!duplicated(mainhash[, md5sum, basename]), ]
 
     writePARQUET(x = parthash, sink = DB_HASH_fl)
 }
@@ -298,7 +298,6 @@ if (nrow(tabs) > 0) {
 ## - list therm
 ## - list step
 ## - more instruments
-
 
 
 #+ include=T, echo=F, results="asis"

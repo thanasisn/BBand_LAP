@@ -17,7 +17,6 @@ renv::load("~/BBand_LAP")
 
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS_duck/"
 
-
 ## __ Check inputs  ------------------------------------------------------------
 try({
   cat("\n\n 0. Check files\n")
@@ -59,11 +58,11 @@ try({
 
 ## No point for clean yet
 # try({
-#     cat("\n\n 3a. Inspect INCLINED CM-21 signal CLEAN\n")
-#     rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/03_Inspect_CM21INC_sig.R",
-#                       params      = list(CLEAN = TRUE),
-#                       output_file = "03_Inspect_CM21INC_sig_CLEAN.pdf",
-#                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+#   cat("\n\n 3a. Inspect INCLINED CM-21 signal CLEAN\n")
+#   rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/03_Inspect_CM21INC_sig.R",
+#                     params      = list(CLEAN = TRUE),
+#                     output_file = "03_Inspect_CM21INC_sig_CLEAN.pdf",
+#                     output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 # })
 try({
   cat("\n\n 3b. Inspect INCLINED CM-21 signal DIRTY\n")
@@ -73,7 +72,6 @@ try({
                     output_dir  = output_dir)
 })
 
-
 try({
   cat("\n\n 4b. Inspect ERPPLAY PIR signal DIRTY\n")
   rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/04_Inspect_PIR_sig.R",
@@ -82,8 +80,7 @@ try({
                     output_dir  = output_dir)
 })
 
-## _  Plot daily signal  -------------------------------------------------------
-
+## __ Plot daily signal  -------------------------------------------------------
 try({
   cat("\n\n 10. Plot daily CHP-1 signals\n")
   source("~/BBand_LAP/inspect_duckdb/10_Plot_daily_CHP1_sig.R")
@@ -97,7 +94,6 @@ try({
 #     cat("\n\n 12. Plot daily PIR signals\n")
 #     source("~/BBand_LAP/inspect_duckdb/12_Plot_daily_PIR_sig.R")
 # })
-
 
 
 ## __ Check Radiation  ---------------------------------------------------------
@@ -114,8 +110,6 @@ try({
 })
 
 
-
-
 # try({
 #     cat("\n\n 30. Plot daily radiation\n")
 #     source("~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R")
@@ -126,13 +120,11 @@ try({
 # })
 
 
-
 # try({
 #     cat("\n\n 60. Inspect CM-21/TOT radiation\n")
 #     rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
 #                       output_dir  = output_dir)
 # })
-
 
 # try({
 #     cat("\n\n 80. Inspect duckdbs\n")
