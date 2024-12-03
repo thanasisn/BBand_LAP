@@ -208,7 +208,8 @@ for (YYYY in sort(years_to_do)) {
   dev.off()
 }
 
-
+## clean exit
+dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
 #+ include=T, echo=F, results="asis"
 tac <- Sys.time()

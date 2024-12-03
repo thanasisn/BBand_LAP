@@ -457,6 +457,8 @@ for (YYYY in sort(years_to_do)) {
   }
 }
 
+## clean exit
+dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
 #' **END**
 #+ include=T, echo=F
