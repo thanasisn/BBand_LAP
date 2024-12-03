@@ -121,7 +121,7 @@ years_to_do <- selected[is.na(path) | updated > mtime, year ]
 
 ## TEST
 if (TEST) {
-  years_to_do <- 2016
+  years_to_do <- 2018
 }
 
 
@@ -131,7 +131,7 @@ for (YYYY in sort(years_to_do)) {
   cat(YYYY, "rows:", nrow(year_data), "\n")
 
   ## days with data
-  daystodo <- year_data[!is.na(DIR_SD_wpsm), unique(as.Date(Date))]
+  daystodo <- year_data[!is.na(DIR_wpsm), unique(as.Date(Date))]
   daystodo <- sort(daystodo)
   ## signal limit for all year
   # ylim <- range(year_data[, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE)
