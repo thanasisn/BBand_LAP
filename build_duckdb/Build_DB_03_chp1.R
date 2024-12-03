@@ -65,8 +65,8 @@ inp_filelist[, chp1_basename := basename(fullname)]
 stopifnot( all(duplicated(sub("\\..*", "", inp_filelist$chp1_basename))) == FALSE)
 
 inp_filelist$Day <- as.Date(parse_date_time(
-    sub("03\\..*", "", inp_filelist$chp1_basename),
-    "dmy"))
+  sub("03\\..*", "", inp_filelist$chp1_basename),
+  "dmy"))
 setorder(inp_filelist, Day)
 cat("\n**Found:",paste(nrow(inp_filelist), "CHP-1 files**\n"))
 
