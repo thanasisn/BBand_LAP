@@ -1,7 +1,7 @@
-# /* !/usr/bin/env Rscript */
-# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
+#!/opt/R/4.2.3/bin/Rscript
+# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Daily raw CM-21 data **SIG** "
+#' title:         "Daily CHP-1 radiation data **L1** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -38,7 +38,7 @@
 #' ---
 
 #'
-#'  **CM21 SIG PLOT**
+#'  **DHI L1 PLOT**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -58,10 +58,10 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_duckdb/11_Plot_daily_CM21_sig.R"
+Script.Name <- "~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -76,61 +76,69 @@ library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
+panderOptions("table.alignment.default", "right")
+panderOptions("table.split.table",        120   )
+
+
 ## __  Variables  --------------------------------------------------------------
-OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CM21_signal/"
-OUT_PREFIX <- "CM21_signal_"
+OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CHP1_DIR_L1_test/"
+OUT_PREFIX <- "CHP1_direct_L1_"
 dir.create(OUT_FOLDER, showWarnings = FALSE, recursive = TRUE)
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
-## __ Execution control  -------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+## __ Open database  -----------------------------------------------------------
+con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+DT  <- tbl(con, "LAP")
+MT  <- tbl(con, "META")
 
-## when dark was computed for each year
-metalist <- tbl(con, "META")        |>
-  filter(!is.na(cm21_basename))     |>
-  select("Day", cm21_dark_computed) |>
+
+## __ Execution control  -------------------------------------------------------
+TEST <- TRUE
+
+
+metalist <- MT |>
+  mutate(year               = year(Day),
+         chp1_dark_computed = as.Date(chp1_dark_computed)) |>
+  filter(!is.na(chp1_basename))                            |>
+  select(chp1_dark_computed, year)                         |>
+  group_by(year)                                           |>
+  summarise(updated = max(chp1_dark_computed, na.rm = T))  |>
   collect() |> data.table()
 
-metalist[, year := year(Day)]
-metalist <- metalist[, .(updated = max(cm21_dark_computed, na.rm = TRUE)), by = year ]
 
-## when each plot file was produced
-plotfiles <- data.table(path = list.files(path    = OUT_FOLDER,
-                                          pattern = OUT_PREFIX,
+plotfiles <- data.table(path = list.files(path        = OUT_FOLDER,
+                                          pattern     = OUT_PREFIX,
                                           full.names  = TRUE,
                                           ignore.case = TRUE))
-plotfiles[, mtime := file.mtime(path)]
-plotfiles[, year  := as.numeric(sub(OUT_PREFIX, "",
-                           sub("\\.pdf", "",
-                               basename(path))))]
+plotfiles$mtime <- file.mtime(plotfiles$path)
+plotfiles$year  <- as.numeric(
+    sub(OUT_PREFIX, "", sub("\\.pdf", "", basename(plotfiles$path))))
 
-## find what needs update
+
 selected    <- merge(metalist, plotfiles, all = TRUE)
 years_to_do <- selected[is.na(path) | updated > mtime, year ]
 
-# TEST
-# years_to_do <- 2022
+
+## TEST
+if (TEST) {
+  years_to_do <- 2016
+}
+
 
 for (YYYY in sort(years_to_do)) {
+
   ## load data for year
-  META <- tbl(con, "META") |>
-    filter(year(Day) == YYYY) |>
-    collect() |> data.table()
-
-  DT <- tbl(con, "LAP") |>
-    filter(year == YYYY)
-  year_data <- DT |>
-    select(Date, Elevat,
-           CM21_sig,
-           CM21_sig_sd,
-           cm21_bad_data_flag,
-           CM21_sig_wo_dark) |>
-    collect() |> data.table()
-
+  year_data <- DT |> filter(year == YYYY) |> collect() |> data.table()
   cat(YYYY, "rows:", nrow(year_data), "\n")
+
+
   ## days with data
-  daystodo <- year_data[!is.na(CM21_sig), unique(as.Date(Date))]
+  daystodo <- year_data[!is.na(DIR_SD_wpsm), unique(as.Date(Date))]
   daystodo <- sort(daystodo)
+  ## signal limit for year
+  # ylim <- range(year_data[, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE)
+
+  stop()
 
   if (!interactive()) {
     pdffile <- paste0(OUT_FOLDER, "/", OUT_PREFIX, YYYY, ".pdf")
@@ -141,68 +149,56 @@ for (YYYY in sort(years_to_do)) {
   for (aday in sort(daystodo)) {
     dd   <- year_data[as.Date(Date) == aday]
     aday <- as.Date(aday, origin = "1970-01-01")
-    setorder(dd, Date)
 
-    layout(matrix(c(1,2,3,3,3,3), 6, 1, byrow = TRUE))
+    layout(matrix(c(1,2,2,2,2), 5, 1, byrow = TRUE))
 
-    ## Night signal
+    ## Direct SD
     par("mar" = c(0,4,2,1))
+    plot(dd$Date, dd$DIR_SD_wpsm,
+         ylim = range(c(0, dd$DIR_SD_wpsm), na.rm = T),
+         pch  = 19,  cex = 0.5, col = "red",
+         xaxt = "n", xlab = "",
+         ylab = "Direct SD [Watt/m^2]")
+    abline(h = 0, col = "grey", lty = 2)
 
-    if  (all(is.na(dd[Elevat < 0, CM21_sig]))) {
-      plot.new()
-    } else {
-      plot(dd[Elevat < 0, Date], dd[Elevat < 0, CM21_sig],
-           ylim = range(dd[Elevat < 0, .(CM21_sig, CM21_sig_wo_dark)], na.rm = TRUE),
-           pch = 19,  cex = 0.5, col = "darkolivegreen",
-           xaxt = "n",
-           xlab = "", ylab = "Night [V]")
-      points(dd[Elevat < 0, Date], dd[Elevat < 0, CM21_sig_wo_dark],
-             pch = 19,  cex = 0.5, col = "green")
-      abline(h = 0, col = "grey")
+    title(paste0("Direct Irradiance  doy: ", yday(aday), "  ", aday))
+
+
+    ## Radiation
+    par("mar" = c(3,4,0,1))
+    plot(dd$Date, dd$HOR_wpsm, type = "l",
+         ylim = range(dd[, .(DIR_wpsm, HOR_wpsm, DIR_wpsm_temp_cor)], na.rm = TRUE),
+         lwd  = 1.5,
+         pch  = 19,  cex = 0.5, col = "cyan",
+         xlab = "", ylab = "Radiation Flux [Watt/m^2]")
+    lines(dd$Date, dd$DIR_wpsm,
+          col = "blue",)
+    abline(h = 0, col = "grey", lty = 2)
+
+    ## Temperature correction
+    if (!all(is.na(dd$DIR_wpsm_temp_cor))) {
+      par(new = T)
+      plot(dd$Date, dd$DIR_wpsm_temp_cor, type = "l",
+           xaxt = "n", yaxt = "n",
+           lty = 3, col = "darkgrey")
     }
 
-    title(paste0("CM-21  doy: ", yday(aday), "  ",
-                 aday, "  dark ",
-                 tolower(META[Day == aday, cm21_dark_flag])))
-
-    ## Signal SD
-    par("mar" = c(0,4,0,1))
-    plot(dd$Date, dd$CM21_sig_sd,
-         ylim = range(c(0, dd$CM21_sig_sd), na.rm = T),
-         pch  = 19,  cex = 0.5, col = "red",
-         xaxt = "n", xlab = "", ylab = "Signal SD [V]")
-    abline(h = 0, col = "grey", lty = 2)
-
-    ## Signal
-    par("mar" = c(3,4,0,1))
-    plot(dd$Date, dd$CM21_sig, type = "l",
-         ylim = range(dd[, .(CM21_sig, CM21_sig_wo_dark)], na.rm = TRUE),
-         lwd  = 1.5,
-         pch  = 19,  cex = 0.5, col = "darkolivegreen",
-         xlab = "", ylab = "Signal [V]")
-    lines(dd$Date, dd$CM21_sig_wo_dark,
-          col = "green",)
-    abline(h = 0, col = "grey", lty = 2)
-
-    ## Plot bad data
-    points(dd[!cm21_bad_data_flag %in% c("empty", "pass"),
-              CM21_sig, Date],
-           col = "black", cex = 1.2, pch = 0)
-
     ## Decorations
-    text(dd$Date[1], max(dd$CM21_sig, dd$CM21_sig_wo_dark, na.rm = TRUE),
-         labels = tag, pos = 4, cex =.9)
+    text(dd$Date[1], max(dd[, .(DIR_wpsm, HOR_wpsm)], na.rm = TRUE),
+         labels = tag, pos = 4, cex = .9)
 
-    legend("topright", pch = 19, bty = "n",
+    legend("topright", bty = "n",
+           lty = c( 1,  1, NA,  3),
+           pch = c(NA, NA, 19, NA),
            legend = c(
-             "Signal",
-             "Signal dark corrected",
+             "Direct on horizontal",
+             "Direct beam",
              "Signal SD",
-             "Excluded bad data"),
-           col = c("darkolivegreen",
-                   "green",
+             "Direct beam temp. cor."),
+           col = c("cyan",
+                   "blue",
                    "red",
-                   "black")
+                   "darkgrey")
     )
   }
   dev.off()
@@ -211,9 +207,10 @@ for (YYYY in sort(years_to_do)) {
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
-#+ include=T, echo=F, results="asis"
+#' **END**
+#+ include=T, echo=F
 tac <- Sys.time()
-cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
 
