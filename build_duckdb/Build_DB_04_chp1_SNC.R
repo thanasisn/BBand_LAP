@@ -156,7 +156,7 @@ if (nrow(inp_filelist) > 0) {
     ## create vector of asyncs
     for (ik in 1:nrow(syc_temp)) {
       async[ which( D_minutes <= syc_temp$async_end[   ik ] &
-                    D_minutes >= syc_temp$async_start[ ik ]  ) ] <- TRUE   ## !!
+                      D_minutes >= syc_temp$async_start[ ik ]  ) ] <- TRUE   ## !!
     }
 
     ## Move dates to the centre of each minute, as the rest of DB
