@@ -81,20 +81,20 @@ panderOptions("table.split.table",        120   )
 
 
 ## __  Variables  --------------------------------------------------------------
-OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CHP1_DIR_L1_test/"
+OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CHP1_DIR_L1/"
 OUT_PREFIX <- "CHP1_direct_L1_"
 dir.create(OUT_FOLDER, showWarnings = FALSE, recursive = TRUE)
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
+cex <- 0.6
 
 ## __ Open database  -----------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 DT  <- tbl(con, "LAP")
 MT  <- tbl(con, "META")
 
-
 ## __ Execution control  -------------------------------------------------------
 TEST <- TRUE
-
+TEST <- FALSE
 
 metalist <- MT |>
   mutate(year               = year(Day),
@@ -114,7 +114,7 @@ plotfiles$mtime <- file.mtime(plotfiles$path)
 plotfiles$year  <- as.numeric(
     sub(OUT_PREFIX, "", sub("\\.pdf", "", basename(plotfiles$path))))
 
-
+## find year to do
 selected    <- merge(metalist, plotfiles, all = TRUE)
 years_to_do <- selected[is.na(path) | updated > mtime, year ]
 
@@ -126,19 +126,15 @@ if (TEST) {
 
 
 for (YYYY in sort(years_to_do)) {
-
   ## load data for year
   year_data <- DT |> filter(year == YYYY) |> collect() |> data.table()
   cat(YYYY, "rows:", nrow(year_data), "\n")
 
-
   ## days with data
   daystodo <- year_data[!is.na(DIR_SD_wpsm), unique(as.Date(Date))]
   daystodo <- sort(daystodo)
-  ## signal limit for year
+  ## signal limit for all year
   # ylim <- range(year_data[, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE)
-
-  stop()
 
   if (!interactive()) {
     pdffile <- paste0(OUT_FOLDER, "/", OUT_PREFIX, YYYY, ".pdf")
@@ -148,29 +144,38 @@ for (YYYY in sort(years_to_do)) {
 
   for (aday in sort(daystodo)) {
     dd   <- year_data[as.Date(Date) == aday]
+    setorder(dd, Date)
     aday <- as.Date(aday, origin = "1970-01-01")
 
     layout(matrix(c(1,2,2,2,2), 5, 1, byrow = TRUE))
 
     ## Direct SD
-    par("mar" = c(0,4,2,1))
-    plot(dd$Date, dd$DIR_SD_wpsm,
-         ylim = range(c(0, dd$DIR_SD_wpsm), na.rm = T),
-         pch  = 19,  cex = 0.5, col = "red",
-         xaxt = "n", xlab = "",
-         ylab = "Direct SD [Watt/m^2]")
+    par("mar" = c(0, 4.5, 2, 1))
+    plot(
+      dd$Date, dd$DIR_SD_wpsm,
+      ylim = range(c(0, dd$DIR_SD_wpsm), na.rm = T),
+      pch  = 19,
+      cex  = cex,
+      col = "red",
+      xaxt = "n", xlab = "",
+      ylab = expression(paste("SD [", Watt/m^2, "]"))
+    )
     abline(h = 0, col = "grey", lty = 2)
 
     title(paste0("Direct Irradiance  doy: ", yday(aday), "  ", aday))
 
-
     ## Radiation
-    par("mar" = c(3,4,0,1))
-    plot(dd$Date, dd$HOR_wpsm, type = "l",
-         ylim = range(dd[, .(DIR_wpsm, HOR_wpsm, DIR_wpsm_temp_cor)], na.rm = TRUE),
-         lwd  = 1.5,
-         pch  = 19,  cex = 0.5, col = "cyan",
-         xlab = "", ylab = "Radiation Flux [Watt/m^2]")
+    par("mar" = c(3, 4.5, 0, 1))
+    ylim <- range(dd[, .(DIR_wpsm, HOR_strict)], na.rm = TRUE)
+    plot(
+      dd$Date, dd$HOR_strict, type = "l",
+      ylim = ylim,
+      lwd  = 1.5,
+      pch  = 19,
+      cex  = cex,
+      col  = "cyan",
+      ylab = expression(paste("Direct irradiance [", Watt/m^2, "]"))
+    )
     lines(dd$Date, dd$DIR_wpsm,
           col = "blue",)
     abline(h = 0, col = "grey", lty = 2)
@@ -184,7 +189,7 @@ for (YYYY in sort(years_to_do)) {
     }
 
     ## Decorations
-    text(dd$Date[1], max(dd[, .(DIR_wpsm, HOR_wpsm)], na.rm = TRUE),
+    text(dd$Date[1], max(dd[, .(DIR_wpsm, HOR_strict)], na.rm = TRUE),
          labels = tag, pos = 4, cex = .9)
 
     legend("topright", bty = "n",

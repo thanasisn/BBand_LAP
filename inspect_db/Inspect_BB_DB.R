@@ -89,10 +89,10 @@ try({
 # })
 
 
-try({
-    cat("\n\n 30. Plot daily radiation\n")
-    source("~/BBand_LAP/inspect_db/30_Plot_daily_CHP1_L1.R")
-})
+# try({
+#     cat("\n\n 30. Plot daily radiation\n")
+#     source("~/BBand_LAP/inspect_db/30_Plot_daily_CHP1_L1.R")
+# })
 try({
     cat("\n\n 31. Plot daily radiation\n")
     source("~/BBand_LAP/inspect_db/31_Plot_daily_CM21_L1.R")
