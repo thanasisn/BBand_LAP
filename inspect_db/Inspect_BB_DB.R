@@ -16,8 +16,6 @@ Script.Name <- "~/BBand_LAP/inspect_db/Inspect_BB_DB.R"
 renv::load("~/BBand_LAP")
 
 
-
-
 try({
     cat("\n\n 0. Check files\n")
     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/00_Check_input_files.R",
@@ -26,40 +24,35 @@ try({
 })
 
 
+# try({
+#     cat("\n\n 1a. Inspect CHP-1 signal CLEAN\n")
+#     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/01_Inspect_CHP1_sig_snc_temp.R",
+#                       params      = list(CLEAN = TRUE),
+#                       output_file = "01_Inspect_CHP1_sig_snc_temp_CLEAN.pdf",
+#                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+# })
+# try({
+#     cat("\n\n 1b. Inspect CHP-1 signal DIRTY\n")
+#     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/01_Inspect_CHP1_sig_snc_temp.R",
+#                       params      = list(CLEAN = FALSE),
+#                       output_file = "01_Inspect_CHP1_sig_snc_temp_DIRTY.pdf",
+#                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+# })
 
-
-try({
-    cat("\n\n 1a. Inspect CHP-1 signal CLEAN\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/01_Inspect_CHP1_sig_snc_temp.R",
-                      params      = list(CLEAN = TRUE),
-                      output_file = "01_Inspect_CHP1_sig_snc_temp_CLEAN.pdf",
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
-})
-try({
-    cat("\n\n 1b. Inspect CHP-1 signal DIRTY\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/01_Inspect_CHP1_sig_snc_temp.R",
-                      params      = list(CLEAN = FALSE),
-                      output_file = "01_Inspect_CHP1_sig_snc_temp_DIRTY.pdf",
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
-})
-
-
-
-
-try({
-    cat("\n\n 2a. Inspect CM-21 signal CLEAN\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/02_Inspect_CM21_sig.R",
-                      params      = list(CLEAN = TRUE),
-                      output_file = "02_Inspect_CM21_sig_CLEAN.pdf",
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
-})
-try({
-    cat("\n\n 2b. Inspect CM-21 signal DIRTY\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/02_Inspect_CM21_sig.R",
-                      params      = list(CLEAN = FALSE),
-                      output_file = "02_Inspect_CM21_sig_DIRTY.pdf",
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
-})
+# try({
+#     cat("\n\n 2a. Inspect CM-21 signal CLEAN\n")
+#     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/02_Inspect_CM21_sig.R",
+#                       params      = list(CLEAN = TRUE),
+#                       output_file = "02_Inspect_CM21_sig_CLEAN.pdf",
+#                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+# })
+# try({
+#     cat("\n\n 2b. Inspect CM-21 signal DIRTY\n")
+#     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/02_Inspect_CM21_sig.R",
+#                       params      = list(CLEAN = FALSE),
+#                       output_file = "02_Inspect_CM21_sig_DIRTY.pdf",
+#                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+# })
 
 
 
