@@ -16,13 +16,12 @@ Script.Name <- "~/BBand_LAP/inspect_db/Inspect_BB_DB.R"
 renv::load("~/BBand_LAP")
 
 
-try({
-    cat("\n\n 0. Check files\n")
-    rmarkdown::render(input       = "~/BBand_LAP/inspect_db/00_Check_input_files.R",
-                      params      = list(CLEAN = TRUE),
-                      output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
-})
-
+# try({
+#     cat("\n\n 0. Check files\n")
+#     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/00_Check_input_files.R",
+#                       params      = list(CLEAN = TRUE),
+#                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+# })
 
 # try({
 #     cat("\n\n 1a. Inspect CHP-1 signal CLEAN\n")
@@ -54,9 +53,6 @@ try({
 #                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 # })
 
-
-
-
 # try({
 #     cat("\n\n 3a. Inspect INCLINED CM-21 signal CLEAN\n")
 #     rmarkdown::render(input       = "~/BBand_LAP/inspect_db/03_Inspect_CM21INC_sig.R",
@@ -73,31 +69,24 @@ try({
 # })
 
 
-
-
 try({
     cat("\n\n 11. Plot daily CM-21 signals\n")
     source("~/BBand_LAP/inspect_db/11_Plot_daily_CM21_sig.R")
 })
 
 
-
-
-try({
-    cat("\n\n 20. Inspect CHP-1 radiation\n")
-    rmarkdown::render(input      = "~/BBand_LAP/inspect_db/20_Inspect_CHP1_rad_temp.R",
-                      # params     = list(CLEAN = FALSE),
-                      output_dir = "~/BBand_LAP/REPORTS/REPORTS")
-})
-
-try({
-    cat("\n\n 21. Inspect CM-21 radiation\n")
-    rmarkdown::render(input      = "~/BBand_LAP/inspect_db/21_Inspect_CM21_rad.R",
-                      # params     = list(CLEAN = FALSE),
-                      output_dir = "~/BBand_LAP/REPORTS/REPORTS")
-})
-
-
+# try({
+#     cat("\n\n 20. Inspect CHP-1 radiation\n")
+#     rmarkdown::render(input      = "~/BBand_LAP/inspect_db/20_Inspect_CHP1_rad_temp.R",
+#                       # params     = list(CLEAN = FALSE),
+#                       output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+# })
+# try({
+#     cat("\n\n 21. Inspect CM-21 radiation\n")
+#     rmarkdown::render(input      = "~/BBand_LAP/inspect_db/21_Inspect_CM21_rad.R",
+#                       # params     = list(CLEAN = FALSE),
+#                       output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+# })
 
 
 try({
@@ -110,15 +99,11 @@ try({
 })
 
 
-
 try({
     cat("\n\n 60. Inspect CM-21/TOT radiation\n")
     rmarkdown::render(input      = "~/BBand_LAP/inspect_db/60_Inspect_TOT_GLB.R",
                       output_dir = "~/BBand_LAP/REPORTS/REPORTS")
 })
-
-
-
 
 
 tac <- Sys.time()

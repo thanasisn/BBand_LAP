@@ -38,7 +38,7 @@
 #' ---
 
 #'
-#'  **SIG**
+#'  **CM-21 GHI L1**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -58,10 +58,10 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_duckdb/20_Inspect_CHP1_sig_snc_temp.R"
+Script.Name <- "~/BBand_LAP/inspect_duckdb/21_Inspect_CM21_rad.R"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
