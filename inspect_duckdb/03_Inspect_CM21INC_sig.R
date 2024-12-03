@@ -60,7 +60,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_duckdb//03_Inspect_CM21INC_sig.R"
+Script.Name <- "~/BBand_LAP/inspect_duckdb/03_Inspect_CM21INC_sig.R"
 renv::load("~/BBand_LAP")
 
 if (!interactive()) {

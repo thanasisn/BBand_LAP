@@ -57,13 +57,6 @@ try({
 })
 
 ## No point for clean yet
-# try({
-#   cat("\n\n 3a. Inspect INCLINED CM-21 signal CLEAN\n")
-#   rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/03_Inspect_CM21INC_sig.R",
-#                     params      = list(CLEAN = TRUE),
-#                     output_file = "03_Inspect_CM21INC_sig_CLEAN.pdf",
-#                     output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
-# })
 try({
   cat("\n\n 3b. Inspect INCLINED CM-21 signal DIRTY\n")
   rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/03_Inspect_CM21INC_sig.R",
@@ -110,6 +103,7 @@ try({
 })
 
 
+## __ Plot daily radiation  ----------------------------------------------------
 # try({
 #     cat("\n\n 30. Plot daily radiation\n")
 #     source("~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R")
