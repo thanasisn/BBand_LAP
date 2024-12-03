@@ -175,8 +175,8 @@ for (YYYY in sort(years_to_do)) {
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
                     dmax = max(V1, na.rm = T)),
                 by = as.Date(Date)]
-    low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
-    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP   * sd(dmax)]
+    low <- pp[!is.infinite(dmin), mean(dmin, na.rm = T) - OutliersDOWN * sd(dmin, na.rm = T)]
+    upe <- pp[!is.infinite(dmax), mean(dmax, na.rm = T) + OutliersUP   * sd(dmax, na.rm = T)]
     pplims <- data.table(av = av,low = low, upe = upe)
 
     plot(ppD,
@@ -205,8 +205,8 @@ for (YYYY in sort(years_to_do)) {
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
                     dmax = max(V1, na.rm = T)),
                 by = as.Date(Date)]
-    low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
-    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP   * sd(dmax)]
+    low <- pp[!is.infinite(dmin), mean(dmin, na.rm = T) - OutliersDOWN * sd(dmin, na.rm = T)]
+    upe <- pp[!is.infinite(dmax), mean(dmax, na.rm = T) + OutliersUP   * sd(dmax, na.rm = T)]
     pplims <- data.table(av = av,low = low, upe = upe)
 
     plot(ppD,
@@ -235,8 +235,8 @@ for (YYYY in sort(years_to_do)) {
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
                     dmax = max(V1, na.rm = T)),
                 by = as.Date(Date)]
-    low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
-    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP   * sd(dmax)]
+    low <- pp[!is.infinite(dmin), mean(dmin, na.rm = T) - OutliersDOWN * sd(dmin, na.rm = T)]
+    upe <- pp[!is.infinite(dmax), mean(dmax, na.rm = T) + OutliersUP   * sd(dmax, na.rm = T)]
     pplims <- data.table(av = av,low = low, upe = upe)
 
     plot(ppD,
@@ -266,8 +266,8 @@ for (YYYY in sort(years_to_do)) {
     pp  <- ppD[ , .(dmin = min(V1, na.rm = T),
                     dmax = max(V1, na.rm = T)),
                 by = as.Date(Date)]
-    low <- pp[!is.infinite(dmin), mean(dmin) - OutliersDOWN * sd(dmin)]
-    upe <- pp[!is.infinite(dmax), mean(dmax) + OutliersUP * sd(dmax)]
+    low <- pp[!is.infinite(dmin), mean(dmin, na.rm = T) - OutliersDOWN * sd(dmin, na.rm = T)]
+    upe <- pp[!is.infinite(dmax), mean(dmax, na.rm = T) + OutliersUP   * sd(dmax, na.rm = T)]
     pplims <- data.table(av = av,low = low, upe = upe)
 
     plot(ppD,

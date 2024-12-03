@@ -63,7 +63,7 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_duckdb/02_Inspect_CM21_sig.R"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -90,15 +90,15 @@ CLEAN        <- TRUE
 ## __ Execution control  -------------------------------------------------------
 ## When knitting
 if (exists("params")) {
-    # params <- list(CLEAN = CLEAN)
-    CLEAN <- params$CLEAN
+  # params <- list(CLEAN = CLEAN)
+  CLEAN <- params$CLEAN
 }
 ## When running
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) > 0) {
-    if (any(args == "CLEAN")) { CLEAN <- TRUE  }
-    if (any(args == "DIRTY")) { CLEAN <- FALSE }
-    cat("Arguments", paste(args),"\n")
+  if (any(args == "CLEAN")) { CLEAN <- TRUE  }
+  if (any(args == "DIRTY")) { CLEAN <- FALSE }
+  cat("Arguments", paste(args),"\n")
 }
 
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
@@ -141,335 +141,335 @@ years_to_do <- datayears
 
 #+ include=TRUE, echo=FALSE, results="asis"
 for (YYYY in sort(years_to_do)) {
-    days_of_year <- seq.Date(as.Date(paste0(YYYY, "-01-01")),
-                             as.Date(paste0(YYYY, "-12-31")), by = "day")
-    ## don't go to the future
-    days_of_year <- days_of_year[days_of_year <= Sys.Date()]
+  days_of_year <- seq.Date(as.Date(paste0(YYYY, "-01-01")),
+                           as.Date(paste0(YYYY, "-12-31")), by = "day")
+  ## don't go to the future
+  days_of_year <- days_of_year[days_of_year <= Sys.Date()]
 
-    cat("\n\n\\FloatBarrier\n\n")
-    cat("\\newpage\n\n")
-    cat("\n## Year:", YYYY, "\n\n")
+  cat("\n\n\\FloatBarrier\n\n")
+  cat("\\newpage\n\n")
+  cat("\n## Year:", YYYY, "\n\n")
 
-    ## load data for year
-    ## FIXME this draws all data in memory, could use only database
-    DT <- tbl(con, "LAP") |> filter(year == YYYY)
-    year_data <- DT |>
-      select(
-        Date, SZA, Day, Elevat, Azimuth,
-        tot_glb,
-        contains("cm21", ignore.case = T)
-      ) |>
-      collect() |> data.table()
-    setorder(year_data, Date)
+  ## load data for year
+  ## FIXME this draws all data in memory, could use only database
+  DT <- tbl(con, "LAP") |> filter(year == YYYY)
+  year_data <- DT |>
+    select(
+      Date, SZA, Day, Elevat, Azimuth,
+      tot_glb,
+      contains("cm21", ignore.case = T)
+    ) |>
+    collect() |> data.table()
+  setorder(year_data, Date)
 
-    ## Recording limits
-    year_data[, sig_lowlim := cm21_signal_lower_limit(Date)]
-    year_data[, sig_upplim := cm21_signal_upper_limit(Date)]
+  ## Recording limits
+  year_data[, sig_lowlim := cm21_signal_lower_limit(Date)]
+  year_data[, sig_upplim := cm21_signal_upper_limit(Date)]
 
-    ## Choose what to plot (data.table slicing dong work)
-    if (CLEAN) {
-        cat("\nRemove bad data regions\n")
-        cat(year_data[!cm21_bad_data_flag %in% c("empty", "pass"), .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
-        year_data[!cm21_bad_data_flag %in% c("empty", "pass"), CM21_sig    := NA]
-        year_data[!cm21_bad_data_flag %in% c("empty", "pass"), CM21_sig_sd := NA]
+  ## Choose what to plot (data.table slicing dong work)
+  if (CLEAN) {
+    cat("\nRemove bad data regions\n")
+    cat(year_data[!cm21_bad_data_flag %in% c("empty", "pass"), .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
+    year_data[!cm21_bad_data_flag %in% c("empty", "pass"), CM21_sig    := NA]
+    year_data[!cm21_bad_data_flag %in% c("empty", "pass"), CM21_sig_sd := NA]
 
-        cat("\nRemove data above physical limits\n")
-        cat(year_data[cm21_sig_limit_flag == "Abnormal HIGH signal", .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
-        year_data[cm21_sig_limit_flag == "Abnormal HIGH signal", CM21_sig    := NA]
-        year_data[cm21_sig_limit_flag == "Abnormal HIGH signal", CM21_sig_sd := NA]
+    cat("\nRemove data above physical limits\n")
+    cat(year_data[cm21_sig_limit_flag == "Abnormal HIGH signal", .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
+    year_data[cm21_sig_limit_flag == "Abnormal HIGH signal", CM21_sig    := NA]
+    year_data[cm21_sig_limit_flag == "Abnormal HIGH signal", CM21_sig_sd := NA]
 
-        cat("\nRemove data below physical limits\n")
-        cat(year_data[cm21_sig_limit_flag == "Abnormal LOW signal", .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
-        year_data[cm21_sig_limit_flag == "Abnormal LOW signal", CM21_sig    := NA ]
-        year_data[cm21_sig_limit_flag == "Abnormal LOW signal", CM21_sig_sd := NA ]
+    cat("\nRemove data below physical limits\n")
+    cat(year_data[cm21_sig_limit_flag == "Abnormal LOW signal", .N], "/", year_data[!is.na(CM21_sig), .N], "\n\n")
+    year_data[cm21_sig_limit_flag == "Abnormal LOW signal", CM21_sig    := NA ]
+    year_data[cm21_sig_limit_flag == "Abnormal LOW signal", CM21_sig_sd := NA ]
+  }
+
+  ## Missing days
+  dwod <- year_data[is.na(CM21_sig), .N == 1440, by = Day]
+  empty_days <- dwod[V1 == T, Day]
+  cat(paste0("\n**", length(empty_days), " days without any CM-21 data**\n\n"))
+  cat(format(empty_days), " ")
+  cat("\n\n")
+
+  ## Get outliers limits
+  suppressWarnings({
+    ## Try to find outliers
+    yearlims <- data.table()
+    for (an in grep("CM21_sig", names(year_data), value = TRUE)) {
+      daily <- year_data[ , .(dmin = min(get(an), na.rm = T),
+                              dmax = max(get(an), na.rm = T)), by = as.Date(Date) ]
+      low <- daily[!is.infinite(dmin), mean(dmin, na.rm = T) - OutliersPlot * sd(dmin, na.rm = T)]
+      upe <- daily[!is.infinite(dmax), mean(dmax, na.rm = T) + OutliersPlot * sd(dmax, na.rm = T)]
+      yearlims <- rbind(yearlims, data.table(an = an,low = low, upe = upe))
     }
+  })
 
-    ## Missing days
-    dwod <- year_data[is.na(CM21_sig), .N == 1440, by = Day]
-    empty_days <- dwod[V1 == T, Day]
-    cat("\n**", length(empty_days), "days without any CM-21 data:**\n\n")
-    cat(format(empty_days), " ")
-    cat("\n\n")
+  cat("\n\n### Proposed outliers limits \n")
+  cat('\n\n\\footnotesize\n\n')
+  cat(pander(yearlims))
+  cat('\n\n\\normalsize\n\n')
 
-    ## Get outliers limits
-    suppressWarnings({
-        ## Try to find outliers
-        yearlims <- data.table()
-        for (an in grep("CM21_sig", names(year_data), value = TRUE)) {
-            daily <- year_data[ , .(dmin = min(get(an),na.rm = T),
-                                    dmax = max(get(an),na.rm = T)), by = as.Date(Date) ]
-            low <- daily[!is.infinite(dmin), mean(dmin) - OutliersPlot * sd(dmin)]
-            upe <- daily[!is.infinite(dmax), mean(dmax) + OutliersPlot * sd(dmax)]
-            yearlims <- rbind(yearlims, data.table(an = an,low = low, upe = upe))
-        }
-    })
+  cat("\n**Days with outliers:**\n\n")
+  cat(format(
+    year_data[CM21_sig > yearlims[ an == "CM21_sig", upe], unique(as.Date(Date))]
+  ))
+  cat("\n\n")
+  cat(format(
+    year_data[CM21_sig < yearlims[ an == "CM21_sig", low], unique(as.Date(Date))]
+  ))
+  cat("\n\n")
+  cat(format(
+    year_data[CM21_sig_sd > yearlims[ an == "CM21_sig_sd", upe], unique(as.Date(Date))]
+  ))
+  cat("\n\n")
+  cat(format(
+    year_data[CM21_sig_sd < yearlims[ an == "CM21_sig_sd", low], unique(as.Date(Date))]
+  ))
+  cat("\n\n")
 
-    cat("\n\n### Proposed outliers limits \n")
-    cat('\n\n\\footnotesize\n\n')
-    cat(pander(yearlims))
-    cat('\n\n\\normalsize\n\n')
+  cat("\n**Days hitting physical limit:**\n\n")
+  cat(format(
+    year_data[CM21_sig > sig_upplim, unique(as.Date(Date))]
+  ))
+  cat("\n\n")
+  cat(format(
+    year_data[CM21_sig < sig_lowlim, unique(as.Date(Date))]
+  ))
 
-    cat("\n**Days with outliers:**\n\n")
-    cat(format(
-        year_data[CM21_sig > yearlims[ an == "CM21_sig", upe], unique(as.Date(Date))]
-        ))
-    cat("\n\n")
-    cat(format(
-        year_data[CM21_sig < yearlims[ an == "CM21_sig", low], unique(as.Date(Date))]
-    ))
-    cat("\n\n")
-    cat(format(
-        year_data[CM21_sig_sd > yearlims[ an == "CM21_sig_sd", upe], unique(as.Date(Date))]
-    ))
-    cat("\n\n")
-    cat(format(
-        year_data[CM21_sig_sd < yearlims[ an == "CM21_sig_sd", low], unique(as.Date(Date))]
-    ))
-    cat("\n\n")
+  cat('\n\n\\footnotesize\n\n')
+  cat(pander(summary(year_data[, .(Date, SZA, CM21_sig, CM21_sig_sd)])))
+  cat('\n\n\\normalsize\n\n')
 
-    cat("\n**Days hitting physical limit:**\n\n")
-    cat(format(
-        year_data[CM21_sig > sig_upplim, unique(as.Date(Date))]
-    ))
-    cat("\n\n")
-    cat(format(
-        year_data[CM21_sig < sig_lowlim, unique(as.Date(Date))]
-    ))
+  hist(year_data$CM21_sig,
+       breaks = 50,
+       main   = paste("CM21 signal ", YYYY))
+  abline(v = yearlims[ an == "CM21_sig", low], lty = 3, col = "red")
+  abline(v = yearlims[ an == "CM21_sig", upe], lty = 3, col = "red")
+  cat('\n\n')
 
-    cat('\n\n\\footnotesize\n\n')
-    cat(pander(summary(year_data[, .(Date, SZA, CM21_sig, CM21_sig_sd)])))
-    cat('\n\n\\normalsize\n\n')
+  hist(year_data$CM21_sig_sd,
+       breaks = 50,
+       main   = paste("CM21 signal SD", YYYY))
+  abline(v = yearlims[ an == "CM21_sig_sd", low], lty = 3, col = "red")
+  abline(v = yearlims[ an == "CM21_sig_sd", upe], lty = 3, col = "red")
+  cat('\n\n')
 
-    hist(year_data$CM21_sig,
-         breaks = 50,
-         main   = paste("CM21 signal ", YYYY))
-    abline(v = yearlims[ an == "CM21_sig", low], lty = 3, col = "red")
-    abline(v = yearlims[ an == "CM21_sig", upe], lty = 3, col = "red")
+  plot(year_data$Elevat, year_data$CM21_sig,
+       pch  = 19,
+       cex  = .1,
+       main = paste("CM21 signal ", YYYY),
+       xlab = "Elevation",
+       ylab = "CM21 signal")
+  points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
+  points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
+  cat('\n\n')
+
+  plot(year_data$Date, year_data$CM21_sig,
+       pch  = 19,
+       cex  = .1,
+       main = paste("CM21 signal ", YYYY),
+       xlab = "",
+       ylab = "CM21 signal")
+  points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
+  points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
+  abline(h = yearlims[ an == "CM21_sig", low], lty = 3, col = "red")
+  abline(h = yearlims[ an == "CM21_sig", upe], lty = 3, col = "red")
+  cat('\n\n')
+
+  plot(year_data$Elevat, year_data$CM21_sig_sd,
+       pch  = 19,
+       cex  = .1,
+       main = paste("CM21 signal SD", YYYY),
+       xlab = "Elevation",
+       ylab = "CM21 signal SD")
+  abline(h = yearlims[ an == "CM21_sig_sd", low], lty = 3, col = "red")
+  abline(h = yearlims[ an == "CM21_sig_sd", upe], lty = 3, col = "red")
+  cat('\n\n')
+
+  all    <- cumsum(tidyr::replace_na(year_data$CM21_sig, 0))
+  pos    <- year_data[ CM21_sig > 0 ]
+  pos$V1 <- cumsum(tidyr::replace_na(pos$CM21_sig, 0))
+  neg    <- year_data[ CM21_sig < 0 ]
+  neg$V1 <- cumsum(tidyr::replace_na(neg$CM21_sig, 0))
+  xlim   <- range(year_data$Date)
+  plot(year_data$Date, all,
+       type = "l",
+       xlim = xlim,
+       ylab = "",
+       yaxt = "n", xlab = "",
+       main = paste("Cum Sum of CM-21 signal ",  YYYY))
+  par(new = TRUE)
+  plot(pos$Date, pos$V1,
+       xlim = xlim,
+       col = "blue", type = "l",
+       ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+  par(new = TRUE)
+  plot(neg$Date, neg$V1,
+       xlim = xlim,
+       col = "red", type = "l",
+       ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+  legend("left", legend = c("Positive signal",
+                            "Negative signal",
+                            "All signal"),
+         lty = 1, bty = "n", cex = 0.8,
+         col = c("blue", "red", "black"))
+  cat('\n\n')
+
+  all    <- cumsum(tidyr::replace_na(year_data$CM21_sig_sd, 0))
+  pos    <- year_data[ CM21_sig > 0 ]
+  pos$V1 <- cumsum(tidyr::replace_na(pos$CM21_sig_sd, 0))
+  neg    <- year_data[ CM21_sig < 0 ]
+  neg$V1 <- cumsum(tidyr::replace_na(neg$CM21_sig_sd, 0))
+  xlim   <- range(year_data$Date)
+  plot(year_data$Date, all,
+       type = "l",
+       xlim = xlim,
+       ylab = "",
+       yaxt = "n", xlab = "",
+       main = paste("Cum Sum of CM-21 SD ",  YYYY))
+  par(new = TRUE)
+  plot(pos$Date, pos$V1,
+       xlim = xlim,
+       col = "blue", type = "l",
+       ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+  par(new = TRUE)
+  plot(neg$Date, neg$V1,
+       xlim = xlim,
+       col = "red", type = "l",
+       ylab = "", yaxt = "n", xlab = "", xaxt = "n")
+  legend("left", legend = c("Positive signal",
+                            "Negative signal",
+                            "All signal"),
+         lty = 1, bty = "n", cex = 0.8,
+         col = c("red", "blue", "black"))
+  cat('\n\n')
+
+  month_vec <- strftime(  year_data$Date, format = "%m")
+  dd        <- aggregate(year_data[, .(CM21_sig, CM21_sig_sd, Elevat, Azimuth)],
+                         list(month_vec), FUN = summary, digits = 6 )
+
+  boxplot(year_data$CM21_sig ~ month_vec )
+  title(main = paste("CM21 signal by month", YYYY))
+  cat('\n\n')
+
+  boxplot(year_data$CM21_sig_sd ~ month_vec)
+  title(main = paste("CM21 sd by month", YYYY))
+  cat('\n\n')
+
+  # boxplot(year_data$Elevat ~ month_vec )
+  # title(main = paste("Elevation by month", YYYY) )
+  # cat('\n\n')
+
+  # boxplot(year_data$Azimuth ~ month_vec )
+  # title(main = paste("Azimuth by month", YYYY) )
+  # cat('\n\n')
+
+  ## __ Plots of exceptions for investigation  -------------------------------
+
+  ## ____ 1995 ---------------------------------------------------------------
+  if (YYYY == 1995) {
+    cat("\n### Year:", YYYY, " exceptions \n\n")
+
+    part <- year_data[Date > as.POSIXct("1995-10-08") &
+                        Date < as.POSIXct("1995-11-15") ]
+    plot(part$Date,   part$CM21_sig, pch = ".", ylim = c(-2, 3),
+         xlab = "", ylab = "CM-21 signal")
+    points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+    points(part$Date, part$sig_upplim, pch = ".", col = "red")
+    ## plot config changes
+    abline(v = signal_physical_limits$Date, lty = 3)
     cat('\n\n')
 
-    hist(year_data$CM21_sig_sd,
-         breaks = 50,
-         main   = paste("CM21 signal SD", YYYY))
-    abline(v = yearlims[ an == "CM21_sig_sd", low], lty = 3, col = "red")
-    abline(v = yearlims[ an == "CM21_sig_sd", upe], lty = 3, col = "red")
+    part <- year_data[Date > as.POSIXct("1995-11-15") &
+                        Date < as.POSIXct("1995-12-31") ]
+    plot(  part$Date, part$CM21_sig,   pch = ".", ylim = c(-1, 2))
+    points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+    points(part$Date, part$sig_upplim, pch = ".", col = "red")
+    ## plot config changes
+    abline(v = signal_physical_limits$Date, lty = 3)
+    ## reverse sirena TOT to signal
+    points(part$Date, part$tot_glb / cm21factor(part$Date),
+           pch = ".", col = "cyan")
     cat('\n\n')
+  }
 
-    plot(year_data$Elevat, year_data$CM21_sig,
-         pch  = 19,
-         cex  = .1,
-         main = paste("CM21 signal ", YYYY),
-         xlab = "Elevation",
-         ylab = "CM21 signal")
-    points(year_data$Elevat, year_data$sig_lowlim, pch = ".", col = "red")
-    points(year_data$Elevat, year_data$sig_upplim, pch = ".", col = "red")
+  ## ____ 1996 ---------------------------------------------------------------
+  if (YYYY == 1996) {
+    cat("\n### Year:", YYYY, " exceptions \n\n")
+
+    part <- year_data[Date > as.POSIXct("1996-02-01") &
+                        Date < as.POSIXct("1996-03-07") ]
+    plot(  part$Date, part$CM21_sig, pch = ".", ylim = c(-1,2),
+           xlab = "", ylab = "CM-21 signal")
+    points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+    points(part$Date, part$sig_upplim, pch = ".", col = "red")
+    abline(v = as.POSIXct("1996-2-08"))
+    abline(v = as.POSIXct("1996-2-29 12:00"))
+    ## reverse sirena TOT to signal
+    points(part$Date, part$tot_glb / cm21factor(part$Date),
+           pch = ".", col = "cyan")
     cat('\n\n')
+  }
 
-    plot(year_data$Date, year_data$CM21_sig,
-         pch  = 19,
-         cex  = .1,
-         main = paste("CM21 signal ", YYYY),
-         xlab = "",
-         ylab = "CM21 signal")
-    points(year_data$Date, year_data$sig_lowlim, pch = ".", col = "red")
-    points(year_data$Date, year_data$sig_upplim, pch = ".", col = "red")
-    abline(h = yearlims[ an == "CM21_sig", low], lty = 3, col = "red")
-    abline(h = yearlims[ an == "CM21_sig", upe], lty = 3, col = "red")
-    cat('\n\n')
-
-    plot(year_data$Elevat, year_data$CM21_sig_sd,
-         pch  = 19,
-         cex  = .1,
-         main = paste("CM21 signal SD", YYYY),
-         xlab = "Elevation",
-         ylab = "CM21 signal SD")
-    abline(h = yearlims[ an == "CM21_sig_sd", low], lty = 3, col = "red")
-    abline(h = yearlims[ an == "CM21_sig_sd", upe], lty = 3, col = "red")
-    cat('\n\n')
-
-    all    <- cumsum(tidyr::replace_na(year_data$CM21_sig, 0))
-    pos    <- year_data[ CM21_sig > 0 ]
-    pos$V1 <- cumsum(tidyr::replace_na(pos$CM21_sig, 0))
-    neg    <- year_data[ CM21_sig < 0 ]
-    neg$V1 <- cumsum(tidyr::replace_na(neg$CM21_sig, 0))
-    xlim   <- range(year_data$Date)
-    plot(year_data$Date, all,
-         type = "l",
-         xlim = xlim,
-         ylab = "",
-         yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM-21 signal ",  YYYY))
-    par(new = TRUE)
-    plot(pos$Date, pos$V1,
-         xlim = xlim,
-         col = "blue", type = "l",
-         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
-    par(new = TRUE)
-    plot(neg$Date, neg$V1,
-         xlim = xlim,
-         col = "red", type = "l",
-         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
-    legend("left", legend = c("Positive signal",
-                              "Negative signal",
-                              "All signal"),
-           lty = 1, bty = "n", cex = 0.8,
-           col = c("blue", "red", "black"))
-    cat('\n\n')
-
-    all    <- cumsum(tidyr::replace_na(year_data$CM21_sig_sd, 0))
-    pos    <- year_data[ CM21_sig > 0 ]
-    pos$V1 <- cumsum(tidyr::replace_na(pos$CM21_sig_sd, 0))
-    neg    <- year_data[ CM21_sig < 0 ]
-    neg$V1 <- cumsum(tidyr::replace_na(neg$CM21_sig_sd, 0))
-    xlim   <- range(year_data$Date)
-    plot(year_data$Date, all,
-         type = "l",
-         xlim = xlim,
-         ylab = "",
-         yaxt = "n", xlab = "",
-         main = paste("Cum Sum of CM-21 SD ",  YYYY))
-    par(new = TRUE)
-    plot(pos$Date, pos$V1,
-         xlim = xlim,
-         col = "blue", type = "l",
-         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
-    par(new = TRUE)
-    plot(neg$Date, neg$V1,
-         xlim = xlim,
-         col = "red", type = "l",
-         ylab = "", yaxt = "n", xlab = "", xaxt = "n")
-    legend("left", legend = c("Positive signal",
-                              "Negative signal",
-                              "All signal"),
-           lty = 1, bty = "n", cex = 0.8,
-           col = c("red", "blue", "black"))
-    cat('\n\n')
-
-    month_vec <- strftime(  year_data$Date, format = "%m")
-    dd        <- aggregate(year_data[, .(CM21_sig, CM21_sig_sd, Elevat, Azimuth)],
-                           list(month_vec), FUN = summary, digits = 6 )
-
-    boxplot(year_data$CM21_sig ~ month_vec )
-    title(main = paste("CM21 signal by month", YYYY))
-    cat('\n\n')
-
-    boxplot(year_data$CM21_sig_sd ~ month_vec)
-    title(main = paste("CM21 sd by month", YYYY))
-    cat('\n\n')
-
-    # boxplot(year_data$Elevat ~ month_vec )
-    # title(main = paste("Elevation by month", YYYY) )
-    # cat('\n\n')
-
-    # boxplot(year_data$Azimuth ~ month_vec )
-    # title(main = paste("Azimuth by month", YYYY) )
-    # cat('\n\n')
-
-    ## __ Plots of exceptions for investigation  -------------------------------
-
-    ## ____ 1995 ---------------------------------------------------------------
-    if (YYYY == 1995) {
-        cat("\n### Year:", YYYY, " exceptions \n\n")
-
-        part <- year_data[Date > as.POSIXct("1995-10-08") &
-                          Date < as.POSIXct("1995-11-15") ]
-        plot(part$Date,   part$CM21_sig, pch = ".", ylim = c(-2, 3),
-             xlab = "", ylab = "CM-21 signal")
-        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
-        points(part$Date, part$sig_upplim, pch = ".", col = "red")
-        ## plot config changes
-        abline(v = signal_physical_limits$Date, lty = 3)
-        cat('\n\n')
-
-        part <- year_data[Date > as.POSIXct("1995-11-15") &
-                          Date < as.POSIXct("1995-12-31") ]
-        plot(  part$Date, part$CM21_sig,   pch = ".", ylim = c(-1, 2))
-        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
-        points(part$Date, part$sig_upplim, pch = ".", col = "red")
-        ## plot config changes
-        abline(v = signal_physical_limits$Date, lty = 3)
-        ## reverse sirena TOT to signal
-        points(part$Date, part$tot_glb / cm21factor(part$Date),
-               pch = ".", col = "cyan")
-        cat('\n\n')
-    }
-
-    ## ____ 1996 ---------------------------------------------------------------
-    if (YYYY == 1996) {
-        cat("\n### Year:", YYYY, " exceptions \n\n")
-
-        part <- year_data[Date > as.POSIXct("1996-02-01") &
-                          Date < as.POSIXct("1996-03-07") ]
-        plot(  part$Date, part$CM21_sig, pch = ".", ylim = c(-1,2),
-               xlab = "", ylab = "CM-21 signal")
-        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
-        points(part$Date, part$sig_upplim, pch = ".", col = "red")
-        abline(v = as.POSIXct("1996-2-08"))
-        abline(v = as.POSIXct("1996-2-29 12:00"))
-        ## reverse sirena TOT to signal
-        points(part$Date, part$tot_glb / cm21factor(part$Date),
-               pch = ".", col = "cyan")
-        cat('\n\n')
-    }
-
-    ## ____ 2004 ---------------------------------------------------------------
-    if (YYYY == 2004) {
-        cat("\n### Year:", YYYY, " exceptions \n\n")
-        cat("\n#### BEWARE!\n")
-        cat("There is an unexpected +2.5V offset in the recording signal for
+  ## ____ 2004 ---------------------------------------------------------------
+  if (YYYY == 2004) {
+    cat("\n### Year:", YYYY, " exceptions \n\n")
+    cat("\n#### BEWARE!\n")
+    cat("There is an unexpected +2.5V offset in the recording signal for
             2004-07-03 00:00 until 2004-07-22 00:00.
             We changed the allowed physical signal limits to compensate.
             Have to check dark calculation and the final output for problems.\n")
 
-        part <- year_data[Date > as.POSIXct("2004-06-01") &
-                          Date < as.POSIXct("2004-08-01") ]
-        ylim <- range(-1, 2, part$sig_lowlim, part$sig_upplim)
+    part <- year_data[Date > as.POSIXct("2004-06-01") &
+                        Date < as.POSIXct("2004-08-01") ]
+    ylim <- range(-1, 2, part$sig_lowlim, part$sig_upplim)
 
-        plot(  part$Date, part$CM21_sig,  pch = ".", ylim = ylim,
-               xlab = "", ylab = "CM-21 signal")
-        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
-        points(part$Date, part$sig_upplim, pch = ".", col = "red")
-        ## plot config changes
-        abline(v = signal_physical_limits$Date, lty = 3)
-        ## Plot existing sirena data
-        points(part$Date, part$tot_glb / cm21factor(part$Date), pch = ".", col = "cyan")
-    }
+    plot(  part$Date, part$CM21_sig,  pch = ".", ylim = ylim,
+           xlab = "", ylab = "CM-21 signal")
+    points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+    points(part$Date, part$sig_upplim, pch = ".", col = "red")
+    ## plot config changes
+    abline(v = signal_physical_limits$Date, lty = 3)
+    ## Plot existing sirena data
+    points(part$Date, part$tot_glb / cm21factor(part$Date), pch = ".", col = "cyan")
+  }
 
-    ## ____ 2005 ---------------------------------------------------------------
-    if (YYYY == 2005) {
-        cat("\n### Year:", YYYY, " exceptions \n\n")
+  ## ____ 2005 ---------------------------------------------------------------
+  if (YYYY == 2005) {
+    cat("\n### Year:", YYYY, " exceptions \n\n")
 
-        part <- year_data[Date > as.POSIXct("2005-11-15") &
-                          Date < as.POSIXct("2005-12-31") ]
-        ylim <- range(-1, 2, part$sig_lowlim, part$sig_upplim)
+    part <- year_data[Date > as.POSIXct("2005-11-15") &
+                        Date < as.POSIXct("2005-12-31") ]
+    ylim <- range(-1, 2, part$sig_lowlim, part$sig_upplim)
 
-        plot(  part$Date, part$CM21_sig,  pch = ".", ylim = ylim,
-               xlab = "", ylab = "CM-21 signal")
-        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
-        points(part$Date, part$sig_upplim, pch = ".", col = "red")
-        ## plot config changes
-        abline(v = signal_physical_limits$Date, lty = 3)
-        ## Plot existing sirena data
-        points(part$Date, part$tot_glb / cm21factor(part$Date), pch = ".", col = "cyan")
-    }
+    plot(  part$Date, part$CM21_sig,  pch = ".", ylim = ylim,
+           xlab = "", ylab = "CM-21 signal")
+    points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+    points(part$Date, part$sig_upplim, pch = ".", col = "red")
+    ## plot config changes
+    abline(v = signal_physical_limits$Date, lty = 3)
+    ## Plot existing sirena data
+    points(part$Date, part$tot_glb / cm21factor(part$Date), pch = ".", col = "cyan")
+  }
 
-    ## ____ 2015 ---------------------------------------------------------------
-    if (YYYY == 2015) {
-        cat("\n### Year:", YYYY, " exceptions \n\n")
+  ## ____ 2015 ---------------------------------------------------------------
+  if (YYYY == 2015) {
+    cat("\n### Year:", YYYY, " exceptions \n\n")
 
-        part <- year_data[Date > as.POSIXct("2015-04-10") &
-                          Date < as.POSIXct("2015-05-01") ]
-        ylim <- range(-1, 2, part$sig_lowlim, part$sig_upplim)
+    part <- year_data[Date > as.POSIXct("2015-04-10") &
+                        Date < as.POSIXct("2015-05-01") ]
+    ylim <- range(-1, 2, part$sig_lowlim, part$sig_upplim)
 
-        plot(  part$Date, part$CM21_sig,  pch = ".", ylim = ylim,
-               xlab = "", ylab = "CM-21 signal")
-        points(part$Date, part$sig_lowlim, pch = ".", col = "red")
-        points(part$Date, part$sig_upplim, pch = ".", col = "red")
+    plot(  part$Date, part$CM21_sig,  pch = ".", ylim = ylim,
+           xlab = "", ylab = "CM-21 signal")
+    points(part$Date, part$sig_lowlim, pch = ".", col = "red")
+    points(part$Date, part$sig_upplim, pch = ".", col = "red")
 
-        ## plot config changes
-        abline(v = signal_physical_limits$Date, lty = 3)
-        ## Plot existing sirena data
-        points(part$Date, part$tot_glb / cm21factor(part$Date), pch = ".", col = "cyan")
-    }
+    ## plot config changes
+    abline(v = signal_physical_limits$Date, lty = 3)
+    ## Plot existing sirena data
+    points(part$Date, part$tot_glb / cm21factor(part$Date), pch = ".", col = "cyan")
+  }
 
 } ## for every year
 
