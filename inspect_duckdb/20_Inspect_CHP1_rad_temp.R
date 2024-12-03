@@ -38,7 +38,7 @@
 #' ---
 
 #'
-#'  **SIG**
+#'  **CHP-1 DNI L1**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
