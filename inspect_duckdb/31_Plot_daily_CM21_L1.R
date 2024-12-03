@@ -1,7 +1,7 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Daily CHP-1 radiation data **L1** "
+#' title:         "Daily CM-21 radiation data **L1** "
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -38,7 +38,7 @@
 #' ---
 
 #'
-#'  **DHI L1 PLOT**
+#'  **GHI L1 PLOT**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -59,7 +59,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R"
+Script.Name <- "~/BBand_LAP/inspect_duckdb/31_Plot_daily_CM21_L1.R"
 
 if (!interactive()) {
   pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -82,8 +82,8 @@ panderOptions("table.split.table",        120   )
 
 
 ## __  Variables  --------------------------------------------------------------
-OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CHP1_DIR_L1/"
-OUT_PREFIX <- "CHP1_direct_L1_"
+OUT_FOLDER <- "~/BBand_LAP/REPORTS/DAILY/CM21_GLB_L1/"
+OUT_PREFIX <- "CM21_global_L1_"
 dir.create(OUT_FOLDER, showWarnings = FALSE, recursive = TRUE)
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 cex <- 0.6
@@ -99,20 +99,20 @@ TEST <- FALSE
 
 metalist <- MT |>
   mutate(year               = year(Day),
-         chp1_dark_computed = as.Date(chp1_dark_computed)) |>
-  filter(!is.na(chp1_basename))                            |>
-  select(chp1_dark_computed, year)                         |>
+         cm21_dark_computed = as.Date(cm21_dark_computed)) |>
+  filter(!is.na(cm21_basename))                            |>
+  select(cm21_dark_computed, year)                         |>
   group_by(year)                                           |>
-  summarise(updated = max(chp1_dark_computed, na.rm = T))  |>
+  summarise(updated = max(cm21_dark_computed, na.rm = T))  |>
   collect() |> data.table()
 
-plotfiles <- data.table(path = list.files(path        = OUT_FOLDER,
-                                          pattern     = OUT_PREFIX,
+plotfiles <- data.table(path = list.files(path    = OUT_FOLDER,
+                                          pattern = OUT_PREFIX,
                                           full.names  = TRUE,
                                           ignore.case = TRUE))
 plotfiles$mtime <- file.mtime(plotfiles$path)
 plotfiles$year  <- as.numeric(
-    sub(OUT_PREFIX, "", sub("\\.pdf", "", basename(plotfiles$path))))
+  sub(OUT_PREFIX, "", sub("\\.pdf", "", basename(plotfiles$path))))
 
 ## find year to do
 selected    <- merge(metalist, plotfiles, all = TRUE)
@@ -129,10 +129,10 @@ for (YYYY in sort(years_to_do)) {
   cat(YYYY, "rows:", nrow(year_data), "\n")
 
   ## days with data
-  daystodo <- year_data[!is.na(DIR_wpsm), unique(as.Date(Date))]
+  daystodo <- year_data[!is.na(GLB_wpsm), unique(as.Date(Date))]
   daystodo <- sort(daystodo)
-  ## signal limit for all year
-  # ylim <- range(year_data[, .(CHP1_sig, CHP1_sig_wo_dark)], na.rm = TRUE)
+  ## signal limit for year
+  # ylim <- range(year_data[, .(CM21_sig, CM21_sig_wo_dark)], na.rm = TRUE)
 
   if (!interactive()) {
     pdffile <- paste0(OUT_FOLDER, "/", OUT_PREFIX, YYYY, ".pdf")
@@ -147,11 +147,11 @@ for (YYYY in sort(years_to_do)) {
 
     layout(matrix(c(1,2,2,2,2), 5, 1, byrow = TRUE))
 
-    ## Direct SD
+    ## Global SD
     par("mar" = c(0, 4.5, 2, 1))
     plot(
-      dd$Date, dd$DIR_SD_wpsm,
-      ylim = range(c(0, dd$DIR_SD_wpsm), na.rm = T),
+      dd$Date, dd$GLB_SD_wpsm,
+      ylim = range(c(0, dd$GLB_SD_wpsm), na.rm = T),
       pch  = 19,
       cex  = cex,
       col = "red",
@@ -160,49 +160,37 @@ for (YYYY in sort(years_to_do)) {
     )
     abline(h = 0, col = "grey", lty = 2)
 
-    title(paste0("Direct Irradiance  doy: ", yday(aday), "  ", aday))
+    title(paste0("Global Irradiance  doy: ", yday(aday), "  ", aday))
 
     ## Radiation
     par("mar" = c(3, 4.5, 0, 1))
-    ylim <- range(dd[, .(DIR_wpsm, HOR_strict)], na.rm = TRUE)
+    ylim <- range(dd[, .(GLB_wpsm, HOR_strict)], na.rm = TRUE)
     plot(
-      dd$Date, dd$HOR_strict, 
+      dd$Date, dd$GLB_wpsm,
       type = "l",
       ylim = ylim,
       lwd  = 1.5,
       pch  = 19,
       cex  = cex,
-      col  = "cyan",
+      col  = "green",
+      xlab = "",
       ylab = expression(paste("Direct irradiance [", Watt/m^2, "]"))
     )
-    lines(dd$Date, dd$DIR_wpsm,
-          col = "blue",)
     abline(h = 0, col = "grey", lty = 2)
 
-    ## Temperature correction
-    if (!all(is.na(dd$DIR_wpsm_temp_cor))) {
-      par(new = T)
-      plot(dd$Date, dd$DIR_wpsm_temp_cor, type = "l",
-           xaxt = "n", yaxt = "n",
-           lty = 3, col = "darkgrey")
-    }
 
     ## Decorations
-    text(dd$Date[1], max(dd[, .(DIR_wpsm, HOR_strict)], na.rm = TRUE),
+    text(dd$Date[1], max(dd[, .(GLB_wpsm)], na.rm = TRUE),
          labels = tag, pos = 4, cex = .9)
 
     legend("topright", bty = "n",
-           lty = c( 1,  1, NA,  3),
-           pch = c(NA, NA, 19, NA),
+           lty = c( 1, NA),
+           pch = c(NA, 19),
            legend = c(
-             "Direct on horizontal",
-             "Direct beam",
-             "Signal SD",
-             "Direct beam temp. cor."),
-           col = c("cyan",
-                   "blue",
-                   "red",
-                   "darkgrey")
+             "Global",
+             "Signal SD"),
+           col = c("green",
+                   "red")
     )
   }
   dev.off()
