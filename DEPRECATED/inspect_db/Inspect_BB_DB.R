@@ -68,12 +68,10 @@ renv::load("~/BBand_LAP")
 #                       output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
 # })
 
-
-try({
-    cat("\n\n 11. Plot daily CM-21 signals\n")
-    source("~/BBand_LAP/inspect_db/11_Plot_daily_CM21_sig.R")
-})
-
+# try({
+#     cat("\n\n 11. Plot daily CM-21 signals\n")
+#     source("~/BBand_LAP/inspect_db/11_Plot_daily_CM21_sig.R")
+# })
 
 # try({
 #     cat("\n\n 20. Inspect CHP-1 radiation\n")
@@ -99,11 +97,11 @@ try({
 # })
 
 
-try({
-    cat("\n\n 60. Inspect CM-21/TOT radiation\n")
-    rmarkdown::render(input      = "~/BBand_LAP/inspect_db/60_Inspect_TOT_GLB.R",
-                      output_dir = "~/BBand_LAP/REPORTS/REPORTS")
-})
+# try({
+#     cat("\n\n 60. Inspect CM-21/TOT radiation\n")
+#     rmarkdown::render(input      = "~/BBand_LAP/inspect_db/60_Inspect_TOT_GLB.R",
+#                       output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+# })
 
 
 tac <- Sys.time()
