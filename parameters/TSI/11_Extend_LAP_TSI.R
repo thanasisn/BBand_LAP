@@ -136,7 +136,7 @@ some <- some[!is.na(TSI)]
 if (nrow(some) > 0) {
   cat(paste(Script.ID, ":",
             "Interpolate TSI for"), "\n")
-  res <- update_table(con, some, TABLE, "Date")
+  res <- update_table(con, some, "LAP_TSI", "Date")
 }
 
 
@@ -176,7 +176,7 @@ ADD <- left_join(some, SUN, copy = T) |>
 if (ADD |> tally() |> pull() > 0) {
   cat(paste(Script.ID, ":",
             "TOA and Ground TSI"), "\n")
-  res <- update_table(con, ADD, TABLE, "Date")
+  res <- update_table(con, ADD, "LAP_TSI", "Date")
 }
 
 
