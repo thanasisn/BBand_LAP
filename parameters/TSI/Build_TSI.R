@@ -9,9 +9,9 @@ Script.Name <- "~/BBand_LAP/parameters/TSI/Build_TSI.R"
 renv::load("~/BBand_LAP")
 
 ##  Get and parse NOAA TSI  ----------------------------------------------------
-source("~/BBand_LAP/parameters/TSI/Read_raw_TSI_NOAA.R"  )
+source("~/BBand_LAP/parameters/TSI/01_Read_raw_TSI_NOAA.R"  )
 ##  Create TSI for LAP  --------------------------------------------------------
-source("~/BBand_LAP/parameters/TSI/Create_LAP_TSI.R"     )
+source("~/BBand_LAP/parameters/TSI/10_Create_LAP_TSI.R"     )
 
 
 tac <- Sys.time()
