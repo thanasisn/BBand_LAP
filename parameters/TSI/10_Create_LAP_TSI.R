@@ -45,8 +45,9 @@ con <- dbConnect(duckdb(dbdir = DB_TSI))
 sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
 ##  Select Astropy data  -------------------------------------------------------
+start_date <- DB_start_date - 1
 SUN <- tbl(sun, "params") |>
-  filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
+  filter(!is.na(AsPy_Elevation) & Date >= start_date) |>
   rename(Elevat           = "AsPy_Elevation")  |>
   filter(Elevat > -5)                          |> ## Don't need night LAP
   select(Date)                                 |>
@@ -88,6 +89,7 @@ if (!dbExistsTable(con, TABLE)) {
 #'
 #'  Insert raw NOAA values to the main table
 #'
+#+ echo=T
 
 ## TODO detect new data
 
@@ -117,6 +119,7 @@ NEW |> filter(!is.na(TSI)) |> summarise(min(Date), max(Date))
 #'
 #'  Create a function than can fill any date
 #'
+#+ echo=T
 
 ### Create interpolation function
 tt <- NEW |> filter(Source == "NOAA_RAW") |>
@@ -153,21 +156,25 @@ for (ay in yearstofill) {
 #'
 #'  Create values of TSI at TOA and LAP
 #'
+#+ echo=T
 
 ## Fill TOA and LAP ground
-make_new_column(con = con, table = TABLE, "TSI_TOA")
-make_new_column(con = con, table = TABLE, "TSI_GRN")
+# make_new_column(con = con, table = TABLE, "TSI_TOA")
+# make_new_column(con = con, table = TABLE, "TSI_GRN")
 NEW <- tbl(con, TABLE)
 
+dd <- NEW |> filter(is.na(TSI)) |> collect() |>data.table()
+
 yearstofill <- NEW |>
+  filter(Date > DB_start_date)            |>
   filter(is.na(TSI_TOA) | is.na(TSI_GRN)) |>
-  mutate(year = year(Date))  |>
+  mutate(year = year(Date))               |>
   select(year) |> distinct() |> pull()
 
 for (ay in yearstofill) {
   some <- NEW |> filter(year(Date) == ay) |>
     filter(is.na(TSI_TOA) | is.na(TSI_GRN)) |>
-    select(Date, TSI) |>
+    select(Date, TSI)
 
   SUN <- tbl(sun, "params") |>
     filter(year(Date) == ay) |>
@@ -202,7 +209,7 @@ for (ay in yearstofill) {
 # plot(test$Date, test$TSI_TOA)
 # plot(test$Date, test$TSI_GRN)
 
-
+if (interactive()) {stop("dont close")}
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con)
