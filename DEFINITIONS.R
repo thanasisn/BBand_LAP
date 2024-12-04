@@ -99,5 +99,13 @@ QCrad_plot_date_max <- as.Date("2025-01-01")
 ##  NOAA TSI  ------------------------------------------------------------------
 ##  https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00828
 ##  Cite as: Odele Coddington, Judith L. Lean, Doug Lindholm, Peter Pilewskie, Martin Snow, and NOAA CDR Program (2015): NOAA Climate Data Record (CDR) of Total Solar Irradiance (TSI), NRLTSI Version 2. [indicate subset used]. NOAA National Centers for Environmental Information. doi:10.7289/V55B00C1 [access date].
-FROM_NOAA  <- "https://www.ncei.noaa.gov/data/total-solar-irradiance/access/daily/"
-DEST_NOAA  <- "~/DATA/SUN/TSI_model_NOAA/"
+FROM_NOAA <- "https://www.ncei.noaa.gov/data/total-solar-irradiance/access/daily/"
+DEST_NOAA <- "~/DATA/SUN/TSI_model_NOAA/"
+
+##  TSIS TSI from LISIRD  ------------------------------------------------------
+##  https://lasp.colorado.edu/lisird/data/tsis_tsi_6hr
+##
+FROM_TSIS <- "https://lasp.colorado.edu/lisird/latis/dap/tsis_tsi_6hr.csv?&format_time(yyyy-MM-dd'T'HH:mm:ss.SSSZ)"
+DEST_TSIS <- "~/DATA/SUN/TSI_tsis_6hr.csv"
+DATA_TSIS <- "~/DATA/SUN/TSI_tsis_6hr.Rds"
+
