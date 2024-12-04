@@ -19,7 +19,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/parameters/TSI/00_download_TSI_NOAA.R"
+Script.Name <- "~/BBand_LAP/parameters/TSI/00_download_TSI.R"
 
 if (!interactive()) {
   pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -31,15 +31,50 @@ source("~/BBand_LAP/DEFINITIONS.R")
 
 cat("\n GET NOAA DATA\n\n")
 
-## __ Get data  ----------------------------------------------------------------
+##  Get data  ------------------------------------------------------------------
+
+
+## __ NOAA  --------------------------------------------------------------------
 #'
 #' Get data from NOAA.
 #'
 #+ echo=T
 if (Sys.info()["nodename"] == "sagan") {
-  system(paste("wget --timeout=66 -N -r -np -nd -nH -A .nc -P", DEST_NOAA, FROM_NOAA))
+  command <- paste("wget --timeout=66 -N -r -np -nd -nH -A .nc -P", DEST_NOAA, FROM_NOAA)
+  cat(command, "\n\n")
+  system(command)
 }
 #+ echo=F
+
+
+## __ TSIS  --------------------------------------------------------------------
+#'
+#' Get data from TSIS and read it.
+#'
+#+ echo=T
+##  Get data  ------------------------------------------------------------------
+command <- paste0("curl \"", FROM_TSIS, "\" > ", DEST_TSIS)
+cat(command, "\n\n")
+system(command)
+
+##  Parse data  ----------------------------------------------------------------
+tsis_data <- fread(DEST_TSIS)
+## fix names
+names(tsis_data)[grep("time",names(tsis_data))]    <- "Date"
+names(tsis_data)[grep(" \\(W/m\\^2\\)", names(tsis_data))] <-
+  sub(" \\(W/m\\^2\\)", "", grep(" \\(W/m\\^2\\)", names(tsis_data), value = TRUE))
+## ignore zeros
+tsis_data <- tsis_data[ tsi_1au >= 1 ]
+tsis_data[, provisional_flag := NULL ]
+wecare <- grep("true_earth", names(tsis_data), value = TRUE, invert = TRUE)
+setorder(tsis_data, Date)
+## save data
+tsis_data <- tsis_data[, ..wecare ]
+saveRDS(object = tsis_data,
+        file   = DATA_TSIS)
+
+
+
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
