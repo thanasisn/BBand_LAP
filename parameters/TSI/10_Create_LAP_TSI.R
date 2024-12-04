@@ -187,7 +187,7 @@ for (ay in yearstofill) {
   ADD <- left_join(some, SUN, copy = T) |>
     mutate(
       TSI_TOA = TSI / Sun_Dist_Astropy^2,  ## TSI on LAP TOA
-      TSI_GRN = TSI_TOA * cos(SZA*pi/180)  ## TSI on LAP ground
+      TSI_LAP = TSI_TOA * cos(SZA*pi/180)  ## TSI on LAP ground
     ) |>
     select(Date, TSI_TOA, TSI_GRN) |>
     filter(!is.na(TSI_TOA) & !is.na(TSI_GRN))
