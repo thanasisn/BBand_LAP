@@ -163,7 +163,7 @@ make_new_column(con = con, table = TABLE, "TSI_TOA")
 make_new_column(con = con, table = TABLE, "TSI_LAP")
 NEW <- tbl(con, TABLE)
 
-dd <- NEW |> filter(is.na(TSI)) |> collect() |> data.table()
+# dd <- NEW |> filter(is.na(TSI)) |> collect() |> data.table()
 
 yearstofill <- NEW |>
   filter(Date > DB_start_date)            |>

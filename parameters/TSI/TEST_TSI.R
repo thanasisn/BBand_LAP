@@ -61,9 +61,12 @@ dummy <- gc()
 
 ayears <- unique(year(TSI$Date))
 
+#+ echo=F, include=T, results="asis"
 for (ay in ayears) {
   OLD <- TSI[year(Date)== ay,]
   NEW <- NEW_DT |> filter(year(Date)== ay) |> collect() |> data.table()
+
+  cat(ay, "\n")
 
   test <- right_join(NEW, OLD, by = "Date")
 
@@ -72,11 +75,7 @@ for (ay in ayears) {
 
   plot(test[,       TSI/TSI_1au, Date])
   title(paste(ay, "1 AU"))
-
-
 }
-
-
 
 
 
