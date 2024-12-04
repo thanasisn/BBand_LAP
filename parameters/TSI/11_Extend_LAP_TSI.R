@@ -20,7 +20,7 @@ knitr::opts_chunk$set(fig.pos   = '!h'    )
 # closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/parameters/TSI/Create_LAP_TSI.R"
+Script.Name <- "~/BBand_LAP/parameters/TSI/11_Extend_LAP_TSI.R"
 Script.ID   <- "0B"
 
 if (!interactive()) {
@@ -57,7 +57,7 @@ STIS <- tbl(con, "TSI_TSIS") |>
 LAP  <- tbl(con, "LAP_TSI")
 
 
-##  Find adjusment  ------------------------------------------------------------
+##  Find adjustment  ------------------------------------------------------------
 noaarange <- NOAA |> summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |> collect() |> data.table()
 stisrange <- STIS |> summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |> collect() |> data.table()
 
