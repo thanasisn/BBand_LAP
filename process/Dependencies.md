@@ -15,7 +15,7 @@ At: 2024-12-04
        lubridate:  1.9.3   
            gdata:  3.0.1   
           pander:  0.6.5   
-           Hmisc:  5.2.0   
+           Hmisc:  5.2.1   
            tools:  4.2.3   
           dbplyr:  2.5.0   
           duckdb:  1.1.2   
