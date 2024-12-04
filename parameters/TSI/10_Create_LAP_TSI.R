@@ -1,17 +1,8 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Compute sun vector for LAP with standard tools
-#'
 #' Populates:
-#'  - Date
-#'  - AsPy_Azimuth
-#'  - AsPy_Elevatation
-#'  - AsPy_Dist
-#'  - PySo_Azimuth
-#'  - PySo_Elevation
-#'  - LAP_SZA_start
-#'  - LAP_SZA_middle
+#'  - TSI from NOAA
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -26,7 +17,7 @@ knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 ## __ Set environment  ---------------------------------------------------------
-closeAllConnections()
+# closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/Create_LAP_TSI.R"
@@ -62,11 +53,7 @@ SUN <- tbl(sun, "params") |>
   select(Date)                                 |>
   arrange(Date)
 
-## TEST
-# SUN <- SUN |> filter(Date < "2020-01-03")
-# print(SUN |> summarise(min(Date), max(Date)))
-
-##  Add Dates  -----------------------------------------------------------------
+##  Add new dates to main table  -----------------------------------------------
 TABLE <- "LAP_TSI"
 if (!dbExistsTable(con, TABLE)) {
   ## Create new table
@@ -99,17 +86,21 @@ if (!dbExistsTable(con, TABLE)) {
 
 
 ## Fill with TSI DATA  ---------------------------------------------------------
+#'
+#'  Insert raw NOAA values to the main table
+#'
 
 ## TODO detect new data
 tbl(con, "TSI_NOAA") |> summarise(max(file_Creation, na.rm = T))
 tbl(con, "TSI_NOAA")   |>
-  filter(prelimi == T) |> summarise(min(Time))
-
+  filter(prelimi == T) |> summarise(min(Time, na.rm = T))
+tbl(con, "LAP_TSI")
 
 ## ADD row values for LAP
-RAW <- tbl(con, "TSI_NOAA")   |>
-  mutate(Source = "NOAA_RAW") |>
-  select(Time, TSI, Source)   |>
+RAW <- tbl(con, "TSI_NOAA")                |>
+  mutate(Source = "NOAA_RAW")              |>
+  select(Time, TSI, Source, file_Creation) |>
+  rename(Updated = "file_Creation")        |>
   rename(Date = "Time")
 
 ## Add raw values
@@ -117,7 +108,6 @@ update_table(con, RAW, TABLE, "Date")
 
 ## Fill raw with interpolation
 NEW <- tbl(con, TABLE)
-
 
 NEW |> filter(is.na(TSI)) |> summarise(min(Date), max(Date))
 NEW |> filter(!is.na(TSI)) |> summarise(min(Date), max(Date))
@@ -128,11 +118,13 @@ ff <- NEW |> filter(Date > "2024-06-29") |> collect()
 ### Create interpolation function
 tt <- NEW |> filter(Source == "NOAA_RAW") |>
   collect() |> data.table()
-tsi_fun <- approxfun(x      = tt$Date,
-                     y      = tt$TSI,
-                     method = "linear",
-                     rule   = 1,
-                     ties   = mean )
+tsi_fun <- approxfun(
+  x      = tt$Date,
+  y      = tt$TSI,
+  method = "linear",
+  rule   = 1,
+  ties   = mean
+)
 
 ## Fill with interpolated data
 yearstofill <- NEW           |>
@@ -166,9 +158,11 @@ yearstofill <- NEW |>
   select(year) |> distinct() |> pull()
 
 for (ay in yearstofill) {
+  systime <- Sys.time()
   some <- NEW |> filter(year(Date) == ay) |>
     filter(is.na(TSI_TOA) | is.na(TSI_GRN)) |>
-    select(Date, TSI)
+    select(Date, TSI) |>
+    mutate(Updated = systime)
 
   SUN <- tbl(sun, "params") |>
     filter(year(Date) == ay) |>
