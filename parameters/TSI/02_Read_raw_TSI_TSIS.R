@@ -22,7 +22,7 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/02_Read_raw_TSI_TSIS.R"
 
 if (!interactive()) {
-  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -50,7 +50,7 @@ SIS <- SIS |>
   mutate(Time = Time + 30)
 
 ## safe names
-names(SIS) <- gsub("[ ]+", "_" , gsub("[ ]+$", "" , gsub("\\)|\\("," ", names(SIS))))
+names(SIS) <- gsub("[ ]+", "_", gsub("[ ]+$", "", gsub("\\)|\\(", " ", names(SIS))))
 
 ## this doesn't fit in the current scheme
 SIS <- SIS |> select(-avg_measurement_date_Julian_Date)
