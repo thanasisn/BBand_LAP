@@ -114,11 +114,11 @@ try({
 })
 
 
-# try({
-#     cat("\n\n 60. Inspect CM-21/TOT radiation\n")
-#     rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
-#                       output_dir  = output_dir)
-# })
+try({
+    cat("\n\n 60. Inspect CM-21/TOT radiation\n")
+    rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
+                      output_dir  = output_dir)
+})
 
 # try({
 #     cat("\n\n 80. Inspect duckdbs\n")

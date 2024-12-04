@@ -20,8 +20,8 @@ info "Get data from Sirena"
 info "Build the main database"
 "$HOME/BBand_LAP/build_db/Build_BB_DB.R"
 
-info "Create plots and reports"
-"$HOME/BBand_LAP/inspect_db/Inspect_BB_DB.R"
+# info "Create plots and reports"
+# "$HOME/BBand_LAP/inspect_db/Inspect_BB_DB.R"
 
 info "Run other processes"
 "$HOME/BBand_LAP/process/Process_BB_DB.R"
