@@ -20,11 +20,9 @@ closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/01_Read_raw_TSI_NOAA.R"
-Script.ID   <- "0B"
 
 if (!interactive()) {
   pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-  sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -42,11 +40,6 @@ cat("\n Initialize params DB and/or import TSI data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_TSI))
-
-## __ Get data  ----------------------------------------------------------------
-if (Sys.info()["nodename"] == "sagan") {
-  system(paste("wget --timeout=66 -N -r -np -nd -nH -A .nc -P", DEST_NOAA, FROM_NOAA))
-}
 
 ## __ Check available files  ---------------------------------------------------
 ncfiles <- list.files(path       = DEST_NOAA,
@@ -117,6 +110,12 @@ if (length(unique(gather$time_low - gather$time_upp)) == 1 &
   gather[, time_upp := NULL]
 }
 
+
+
+#'
+#' Insert new data as needed
+#'
+#+ echo=T
 TABLE <- "TSI_NOAA"
 if (!dbExistsTable(con, TABLE)) {
   cat("Initialize table\n")
@@ -158,6 +157,7 @@ if (!dbExistsTable(con, TABLE)) {
     cat("No New data for import\n\n")
   }
 }
+#+ echo=F
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
