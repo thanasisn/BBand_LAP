@@ -24,8 +24,7 @@ Script.Name <- "~/BBand_LAP/parameters/TSI/Create_LAP_TSI.R"
 Script.ID   <- "0B"
 
 if (!interactive()) {
-  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-  sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -91,6 +90,7 @@ if (!dbExistsTable(con, TABLE)) {
 #'
 
 ## TODO detect new data
+
 tbl(con, "TSI_NOAA") |> summarise(max(file_Creation, na.rm = T))
 tbl(con, "TSI_NOAA")   |>
   filter(prelimi == T) |> summarise(min(Time, na.rm = T))
@@ -112,8 +112,11 @@ NEW <- tbl(con, TABLE)
 NEW |> filter(is.na(TSI)) |> summarise(min(Date), max(Date))
 NEW |> filter(!is.na(TSI)) |> summarise(min(Date), max(Date))
 
-
-ff <- NEW |> filter(Date > "2024-06-29") |> collect()
+#'
+#'  Fill NOAA TSI with interpolated values.
+#'
+#'  Create a function than can fill any date
+#'
 
 ### Create interpolation function
 tt <- NEW |> filter(Source == "NOAA_RAW") |>
@@ -135,8 +138,9 @@ yearstofill <- NEW           |>
 for (ay in yearstofill) {
   some <- NEW |> filter(year(Date) == ay) |>
     filter(is.na(TSI)) |> select(Date) |> collect() |> data.table()
-  some[, TSI    := tsi_fun(Date)]
-  some[, Source := "NOAA_INTERP"]
+  some[, TSI     := tsi_fun(Date)]
+  some[, Source  := "NOAA_INTERP"]
+  some[, Updated := Sys.time()   ]
   ## write only when needed
   some <- some[!is.na(TSI)]
   if (nrow(some) > 0) {
@@ -146,6 +150,9 @@ for (ay in yearstofill) {
   }
 }
 
+#'
+#'  Create values of TSI at TOA and LAP
+#'
 
 ## Fill TOA and LAP ground
 make_new_column(con = con, table = TABLE, "TSI_TOA")
@@ -158,11 +165,9 @@ yearstofill <- NEW |>
   select(year) |> distinct() |> pull()
 
 for (ay in yearstofill) {
-  systime <- Sys.time()
   some <- NEW |> filter(year(Date) == ay) |>
     filter(is.na(TSI_TOA) | is.na(TSI_GRN)) |>
     select(Date, TSI) |>
-    mutate(Updated = systime)
 
   SUN <- tbl(sun, "params") |>
     filter(year(Date) == ay) |>
@@ -200,7 +205,7 @@ for (ay in yearstofill) {
 
 
 ## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
