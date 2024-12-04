@@ -43,9 +43,10 @@ cat("\n Create TSI data for LAP\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_TSI))
+sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
 NOAA <- tbl(con, "TSI_NOAA") |>
-  filter(!prelimi)           |>
+  # filter(!prelimi)           |>
   filter(!is.na(TSI))        |>
   mutate(Day = as.Date(Time))
 
@@ -78,16 +79,31 @@ offsets <- full_join(mnoaa, mstis, by = "Day") |>
     mediandiff = median(diff, na.rm = T)
   ) |> collect() |> data.table()
 
-library(ggplot2)
+## Create adjusted values
+STIS <- tbl(con, "TSI_TSIS") |>
+  filter(!is.na(TSI))        |>
+  select(Time, TSI) |> collect() |> data.table()
+STIS[, TSI := TSI + offsets$meandiff]
+STIS[, Source  := "TSIS_RAW"]
+STIS[, Updated := Sys.time()]
 
-mnoaa |> ggplot(aes(x = Day, y = TSI)) + geom_point()
+## function to interpolate TSIS
+tsi_fun <- approxfun(
+  x      = STIS$Time,
+  y      = STIS$TSI,
+  method = "linear",
+  rule   = 1,
+  ties   = mean
+)
 
-mstis |> ggplot(aes(x = Day, y = TSI)) + geom_point()
+## just
+STIS <- STIS[Time > commonmax, ]
 
-
-# & Day <= common[2])
-
-stop()
+ggplot() +
+  geom_point(data = mstis, aes(x = Day, y = TSI), color = "blue", size = 0.5) +
+  geom_point(data = mnoaa, aes(x = Day, y = TSI), color = "black") +
+  geom_point(data = mstis, aes(x = Day, y = TSI + offsets$meandiff), color = "green", size = 0.5) +
+  geom_point(data = STIS,  aes(x = as.Date(Time), y = TSI), color = "orange")
 
 ## Fill with TSI DATA  ---------------------------------------------------------
 #'
@@ -95,62 +111,34 @@ stop()
 #'
 #+ echo=T
 
-## TODO detect new data
-
 ## ADD row values for LAP
-RAW <- tbl(con, "TSI_NOAA")                |>
-  mutate(Source = "NOAA_RAW")              |>
-  select(Time, TSI, Source, file_Creation) |>
-  rename(Updated = "file_Creation")        |>
-  rename(Date = "Time")
+RAW <- STIS |> rename(Date = "Time")
 
 ## Add raw values
-update_table(con, RAW, TABLE, "Date")
+update_table(con, RAW, "LAP_TSI", "Date")
 
-## Fill raw with interpolation
-NEW <- tbl(con, TABLE)
 
-NEW |> filter(is.na(TSI)) |> summarise(min(Date), max(Date))
-NEW |> filter(!is.na(TSI)) |> summarise(min(Date), max(Date))
-
+## Fill raw with interpolation  ------------------------------------------------
 #'
 #'  Fill NOAA TSI with interpolated values.
 #'
 #'  Create a function than can fill any date
 #'
 #+ echo=T
+some <- LAP |>
+  filter(is.na(TSI) & Date > commonmin) |>
+  select(Date) |> collect() |> data.table()
+some[, TSI     := tsi_fun(Date)]
+some[, Source  := "TSIS_INTERP"]
+some <- some[!is.na(TSI)]
 
-### Create interpolation function
-tt <- NEW |> filter(Source == "NOAA_RAW") |>
-  collect() |> data.table()
-tsi_fun <- approxfun(
-  x      = tt$Date,
-  y      = tt$TSI,
-  method = "linear",
-  rule   = 1,
-  ties   = mean
-)
-
-## Fill with interpolated data
-yearstofill <- NEW           |>
-  filter(is.na(TSI))         |>
-  mutate(year = year(Date))  |>
-  select(year) |> distinct() |> pull()
-
-for (ay in yearstofill) {
-  some <- NEW |> filter(year(Date) == ay) |>
-    filter(is.na(TSI)) |> select(Date) |> collect() |> data.table()
-  some[, TSI     := tsi_fun(Date)]
-  some[, Source  := "NOAA_INTERP"]
-  some[, Updated := Sys.time()   ]
-  ## write only when needed
-  some <- some[!is.na(TSI)]
-  if (nrow(some) > 0) {
-    cat(paste(Script.ID, ":",
-              "Interpolate TSI for", ay), "\n")
-    res <- update_table(con, some, TABLE, "Date")
-  }
+## write only when needed
+if (nrow(some) > 0) {
+  cat(paste(Script.ID, ":",
+            "Interpolate TSI for"), "\n")
+  res <- update_table(con, some, TABLE, "Date")
 }
+
 
 #'
 #'  Create values of TSI at TOA and LAP
@@ -158,46 +146,39 @@ for (ay in yearstofill) {
 #+ echo=T
 
 ## Fill TOA and LAP ground
-make_new_column(con = con, table = TABLE, "TSI_TOA")
-make_new_column(con = con, table = TABLE, "TSI_LAP")
-NEW <- tbl(con, TABLE)
+make_new_column(con = con, table = "LAP_TSI", "TSI_TOA")
+make_new_column(con = con, table = "LAP_TSI", "TSI_LAP")
 
-# dd <- NEW |> filter(is.na(TSI)) |> collect() |> data.table()
 
-yearstofill <- NEW |>
+## to fill
+some <- LAP |>
   filter(Date > DB_start_date)            |>
+  filter(!is.na(TSI))                     |>
   filter(is.na(TSI_TOA) | is.na(TSI_LAP)) |>
-  mutate(year = year(Date))               |>
-  select(year) |> distinct() |> pull()
+  select(Date, TSI)
 
-for (ay in yearstofill) {
-  some <- NEW |> filter(year(Date) == ay) |>
-    filter(is.na(TSI_TOA) | is.na(TSI_LAP)) |>
-    select(Date, TSI)
+SUN <- tbl(sun, "params") |>
+  filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
+  rename(Sun_Dist_Astropy = "AsPy_Dist")       |>
+  rename(Elevat           = "AsPy_Elevation")  |>
+  mutate(SZA              = 90 - Elevat)       |>
+  select(Date, Sun_Dist_Astropy, SZA)
 
-  SUN <- tbl(sun, "params") |>
-    filter(year(Date) == ay) |>
-    filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
-    rename(Sun_Dist_Astropy = "AsPy_Dist")       |>
-    rename(Elevat           = "AsPy_Elevation")  |>
-    mutate(SZA              = 90 - Elevat)       |>
-    select(Date, Sun_Dist_Astropy, SZA)
+ADD <- left_join(some, SUN, copy = T) |>
+  mutate(
+    TSI_TOA = TSI / Sun_Dist_Astropy^2,  ## TSI on LAP TOA
+    TSI_LAP = TSI_TOA * cos(SZA*pi/180)  ## TSI on LAP ground
+  ) |>
+  select(Date, TSI_TOA, TSI_LAP) |>
+  filter(!is.na(TSI_TOA) & !is.na(TSI_LAP))
 
-  ADD <- left_join(some, SUN, copy = T) |>
-    mutate(
-      TSI_TOA = TSI / Sun_Dist_Astropy^2,  ## TSI on LAP TOA
-      TSI_LAP = TSI_TOA * cos(SZA*pi/180)  ## TSI on LAP ground
-    ) |>
-    select(Date, TSI_TOA, TSI_LAP) |>
-    filter(!is.na(TSI_TOA) & !is.na(TSI_LAP))
-
-  ## write only when needed
-  if (ADD |> tally() |> pull() > 0) {
-    cat(paste(Script.ID, ":",
-              "TOA and Ground TSI for", ay), "\n")
-    res <- update_table(con, ADD, TABLE, "Date")
-  }
+## write only when needed
+if (ADD |> tally() |> pull() > 0) {
+  cat(paste(Script.ID, ":",
+            "TOA and Ground TSI"), "\n")
+  res <- update_table(con, ADD, TABLE, "Date")
 }
+
 
 
 # test <- NEW |> filter(year(Date) == 1993) |> collect() |> data.table()

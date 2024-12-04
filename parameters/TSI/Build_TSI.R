@@ -15,6 +15,7 @@ source("~/BBand_LAP/parameters/TSI/01_Read_raw_TSI_NOAA.R" )
 source("~/BBand_LAP/parameters/TSI/02_Read_raw_TSI_TSIS.R" )
 ##  Create TSI for LAP  --------------------------------------------------------
 source("~/BBand_LAP/parameters/TSI/10_Create_LAP_TSI.R"    )
+source("~/BBand_LAP/parameters/TSI/11_Extend_LAP_TSI.R"    )
 
 
 tac <- Sys.time()
