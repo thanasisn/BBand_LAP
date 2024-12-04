@@ -159,21 +159,21 @@ for (ay in yearstofill) {
 #+ echo=T
 
 ## Fill TOA and LAP ground
-# make_new_column(con = con, table = TABLE, "TSI_TOA")
-# make_new_column(con = con, table = TABLE, "TSI_GRN")
+make_new_column(con = con, table = TABLE, "TSI_TOA")
+make_new_column(con = con, table = TABLE, "TSI_LAP")
 NEW <- tbl(con, TABLE)
 
-dd <- NEW |> filter(is.na(TSI)) |> collect() |>data.table()
+dd <- NEW |> filter(is.na(TSI)) |> collect() |> data.table()
 
 yearstofill <- NEW |>
   filter(Date > DB_start_date)            |>
-  filter(is.na(TSI_TOA) | is.na(TSI_GRN)) |>
+  filter(is.na(TSI_TOA) | is.na(TSI_LAP)) |>
   mutate(year = year(Date))               |>
   select(year) |> distinct() |> pull()
 
 for (ay in yearstofill) {
   some <- NEW |> filter(year(Date) == ay) |>
-    filter(is.na(TSI_TOA) | is.na(TSI_GRN)) |>
+    filter(is.na(TSI_TOA) | is.na(TSI_LAP)) |>
     select(Date, TSI)
 
   SUN <- tbl(sun, "params") |>
@@ -189,8 +189,8 @@ for (ay in yearstofill) {
       TSI_TOA = TSI / Sun_Dist_Astropy^2,  ## TSI on LAP TOA
       TSI_LAP = TSI_TOA * cos(SZA*pi/180)  ## TSI on LAP ground
     ) |>
-    select(Date, TSI_TOA, TSI_GRN) |>
-    filter(!is.na(TSI_TOA) & !is.na(TSI_GRN))
+    select(Date, TSI_TOA, TSI_LAP) |>
+    filter(!is.na(TSI_TOA) & !is.na(TSI_LAP))
 
   ## write only when needed
   if (ADD |> tally() |> pull() > 0) {
@@ -207,7 +207,7 @@ for (ay in yearstofill) {
 # points(test[Source == "NOAA_RAW", TSI, Date], col = "red")
 #
 # plot(test$Date, test$TSI_TOA)
-# plot(test$Date, test$TSI_GRN)
+# plot(test$Date, test$TSI_LAP)
 
 if (interactive()) {stop("dont close")}
 
