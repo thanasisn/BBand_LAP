@@ -13,7 +13,7 @@ renv::load("~/BBand_LAP")
 ## Build tracker database ------------------------------------------------------
 ## TODO: Under development
 try(
-    source("~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"       )
+  source("~/BBand_LAP/build_db/Build_chp1_tracker_DB.R"     )
 )
 
 ## Import raw data from instruments --------------------------------------------
