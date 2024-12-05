@@ -192,13 +192,15 @@ inp_days <- pysolar |>
 
 # inp_days <- inp_days[!inp_days %in% BB_meta$day]
 
-LAP <- opendata()
-LAPdays <- LAP |>
-  filter(!is.na(SZA))         |>
-  mutate(Day = as.Date(Date)) |>
-  select(Day) |> distinct()   |> collect() |> data.table()
+if (file.exists(DB_DIR)) {
+  LAP <- opendata()
+  LAPdays <- LAP |>
+    filter(!is.na(SZA))         |>
+    mutate(Day = as.Date(Date)) |>
+    select(Day) |> distinct()   |> collect() |> data.table()
 
-inp_days <- inp_days[!inp_days %in% LAPdays$Day]
+  inp_days <- inp_days[!inp_days %in% LAPdays$Day]
+}
 
 # LAP  |> select(SZA)
 # stop()

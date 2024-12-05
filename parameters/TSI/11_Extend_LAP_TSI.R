@@ -39,7 +39,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(RNetCDF,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
-cat("\n Create TSI data for LAP\n\n")
+cat("\n Extend TSI data for LAP with TSIS\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_TSI))
@@ -146,8 +146,8 @@ if (nrow(some) > 0) {
 #+ echo=T
 
 ## Fill TOA and LAP ground
-make_new_column(con = con, table = "LAP_TSI", "TSI_TOA")
-make_new_column(con = con, table = "LAP_TSI", "TSI_LAP")
+# make_new_column(con = con, table = "LAP_TSI", "TSI_TOA")
+# make_new_column(con = con, table = "LAP_TSI", "TSI_LAP")
 
 
 ## to fill
