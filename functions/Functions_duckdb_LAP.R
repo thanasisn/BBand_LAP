@@ -185,7 +185,7 @@ remove_column <- function(con, table, acolname) {
 #' @return         A tibble and an in place mutation of the data base
 #' @export
 #'
-update_table <- function(con, new_data, table, matchvar) {
+update_table <- function(con, new_data, table, matchvar, quiet = FALSE) {
 
   create_missing_columns(con      = con,
                          new_data = new_data,
@@ -197,6 +197,12 @@ update_table <- function(con, new_data, table, matchvar) {
                      unmatched = "ignore",
                      in_place  = TRUE,
                      copy      = TRUE)
+
+  if (!quiet) {
+    nm <- deparse(substitute(new_data))
+    cat(paste("Updated >>", table, "<< with >>", nm, "<<\n\n"))
+  }
+
   return(res)
 }
 
@@ -213,7 +219,7 @@ update_table <- function(con, new_data, table, matchvar) {
 #' @return         A tibble and an in place mutation of the data base
 #' @export
 #'
-insert_table <- function(con, new_data, table, matchvar) {
+insert_table <- function(con, new_data, table, matchvar, quiet = FALSE) {
 
   create_missing_columns(con      = con,
                          new_data = new_data,
@@ -225,6 +231,12 @@ insert_table <- function(con, new_data, table, matchvar) {
                      conflict = "ignore",  ## only option for duckdb
                      in_place = TRUE,
                      copy     = TRUE)
+
+  if (!quiet) {
+    nm <- deparse(substitute(new_data))
+    cat(paste("Inserted >>", table, "<< with >>", nm, "<<\n\n"))
+  }
+
   return(res)
 }
 
@@ -242,7 +254,7 @@ insert_table <- function(con, new_data, table, matchvar) {
 #' @return         A tibble and an in place mutation of the data base
 #' @export
 #'
-upsert_table <- function(con, new_data, table, matchvar) {
+upsert_table <- function(con, new_data, table, matchvar, quiet = FALSE) {
 
   create_missing_columns(con      = con,
                          new_data = new_data,
@@ -253,8 +265,13 @@ upsert_table <- function(con, new_data, table, matchvar) {
                      by       = matchvar,
                      in_place = TRUE,
                      copy     = TRUE)
+
+  if (!quiet) {
+    nm <- deparse(substitute(new_data))
+    cat(paste("Inserted >>", table, "<< with >>", nm, "<<\n\n"))
+  }
+
   return(res)
 }
-
 
 
