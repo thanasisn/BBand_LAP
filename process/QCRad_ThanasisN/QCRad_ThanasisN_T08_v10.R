@@ -44,7 +44,7 @@
 #'
 #' ---
 
-#' **QCRad T04**
+#' **QCRad T08**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'

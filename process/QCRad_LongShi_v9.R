@@ -49,8 +49,6 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [`thanasisn.netlify.app/3-data_display`](https://thanasisn.netlify.app/3-data_display)**
-#'
 #' The chosen levels and filters have to be evaluated with the available data.
 #'
 #' For now this is a copy of
@@ -79,12 +77,11 @@ knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
-
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/process/QCRad_LongShi_v9.R"
-renv::load("~/BBand_LAP")
+renv::load("~/BBand_LAP", quiet = TRUE)
 
 parameter_fl <- paste0("~/BBand_LAP/SIDE_DATA/", basename(sub("\\.R", "_parameters.Rds", Script.Name)))
 
@@ -97,7 +94,6 @@ mylock(DB_lock)
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
