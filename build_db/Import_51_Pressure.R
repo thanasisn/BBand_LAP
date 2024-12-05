@@ -14,7 +14,6 @@
 #'
 #+ echo=F, include=T
 
-
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
 knitr::opts_chunk$set(comment    = ""      )
@@ -23,12 +22,11 @@ knitr::opts_chunk$set(out.width  = "100%"  )
 knitr::opts_chunk$set(fig.align  = "center")
 knitr::opts_chunk$set(fig.pos    = '!h'    )
 
-
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_db/Import_51_Pressure.R"
-renv::load("~/BBand_LAP")
+renv::load("~/BBand_LAP", quiet = TRUE)
 
 if (!interactive()) {
   pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
