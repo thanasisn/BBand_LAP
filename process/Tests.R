@@ -70,7 +70,6 @@ source("~/BBand_LAP/functions/Functions_CHP1.R")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
