@@ -17,7 +17,7 @@ knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 ## __ Set environment  ---------------------------------------------------------
-# closeAllConnections()
+closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/Create_LAP_TSI.R"
@@ -40,20 +40,23 @@ library(RNetCDF,    warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Create TSI data for LAP\n\n")
 
+sun_up_limit <- -3  ## limit data creation to daylight only
+
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_TSI))
 sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
-##  Select Astropy data  -------------------------------------------------------
-start_date <- DB_start_date - 1
-SUN <- tbl(sun, "params") |>
-  filter(!is.na(AsPy_Elevation) & Date >= start_date) |>
-  rename(Elevat           = "AsPy_Elevation")  |>
-  filter(Elevat > -5)                          |> ## Don't need night LAP
-  select(Date)                                 |>
-  arrange(Date)
-
 ##  Add new dates to main table  -----------------------------------------------
+#'
+#' Get the dates we care to fill with TSI data
+#'
+start_date <- DB_start_date - 1
+SUN <- tbl(sun, "params")                             |>
+  filter(!is.na(AsPy_Elevation) & Date >= start_date) |>
+  rename(Elevat           = "AsPy_Elevation")         |>
+  filter(Elevat > sun_up_limit)                       |>
+  select(Date)
+
 TABLE <- "LAP_TSI"
 if (!dbExistsTable(con, TABLE)) {
   ## Create new table
@@ -65,8 +68,7 @@ if (!dbExistsTable(con, TABLE)) {
                       SUN |> select(Date) |> arrange(Date),
                       TABLE, "Date")
 } else {
-  ## Append new data
-  cat("\n Add more dates to", TABLE, "\n\n")
+  ## Append new data if needed
   SUN <- anti_join(SUN |>
                      select(Date),
                    tbl(con, TABLE) |>
@@ -75,28 +77,27 @@ if (!dbExistsTable(con, TABLE)) {
                    by   = "Date",
                    copy = TRUE)
 
-  cat(paste(Script.ID, ":",
-            SUN |> tally() |> pull(),
-            "New rows"), "\n")
+  if (SUN |> tally() |> pull() > 0) {
+    cat("\n Add more dates to", TABLE, "\n\n")
+    cat(paste(Script.ID, ":",
+              SUN |> tally() |> pull(),
+              "New rows"), "\n")
 
-  res <- insert_table(con,
-                      SUN |> select(Date) |> arrange(Date),
-                      TABLE, "Date")
+    res <- insert_table(con,
+                        SUN |> select(Date) |> arrange(Date),
+                        TABLE, "Date")
+  }
 }
 
 
-## Fill with TSI DATA  ---------------------------------------------------------
+##  Fill LAP TSI DATA  ---------------------------------------------------------
+
+
+## __ Insert raw NOAA  ---------------------------------------------------------
 #'
 #'  Insert raw NOAA values to the main table
 #'
 #+ echo=T
-
-## TODO detect new data
-
-tbl(con, "TSI_NOAA") |> summarise(max(file_Creation, na.rm = T))
-tbl(con, "TSI_NOAA")   |>
-  filter(prelimi == T) |> summarise(min(Time, na.rm = T))
-tbl(con, "LAP_TSI")
 
 ## ADD row values for LAP
 RAW <- tbl(con, "TSI_NOAA")                |>
@@ -105,17 +106,37 @@ RAW <- tbl(con, "TSI_NOAA")                |>
   rename(Updated = "file_Creation")        |>
   rename(Date = "Time")
 
-## Add raw values
-update_table(con, RAW, TABLE, "Date")
+
+if (!tbl(con, TABLE) |> colnames() %in% "Source") {
+  cat("Inialiaze table", TABLE, "\n\n")
+  ## Add raw values
+  res <- update_table(con, RAW, TABLE, "Date")
+}
+
+TEST <- tbl(con, TABLE) |>
+  filter(Source == "NOAA_RAW") |>
+  select(Date, TSI)
+
+##  Update with newer data
+if (anti_join(TEST, RAW) |> tally() |> pull() == 0) {
+  cat("No new data from NOAA\n\n")
+} else {
+  cat("Neew data from NOAA\n\n")
+  ## Add raw values
+  res <- update_table(con, RAW, TABLE, "Date")
+}
+
+stop("DDD")
+
+## TODO detect new data fo
 
 ## Fill raw with interpolation
 NEW <- tbl(con, TABLE)
 
-NEW |> filter(is.na(TSI)) |> summarise(min(Date), max(Date))
-NEW |> filter(!is.na(TSI)) |> summarise(min(Date), max(Date))
 
+## __ Interpolate NOAA  ---------------------------------------------------------
 #'
-#'  Fill NOAA TSI with interpolated values.
+#'  Fill TSI with interpolated values from raw NOAA.
 #'
 #'  Create a function than can fill any date
 #'
@@ -153,8 +174,10 @@ for (ay in yearstofill) {
   }
 }
 
+
+## __ Calculate other TSI values for LAP  --------------------------------------
 #'
-#'  Create values of TSI at TOA and LAP
+#'  Create values of TSI at TOA and LAP for all TSIs at 1 au.
 #'
 #+ echo=T
 
