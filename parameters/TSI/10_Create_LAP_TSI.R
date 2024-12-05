@@ -107,13 +107,13 @@ RAW <- tbl(con, "TSI_NOAA")                |>
   rename(Date = "Time")
 
 
-if (!tbl(con, TABLE) |> colnames() %in% "Source") {
+if (!any(tbl(con, TABLE) |> colnames() %in% "Source")) {
   cat("Inialiaze table", TABLE, "\n\n")
   ## Add raw values
   res <- update_table(con, RAW, TABLE, "Date")
 }
 
-TEST <- tbl(con, TABLE) |>
+TEST <- tbl(con, TABLE)        |>
   filter(Source == "NOAA_RAW") |>
   select(Date, TSI)
 
@@ -121,17 +121,12 @@ TEST <- tbl(con, TABLE) |>
 if (anti_join(TEST, RAW) |> tally() |> pull() == 0) {
   cat("No new data from NOAA\n\n")
 } else {
-  cat("Neew data from NOAA\n\n")
+  cat("New data from NOAA\n\n")
   ## Add raw values
   res <- update_table(con, RAW, TABLE, "Date")
 }
 
-stop("DDD")
 
-## TODO detect new data fo
-
-## Fill raw with interpolation
-NEW <- tbl(con, TABLE)
 
 
 ## __ Interpolate NOAA  ---------------------------------------------------------
@@ -143,7 +138,7 @@ NEW <- tbl(con, TABLE)
 #+ echo=T
 
 ### Create interpolation function
-tt <- NEW |> filter(Source == "NOAA_RAW") |>
+tt <- tbl(con, TABLE) |> filter(Source == "NOAA_RAW") |>
   collect() |> data.table()
 tsi_fun <- approxfun(
   x      = tt$Date,
@@ -152,6 +147,18 @@ tsi_fun <- approxfun(
   rule   = 1,
   ties   = mean
 )
+
+## Fill raw with interpolation
+NEW <- tbl(con, TABLE)
+
+NEW |> filter(Source == "NOAA_RAW")    |> summarise(max(Updated, na.rm = T)) |> pull() >
+  NEW |> filter(Source == "NOAA_INTERP") |> summarise(max(Updated, na.rm = T)) |> pull()
+
+
+
+## TODO check updated
+warning("This will not detecte")
+
 
 ## Fill with interpolated data
 yearstofill <- NEW           |>
