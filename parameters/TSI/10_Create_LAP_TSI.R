@@ -89,9 +89,7 @@ if (!dbExistsTable(con, TABLE)) {
   }
 }
 
-
 ##  Fill LAP TSI DATA  ---------------------------------------------------------
-
 
 ## __ Insert raw NOAA  ---------------------------------------------------------
 #'
@@ -105,7 +103,6 @@ RAW <- tbl(con, "TSI_NOAA")                |>
   select(Time, TSI, Source, file_Creation) |>
   rename(Updated = "file_Creation")        |>
   rename(Date = "Time")
-
 
 if (!any(tbl(con, TABLE) |> colnames() %in% "Source")) {
   cat("Inialiaze table", TABLE, "\n\n")
@@ -122,12 +119,12 @@ if (anti_join(TEST, RAW) |> tally() |> pull() == 0) {
   cat("No new data from NOAA\n\n")
 } else {
   cat("New data from NOAA\n\n")
+  remove_column(con, TABLE, "TSI")
+  remove_column(con, TABLE, "TSI_TOA")
+  remove_column(con, TABLE, "TSI_LAP")
   ## Add raw values
   res <- update_table(con, RAW, TABLE, "Date")
 }
-
-
-
 
 ## __ Interpolate NOAA  ---------------------------------------------------------
 #'
@@ -151,15 +148,6 @@ tsi_fun <- approxfun(
 ## Fill raw with interpolation
 NEW <- tbl(con, TABLE)
 
-NEW |> filter(Source == "NOAA_RAW")    |> summarise(max(Updated, na.rm = T)) |> pull() >
-  NEW |> filter(Source == "NOAA_INTERP") |> summarise(max(Updated, na.rm = T)) |> pull()
-
-
-
-## TODO check updated
-warning("This will not detecte")
-
-
 ## Fill with interpolated data
 yearstofill <- NEW           |>
   filter(is.na(TSI))         |>
@@ -181,7 +169,6 @@ for (ay in yearstofill) {
   }
 }
 
-
 ## __ Calculate other TSI values for LAP  --------------------------------------
 #'
 #'  Create values of TSI at TOA and LAP for all TSIs at 1 au.
@@ -193,8 +180,6 @@ make_new_column(con = con, table = TABLE, "TSI_TOA")
 make_new_column(con = con, table = TABLE, "TSI_LAP")
 NEW <- tbl(con, TABLE)
 
-# dd <- NEW |> filter(is.na(TSI)) |> collect() |> data.table()
-
 yearstofill <- NEW |>
   filter(Date > DB_start_date)            |>
   filter(is.na(TSI_TOA) | is.na(TSI_LAP)) |>
@@ -202,7 +187,7 @@ yearstofill <- NEW |>
   select(year) |> distinct() |> pull()
 
 for (ay in yearstofill) {
-  some <- NEW |> filter(year(Date) == ay) |>
+  some <- NEW |> filter(year(Date) == ay)   |>
     filter(is.na(TSI_TOA) | is.na(TSI_LAP)) |>
     select(Date, TSI)
 
