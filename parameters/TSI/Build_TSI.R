@@ -17,6 +17,8 @@ source("~/BBand_LAP/parameters/TSI/02_Read_raw_TSI_TSIS.R" )
 source("~/BBand_LAP/parameters/TSI/10_Create_LAP_TSI.R"    )
 source("~/BBand_LAP/parameters/TSI/11_Extend_LAP_TSI.R"    )
 
+##  Will be removed  -----------------------------------------------------------
+source("~/BBand_LAP/parameters/TSI/30_Export_LAP_TSI_legacy.R")
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
