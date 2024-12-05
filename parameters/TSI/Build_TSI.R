@@ -6,7 +6,7 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/Build_TSI.R"
-renv::load("~/BBand_LAP")
+renv::load("~/BBand_LAP", quiet = TRUE)
 
 ##  Get TSI data  --------------------------------------------------------------
 source("~/BBand_LAP/parameters/TSI/00_download_TSI.R"      )

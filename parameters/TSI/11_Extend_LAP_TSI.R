@@ -57,6 +57,7 @@ STIS <- tbl(con, "TSI_TSIS") |>
 LAP  <- tbl(con, "LAP_TSI")
 
 
+
 ##  Find adjustment  ------------------------------------------------------------
 noaarange <- NOAA |> summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |> collect() |> data.table()
 stisrange <- STIS |> summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |> collect() |> data.table()
@@ -130,6 +131,7 @@ some <- LAP |>
   select(Date) |> collect() |> data.table()
 some[, TSI     := tsi_fun(Date)]
 some[, Source  := "TSIS_INTERP"]
+some[, Updated := Sys.time()]
 some <- some[!is.na(TSI)]
 
 ## write only when needed
@@ -189,7 +191,7 @@ if (ADD |> tally() |> pull() > 0) {
 # plot(test$Date, test$TSI_TOA)
 # plot(test$Date, test$TSI_LAP)
 
-if (interactive()) {stop("dont close")}
+# if (interactive()) {stop("dont close")}
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con)
