@@ -47,13 +47,8 @@
 #'
 #' **Source code: [github.com/thanasisn/BBand_LAP](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' **Data display: [thanasisn.netlify.app/3-data_display/](https://thanasisn.netlify.app/3-data_display/)**
 #'
 #+ echo=F, include=T
-
-
-
-
 
 #+ echo=F, include=F
 ## __ Document options ---------------------------------------------------------
@@ -62,7 +57,6 @@ knitr::opts_chunk$set(dev        = "png"   )
 knitr::opts_chunk$set(out.width  = "100%"  )
 knitr::opts_chunk$set(fig.align  = "center")
 knitr::opts_chunk$set(fig.pos    = '!h'    )
-
 
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
@@ -80,7 +74,6 @@ source("~/CODE/FUNCTIONS/R/execlock.R")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
