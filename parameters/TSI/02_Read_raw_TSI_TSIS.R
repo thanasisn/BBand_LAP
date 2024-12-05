@@ -34,7 +34,6 @@ library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
-library(RNetCDF,    warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Initialize params DB and/or import TSI data\n\n")
 
