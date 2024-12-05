@@ -82,7 +82,7 @@ mstis <- STIS |> get_mean()
 offsets <- full_join(mnoaa, mstis, by = "Day") |>
   mutate(diff = TSI.x - TSI.y)      |>
   summarise(
-    meandiff   = mean(diff, na.rm = T),
+    meandiff   = mean(  diff, na.rm = T),
     mediandiff = median(diff, na.rm = T)
   ) |> collect() |> data.table()
 
@@ -125,13 +125,34 @@ ggplot() +
 
 ## Add row TSIS values for LAP
 RAW <- STIS |> rename(Date = "Time")
-update_table(con, RAW, "LAP_TSI", "Date")
+
+TEST1 <- tbl(con, TABLE)        |>
+  filter(Source == "TSIS_RAW") |>
+  select(Date, TSI)
+TEST2 <- RAW[Source == "TSIS_RAW", Date, TSI]
+
+
+# return all rows from x without a match in y
+
+
+##  Update with newer data
+if (anti_join(TEST1, TEST2, copy = TRUE) |> tally() |> pull() == 0) {
+  cat("No new data from TSIS\n\n")
+} else {
+  cat("New data from TSIS\n\n")
+  ## Add raw values
+  res <- update_table(con, RAW, TABLE, "Date")
+}
+
 
 ## Fill raw with interpolation  ------------------------------------------------
 #'
 #'  Fill TSIS TSI with interpolated values.
 #'
 #'  Create a function than can fill any date
+#'
+#'  Assume old TSIS data do not need update,
+#'  otherwise should select old TSIS and replace them all
 #'
 #+ echo=T
 some <- LAP |>
@@ -149,11 +170,11 @@ if (nrow(some) > 0) {
   res <- update_table(con, some, "LAP_TSI", "Date")
 }
 
+## __ Calculate other TSI values for LAP  --------------------------------------
 #'
-#'  Create values of TSI at TOA and LAP
+#'  Create values of TSI at TOA and LAP for all TSIs at 1 au.
 #'
 #+ echo=T
-
 
 ## to fill
 some <- LAP |>
@@ -183,18 +204,6 @@ if (ADD |> tally() |> pull() > 0) {
             "TOA and Ground TSI"), "\n")
   res <- update_table(con, ADD, "LAP_TSI", "Date")
 }
-
-
-
-# test <- NEW |> filter(year(Date) == 1993) |> collect() |> data.table()
-#
-# plot(test$Date, test$TSI)
-# points(test[Source == "NOAA_RAW", TSI, Date], col = "red")
-#
-# plot(test$Date, test$TSI_TOA)
-# plot(test$Date, test$TSI_LAP)
-
-# if (interactive()) {stop("dont close")}
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con)

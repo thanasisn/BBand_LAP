@@ -63,8 +63,8 @@ ayears <- unique(year(TSI$Date))
 
 #+ echo=F, include=T, results="asis"
 for (ay in ayears) {
-  OLD <- TSI[year(Date)== ay,]
-  NEW <- NEW_DT |> filter(year(Date)== ay) |> collect() |> data.table()
+  OLD <- TSI[year(Date) == ay,]
+  NEW <- NEW_DT |> filter(year(Date) == ay) |> collect() |> data.table()
 
   cat(ay, "\n")
 
@@ -75,16 +75,14 @@ for (ay in ayears) {
 
   plot(test[,       TSI/TSI_1au, Date])
   title(paste(ay, "1 AU"))
+
 }
 
-
-
-if (interactive()) {stop("dont close")}
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+# cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
+#     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
