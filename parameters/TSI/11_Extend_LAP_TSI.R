@@ -56,31 +56,37 @@ STIS <- tbl(con, "TSI_TSIS") |>
 
 LAP  <- tbl(con, "LAP_TSI")
 
-
-
 ##  Find adjustment  ------------------------------------------------------------
+#'
+#' Use the common period to find an offset adjustment.
+#'
+#' Use NOAA as base and bring TSIS near NOAA
+#'
 noaarange <- NOAA |> summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |> collect() |> data.table()
 stisrange <- STIS |> summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |> collect() |> data.table()
 
 commonmin <- stisrange$min
 commonmax <- noaarange$max
 
+## Create a pipe function for creating daily mean
 get_mean <- . %>%
   filter(Day >= commonmin & Day <= commonmax) %>%
   group_by(Day) %>%
   summarise(TSI = mean(TSI, na.rm = T))
 
+## Calculate the daily means on the common days
 mnoaa <- NOAA |> get_mean()
 mstis <- STIS |> get_mean()
 
+## Calculate the mean and median difference
 offsets <- full_join(mnoaa, mstis, by = "Day") |>
   mutate(diff = TSI.x - TSI.y)      |>
   summarise(
-    meandiff = mean(diff, na.rm = T),
+    meandiff   = mean(diff, na.rm = T),
     mediandiff = median(diff, na.rm = T)
   ) |> collect() |> data.table()
 
-## Create adjusted values
+## Create adjusted TSIS values
 STIS <- tbl(con, "TSI_TSIS") |>
   filter(!is.na(TSI))        |>
   select(Time, TSI) |> collect() |> data.table()
@@ -88,7 +94,7 @@ STIS[, TSI := TSI + offsets$meandiff]
 STIS[, Source  := "TSIS_RAW"]
 STIS[, Updated := Sys.time()]
 
-## function to interpolate TSIS
+## Function to interpolate TSIS
 tsi_fun <- approxfun(
   x      = STIS$Time,
   y      = STIS$TSI,
@@ -97,31 +103,33 @@ tsi_fun <- approxfun(
   ties   = mean
 )
 
-## just
+## Will use only the resent to fill
 STIS <- STIS[Time > commonmax, ]
 
+## Test plot
 ggplot() +
-  geom_point(data = mstis, aes(x = Day, y = TSI), color = "blue", size = 0.5) +
-  geom_point(data = mnoaa, aes(x = Day, y = TSI), color = "black") +
-  geom_point(data = mstis, aes(x = Day, y = TSI + offsets$meandiff), color = "green", size = 0.5) +
-  geom_point(data = STIS,  aes(x = as.Date(Time), y = TSI), color = "orange")
+  geom_point(data = mstis, aes(x = Day, y = TSI),
+             color = "blue", size = 0.5) +
+  geom_point(data = mnoaa, aes(x = Day, y = TSI),
+             color = "black") +
+  geom_point(data = mstis, aes(x = Day, y = TSI + offsets$meandiff),
+             color = "green", size = 0.5) +
+  geom_point(data = STIS,  aes(x = as.Date(Time), y = TSI),
+             color = "orange")
 
 ## Fill with TSI DATA  ---------------------------------------------------------
 #'
-#'  Insert raw NOAA values to the main table
+#'  Insert raw TSIS values to the main table
 #'
 #+ echo=T
 
-## ADD row values for LAP
+## Add row TSIS values for LAP
 RAW <- STIS |> rename(Date = "Time")
-
-## Add raw values
 update_table(con, RAW, "LAP_TSI", "Date")
-
 
 ## Fill raw with interpolation  ------------------------------------------------
 #'
-#'  Fill NOAA TSI with interpolated values.
+#'  Fill TSIS TSI with interpolated values.
 #'
 #'  Create a function than can fill any date
 #'
@@ -141,15 +149,10 @@ if (nrow(some) > 0) {
   res <- update_table(con, some, "LAP_TSI", "Date")
 }
 
-
 #'
 #'  Create values of TSI at TOA and LAP
 #'
 #+ echo=T
-
-## Fill TOA and LAP ground
-# make_new_column(con = con, table = "LAP_TSI", "TSI_TOA")
-# make_new_column(con = con, table = "LAP_TSI", "TSI_LAP")
 
 
 ## to fill
