@@ -6,7 +6,7 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB.R"
-renv::load("~/BBand_LAP")
+renv::load("~/BBand_LAP", quit = TRUE)
 
 # ## Update input files  -------------------------------------------------------
 # system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
