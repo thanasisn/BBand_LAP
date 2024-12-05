@@ -1,8 +1,6 @@
 #!/opt/R/4.2.3/bin/Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Populates:
-#'  - TSI from NOAA
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -39,29 +37,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Extend TSI data for LAP with TSIS\n\n")
 
-##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_TSI, read_only = TRUE))
-sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
-
-SUN <- tbl(sun, "params")                                |>
-  filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
-  rename(sun_dist = "AsPy_Dist")                         |>
-  select(Date, sun_dist)
-
-LAP  <- tbl(con, "LAP_TSI")            |>
-  filter(!is.na(TSI_TOA))              |>
-  rename(tsi_1au_comb     = "TSI",
-         TSIextEARTH_comb = "TSI_TOA") |>
-  select(Date, TSIextEARTH_comb, tsi_1au_comb, Source)
-
-## Read all in memory
-EXP <- left_join(LAP, SUN, copy = T) |>
-  arrange(Date) |> collect() |> data.table()
-
-write_RDS(object = EXP, file = COMP_TSI_legacy)
-
 # Data file:      /home/athan/DATA/SUN/TSI_COMPOSITE.Rds
-#
 # $ Date             : POSIXct, format: "1993-01-01 00:00:30" "1993-01-01 00:01:30" ...
 # $ sun_dist         : num  0.983 0.983 0.983 0.983 0.983 ...
 # $ TSIextEARTH_comb : num  NA NA NA NA NA NA NA NA NA NA ...
@@ -69,9 +45,41 @@ write_RDS(object = EXP, file = COMP_TSI_legacy)
 # $ tsi_1au_comb     : num  NA NA NA NA NA NA NA NA NA NA ...
 # $ Source           : chr  "TSIS_adjusted" "TSIS_adjusted" "TSIS_adjusted"
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con)
-dbDisconnect(sun, shutdown = TRUE); rm(con)
+##  Check if need to run  -----------------------------------------------------
+
+if (!file.exists(COMP_TSI_legacy) |
+     file.mtime(DB_TSI) > file.mtime(COMP_TSI_legacy)) {
+
+  cat("\nHave to export\n")
+
+  ##  Open dataset  --------------------------------------------------------------
+  con <- dbConnect(duckdb(dbdir = DB_TSI, read_only = TRUE))
+  sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
+
+  SUN <- tbl(sun, "params")                                |>
+    filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
+    rename(sun_dist = "AsPy_Dist")                         |>
+    select(Date, sun_dist)
+
+  LAP  <- tbl(con, "LAP_TSI")            |>
+    filter(!is.na(TSI_TOA))              |>
+    rename(tsi_1au_comb     = "TSI",
+           TSIextEARTH_comb = "TSI_TOA") |>
+    select(Date, TSIextEARTH_comb, tsi_1au_comb, Source)
+
+  ## Read all in memory
+  EXP <- left_join(LAP, SUN, copy = T) |>
+    arrange(Date) |> collect() |> data.table()
+
+  ## Store to disk
+  write_RDS(object = EXP, file = COMP_TSI_legacy)
+
+  ## clean exit
+  dbDisconnect(con, shutdown = TRUE); rm(con)
+  dbDisconnect(sun, shutdown = TRUE); rm(sun)
+} else {
+  cat("\nDo not have to export new Rds\n\n")
+}
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
