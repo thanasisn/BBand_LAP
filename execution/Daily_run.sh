@@ -38,25 +38,33 @@ pids=()
 
 (
   sleep 1
-  info "## Start Get source files from Sirena ##"
+  info "##  Start Get source files from Sirena  ##"
   "$HOME/BBand_LAP/tools/Get_data_from_sirena.sh"
-  info "## End Get source files from Sirena STATUS:$?  ##"
+  info "##  End Get source files from Sirena STATUS:$?  ##"
 ) & pids+=($!)
 
 (
   sleep 3
-  info "## Start Get source files from Radmon ##"
+  info "##  Start Get source files from Radmon  ##"
   "$HOME/BBand_LAP/tools/Get_data_from_radmon.sh"
-  info "## End Get source files from Radmon STATUS:$?  ##"
+  info "##  End Get source files from Radmon STATUS:$?  ##"
 ) & pids+=($!)
 
 (
   sleep 5
-  info "## Start Get data from davis ##"
+  info "##  Start Get data from davis  ##"
   "$HOME/BBand_LAP/tools/Get_data_from_davis.sh"
-  info "## End Get data from davis STATUS:$?  ##"
+  info "##  End Get data from davis STATUS:$?  ##"
 ) & pids+=($!)
 
+(
+  sleep 6
+  info "##  Prepare TSI data  ##"
+  "$HOME/BBand_LAP/parameters/TSI/Build_TSI.R"
+  info "##  End Get data from davis STATUS:$?  ##"
+) & pids+=($!)
+
+## wait all the above to finish
 wait "${pids[@]}"; pids=()
 
 
