@@ -200,17 +200,6 @@ for (ay in yearstofill) {
   }
 }
 
-
-# test <- NEW |> filter(year(Date) == 1993) |> collect() |> data.table()
-#
-# plot(test$Date, test$TSI)
-# points(test[Source == "NOAA_RAW", TSI, Date], col = "red")
-#
-# plot(test$Date, test$TSI_TOA)
-# plot(test$Date, test$TSI_LAP)
-
-if (interactive()) {stop("dont close")}
-
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
