@@ -75,11 +75,12 @@ filelist$flmonth <- as.numeric(unlist(dd[length(dd)]))
 filelist$flyear  <- as.numeric(unlist(dd[length(dd)-1]))
 
 ## list data set files possible to touch
+minpressuredate <- min(PRESSURE$Date, na.rm = TRUE)
 BB <- opendata()
 wewantlist <- BB                       |>
   select(Date, Pressure)               |>
   filter(is.na(Pressure) &
-           Date >= min(PRESSURE$Date)) |>
+           Date >= minpressuredate) |>
   mutate(month = month(Date),
          year  = year(Date))          |>
   select(month, year)                 |>

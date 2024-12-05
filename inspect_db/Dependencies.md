@@ -8,7 +8,7 @@ At: 2024-12-05
            knitr:  1.49    
           pander:  0.6.5   
             renv:  1.0.11  
-           arrow:  17.0.0.1
+           arrow:  18.1.0  
            dplyr:  1.1.4   
            gdata:  3.0.1   
        lubridate:  1.9.3   

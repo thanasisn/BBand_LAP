@@ -5,7 +5,7 @@ At: 2024-12-05
  R version 4.2.3 (2023-03-15) 
 
             renv:  1.0.11  
-           arrow:  17.0.0.1
+           arrow:  18.1.0  
       data.table:  1.16.2  
            dplyr:  1.1.4   
            knitr:  1.49    

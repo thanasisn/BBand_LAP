@@ -6,7 +6,7 @@ At: 2024-12-05
 
             renv:  1.0.11  
        rmarkdown:  2.29    
-           arrow:  17.0.0.1
+           arrow:  18.1.0  
       data.table:  1.16.2  
             doMC:  1.3.8   
            dplyr:  1.1.4   
