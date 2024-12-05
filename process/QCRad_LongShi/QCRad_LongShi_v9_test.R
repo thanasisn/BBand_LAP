@@ -51,7 +51,6 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#'
 #+ echo=F, include=T
 
 stop("This is a reference file")
@@ -83,7 +82,6 @@ if (interactive()) {
     DO_PLOTS <- FALSE
 }
 
-
 # Daily plots
 DO_PLOTS       <- TRUE
 # Ignore previous flagged points in plots (not fully implemented yet)
@@ -96,7 +94,6 @@ PARTIAL    <- FALSE
 PARTIAL    <- TRUE
 PLOT_FIRST <- as_date("2023-01-01")
 PLOT_LAST  <- as_date("2024-01-01")
-
 
 
 
