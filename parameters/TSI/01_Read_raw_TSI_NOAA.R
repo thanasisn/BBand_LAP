@@ -24,6 +24,7 @@ knitr::opts_chunk$set(tidy = TRUE,
 
 
 ## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/01_Read_raw_TSI_NOAA.R"
@@ -118,49 +119,46 @@ if (length(unique(gather$time_low - gather$time_upp)) == 1 &
   gather[, time_upp := NULL]
 }
 
-
-
 #'
 #' Insert new data as needed
 #'
-#+ echo=T
-TABLE <- "TSI_NOAA"
-if (!dbExistsTable(con, TABLE)) {
+
+if (!dbExistsTable(con, "TSI_NOAA")) {
   cat("Initialize table\n")
   ## create table and date variable with pure SQL call
-  dbExecute(con, paste("CREATE TABLE", TABLE,  "(Time TIMESTAMP)")) ## this is better than TIMESTAMP_S
+  dbExecute(con, paste("CREATE TABLE", "TSI_NOAA",  "(Time TIMESTAMP)")) ## this is better than TIMESTAMP_S
   setorder(gather, Time)
-  res <- insert_table(con, gather, TABLE, "Time")
+  res <- insert_table(con, gather, "TSI_NOAA", "Time")
 } else {
 
   ## Check for new data
   new <- anti_join(gather,
-                   tbl(con, TABLE),
+                   tbl(con, "TSI_NOAA"),
                    by = c("Time", "TSI"),
                    copy = TRUE)
   if (nrow(new) > 0) {
     cat("New data for import\n")
 
     ## always drop preliminar data from DB
-    CCC <- tbl(con, TABLE) |>
+    CCC <- tbl(con, "TSI_NOAA") |>
       filter(prelimi == T) |>
       mutate(TSI           = NA,
              TSI_UNC       = NA,
              file_Version  = NA,
              file_Creation = NA,
              prelimi       = NA)
-    res <- update_table(con, CCC, TABLE, "Time")
+    res <- update_table(con, CCC, "TSI_NOAA", "Time")
 
     ## Keep most recent data every time
-    DT   <- tbl(con, TABLE) |> collect() |> data.table()
+    DT   <- tbl(con, "TSI_NOAA") |> collect() |> data.table()
     Keep <- full_join(
       DT,
       gather) |>
       group_by(Time) |>
       slice(which.max(file_Creation))
     setorder(Keep, Time)
-    cat(Script.ID, ": Update", nrow(Keep), "rows of raw", TABLE, "\n")
-    res <- update_table(con, Keep, TABLE, "Time")
+    cat(Script.ID, ": Update", nrow(Keep), "rows of raw", "TSI_NOAA", "\n")
+    res <- update_table(con, Keep, "TSI_NOAA", "Time")
   } else {
     cat("No New data for import\n\n")
   }

@@ -1,19 +1,29 @@
-#!/opt/R/4.2.3/bin/Rscript
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Download and import TSI from NOAA
+#' Download TSI from:
+#' -  NOAA
+#' -  TSIS get and parse
+#' -  SORCE get and parse
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#+ echo=F, include=T
+#+ include=F
 
-#+ echo=F, include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+                      )
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
@@ -27,35 +37,30 @@ if (!interactive()) {
 
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
+library(data.table)
 
-
-cat("\n GET NOAA DATA\n\n")
-
-##  Get data  ------------------------------------------------------------------
-
+#+ include=T, echo=F, results="asis"
+cat("\n ## GET TSI DATA\n\n")
 
 ## __ NOAA  --------------------------------------------------------------------
 #'
 #' Get data from NOAA.
 #'
-#+ echo=T
 if (Sys.info()["nodename"] == "sagan") {
   command <- paste("wget --timeout=66 -N -r -np -nd -nH -A .nc -P", DEST_NOAA, FROM_NOAA)
   cat(command, "\n\n")
   system(command)
 }
-#+ echo=F
-
 
 ## __ TSIS  --------------------------------------------------------------------
 #'
 #' Get data from TSIS and read it.
 #'
-#+ echo=T
-##  Get data  ------------------------------------------------------------------
-command <- paste0("curl \"", FROM_TSIS, "\" > ", DEST_TSIS)
-cat(command, "\n\n")
-system(command)
+if (Sys.info()["nodename"] == "sagan") {
+  command <- paste0("curl \"", FROM_TSIS, "\" > ", DEST_TSIS)
+  cat(command, "\n\n")
+  system(command)
+}
 
 ##  Parse data  ----------------------------------------------------------------
 tsis_data <- fread(DEST_TSIS)
@@ -102,6 +107,7 @@ saveRDS(object = tsis_data,
 #         file   = DATA_SORCE)
 
 
+#+ results="asis", echo=FALSE
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
