@@ -125,10 +125,17 @@ ggplot() +
 ## Add row TSIS values for LAP
 RAW <- STIS |> rename(Date = "Time")
 
-TEST1 <- tbl(con, TABLE)        |>
+TEST1 <- tbl(con, TABLE)       |>
   filter(Source == "TSIS_RAW") |>
-  select(Date, TSI)
+  filter(Date > commonmax)  |>
+  select(Date, TSI) |> collect() |> data.table()
+
 TEST2 <- RAW[Source == "TSIS_RAW", Date, TSI]
+
+TEST1 |> tally()
+TEST2 |> tally()
+
+anti_join(TEST1, TEST2)
 
 
 # return all rows from x without a match in y
