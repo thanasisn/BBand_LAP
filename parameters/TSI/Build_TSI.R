@@ -1,5 +1,5 @@
-#!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+#!/usr/bin/env Rscript
+# /* Copyright (C) 2022-2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
@@ -8,8 +8,8 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/Build_TSI.R"
 renv::load("~/BBand_LAP", quiet = TRUE)
 
-output_dir <- "~/BBand_LAP/REPORTS/REPORTS_duck/"
-
+output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Parameters_TSI/"
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 ##  Get TSI data  --------------------------------------------------------------
 source("~/BBand_LAP/parameters/TSI/00_download_TSI.R"      )
