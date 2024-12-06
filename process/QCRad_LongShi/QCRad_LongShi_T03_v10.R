@@ -25,6 +25,10 @@
 #' - \captionsetup{font=small}
 #'
 #' output:
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  9
+#'     fig_height: 4
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
@@ -35,14 +39,11 @@
 #'     toc_depth:        4
 #'     fig_width:        8
 #'     fig_height:       5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  9
-#'     fig_height: 4
 #'
 #' date: "`r format(Sys.time(), '%F')`"
 #'
 #' ---
+#+ include=F
 
 #' **QCRad T03**
 #'
@@ -50,9 +51,8 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=T
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -84,6 +84,7 @@ library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
+#+ include=T, echo=F, results="asis"
 ##  Variables  -----------------------------------------------------------------
 if (file.exists(parameter_fl)) {
   QS <<- readRDS(parameter_fl)
@@ -102,6 +103,7 @@ DO_PLOTS       <- TRUE
 # Ignore previous flagged points in plots (not fully implemented yet)
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 IGNORE_FLAGGED <- FALSE
+DAILY_PLOTS_DIR <- "~/BBand_LAP/REPORTS/REPORTS/QCRad_LongShi/"
 
 flagname_UPP     <- "QCv10_03_upp_flag"
 flagname_LOW     <- "QCv10_03_low_flag"
@@ -119,6 +121,7 @@ if (Sys.info()["nodename"] == "sagan") {
   #'
   #' Aplies to both, but probably more relevant for global
   #'
+  #' The choose of those settings may be optimized with an iterative process.
 
   QS$dif_rati_min  <-  0.001 # DiffuseFraction_kd low limit this make obstacles stand out
   QS$dif_rati_po1  <-  0.03  # DiffuseFraction_kd low limit
@@ -341,7 +344,7 @@ for (ay in years) {
 if (DO_PLOTS) {
 
   if (!interactive()) {
-    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
+    afile <- paste0(DAILY_PLOTS_DIR, "/",
                     sub("\\.R$", "", basename(Script.Name)),
                     ".pdf")
     pdf(file = afile)
@@ -413,12 +416,12 @@ if (DO_PLOTS) {
   }
 }
 if (!interactive()) dummy <- dev.off()
-#+ echo=F, include=T
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
-#+ include=T, echo=F, results="asis"
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
+
+#+ results="asis", echo=FALSE
 tac <- Sys.time()
 cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
