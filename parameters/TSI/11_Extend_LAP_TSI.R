@@ -1,8 +1,7 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Populates:
-#'  - TSI from NOAA
+#' Extends TSI from TSIS
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -46,7 +45,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
 #+ include=T, echo=F, results="asis"
-cat("\n Extend TSI data for LAP with TSIS\n\n")
+cat("\n# Extend TSI data for LAP with TSIS\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_TSI))
@@ -69,6 +68,7 @@ LAP  <- tbl(con, "LAP_TSI")
 #'
 #' Use NOAA as base and bring TSIS near NOAA
 #'
+
 noaarange <- NOAA |> summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |> collect() |> data.table()
 stisrange <- STIS |> summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |> collect() |> data.table()
 
@@ -128,15 +128,14 @@ ggplot() +
 #'
 #'  Insert raw TSIS values to the main table
 #'
-#+ echo=T
 
 ## Add row TSIS values for LAP
-RAW <- STIS |> rename(Date = "Time")
-TEST2 <- RAW[Source == "TSIS_RAW", Date, TSI]
-
 TEST1 <- tbl(con, "LAP_TSI")   |>
   filter(Source == "TSIS_RAW") |>
   select(Date, TSI)
+
+RAW   <- STIS |> rename(Date = "Time")
+TEST2 <- RAW[Source == "TSIS_RAW", Date, TSI]
 
 # setorder(TEST1, Date)
 # setorder(TEST2, Date)
@@ -159,14 +158,15 @@ if (TEST1 |> tally() |> pull() != 0 &
   # RAW |> tally()
 }
 
-## Fill raw with interpolation  ------------------------------------------------
+##  Fill raw with interpolation  -----------------------------------------------
 #'
-#'  Fill TSIS TSI with interpolated values.
+#'  ## Fill TSIS TSI with interpolated values.
 #'
 #'  Create a function than can fill any date
 #'
 #'  Assume old TSIS data do not need update,
-#'  otherwise should select old TSIS and replace them all
+#'  otherwise should select old TSIS and replace them all, and also update
+#'  TSI_TOA and TSI_LAP
 #'
 #+ echo=T
 some <- tbl(con, "LAP_TSI") |>
@@ -184,11 +184,10 @@ if (nrow(some) > 0) {
   res <- update_table(con, some, "LAP_TSI", "Date")
 }
 
-## __ Calculate other TSI values for LAP  --------------------------------------
+##  Calculate other TSI values for LAP  ----------------------------------------
 #'
-#'  Create values of TSI at TOA and LAP for all TSIs at 1 au.
+#' ## Create values of TSI at TOA and LAP for all TSIs at 1 au.
 #'
-#+ echo=T
 
 ## Dates to fill
 some <- LAP |>
@@ -230,12 +229,11 @@ tbl(con, "LAP_TSI") |> filter(!is.na(TSI)) |> # head(10000) |>
         color = Source),
     size = 0.5)
 
-## Clean exit
+#+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
 dbDisconnect(sun, shutdown = TRUE); rm(sun)
 
-
-#+ results="asis", echo=F
+#+ results="asis", echo=FALSE
 tac <- Sys.time()
 cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
