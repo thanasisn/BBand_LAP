@@ -75,6 +75,26 @@ saveRDS(object = tsis_data,
 
 
 
+## __ SORSE  --------------------------------------------------------------------
+#'
+#' Get data from SORSE and read it.
+#'
+#+ echo=T
+##  Get data  ------------------------------------------------------------------
+command <- paste0("curl \"", FROM_SORCE, "\" > ", DEST_SORCE)
+cat(command, "\n\n")
+system(command)
+
+##  Parse data  ----------------------------------------------------------------
+sorce_data <- fread(DEST_SORCE)
+## fix names
+names(sorce_data)[grep("time",names(sorce_data))]    <- "Date"
+names(sorce_data)[grep(" \\(W/m\\^2\\)", names(sorce_data))] <-
+  sub(" \\(W/m\\^2\\)", "", grep(" \\(W/m\\^2\\)", names(sorce_data), value = TRUE))
+## ignore zeros
+
+
+
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
