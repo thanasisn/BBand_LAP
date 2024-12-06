@@ -12,10 +12,12 @@ output_dir <- "~/BBand_LAP/REPORTS/REPORTS_duck/"
 
 
 ##  Get TSI data  --------------------------------------------------------------
-# source("~/BBand_LAP/parameters/TSI/00_download_TSI.R"      )
+source("~/BBand_LAP/parameters/TSI/00_download_TSI.R"      )
+
 ##  Parse TSI to data base  ----------------------------------------------------
 source("~/BBand_LAP/parameters/TSI/01_Read_raw_TSI_NOAA.R" )
 source("~/BBand_LAP/parameters/TSI/02_Read_raw_TSI_TSIS.R" )
+
 ##  Create TSI for LAP  --------------------------------------------------------
 source("~/BBand_LAP/parameters/TSI/10_Create_LAP_TSI.R"    )
 try({
@@ -25,7 +27,7 @@ try({
 })
 
 
-##  Will be removed  -----------------------------------------------------------
+##  This will be removed  ------------------------------------------------------
 source("~/BBand_LAP/parameters/TSI/30_Export_LAP_TSI_legacy.R")
 
 tac <- Sys.time()

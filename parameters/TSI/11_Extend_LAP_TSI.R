@@ -17,7 +17,6 @@ knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 
 ## __ Set environment  ---------------------------------------------------------
-# closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/11_Extend_LAP_TSI.R"
@@ -130,7 +129,6 @@ TEST1 <- tbl(con, "LAP_TSI")   |>
   filter(Source == "TSIS_RAW") |>
   select(Date, TSI)
 
-
 # setorder(TEST1, Date)
 # setorder(TEST2, Date)
 # TEST1[, DATA := "RAW"]
@@ -139,7 +137,6 @@ TEST1 <- tbl(con, "LAP_TSI")   |>
 # TEST2 |> tally()
 # dd <- merge(TEST1, TEST2, all = T, by = c("Date", "DATA"))
 # anti_join(TEST1, TEST2)
-
 
 ##  Return all rows from x without a match in y
 ##  Update with newer data
@@ -152,7 +149,6 @@ if (TEST1 |> tally() |> pull() != 0 &
   res <- update_table(con, RAW, "LAP_TSI", "Date")
   # RAW |> tally()
 }
-
 
 ## Fill raw with interpolation  ------------------------------------------------
 #'
@@ -185,13 +181,14 @@ if (nrow(some) > 0) {
 #'
 #+ echo=T
 
-## to fill
+## Dates to fill
 some <- LAP |>
   filter(Date > DB_start_date)            |>
   filter(!is.na(TSI))                     |>
   filter(is.na(TSI_TOA) | is.na(TSI_LAP)) |>
   select(Date, TSI)
 
+## Sun's position to calculate TSI on ground
 SUN <- tbl(sun, "params") |>
   filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
   rename(Sun_Dist_Astropy = "AsPy_Dist")       |>
@@ -199,6 +196,7 @@ SUN <- tbl(sun, "params") |>
   mutate(SZA              = 90 - Elevat)       |>
   select(Date, Sun_Dist_Astropy, SZA)
 
+##  Create data to add
 ADD <- left_join(some, SUN, copy = T) |>
   mutate(
     TSI_TOA = TSI / Sun_Dist_Astropy^2,  ## TSI on LAP TOA
@@ -207,14 +205,14 @@ ADD <- left_join(some, SUN, copy = T) |>
   select(Date, TSI_TOA, TSI_LAP) |>
   filter(!is.na(TSI_TOA) & !is.na(TSI_LAP))
 
-## write only when needed
+##  Write only when needed
 if (ADD |> tally() |> pull() > 0) {
   cat(paste(Script.ID, ":",
             "TOA and Ground TSI"), "\n")
   res <- update_table(con, ADD, "LAP_TSI", "Date")
 }
 
-## Plot composite TSI
+##  Plot composite TSI
 tbl(con, "LAP_TSI") |> filter(!is.na(TSI)) |> # head(10000) |>
   ggplot() +
   geom_point(
@@ -223,8 +221,7 @@ tbl(con, "LAP_TSI") |> filter(!is.na(TSI)) |> # head(10000) |>
         color = Source),
     size = 0.5)
 
-
-## clean exit
+## Clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con)
 dbDisconnect(sun, shutdown = TRUE); rm(sun)
 
