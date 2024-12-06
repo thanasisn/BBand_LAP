@@ -24,6 +24,7 @@ knitr::opts_chunk$set(tidy = TRUE,
 
 
 ## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/02_Read_raw_TSI_TSIS.R"
@@ -54,7 +55,7 @@ SIS <- readRDS(DATA_TSIS)
 SIS <- SIS |>
   rename(Time = "Date",
          TSI  = "tsi_1au") |>
-  mutate(Time = Time + 30)    ## shift to midle of the mimute
+  mutate(Time = Time + 30)    ## shift to middle of the minute
 
 ## safe names
 names(SIS) <- gsub("[ ]+", "_", gsub("[ ]+$", "", gsub("\\)|\\(", " ", names(SIS))))
