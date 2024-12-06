@@ -25,6 +25,10 @@
 #' - \captionsetup{font=small}
 #'
 #' output:
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  9
+#'     fig_height: 4
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
@@ -35,14 +39,11 @@
 #'     toc_depth:        4
 #'     fig_width:        8
 #'     fig_height:       5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  9
-#'     fig_height: 4
 #'
 #' date: "`r format(Sys.time(), '%F')`"
 #'
 #' ---
+#+ include=F
 
 #' **QCRad T01**
 #'
@@ -52,9 +53,7 @@
 #'
 #' The chosen levels and filters have to be evaluated with the available data.
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=T
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -86,6 +85,7 @@ library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
+#+ include=T, echo=F, results="asis"
 ##  Variables  -----------------------------------------------------------------
 if (file.exists(parameter_fl)) {
   QS <<- readRDS(parameter_fl)
@@ -380,11 +380,11 @@ tbl(con, "LAP") |> summarise(max(Glo_max_ref, na.rm = T))
 # if (!interactive()) dummy <- dev.off()
 
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
-#+ include=T, echo=F, results="asis"
+#+ results="asis", echo=FALSE
 tac <- Sys.time()
-cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
+cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
