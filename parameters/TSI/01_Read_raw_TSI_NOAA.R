@@ -1,22 +1,29 @@
-#!/opt/R/4.2.3/bin/Rscript
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Download and import TSI from NOAA
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#+ echo=F, include=T
+#+ include=F
 
-#+ echo=F, include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+                      )
+
 
 ## __ Set environment  ---------------------------------------------------------
-closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/01_Read_raw_TSI_NOAA.R"
@@ -36,7 +43,8 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(RNetCDF,    warn.conflicts = FALSE, quietly = TRUE)
 
-cat("\n Initialize params DB and/or import TSI data\n\n")
+#+ include=T, echo=F, results="asis"
+cat("\n# Initialize TSI DB and/or import NOAA TSI data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_TSI))
@@ -157,11 +165,11 @@ if (!dbExistsTable(con, TABLE)) {
     cat("No New data for import\n\n")
   }
 }
-#+ echo=F
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
+#+ results="asis", echo=FALSE
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
