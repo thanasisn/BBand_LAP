@@ -22,8 +22,8 @@ knitr::opts_chunk$set(tidy = TRUE,
                         arrow        = TRUE)
                       )
 
-
 ## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/11_Extend_LAP_TSI.R"
@@ -69,8 +69,12 @@ LAP  <- tbl(con, "LAP_TSI")
 #' Use NOAA as base and bring TSIS near NOAA
 #'
 
-noaarange <- NOAA |> summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |> collect() |> data.table()
-stisrange <- STIS |> summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |> collect() |> data.table()
+noaarange <- NOAA |>
+  summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |>
+  collect() |> data.table()
+stisrange <- STIS |>
+  summarise(min = min(Day, na.rm = T), max = max(Day, na.rm = T)) |>
+  collect() |> data.table()
 
 commonmin <- stisrange$min
 commonmax <- noaarange$max
