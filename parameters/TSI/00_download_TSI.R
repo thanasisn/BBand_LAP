@@ -74,26 +74,32 @@ saveRDS(object = tsis_data,
         file   = DATA_TSIS)
 
 
-
-## __ SORSE  --------------------------------------------------------------------
-#'
-#' Get data from SORSE and read it.
-#'
-#+ echo=T
-##  Get data  ------------------------------------------------------------------
-command <- paste0("curl \"", FROM_SORCE, "\" > ", DEST_SORCE)
-cat(command, "\n\n")
-system(command)
-
-##  Parse data  ----------------------------------------------------------------
-sorce_data <- fread(DEST_SORCE)
-## fix names
-names(sorce_data)[grep("time",names(sorce_data))]    <- "Date"
-names(sorce_data)[grep(" \\(W/m\\^2\\)", names(sorce_data))] <-
-  sub(" \\(W/m\\^2\\)", "", grep(" \\(W/m\\^2\\)", names(sorce_data), value = TRUE))
-## ignore zeros
-
-
+# ## NO NEW DATA
+#
+# ## __ SORCE  --------------------------------------------------------------------
+# #'
+# #' Get data from SORCE and read it.
+# #'
+# #+ echo=T
+# ##  Get data  ------------------------------------------------------------------
+# command <- paste0("curl \"", FROM_SORCE, "\" > ", DEST_SORCE)
+# cat(command, "\n\n")
+# system(command)
+#
+# ##  Parse data  ----------------------------------------------------------------
+# sorce_data <- fread(DEST_SORCE)
+# ## fix names
+# names(sorce_data)[grep("time",names(sorce_data))]    <- "Date"
+# names(sorce_data)[grep(" \\(W/m\\^2\\)", names(sorce_data))] <-
+#   sub(" \\(W/m\\^2\\)", "", grep(" \\(W/m\\^2\\)", names(sorce_data), value = TRUE))
+# ## ignore zeros
+# sorce_data <- sorce_data[tsi_1au >= 1]
+# wecare <- grep("true_earth", names(sorce_data), value = TRUE, invert = TRUE)
+# setorder(sorce_data, Date)
+# ## save data
+# sorce_data <- sorce_data[, ..wecare ]
+# saveRDS(object = sorce_data,
+#         file   = DATA_SORCE)
 
 
 tac <- Sys.time()
