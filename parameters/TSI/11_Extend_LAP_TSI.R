@@ -124,30 +124,33 @@ ggplot() +
 
 ## Add row TSIS values for LAP
 RAW <- STIS |> rename(Date = "Time")
-
-TEST1 <- tbl(con, TABLE)       |>
-  filter(Source == "TSIS_RAW") |>
-  filter(Date > commonmax)  |>
-  select(Date, TSI) |> collect() |> data.table()
-
 TEST2 <- RAW[Source == "TSIS_RAW", Date, TSI]
 
-TEST1 |> tally()
-TEST2 |> tally()
-
-anti_join(TEST1, TEST2)
-
-
-# return all rows from x without a match in y
+TEST1 <- tbl(con, "LAP_TSI")   |>
+  filter(Source == "TSIS_RAW") |>
+  select(Date, TSI)
 
 
+# setorder(TEST1, Date)
+# setorder(TEST2, Date)
+# TEST1[, DATA := "RAW"]
+# TEST2[, DATA := "DB"]
+# TEST1 |> tally()
+# TEST2 |> tally()
+# dd <- merge(TEST1, TEST2, all = T, by = c("Date", "DATA"))
+# anti_join(TEST1, TEST2)
+
+
+##  Return all rows from x without a match in y
 ##  Update with newer data
-if (anti_join(TEST1, TEST2, copy = TRUE) |> tally() |> pull() == 0) {
+if (TEST1 |> tally() |> pull() != 0 &
+    anti_join(TEST1, TEST2, copy = TRUE) |> tally() |> pull() == 0) {
   cat("No new data from TSIS\n\n")
 } else {
   cat("New data from TSIS\n\n")
   ## Add raw values
-  res <- update_table(con, RAW, TABLE, "Date")
+  res <- update_table(con, RAW, "LAP_TSI", "Date")
+  # RAW |> tally()
 }
 
 
@@ -161,7 +164,7 @@ if (anti_join(TEST1, TEST2, copy = TRUE) |> tally() |> pull() == 0) {
 #'  otherwise should select old TSIS and replace them all
 #'
 #+ echo=T
-some <- LAP |>
+some <- tbl(con, "LAP_TSI") |>
   filter(is.na(TSI) & Date > commonmin) |>
   select(Date) |> collect() |> data.table()
 some[, TSI     := tsi_fun(Date)]
@@ -211,8 +214,19 @@ if (ADD |> tally() |> pull() > 0) {
   res <- update_table(con, ADD, "LAP_TSI", "Date")
 }
 
+## Plot composite TSI
+tbl(con, "LAP_TSI") |> filter(!is.na(TSI)) |> # head(10000) |>
+  ggplot() +
+  geom_point(
+    aes(x = Date,
+        y = TSI,
+        color = Source),
+    size = 0.5)
+
+
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con)
+dbDisconnect(sun, shutdown = TRUE); rm(sun)
 
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
