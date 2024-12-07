@@ -2,6 +2,7 @@
 # /* Copyright (C) 2022-2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 ## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
