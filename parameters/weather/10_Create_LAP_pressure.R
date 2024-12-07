@@ -47,8 +47,7 @@ library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
-#+ include=T, echo=F, results="asis"
-cat("\n# Create pressure data for LAP\n\n")
+
 
 ## INPUTS
 davis_elect <- "/home/athan/DATA/WEATHER/Eyryma.Rds"
@@ -56,6 +55,8 @@ DIithess2_f <- "/home/athan/DATA/WEATHER/iama.Rds"
 davis_lap   <- "/home/athan/DATA/WEATHER/lap.Rds"
 WUithess2_f <- "/home/athan/DATA/Wunderground/ITHESSAL2.Rds"
 
+#+ include=T, echo=F, results="asis"
+cat("\n# Create pressure data for LAP\n\n")
 
 file.mtime(davis_lap)
 
