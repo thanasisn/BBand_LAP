@@ -12,6 +12,13 @@ renv::load("~/BBand_LAP", quiet = TRUE)
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Parameters_weather/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
+##  Parse data from Davis  -----------------------------------------------------
+try({
+  cat("\n\n 01. Read LAP davis \n")
+  rmarkdown::render(input      = "~/BBand_LAP/parameters/weather/01_Read_LAP_davis.R",
+                    output_dir = output_dir)
+})
+
 ##  Create pressure for LAP  ---------------------------------------------------
 source("~/BBand_LAP/parameters/weather/10_Create_LAP_pressure.R" )
 # try({
