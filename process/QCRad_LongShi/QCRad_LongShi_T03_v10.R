@@ -250,7 +250,7 @@ DT <- tbl(con, "LAP")                  |>
 #'
 #' ## 3. Comparison tests per BSRN “non-definitive”
 #'
-#+ echo=F, include=T, results="asis"
+#+ echo=F
 
 cat(pander(DT |> select(!!flagname_UPP) |> pull() |> table(),
            caption = flagname_UPP))
@@ -266,8 +266,10 @@ cat(" \n \n")
 
 
 ## __  Yearly plots  -----------------------------------------------------------
+#'
 #' ### Yearly plots
-#+ echo=F, include=T, results="asis"
+#'
+#+ echo=F, results="asis"
 years <- DT                          |>
   filter(!is.na(DiffuseFraction_kd)) |>
   select(year)                       |>
@@ -351,8 +353,10 @@ for (ay in years) {
 
 
 ## __  Daily plots  -----------------------------------------------------------
+#'
 #' ### Daily plots
-#+ echo=F, include=T, results="asis"
+#'
+#+ echo=F, results="asis"
 if (DO_PLOTS) {
 
   if (!interactive()) {
