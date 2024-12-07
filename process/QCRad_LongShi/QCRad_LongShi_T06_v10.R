@@ -234,15 +234,11 @@ DT <- tbl(con, "LAP")                  |>
 
 #' \FloatBarrier
 #' \newpage
-#' ## 4. Climatological (configurable) Limits
-#'
-#+ echo=F, include=T
-
-## __  Statistics  -------------------------------------------------------------
 #'
 #' ### Statistics
 #'
-#+ echo=F, include=T, sesults="asis"
+#+ echo=F, include=T, results="asis"
+
 cat(pander(DT |> select(!!flagname_BTH) |> pull() |> table(),
            caption = flagname_BTH))
 cat(" \n \n")
@@ -372,10 +368,13 @@ for (ay in years) {
 #+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
-  if (!interactive()) {
+  DO_PDF <- (!interactive() | isTRUE(getOption('knitr.in.progress')))
+
+  if (DO_PDF) {
     afile <- paste0(DAILY_PLOTS_DIR, "/",
                     sub("\\.R$", "_daily", basename(Script.Name)),
                     ".pdf")
+    cat(paste0("[", basename(afile), "](", path.expand(afile),")"),"\n")
     pdf(file = afile)
   }
 
@@ -452,7 +451,8 @@ if (DO_PLOTS) {
     layout(1, 1)
   }
 }
-if (!interactive()) dummy <- dev.off()
+  if (DO_PDF) dummy <- dev.off()
+}
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
