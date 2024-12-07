@@ -136,6 +136,7 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK))
 #' For GHI this may limit the radiation enhancement cases.
 #'
 #' Exclusions should be done case by case.
+#'
 
 QS$clim_lim_F3_fct <-  0.77
 QS$clim_lim_F3_off <- 10
