@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2024-12-06 
+At: 2024-12-07 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -8,7 +8,7 @@ At: 2024-12-06
            utils:  4.2.3   
             renv:  1.0.11  
            arrow:  18.1.0  
-      data.table:  1.16.2  
+      data.table:  1.16.4  
            dplyr:  1.1.4   
            knitr:  1.49    
        lubridate:  1.9.3   
@@ -29,6 +29,7 @@ At: 2024-12-06
          RNetCDF:  2.9.2   
            Hmisc:  5.2.1   
           scales:  1.3.0   
+        bookdown:  0.41    
           digest:  0.6.37  
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   

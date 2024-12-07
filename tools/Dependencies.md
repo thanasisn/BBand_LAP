@@ -1,11 +1,11 @@
 
 Dependencies for: ~/BBand_LAP/tools/ 
-At: 2024-12-06 
+At: 2024-12-07 
 
  R version 4.2.3 (2023-03-15) 
 
            arrow:  18.1.0  
-      data.table:  1.16.2  
+      data.table:  1.16.4  
            dplyr:  1.1.4   
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   

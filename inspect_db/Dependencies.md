@@ -1,10 +1,10 @@
 
 Dependencies for: ~/BBand_LAP/inspect_db/ 
-At: 2024-12-06 
+At: 2024-12-07 
 
  R version 4.2.3 (2023-03-15) 
 
-      data.table:  1.16.2  
+      data.table:  1.16.4  
            knitr:  1.49    
           pander:  0.6.5   
             renv:  1.0.11  
