@@ -10,9 +10,6 @@
 #'
 #+ include=F
 
-#+ echo=F, include=T
-
-
 ## _ Document options  ---------------------------------------------------------
 knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "png"   )

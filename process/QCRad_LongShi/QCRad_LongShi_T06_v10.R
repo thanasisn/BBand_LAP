@@ -77,7 +77,7 @@ Script.ID    <- "Q6"
 parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
+    pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -150,13 +150,13 @@ Rayleigh_diff <- function(SZA, Pressure) {
   d    <-  -911.2
   e    <-   287.85
   f    <-     0.046725
-  mu_0 <- cos(SZA*pi/180)
-  return( a * mu_0      +
-            b * mu_0^2 +
-            c * mu_0^3 +
-            d * mu_0^4 +
-            e * mu_0^5 +
-            f * mu_0 * Pressure)
+  mu_0 <- cos(SZA * pi / 180)
+  return(a * mu_0     +
+           b * mu_0^2 +
+           c * mu_0^3 +
+           d * mu_0^4 +
+           e * mu_0^5 +
+           f * mu_0 * Pressure)
 }
 
 if (Sys.info()["nodename"] == "sagan") {
@@ -368,13 +368,13 @@ for (ay in years) {
 #+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
-  DO_PDF <- (!interactive() | isTRUE(getOption('knitr.in.progress')))
+  DO_PDF <- (!interactive() | isTRUE(getOption("knitr.in.progress")))
 
   if (DO_PDF) {
     afile <- paste0(DAILY_PLOTS_DIR, "/",
                     sub("\\.R$", "_daily", basename(Script.Name)),
                     ".pdf")
-    cat(paste0("[", basename(afile), "](", path.expand(afile),")"),"\n")
+    cat(paste0("[", basename(afile), "](", path.expand(afile), ")"), "\n")
     pdf(file = afile)
   }
 
@@ -435,11 +435,11 @@ if (DO_PLOTS) {
     title(paste("#6", as.Date(ad, origin = "1970-01-01")))
 
     ## plots data
-    par(mar = c(2,4,1,1))
-    ylim <- range(pp$GLB_strict, pp$DIR_strict, na.rm = T)
+    par(mar = c(2, 4, 1, 1))
+    ylim <- range(pp$GLB_strict, pp$DIR_strict, na.rm = TRUE)
     plot(pp$Date, pp$GLB_strict, "l",
          ylim = ylim, col = "green", ylab = "", xlab = "")
-    lines(pp$Date, pp$DIR_strict, col = "blue" )
+    lines(pp$Date, pp$DIR_strict, col = "blue")
 
     points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, DIR_strict, Date], col = alpha("magenta", 0.4))
     points(pp[get(flagname_BTH) == "Rayleigh diffuse limit lower broad (18)"  & !Ignore, GLB_strict, Date], col = alpha("magenta", 0.4))
@@ -450,7 +450,6 @@ if (DO_PLOTS) {
 
     layout(1, 1)
   }
-}
   if (DO_PDF) dummy <- dev.off()
 }
 
