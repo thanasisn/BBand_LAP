@@ -1,4 +1,4 @@
-# /* #!/opt/R/4.2.3/bin/Rscript */
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Radiation Quality Control **QCRad** "
@@ -129,6 +129,7 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK))
 #' catching erroneous values.
 #'
 #' The choose of those settings may be optimized with an iterative process.
+#'
 
 # Upper modelled values
 QS$Dir_SWdn_amp     <-    0.91  # Direct departure factor above the model
@@ -227,6 +228,7 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
+#+ echo=F
 ##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset

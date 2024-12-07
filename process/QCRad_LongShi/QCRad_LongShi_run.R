@@ -1,4 +1,4 @@
-#!/opt/R/4.2.3/bin/Rscript
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 ## __ Set environment  ---------------------------------------------------------
