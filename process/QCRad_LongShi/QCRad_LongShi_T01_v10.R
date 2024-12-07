@@ -1,4 +1,4 @@
-# /* #!/opt/R/4.2.3/bin/Rscript */
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Radiation Quality Control **QCRad** "
@@ -51,15 +51,22 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#' The chosen levels and filters have to be evaluated with the available data.
-#'
 
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+                      )
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
@@ -104,35 +111,38 @@ DO_PLOTS       <- TRUE
 # Ignore previous flagged points in plots (not fully implemented yet)
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 IGNORE_FLAGGED <- FALSE
+DAILY_PLOTS_DIR <- "~/BBand_LAP/REPORTS/REPORTS/QCRad_LongShi/"
 
 flagname_DIR <- "QCv10_01_dir_flag"
 flagname_GLB <- "QCv10_01_glb_flag"
 
+
+##  Open dataset  --------------------------------------------------------------
+con <- dbConnect(duckdb(dbdir = DB_DUCK))
+
+## 1. Physically possible limits per BSRN  -------------------------------------
+#'
+#' ## 1. Physically possible limits per BSRN
+#'
+#' Test values are within physical/logical limits.
+#'
+#' Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
+#' or need to remove data.
+#'
+#' Global upper constrain is an modelled GHI value.
+#'
+#' These limit should not be met, they are defined neat the maximum observed
+#' values of the data set.
+
+QS$sun_elev_min <- -2 * 0.103 # Drop ALL radiation data when sun is below this point
+QS$dir_SWdn_min <-  -4        # Minimum direct value to consider valid measurement
+QS$dir_SWdn_dif <- 327        # Closeness to to TSI
+QS$glo_SWdn_min <-  -4        # Minimum global value to consider valid measurement
+QS$glo_SWdn_off <- 160        # Global departure offset above the model
+QS$glo_SWdn_amp <-   1.3      # Global departure factor above the model
+
 if (Sys.info()["nodename"] == "sagan") {
 
-  ##  Open dataset  ------------------------------------------------------------
-  con <- dbConnect(duckdb(dbdir = DB_DUCK))
-
-  ## 1. Physically possible limits per BSRN  -----------------------------------
-  #'
-  #' ## 1. Physically possible limits per BSRN
-  #'
-  #' Test values are within physical/logical limits.
-  #'
-  #' Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
-  #' or need to remove data.
-  #'
-  #' Global upper constrain is an modelled GHI value.
-  #'
-  #' These limit should not be met, they are defined neat the maximum observed
-  #' values of the data set.
-
-  QS$sun_elev_min <- -2 * 0.103 # Drop ALL radiation data when sun is below this point
-  QS$dir_SWdn_min <-  -4        # Minimum direct value to consider valid measurement
-  QS$dir_SWdn_dif <- 327        # Closeness to to TSI
-  QS$glo_SWdn_min <-  -4        # Minimum global value to consider valid measurement
-  QS$glo_SWdn_off <- 160        # Global departure offset above the model
-  QS$glo_SWdn_amp <-   1.3      # Global departure factor above the model
 
   cat(paste("\n1. Physically Possible Limits", flagname_DIR, flagname_GLB, "\n\n"))
 
@@ -149,7 +159,6 @@ if (Sys.info()["nodename"] == "sagan") {
   ## create flags if not existing
   make_categorical_column(flagname_DIR, categories, con, "LAP")
   make_categorical_column(flagname_GLB, categories, con, "LAP")
-
 
   ## __ Flag direct  -----------------------------------------------------------
   ADD <- tbl(con, "LAP")              |>
@@ -385,6 +394,6 @@ dbDisconnect(con, shutdown = TRUE); rm(con)
 
 #+ results="asis", echo=FALSE
 tac <- Sys.time()
-cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
+cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)

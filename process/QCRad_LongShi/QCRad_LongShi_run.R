@@ -12,37 +12,41 @@ output_dir <- "~/BBand_LAP/REPORTS/REPORTS/QCRad_LongShi/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 ##  Run tests  -----------------------------------------------------------------
-source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T01_v10.R")
-
+# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T01_v10.R")
 # source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R")
+# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T03_v10.R")
+# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T04_v10.R")
+# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T05_v10.R")
+
+
+try({
+  rmarkdown::render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T01_v10.R",
+                    params      = list(CLEAN = TRUE),
+                    output_file = "QCRad_LongShi_T01_v10",
+                    output_dir  = output_dir)
+})
 try({
   rmarkdown::render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R",
                     params      = list(CLEAN = TRUE),
                     output_file = "QCRad_LongShi_T02_v10",
                     output_dir  = output_dir)
 })
-
-# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T03_v10.R")
 try({
   rmarkdown::render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T03_v10.R",
                     params      = list(CLEAN = TRUE),
-                    output_file = "QCRad_LongShi_T03_v10_B",
+                    output_file = "QCRad_LongShi_T03_v10",
                     output_dir  = output_dir)
 })
-
-# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T04_v10.R")
 try({
   rmarkdown::render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T04_v10.R",
                     params      = list(CLEAN = TRUE),
-                    output_file = "QCRad_LongShi_T04_v10_B",
+                    output_file = "QCRad_LongShi_T04_v10",
                     output_dir  = output_dir)
 })
-
-# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T05_v10.R")
 try({
   rmarkdown::render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T05_v10.R",
                     params      = list(CLEAN = TRUE),
-                    output_file = "QCRad_LongShi_T05_v10_B",
+                    output_file = "QCRad_LongShi_T05_v10",
                     output_dir  = output_dir)
 })
 
