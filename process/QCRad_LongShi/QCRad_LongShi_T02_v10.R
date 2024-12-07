@@ -242,9 +242,10 @@ DT <- tbl(con, "LAP")                  |>
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
-####  2. Extremely rare limits per BSRN  ---------------------------------------
+
 #' \FloatBarrier
 #' \newpage
+#'
 #' ## 2. Extremely rare limits per BSRN
 #'
 #+ echo=F, include=T, results="asis"

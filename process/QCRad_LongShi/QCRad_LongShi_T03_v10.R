@@ -129,6 +129,7 @@ con <- dbConnect(duckdb(dbdir = DB_DUCK))
 #' Applies to both, but probably more relevant for global
 #'
 #' The choose of those settings may be optimized with an iterative process.
+#'
 
 QS$dif_rati_min  <-  0.001 # DiffuseFraction_kd low limit this make obstacles stand out
 QS$dif_rati_po1  <-  0.03  # DiffuseFraction_kd low limit
@@ -229,7 +230,7 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
-#+ include=F
+#+ echo=F
 ##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
@@ -243,9 +244,10 @@ DT <- tbl(con, "LAP")                  |>
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
-####  3. Comparison tests per BSRN “non-definitive”  ---------------------------
+
 #' \FloatBarrier
 #' \newpage
+#'
 #' ## 3. Comparison tests per BSRN “non-definitive”
 #'
 #+ echo=F, include=T, results="asis"
@@ -426,7 +428,6 @@ if (DO_PLOTS) {
   }
 }
 if (!interactive()) dummy <- dev.off()
-
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)

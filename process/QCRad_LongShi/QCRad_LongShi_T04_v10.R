@@ -1,4 +1,4 @@
-# /* #!/opt/R/4.2.3/bin/Rscript */
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Radiation Quality Control **QCRad** "
@@ -43,6 +43,7 @@
 #' date: "`r format(Sys.time(), '%F')`"
 #'
 #' ---
+#+ include=F
 
 #' **QCRad T04**
 #'
@@ -50,15 +51,22 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=T
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+                      )
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
@@ -86,6 +94,7 @@ library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 require(scales,     warn.conflicts = FALSE, quietly = TRUE)
 
+#+ include=T, echo=F, results="asis"
 ##  Variables  -----------------------------------------------------------------
 if (file.exists(parameter_fl)) {
   QS <<- readRDS(parameter_fl)
@@ -104,40 +113,41 @@ DO_PLOTS       <- TRUE
 # Ignore previous flagged points in plots (not fully implemented yet)
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 IGNORE_FLAGGED <- FALSE
+DAILY_PLOTS_DIR <- "~/BBand_LAP/REPORTS/REPORTS/QCRad_LongShi/"
 
 flagname_DIR     <- "QCv10_04_dir_flag"
 flagname_GLB     <- "QCv10_04_glb_flag"
 QS$plot_elev_T04 <- 2
 
+##  Open dataset  --------------------------------------------------------------
+con <- dbConnect(duckdb(dbdir = DB_DUCK))
+
+## 4. Climatological (configurable) Limits  ------------------------------------
+#'
+#' ## 4. Climatological (configurable) Limits
+#'
+#' Limits the maximum expected irradiance based on climatological
+#' observations levels and the value of TSI.
+#'
+#' Some hits on first limits are expected and need manual evaluation.
+#'
+#' Hits on second limit should be problematic data.
+#'
+#' For GHI this may limit the radiation enhancement cases.
+#'
+#' Exclusions should be done case by case.
+
+QS$clim_lim_F3_fct <-  0.77
+QS$clim_lim_F3_off <- 10
+QS$clim_lim_S3_fct <-  0.81
+QS$clim_lim_S3_off <- 15
+
+QS$clim_lim_F1_fct <-  1.14
+QS$clim_lim_F1_off <- 60
+QS$clim_lim_S1_fct <-  1.32
+QS$clim_lim_S1_off <- 60
+
 if (Sys.info()["nodename"] == "sagan") {
-
-  ##  Open dataset  ------------------------------------------------------------
-  con <- dbConnect(duckdb(dbdir = DB_DUCK))
-
-  ## 4. Climatological (configurable) Limits  ----------------------------------
-  #'
-  #' ## 4. Climatological (configurable) Limits
-  #'
-  #' Limits the maximum expected irradiance based on climatological
-  #' observations levels and the value of TSI.
-  #'
-  #' Some hits on first limits are expected and need manual evaluation.
-  #'
-  #' Hits on second limit should be problematic data.
-  #'
-  #' For GHI this may limit the radiation enhancement cases.
-  #'
-  #' Exclusions should be done case by case.
-
-  QS$clim_lim_F3_fct <-  0.77
-  QS$clim_lim_F3_off <- 10
-  QS$clim_lim_S3_fct <-  0.81
-  QS$clim_lim_S3_off <- 15
-
-  QS$clim_lim_F1_fct <-  1.14
-  QS$clim_lim_F1_off <- 60
-  QS$clim_lim_S1_fct <-  1.32
-  QS$clim_lim_S1_off <- 60
 
   cat("\n4. Climatological (configurable) Limits", flagname_DIR, flagname_GLB, "\n\n")
 
@@ -232,6 +242,7 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
+#+ echo=F
 ##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
@@ -486,8 +497,8 @@ for (ay in years) {
 if (DO_PLOTS) {
 
   if (!interactive()) {
-    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
-                    sub("\\.R$", "", basename(Script.Name)),
+    afile <- paste0(DAILY_PLOTS_DIR, "/",
+                    sub("\\.R$", "_daily", basename(Script.Name)),
                     ".pdf")
     pdf(file = afile)
   }
@@ -568,12 +579,11 @@ if (DO_PLOTS) {
   }
 }
 if (!interactive()) dummy <- dev.off()
-#+ echo=F, include=T
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
-#+ include=T, echo=F, results="asis"
+#+ results="asis", echo=FALSE
 tac <- Sys.time()
 cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
