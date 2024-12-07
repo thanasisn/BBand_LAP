@@ -259,13 +259,11 @@ DT <- tbl(con, "LAP")                  |>
 
 #' \FloatBarrier
 #' \newpage
-#' ## 4. Climatological (configurable) Limits
+#'
+#' ### Statistics
 #'
 #+ echo=F, include=T, results="asis"
 
-## __  Statistics  -------------------------------------------------------------
-#' ### Statistics
-#+ echo=F, include=T, sesults="asis"
 cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
            caption = flagname_DIR))
 cat(" \n \n")
@@ -304,7 +302,9 @@ cat(" \n \n")
 
 
 ## __  Yearly plots  -----------------------------------------------------------
+#'
 #' ### Yearly plots
+#'
 #+ echo=F, include=T, results="asis"
 
 ## Yearly plots for Direct
@@ -399,7 +399,6 @@ for (ay in years) {
 }
 
 
-
 ## Yearly plots for Global
 years <- DT |> filter(!is.na(DIR_strict)) |>
   select(year) |> distinct() |> pull()
@@ -491,16 +490,20 @@ for (ay in years) {
   cat(" \n \n")
 }
 
-
 ## __  Daily plots  -----------------------------------------------------------
+#'
 #' ### Daily plots
+#'
 #+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
-  if (!interactive()) {
+  DO_PDF <- (!interactive() | isTRUE(getOption('knitr.in.progress')))
+
+  if (DO_PDF) {
     afile <- paste0(DAILY_PLOTS_DIR, "/",
                     sub("\\.R$", "_daily", basename(Script.Name)),
                     ".pdf")
+    cat(paste0("[", basename(afile), "](", path.expand(afile),")"),"\n")
     pdf(file = afile)
   }
 
@@ -578,8 +581,8 @@ if (DO_PLOTS) {
     points(pp[!get(flagname_GLB) %in% c("empty", "pass"), GLB_strict, Date],
            col = "red", pch = 1)
   }
+  if (DO_PDF) dummy <- dev.off()
 }
-if (!interactive()) dummy <- dev.off()
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)

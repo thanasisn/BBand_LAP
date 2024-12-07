@@ -88,9 +88,9 @@ library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
+library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
-library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 #+ include=T, echo=F, results="asis"
 ##  Variables  -----------------------------------------------------------------
@@ -221,7 +221,8 @@ if (Sys.info()["nodename"] == "sagan") {
         DiffuseFraction_kd  < QS$dif_rati_min  ~ "Diffuse ratio obstacle min (13)",
 
         .default = "pass"
-      ))
+      )
+)
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
 
@@ -247,9 +248,9 @@ DT <- tbl(con, "LAP")                  |>
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## 3. Comparison tests per BSRN “non-definitive”
+#' ### Statistics
 #'
-#+ echo=F
+#+ echo=F, include=T, results="asis"
 
 cat(pander(DT |> select(!!flagname_UPP) |> pull() |> table(),
            caption = flagname_UPP))
@@ -268,7 +269,8 @@ cat(" \n \n")
 #'
 #' ### Yearly plots
 #'
-#+ echo=F, results="asis"
+#+ echo=F, include=T, results="asis"
+
 years <- DT                          |>
   filter(!is.na(DiffuseFraction_kd)) |>
   select(year)                       |>
