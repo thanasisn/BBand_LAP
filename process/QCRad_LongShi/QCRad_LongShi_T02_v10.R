@@ -243,7 +243,7 @@ DT <- tbl(con, "LAP")                  |>
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## 2. Extremely rare limits per BSRN
+#' ### Statistics
 #'
 #+ echo=F, include=T, results="asis"
 
