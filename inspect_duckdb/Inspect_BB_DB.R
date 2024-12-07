@@ -1,4 +1,4 @@
-#!/opt/R/4.2.3/bin/Rscript
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 #'
@@ -9,13 +9,15 @@
 #'
 
 ## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R"
 renv::load("~/BBand_LAP", quiet = TRUE)
 
-output_dir <- "~/BBand_LAP/REPORTS/REPORTS_duck/"
+output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Inspect/"
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 ## __ Check inputs  ------------------------------------------------------------
 try({

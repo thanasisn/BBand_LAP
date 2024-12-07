@@ -1,4 +1,4 @@
-# /* #!/opt/R/4.2.3/bin/Rscript */
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Radiation Quality Control **QCRad** "
@@ -59,6 +59,14 @@ knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+                      )
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
@@ -110,26 +118,27 @@ flagname_LOW     <- "QCv10_03_low_flag"
 flagname_OBS     <- "QCv10_03_obs_flag"
 QS$plot_elev_T03 <- 2
 
+
+##  Open dataset  --------------------------------------------------------------
+con <- dbConnect(duckdb(dbdir = DB_DUCK))
+
+## 3. Comparison tests per BSRN “non-definitive”  ------------------------------
+#'
+#' ## 3. Comparison tests per BSRN “non-definitive”
+#'
+#' Applies to both, but probably more relevant for global
+#'
+#' The choose of those settings may be optimized with an iterative process.
+
+QS$dif_rati_min  <-  0.001 # DiffuseFraction_kd low limit this make obstacles stand out
+QS$dif_rati_po1  <-  0.03  # DiffuseFraction_kd low limit
+QS$dif_rati_po2  <-  0.08  # My DiffuseFraction_kd low limit
+QS$dif_sza_break <- 75     # SZA break point
+QS$dif_rati_pr1  <-  1.03  # DiffuseFraction_kd upper limit
+QS$dif_rati_pr2  <-  1.06  # My DiffuseFraction_kd upper limit
+QS$dif_watt_lim  <- 10     # Filter only when GLB is above that
+
 if (Sys.info()["nodename"] == "sagan") {
-
-  ##  Open dataset  ------------------------------------------------------------
-  con <- dbConnect(duckdb(dbdir = DB_DUCK))
-
-  ## 3. Comparison tests per BSRN “non-definitive”  ----------------------------
-  #'
-  #' ## 3. Comparison tests per BSRN “non-definitive”
-  #'
-  #' Aplies to both, but probably more relevant for global
-  #'
-  #' The choose of those settings may be optimized with an iterative process.
-
-  QS$dif_rati_min  <-  0.001 # DiffuseFraction_kd low limit this make obstacles stand out
-  QS$dif_rati_po1  <-  0.03  # DiffuseFraction_kd low limit
-  QS$dif_rati_po2  <-  0.08  # My DiffuseFraction_kd low limit
-  QS$dif_sza_break <- 75     # SZA break point
-  QS$dif_rati_pr1  <-  1.03  # DiffuseFraction_kd upper limit
-  QS$dif_rati_pr2  <-  1.06  # My DiffuseFraction_kd upper limit
-  QS$dif_watt_lim  <- 10     # Filter only when GLB is above that
 
   cat(paste("\n3. Comparison tests", flagname_UPP, flagname_LOW, flagname_OBS, "\n\n"))
 
@@ -220,6 +229,7 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
+#+ include=F
 ##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
@@ -345,7 +355,7 @@ if (DO_PLOTS) {
 
   if (!interactive()) {
     afile <- paste0(DAILY_PLOTS_DIR, "/",
-                    sub("\\.R$", "", basename(Script.Name)),
+                    sub("\\.R$", "_daily", basename(Script.Name)),
                     ".pdf")
     pdf(file = afile)
   }
