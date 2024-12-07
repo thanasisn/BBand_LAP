@@ -58,7 +58,7 @@ knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
-knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(fig.pos   = "!h"    )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
                         indent       = 4,
@@ -77,7 +77,7 @@ Script.ID    <- "Q5"
 parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -160,10 +160,10 @@ if (Sys.info()["nodename"] == "sagan") {
 
       ## Clear Sky Sort-Wave model
       ClrSW_ref2 := case_when(
-        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b > 9000
+        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA * pi / 180)^QS$ClrSW_b > 9000
         ~ 9000,
-        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b < 9000
-        ~ (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA*pi/180)^QS$ClrSW_b
+        (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA * pi / 180)^QS$ClrSW_b < 9000
+        ~ (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA * pi / 180)^QS$ClrSW_b
       ),
 
     ) |>
@@ -241,7 +241,7 @@ cat(" \n \n")
 #+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
-  DO_PDF <- (!interactive() | isTRUE(getOption('knitr.in.progress')))
+  DO_PDF <- (!interactive() | isTRUE(getOption("knitr.in.progress")))
 
   if (DO_PDF) {
     afile <- paste0(DAILY_PLOTS_DIR, "/",
@@ -272,7 +272,7 @@ if (DO_PLOTS) {
       collect() |> data.table()
     setorder(pp, Date)
 
-    ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = T)
+    ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = TRUE)
     plot(pp$Date, pp$DIR_strict, "l", col = "blue",
          ylim = ylim, xlab = "", ylab = "wattDIR")
     lines(pp$Date, pp$GLB_strict, col = "green")
@@ -285,7 +285,6 @@ if (DO_PLOTS) {
     points(pp[!get(flagname_DIR) %in% c("empty", "pass"), DIR_strict, Date],
            col = "red", pch = 1)
   }
-}
   if (DO_PDF) dummy <- dev.off()
 }
 

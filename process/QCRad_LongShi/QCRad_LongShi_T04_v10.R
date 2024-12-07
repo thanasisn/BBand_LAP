@@ -58,7 +58,7 @@ knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
-knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(fig.pos   = "!h"    )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
                         indent       = 4,
@@ -77,7 +77,7 @@ Script.ID    <- "Q4"
 parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -177,13 +177,13 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       Dir_First_Clim_lim := case_when(
-        TSI_TOA * QS$clim_lim_F3_fct * cos(SZA*pi/180)^0.2 + QS$clim_lim_F3_off > 9000 ~ 9000,
-        TSI_TOA * QS$clim_lim_F3_fct * cos(SZA*pi/180)^0.2 + QS$clim_lim_F3_off < 9000 ~ TSI_TOA * QS$clim_lim_F3_fct * cos(SZA*pi/180)^0.2 + QS$clim_lim_F3_off
+        TSI_TOA * QS$clim_lim_F3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_F3_off > 9000 ~ 9000,
+        TSI_TOA * QS$clim_lim_F3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_F3_off < 9000 ~ TSI_TOA * QS$clim_lim_F3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_F3_off
       ),
 
       Dir_Secon_Clim_lim := case_when(
-        TSI_TOA * QS$clim_lim_S3_fct * cos(SZA*pi/180)^0.2 + QS$clim_lim_S3_off > 9000 ~ 9000,
-        TSI_TOA * QS$clim_lim_S3_fct * cos(SZA*pi/180)^0.2 + QS$clim_lim_S3_off < 9000 ~ TSI_TOA * QS$clim_lim_S3_fct * cos(SZA*pi/180)^0.2 + QS$clim_lim_S3_off
+        TSI_TOA * QS$clim_lim_S3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_S3_off > 9000 ~ 9000,
+        TSI_TOA * QS$clim_lim_S3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_S3_off < 9000 ~ TSI_TOA * QS$clim_lim_S3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_S3_off
       ),
 
     ) |>
@@ -213,13 +213,13 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       Glo_First_Clim_lim := case_when(
-        TSI_TOA * QS$clim_lim_F1_fct * cos(SZA*pi/180)^1.2 + QS$clim_lim_F1_off > 9000 ~ 9000,
-        TSI_TOA * QS$clim_lim_F1_fct * cos(SZA*pi/180)^1.2 + QS$clim_lim_F1_off < 9000 ~ TSI_TOA * QS$clim_lim_F1_fct * cos(SZA*pi/180)^1.2 + QS$clim_lim_F1_off
+        TSI_TOA * QS$clim_lim_F1_fct * cos(SZA * pi / 180)^1.2 + QS$clim_lim_F1_off > 9000 ~ 9000,
+        TSI_TOA * QS$clim_lim_F1_fct * cos(SZA * pi / 180)^1.2 + QS$clim_lim_F1_off < 9000 ~ TSI_TOA * QS$clim_lim_F1_fct * cos(SZA * pi / 180)^1.2 + QS$clim_lim_F1_off
       ),
 
       Glo_Secon_Clim_lim := case_when(
-        TSI_TOA * QS$clim_lim_S1_fct * cos(SZA*pi/180)^1.2 + QS$clim_lim_S1_off > 9000 ~ 9000,
-        TSI_TOA * QS$clim_lim_S1_fct * cos(SZA*pi/180)^1.2 + QS$clim_lim_S1_off < 9000 ~ TSI_TOA * QS$clim_lim_S1_fct * cos(SZA*pi/180)^1.2 + QS$clim_lim_S1_off
+        TSI_TOA * QS$clim_lim_S1_fct * cos(SZA * pi / 180)^1.2 + QS$clim_lim_S1_off > 9000 ~ 9000,
+        TSI_TOA * QS$clim_lim_S1_fct * cos(SZA * pi / 180)^1.2 + QS$clim_lim_S1_off < 9000 ~ TSI_TOA * QS$clim_lim_S1_fct * cos(SZA * pi / 180)^1.2 + QS$clim_lim_S1_off
       ),
 
     ) |>
@@ -313,8 +313,8 @@ years <- DT |> filter(!is.na(DIR_strict)) |>
 
 ## common scale for plots
 vars <- c("Dir_First_Clim_lim", "Dir_Secon_Clim_lim", "DIR_strict")
-ylim <- c(DT |> summarise(across(all_of(vars), ~ min(., na.rm = T))) |> collect() |> min(na.rm = T),
-          DT |> summarise(across(all_of(vars), ~ max(., na.rm = T))) |> collect() |> max(na.rm = T))
+ylim <- c(DT |> summarise(across(all_of(vars), ~ min(., na.rm = TRUE))) |> collect() |> min(na.rm = TRUE),
+          DT |> summarise(across(all_of(vars), ~ max(., na.rm = TRUE))) |> collect() |> max(na.rm = TRUE))
 
 for (ay in years) {
   pp <- tbl(con, "LAP") |>
