@@ -1,5 +1,5 @@
-#!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+#!/usr/bin/env Rscript
+# /* Copyright (C) 2022-2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
