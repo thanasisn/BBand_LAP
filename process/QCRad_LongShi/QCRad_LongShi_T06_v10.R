@@ -1,4 +1,4 @@
-# /* #!/opt/R/4.2.3/bin/Rscript */
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Radiation Quality Control **QCRad** "
@@ -43,6 +43,7 @@
 #' date: "`r format(Sys.time(), '%F')`"
 #'
 #' ---
+#+ include=F
 
 #' **QCRad T04**
 #'
@@ -50,15 +51,22 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=T
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+                      )
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
@@ -86,6 +94,7 @@ library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 require(scales,     warn.conflicts = FALSE, quietly = TRUE)
 
+#+ include=T, echo=F, results="asis"
 ##  Variables  -----------------------------------------------------------------
 if (file.exists(parameter_fl)) {
   QS <<- readRDS(parameter_fl)
@@ -104,51 +113,53 @@ DO_PLOTS       <- TRUE
 # Ignore previous flagged points in plots (not fully implemented yet)
 IGNORE_FLAGGED <- TRUE   ## TRUE is the default of the original
 # IGNORE_FLAGGED <- FALSE
+DAILY_PLOTS_DIR <- "~/BBand_LAP/REPORTS/REPORTS/QCRad_LongShi/"
 
 flagname_BTH     <- "QCv10_06_bth_flag"
 QS$plot_elev_T06 <- 2
 
+
+##  Open dataset  --------------------------------------------------------------
+con <- dbConnect(duckdb(dbdir = DB_DUCK))
+
+## 6. Rayleigh Limit Diffuse Comparison  ---------------------------------------
+#'
+#' ## 6. Rayleigh Limit Diffuse Comparison
+#'
+#' Compare inferred diffuse radiation with a modelled value of diffuse,
+#' based on SZA and atmospheric pressure.
+#'
+#' The upper limit denotes no tracking of CHP-1.
+#'
+#' Reasons:
+#' - Difference of Sun observation angle due to different instruments location.
+#' - Cases of instrument windows cleaning
+#'
+
+# criteria
+QS$Rayleigh_upper_lim <- 500    # Upper departure diffuse limit
+QS$Rayleigh_lower_lim <-  -1    # Lower departure diffuse limit
+QS$Rayleigh_dif_glo_r <-   0.8  # Low limit diffuse/global < threshold
+QS$Rayleigh_glo_min   <-  50    # Low limit minimum global
+
+# Reference model
+Rayleigh_diff <- function(SZA, Pressure) {
+  a    <-   209.3
+  b    <-  -708.3
+  c    <-  1128.7
+  d    <-  -911.2
+  e    <-   287.85
+  f    <-     0.046725
+  mu_0 <- cos(SZA*pi/180)
+  return( a * mu_0      +
+            b * mu_0^2 +
+            c * mu_0^3 +
+            d * mu_0^4 +
+            e * mu_0^5 +
+            f * mu_0 * Pressure)
+}
+
 if (Sys.info()["nodename"] == "sagan") {
-
-  ##  Open dataset  ------------------------------------------------------------
-  con <- dbConnect(duckdb(dbdir = DB_DUCK))
-
-  ## 6. Rayleigh Limit Diffuse Comparison  -------------------------------------
-  #'
-  #' ## 6. Rayleigh Limit Diffuse Comparison
-  #'
-  #' Compare inferred diffuse radiation with a modelled value of diffuse,
-  #' based on SZA and atmospheric pressure.
-  #'
-  #' The upper limit denotes no tracking of CHP-1.
-  #'
-  #' Reasons:
-  #' - Difference of Sun observation angle due to different instruments location.
-  #' - Cases of instrument windows cleaning
-  #'
-
-  # criteria
-  QS$Rayleigh_upper_lim <- 500    # Upper departure diffuse limit
-  QS$Rayleigh_lower_lim <-  -1    # Lower departure diffuse limit
-  QS$Rayleigh_dif_glo_r <-   0.8  # Low limit diffuse/global < threshold
-  QS$Rayleigh_glo_min   <-  50    # Low limit minimum global
-
-  # Reference model
-  Rayleigh_diff <- function(SZA, Pressure) {
-    a    <-   209.3
-    b    <-  -708.3
-    c    <-  1128.7
-    d    <-  -911.2
-    e    <-   287.85
-    f    <-     0.046725
-    mu_0 <- cos(SZA*pi/180)
-    return( a * mu_0      +
-              b * mu_0^2 +
-              c * mu_0^3 +
-              d * mu_0^4 +
-              e * mu_0^5 +
-              f * mu_0 * Pressure)
-  }
 
   cat(paste("\n6. Rayleigh Limit Diffuse Comparison", flagname_BTH, "\n\n"))
 
@@ -207,6 +218,7 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
+#+ echo=F
 ##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
@@ -227,7 +239,9 @@ DT <- tbl(con, "LAP")                  |>
 #+ echo=F, include=T
 
 ## __  Statistics  -------------------------------------------------------------
+#'
 #' ### Statistics
+#'
 #+ echo=F, include=T, sesults="asis"
 cat(pander(DT |> select(!!flagname_BTH) |> pull() |> table(),
            caption = flagname_BTH))
@@ -245,9 +259,10 @@ abline(v = QS$Rayleigh_upper_lim, lty = 3, col = "red")
 cat(" \n \n")
 
 
-
 ## __  Yearly plots  -----------------------------------------------------------
+#'
 #' ### Yearly plots
+#'
 #+ echo=F, include=T, results="asis"
 
 ## Info flags to ignore in plots
@@ -350,14 +365,16 @@ for (ay in years) {
 }
 
 
-## __  Daily plots  ------------------------------------------------------------
+## __  Daily plots  -----------------------------------------------------------
+#'
 #' ### Daily plots
+#'
 #+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
   if (!interactive()) {
-    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
-                    sub("\\.R$", "", basename(Script.Name)),
+    afile <- paste0(DAILY_PLOTS_DIR, "/",
+                    sub("\\.R$", "_daily", basename(Script.Name)),
                     ".pdf")
     pdf(file = afile)
   }
@@ -401,7 +418,6 @@ if (DO_PLOTS) {
         Ignore := TRUE]
     }
 
-
     ## skip if all points are ignored
     if (all(pp$Ignore) == TRUE) next()
 
@@ -437,12 +453,11 @@ if (DO_PLOTS) {
   }
 }
 if (!interactive()) dummy <- dev.off()
-#+ echo=F, include=T
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
-#+ include=T, echo=F, results="asis"
+#+ results="asis", echo=FALSE
 tac <- Sys.time()
 cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),

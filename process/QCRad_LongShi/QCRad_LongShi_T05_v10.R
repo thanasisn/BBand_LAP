@@ -117,27 +117,27 @@ DAILY_PLOTS_DIR <- "~/BBand_LAP/REPORTS/REPORTS/QCRad_LongShi/"
 flagname_DIR     <- "QCv10_05_dir_flag"
 QS$plot_elev_T05 <- 2
 
+
+##  Open dataset  ------------------------------------------------------------
+con <- dbConnect(duckdb(dbdir = DB_DUCK))
+
+## 5. Tracker is off test  -------------------------------------------------
+#'
+#' ## 5. Tracker is off test
+#'
+#' This test use a diffuse model. A better one will be implemented when one
+#' is produced and accepted.
+#'
+
+## criteria
+QS$Tracking_min_elev <-    5
+QS$ClrSW_lim         <-    0.85
+QS$glo_min           <-   25
+## Global Clear SW model
+QS$ClrSW_a           <- 1050.5
+QS$ClrSW_b           <-    1.095
+
 if (Sys.info()["nodename"] == "sagan") {
-
-  ##  Open dataset  ------------------------------------------------------------
-  con <- dbConnect(duckdb(dbdir = DB_DUCK))
-
-  ## 5. Tracker is off test  -------------------------------------------------
-  #'
-  #' ## 5. Tracker is off test
-  #'
-  #' This test use a diffuse model. A better one will be implemented when one
-  #' is produced and accepted.
-  #'
-  #+ echo=F, include=T, results="asis"
-
-  ## criteria
-  QS$Tracking_min_elev <-    5
-  QS$ClrSW_lim         <-    0.85
-  QS$glo_min           <-   25
-  ## Global Clear SW model
-  QS$ClrSW_a           <- 1050.5
-  QS$ClrSW_b           <-    1.095
 
   cat(paste("\n5. Tracking test", flagname_DIR, "\n\n"))
 

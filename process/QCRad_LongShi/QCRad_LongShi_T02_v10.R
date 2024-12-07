@@ -242,13 +242,12 @@ DT <- tbl(con, "LAP")                  |>
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
-
 #' \FloatBarrier
 #' \newpage
 #'
 #' ## 2. Extremely rare limits per BSRN
 #'
-#+ echo=F, include=T, results="asis"
+## #+ echo=F
 
 cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
            caption = flagname_DIR))
@@ -280,7 +279,9 @@ abline(v = QS$glo_SWdn_min_ext, col = "red")
 cat("\n \n")
 
 ## __  Daily plots  -----------------------------------------------------------
+#'
 #' ### Daily plots
+#'
 #+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
