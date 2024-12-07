@@ -25,6 +25,10 @@
 #' - \captionsetup{font=small}
 #'
 #' output:
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  9
+#'     fig_height: 4
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
@@ -35,14 +39,11 @@
 #'     toc_depth:        4
 #'     fig_width:        8
 #'     fig_height:       5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  9
-#'     fig_height: 4
 #'
 #' date: "`r format(Sys.time(), '%F')`"
 #'
 #' ---
+#+ include=F
 
 #'
 #' **QCRad**
@@ -51,7 +52,6 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
 
 stop("This is a reference file")
 
@@ -460,11 +460,8 @@ if (QS$TEST_09) {
     if (!interactive()) dummy <- dev.off()
 
 
-
-
-#' **END**
-#+ include=T, echo=F, results="asis"
+#+ results="asis", echo=FALSE
 tac <- Sys.time()
-cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
