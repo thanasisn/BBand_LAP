@@ -118,7 +118,7 @@ flagname_DIR     <- "QCv10_05_dir_flag"
 QS$plot_elev_T05 <- 2
 
 
-##  Open dataset  ------------------------------------------------------------
+##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
 ## 5. Tracker is off test  -------------------------------------------------
@@ -205,13 +205,11 @@ DT <- tbl(con, "LAP")                  |>
 
 #' \FloatBarrier
 #' \newpage
-#' ## 4. Climatological (configurable) Limits
+#'
+#' ### Statistics
 #'
 #+ echo=F, include=T, results="asis"
 
-## __  Statistics  -------------------------------------------------------------
-#' ### Statistics
-#+ echo=F, include=T, sesults="asis"
 cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
            caption = flagname_DIR))
 cat(" \n \n")
@@ -236,15 +234,20 @@ abline(v = QS$glo_min, col = "red", lty = 3)
 cat(" \n \n")
 
 
-## __  Daily plots  ------------------------------------------------------------
+## __  Daily plots  -----------------------------------------------------------
+#'
 #' ### Daily plots
+#'
 #+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
-  if (!interactive()) {
-    afile <- paste0("~/BBand_LAP/REPORTS/REPORTS/",
-                    sub("\\.R$", "", basename(Script.Name)),
+  DO_PDF <- (!interactive() | isTRUE(getOption('knitr.in.progress')))
+
+  if (DO_PDF) {
+    afile <- paste0(DAILY_PLOTS_DIR, "/",
+                    sub("\\.R$", "_daily", basename(Script.Name)),
                     ".pdf")
+    cat(paste0("[", basename(afile), "](", path.expand(afile),")"),"\n")
     pdf(file = afile)
   }
 
@@ -283,7 +286,8 @@ if (DO_PLOTS) {
            col = "red", pch = 1)
   }
 }
-if (!interactive()) dummy <- dev.off()
+  if (DO_PDF) dummy <- dev.off()
+}
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
