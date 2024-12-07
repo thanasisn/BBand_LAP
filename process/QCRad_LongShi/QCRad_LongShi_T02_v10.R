@@ -118,10 +118,10 @@ flagname_GLB     <- "QCv10_02_glb_flag"
 QS$plot_elev_T02 <- 2
 
 
-##  Open dataset  ------------------------------------------------------------
+##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_DUCK))
 
-## 2. Extremely rare limits per BSRN  ----------------------------------------
+## 2. Extremely rare limits per BSRN  ------------------------------------------
 #'
 #' ## 2. Extremely rare limits per BSRN
 #'
@@ -189,7 +189,6 @@ if (Sys.info()["nodename"] == "sagan") {
 
   ## this needs a lot of memory, could do it in batches
   ADD <- ADD |> collect() |> data.table()
-
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
 
@@ -219,7 +218,6 @@ if (Sys.info()["nodename"] == "sagan") {
 
   ## this needs a lot of memory, could do it in batches
   ADD <- ADD |> collect() |> data.table()
-
   res <- update_table(con, ADD, "LAP", "Date")
   rm(ADD); dummy <- gc()
 
@@ -247,7 +245,7 @@ DT <- tbl(con, "LAP")                  |>
 #'
 #' ## 2. Extremely rare limits per BSRN
 #'
-## #+ echo=F
+#+ echo=F, include=T, results="asis"
 
 cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
            caption = flagname_DIR))
@@ -285,10 +283,13 @@ cat("\n \n")
 #+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
-  if (!interactive()) {
+  DO_PDF <- (!interactive() | isTRUE(getOption('knitr.in.progress')))
+
+  if (DO_PDF) {
     afile <- paste0(DAILY_PLOTS_DIR, "/",
                     sub("\\.R$", "_daily", basename(Script.Name)),
                     ".pdf")
+    cat(paste0("[", basename(afile), "](", path.expand(afile),")"),"\n")
     pdf(file = afile)
   }
 
@@ -344,9 +345,8 @@ if (DO_PLOTS) {
     points(pp[!QCv10_02_glb_flag %in% c("empty", "pass"), GLB_strict, Date],
            col = "magenta", pch = 1)
   }
+  if (DO_PDF) dummy <- dev.off()
 }
-if (!interactive()) dummy <- dev.off()
-
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
