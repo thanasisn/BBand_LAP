@@ -249,6 +249,8 @@ if (Sys.info()["nodename"] == "sagan") {
           file   = parameter_fl)
 }
 
+#+ echo=F
+##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Investigate results  -------------------------------------------------------
 

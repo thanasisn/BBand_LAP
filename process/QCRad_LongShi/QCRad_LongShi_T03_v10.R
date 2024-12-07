@@ -244,7 +244,6 @@ DT <- tbl(con, "LAP")                  |>
 
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
-
 #' \FloatBarrier
 #' \newpage
 #'
@@ -351,18 +350,20 @@ for (ay in years) {
   cat(" \n \n")
 }
 
-
 ## __  Daily plots  -----------------------------------------------------------
 #'
 #' ### Daily plots
 #'
-#+ echo=F, results="asis"
+#+ echo=F, include=T, results="asis"
 if (DO_PLOTS) {
 
-  if (!interactive()) {
+  DO_PDF <- (!interactive() | isTRUE(getOption('knitr.in.progress')))
+
+  if (DO_PDF) {
     afile <- paste0(DAILY_PLOTS_DIR, "/",
                     sub("\\.R$", "_daily", basename(Script.Name)),
                     ".pdf")
+    cat(paste0("[", basename(afile), "](", path.expand(afile),")"),"\n")
     pdf(file = afile)
   }
 
@@ -430,8 +431,8 @@ if (DO_PLOTS) {
 
    layout(1)
   }
+  if (DO_PDF) dummy <- dev.off()
 }
-if (!interactive()) dummy <- dev.off()
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
