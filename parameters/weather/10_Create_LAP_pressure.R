@@ -60,7 +60,6 @@ cat("\n# Create pressure data for LAP\n\n")
 #+ include=T, echo=F
 pressure_limit_low  <- 970
 
-
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_PRESSURE))
 
@@ -181,7 +180,6 @@ if (dbExistsTable(con, "PRESSURE_RAW") &
 
 RAW <- tbl(con, "PRESSURE_RAW")
 RAW |> tally()
-RAW |> summarise(min(Date, na.rm = TRUE), max(Date, na.rm = TRUE))
 
 RAW |>
   ggplot() +
@@ -196,6 +194,12 @@ RAW |>
 #'
 #' ## Fill the composite pressure form raw pressure
 #'
+
+
+date_range <- RAW |> summarise(min(Date, na.rm = TRUE), max(Date, na.rm = TRUE)) |> pull()
+
+## fill date for LAP from raw
+
 
 
 # ##  Fill LAP TSI DATA  ---------------------------------------------------------
