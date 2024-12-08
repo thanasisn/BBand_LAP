@@ -26,7 +26,6 @@ knitr::opts_chunk$set(tidy = TRUE,
                         arrow        = TRUE)
                       )
 
-
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
@@ -47,8 +46,7 @@ library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 require(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
-
-
+require(formatR,    warn.conflicts = FALSE, quietly = TRUE)
 
 ## INPUTS
 davis_elect <- "/home/athan/DATA/WEATHER/Eyryma.Rds"
