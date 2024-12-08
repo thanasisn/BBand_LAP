@@ -69,7 +69,9 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_duckdb/00_Check_input_files.R"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  folder <- "~/BBand_LAP/REPORTS/RUNTIME/duck/"
+  dir.create(folder, showWarnings = FALSE, recursive = TRUE)
+  pdf(file = paste0(folder, basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -114,12 +116,12 @@ cat("\n**CHP-1:", paste(length(radmon_files), "files from Radmon**\n"))
 
 missing_from_sir <- rad_names[!rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
-    # warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
-    cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n\n")
-    cat(missing_from_sir, sep = " ")
-    cat("\n\n")
+  # warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
+  cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n\n")
+  cat(missing_from_sir, sep = " ")
+  cat("\n\n")
 } else {
-    cat("\nThere aren't any CHP-1 files in Radmon missing from Sirena\n\n")
+  cat("\nThere aren't any CHP-1 files in Radmon missing from Sirena\n\n")
 }
 rm(rad_names, radmon_files, sirena_files)
 
@@ -157,12 +159,12 @@ cat("\n**CM-21:", paste(length(radmon_files), "files from Radmon**\n"))
 
 missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
-    # warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
-    cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n\n")
-    cat(missing_from_sir, sep = " ")
-    cat("\n\n")
+  # warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
+  cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n\n")
+  cat(missing_from_sir, sep = " ")
+  cat("\n\n")
 } else {
-    cat("\nThere aren't any CM-21 files in Radmon missing from Sirena\n\n")
+  cat("\nThere aren't any CM-21 files in Radmon missing from Sirena\n\n")
 }
 rm(rad_names, radmon_files, sirena_files)
 
@@ -200,12 +202,12 @@ cat("\n**EKO:", paste(length(radmon_files), "files from Radmon**\n"))
 
 missing_from_sir <- rad_names[ ! rad_names %in% sir_names ]
 if (length(missing_from_sir) > 0) {
-    # warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
-    cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n\n")
-    cat(missing_from_sir, sep = " ")
-    cat("\n\n")
+  # warning("There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena\n")
+  cat("\n**There are ", length(missing_from_sir) , " files on Radmon that are missing from Sirena**\n\n")
+  cat(missing_from_sir, sep = " ")
+  cat("\n\n")
 } else {
-    cat("\nThere aren't any EKO files in Radmon missing from Sirena\n\n")
+  cat("\nThere aren't any EKO files in Radmon missing from Sirena\n\n")
 }
 rm(rad_names, radmon_files, sirena_files)
 
@@ -218,11 +220,11 @@ rm(rad_names, radmon_files, sirena_files)
 
 ## get a fresh hash table from meta data
 parthash <- read_parquet(DB_META_fl) |>
-    select(ends_with("_mtime",    ignore.case = TRUE),
-           ends_with("_md5sum",   ignore.case = TRUE),
-           ends_with("_basename", ignore.case = TRUE),
-           ends_with("_parsed",   ignore.case = TRUE),
-    )
+  select(ends_with("_mtime",    ignore.case = TRUE),
+         ends_with("_md5sum",   ignore.case = TRUE),
+         ends_with("_basename", ignore.case = TRUE),
+         ends_with("_parsed",   ignore.case = TRUE),
+  )
 ## remove constructed files
 parthash$pysolar_mtime    <- NULL
 parthash$pysolar_basename <- NULL
@@ -241,59 +243,59 @@ parthash$variable <- NULL
 
 ## __ Update hash table  -------------------------------------------------------
 if (!file.exists(DB_HASH_fl)) {
-    ## Nothing to compare to, just store the new table
-    writePARQUET(x = parthash, sink = DB_HASH_fl)
+  ## Nothing to compare to, just store the new table
+  writePARQUET(x = parthash, sink = DB_HASH_fl)
 } else {
-    ## Add new hashes to permanent storage
+  ## Add new hashes to permanent storage
 
-    ## read stored
-    mainhash <- read_parquet(DB_HASH_fl)
+  ## read stored
+  mainhash <- read_parquet(DB_HASH_fl)
 
-    ## merge stored with current in DB
-    parthash <- unique(rbind(parthash, mainhash))
-    ## order to keep most resent after deduplication
-    setorder(parthash, md5sum, -parsed)
-    ## keep unique combination of md5sum and basenames
-    mainhash <- mainhash[!duplicated(mainhash[, md5sum, basename]), ]
+  ## merge stored with current in DB
+  parthash <- unique(rbind(parthash, mainhash))
+  ## order to keep most resent after deduplication
+  setorder(parthash, md5sum, -parsed)
+  ## keep unique combination of md5sum and basenames
+  mainhash <- mainhash[!duplicated(mainhash[, md5sum, basename]), ]
 
-    writePARQUET(x = parthash, sink = DB_HASH_fl)
+  writePARQUET(x = parthash, sink = DB_HASH_fl)
 }
 
 ## __ Check duplicate hashes  --------------------------------------------------
 dups <- mainhash[duplicated(mainhash$md5sum)]
 if (nrow(dups) > 0) {
-    cat("\n**There are ", nrow(dups), " files with the same checksum**\n\n")
-    setorder(dups, md5sum, basename)
-    # \scriptsize
-    # \footnotesize
-    # \small
-    cat("\n \\footnotesize \n\n")
-    panderOptions('table.split.table', Inf)
-    cat(pander(dups,
-           caption = "Files with the same md5sum"))
-    cat("\n \n \\normalsize \n \n")
-    # cat("\n\n \\ \n\n")
+  cat("\n**There are ", nrow(dups), " files with the same checksum**\n\n")
+  setorder(dups, md5sum, basename)
+  # \scriptsize
+  # \footnotesize
+  # \small
+  cat("\n \\footnotesize \n\n")
+  panderOptions('table.split.table', Inf)
+  cat(pander(dups,
+             caption = "Files with the same md5sum"))
+  cat("\n \n \\normalsize \n \n")
+  # cat("\n\n \\ \n\n")
 } else {
-    cat("\n**All checksum are unique**\n")
+  cat("\n**All checksum are unique**\n")
 }
 
 ## __ Check files with different hashes  ---------------------------------------
 tabs <- mainhash[, .N, by = basename]
 tabs <- tabs[N > 1, ]
 if (nrow(tabs) > 0) {
-    cat("\n**There are ", nrow(tabs), " files with the same filename and different hash**\n\n")
+  cat("\n**There are ", nrow(tabs), " files with the same filename and different hash**\n\n")
 
-    cat("\n \\footnotesize \n\n")
-    panderOptions('table.split.table', Inf)
-    cat(pander(tabs,
-           caption = "Files with the same filename and different hash!!"))
-    cat("\n \n \\normalsize \n \n")
+  cat("\n \\footnotesize \n\n")
+  panderOptions('table.split.table', Inf)
+  cat(pander(tabs,
+             caption = "Files with the same filename and different hash!!"))
+  cat("\n \n \\normalsize \n \n")
 } else {
-    cat("**There are no files with the same filename and different md5 hash**\n\n")
+  cat("**There are no files with the same filename and different md5 hash**\n\n")
 }
 
 
-## TODO
+## TODO include
 ## - list snc
 ## - list therm
 ## - list step
@@ -305,4 +307,3 @@ tac <- Sys.time()
 cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
-
