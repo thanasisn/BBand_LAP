@@ -39,6 +39,7 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
+source("~/CODE/FUNCTIONS/R/data.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
@@ -47,6 +48,7 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 require(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 require(formatR,    warn.conflicts = FALSE, quietly = TRUE)
+require(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 ## INPUTS
 davis_elect <- "/home/athan/DATA/WEATHER/Eyryma.Rds"
@@ -74,6 +76,14 @@ if (!dbExistsTable(con, "PRESSURE_RAW")) {
   ## Wunderground a nearby station
   ## data stopped being free access
   ITHE <- readRDS(WUithess2_f)
+
+  find_freezed_measurements(ITHE$)
+
+
+  stop()
+
+
+
 
   cat(
     "\nWUithess2: Ignoring",
@@ -181,12 +191,46 @@ if (dbExistsTable(con, "PRESSURE_RAW") &
 RAW <- tbl(con, "PRESSURE_RAW")
 RAW |> tally()
 
-RAW |>
-  ggplot() +
-  geom_point(aes(x = Date, y = Pressure_WUithess2),   color = 2, size = 0.5) +
-  geom_point(aes(x = Date, y = Pressure_DIithess2),   color = 3, size = 0.5) +
-  geom_point(aes(x = Date, y = Pressure_davis_elect), color = 4, size = 0.5) +
-  geom_point(aes(x = Date, y = Pressure_davis_lap),   color = 5, size = 0.5)
+# RAW |>
+#   ggplot() +
+#   geom_point(aes(x = Date, y = Pressure_WUithess2),   color = 2, size = 0.5) +
+#   geom_point(aes(x = Date, y = Pressure_DIithess2),   color = 3, size = 0.5) +
+#   geom_point(aes(x = Date, y = Pressure_davis_elect), color = 4, size = 0.5) +
+#   geom_point(aes(x = Date, y = Pressure_davis_lap),   color = 5, size = 0.5)
+
+#'
+#' ## Estimate temporal resolution
+#'
+#' ### LAP Davis on the roof
+#'
+#+ echo=F
+test <- RAW |> filter(!is.na(Pressure_davis_lap)) |> select(Date) |> collect() |> data.table()
+setorder(test, Date)
+pander(summary(diff(as.numeric(test$Date))))
+
+
+#' ### Electronics Davis on the roof
+#'
+#+ echo=F
+test <- RAW |> filter(!is.na(Pressure_davis_elect)) |> select(Date) |> collect() |> data.table()
+setorder(test, Date)
+pander(summary(diff(as.numeric(test$Date))))
+
+#' ### Direct from Kamara
+#'
+#+ echo=F
+test <- RAW |> filter(!is.na(Pressure_DIithess2)) |> select(Date) |> collect() |> data.table()
+setorder(test, Date)
+pander(summary(diff(as.numeric(test$Date))))
+
+
+#' ### Wunderground from Kamara
+#'
+#+ echo=F
+test <- RAW |> filter(!is.na(Pressure_WUithess2)) |> select(Date) |> collect() |> data.table()
+setorder(test, Date)
+pander(summary(diff(as.numeric(test$Date))))
+
 
 
 
