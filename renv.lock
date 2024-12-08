@@ -317,7 +317,7 @@
     },
     "cluster": {
       "Package": "cluster",
-      "Version": "2.1.6",
+      "Version": "2.1.7",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -327,7 +327,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "0aaa05204035dc43ea0004b9c76611dd"
+      "Hash": "669a8ff0ccc1d9ea17639c773978b44e"
     },
     "codetools": {
       "Package": "codetools",
