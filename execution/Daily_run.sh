@@ -61,8 +61,18 @@ pids=()
   sleep 6
   info "##  Prepare TSI data  ##"
   "$HOME/BBand_LAP/parameters/TSI/Build_TSI.R"
-  info "##  End Get data from davis STATUS:$?  ##"
+  info "##  End Prepare TSI data STATUS:$?  ##"
 ) & pids+=($!)
+
+(
+  sleep 6
+  info "##  Prepare weather data  ##"
+  "$HOME/BBand_LAP/parameters/weather/Build_weather.R"
+  info "##  End Prepare weather data STATUS:$?  ##"
+) & pids+=($!)
+
+
+
 
 ## wait all the above to finish
 wait "${pids[@]}"; pids=()
