@@ -20,12 +20,12 @@ try({
 })
 
 ##  Create pressure for LAP  ---------------------------------------------------
-source("~/BBand_LAP/parameters/weather/10_Create_LAP_pressure.R" )
-# try({
-#   cat("\n\n 02. Read raw TSI TSIS \n")
-#   rmarkdown::render(input      = "~/BBand_LAP/parameters/TSI/02_Read_raw_TSI_TSIS.R",
-#                     output_dir = output_dir)
-# })
+# source("~/BBand_LAP/parameters/weather/10_Create_LAP_pressure.R" )
+try({
+  cat("\n\n 10. Create LAP pressure \n")
+  rmarkdown::render(input      = "~/BBand_LAP/parameters/weather/10_Create_LAP_pressure.R",
+                    output_dir = output_dir)
+})
 
 
 tac <- Sys.time()
