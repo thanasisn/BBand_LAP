@@ -58,7 +58,7 @@ gap_reduction_limit <- 3600 * 4  # if greater than this use ITHESS data to fill 
 #' ### Load data from each weather data source ###
 # Upper date limit used to subset data. We start when CHP1 becomes operational.
 
-startdt     <- as.POSIXct("2016-04-01")     ## We start when before CHP1 becomes operational.
+startdt     <- as.POSIXct("2016-04-01")
 
 ## INPUTS
 davisroof_f <- "/home/athan/DATA/WEATHER/Eyryma.Rds"
@@ -77,11 +77,11 @@ ITHE <- readRDS(WUithess2_f)
 DITH <- readRDS(DIithess2_f)
 DILA <- readRDS(DIlap_f)
 
-#' #### Keep only data after this date
-DAVI <- DAVI[ DAVI$Date    > startdt, ]
-ITHE <- ITHE[ ITHE$DateUTC > startdt, ]
-DITH <- DITH[ DITH$Date    > startdt, ]
-DILA <- DILA[ DILA$Date    > startdt, ]
+# #' #### Keep only data after this date
+# DAVI <- DAVI[ DAVI$Date    > startdt, ]
+# ITHE <- ITHE[ ITHE$DateUTC > startdt, ]
+# DITH <- DITH[ DITH$Date    > startdt, ]
+# DILA <- DILA[ DILA$Date    > startdt, ]
 
 #+ include=F
 ## drop some columns
@@ -121,6 +121,7 @@ hist(DILA$pressure,   breaks = 100)
 #' ### Estimate temporal resolution of each data set
 
 #' #### Davis on roof data
+#'
 #' Maximum time step `r max(diff(DAVI$Date))`
 #'
 #' Minimum time step `r min(diff(DAVI$Date))`
@@ -128,6 +129,7 @@ hist(DILA$pressure,   breaks = 100)
 #' Davis **Time resolution:** `r median(diff(DAVI$Date))`
 
 #' #### IThessal2 at "Kamara" data
+#'
 #' Maximum time step `r max(diff(ITHE$Date))`
 #'
 #' Minimum time step `r min(diff(ITHE$Date))`
@@ -135,6 +137,7 @@ hist(DILA$pressure,   breaks = 100)
 #' IThessal2 **Time resolution:** `r median(diff(ITHE$Date))`
 
 #' #### IThessal2 at "Kamara" Direct data
+#'
 #' Maximum time step `r max(diff(DITH$Date))`
 #'
 #' Minimum time step `r min(diff(DITH$Date))`
@@ -142,6 +145,7 @@ hist(DILA$pressure,   breaks = 100)
 #' IThessal2 **Time resolution:** `r median(diff(DITH$Date))`
 
 #' #### IThessal16 at "Roof" Direct data
+#'
 #' Maximum time step `r max(diff(DILA$Date))`
 #'
 #' Minimum time step `r min(diff(DILA$Date))`
@@ -149,18 +153,22 @@ hist(DILA$pressure,   breaks = 100)
 #' IThessal2 **Time resolution:** `r median(diff(DILA$Date))`
 
 #' ### Summary of DAVI
+#'
 #+ include=T, echo=F
 pander(summary(DAVI))
 
 #' ### Summary of ITHE
+#'
 #+ include=T, echo=F
 pander(summary(ITHE))
 
 #' ### Summary of DITH
+#'
 #+ include=T, echo=F
 pander(summary(DITH))
 
 #' ### Summary of DILA
+#'
 #+ include=T, echo=F
 pander(summary(DILA))
 
@@ -171,7 +179,6 @@ pander(summary(DILA))
 #' We will clean the data "by hand" using a list of exclusions after inspection.
 #'
 #+ include=T, echo=F
-
 
 par(mar = c(2,4,.5,.5))
 yrange <- range(DITH$barometer,
@@ -210,9 +217,11 @@ hist(problems$lengths)
 # plot( range(x1,x2), range(y),type="n")
 # segments( x1, y, x2, y )
 
+#' 
 #' We found `r length(problems$starts)`
 #' cases with more than `r consecutive_limit`
 #' consecutive values
+#' 
 
 for (i in 1:length(problems$starts)) {
     ## show data span of the problem
@@ -467,9 +476,8 @@ plot(composite$Date, composite$pressure, pch = ".",
 
 write_RDS(composite, tempe_f_M1)
 
-##TODO Create pressure climatology for sun tracking
+## TODO Create pressure climatology for sun tracking
 
-## - get pressure above horizon
 
 #+ results="asis", echo=FALSE
 tac <- Sys.time()
