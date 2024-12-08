@@ -58,9 +58,11 @@ WUithess2_f <- "/home/athan/DATA/Wunderground/ITHESSAL2.Rds"
 
 #+ include=T, echo=F, results="asis"
 cat("\n# Create pressure data for LAP\n\n")
+cat("\n# **THIS IS NOT READY**\n\n")
 
 #+ include=T, echo=F
 pressure_limit_low  <- 970
+consecutive_limit   <- 15
 
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_PRESSURE))
@@ -77,14 +79,6 @@ if (!dbExistsTable(con, "PRESSURE_RAW")) {
   ## data stopped being free access
   ITHE <- readRDS(WUithess2_f)
 
-  find_freezed_measurements(ITHE$)
-
-
-  stop()
-
-
-
-
   cat(
     "\nWUithess2: Ignoring",
     ITHE[PressuremB < pressure_limit_low, .N],
@@ -96,8 +90,43 @@ if (!dbExistsTable(con, "PRESSURE_RAW")) {
     select(contains(c("Date", "Pressure"))) |>
     rename(Date               = DateUTC,
            Pressure_WUithess2 = PressuremB) |>
-    filter(Pressure_WUithess2 > pressure_limit_low) |>
-    arrange(Date)
+    filter(Pressure_WUithess2 > pressure_limit_low)
+
+  setorder(ITHE, Date)
+
+  ## find stack sensor values
+  problems <- find_freezed_measurements(ITHE$Pressure_WUithess2, consecutive_limit)
+
+  for (i in 1:length(problems$starts)) {
+    # print(data$Date[problems$ends[i]]-data$Date[problems$starts[i]])
+    ## keep the first value and drop the rest
+    # print(data$temperature[ problems$starts[i]     :problems$ends[i] ])
+    ITHE$Pressure_WUithess2[(problems$starts[i] + 1):problems$ends[i]] <- NA
+  }
+  sum(is.na(ITHE$Pressure_WUithess2))
+
+  ITHE[!is.na(Pressure_WUithess2)]
+
+
+  ## will remove some bad points
+  excludedataithess = as.POSIXct(c(
+    "2016-01-25 08:24:00 UTC", "2016-01-25 08:29:00 UTC",
+    "2016-01-25 08:34:00 UTC", "2016-01-25 08:39:00 UTC",
+    "2016-01-25 08:44:00 UTC", "2016-01-25 08:49:00 UTC",
+    "2016-01-25 08:54:00 UTC", "2016-01-25 08:59:00 UTC",
+    "2016-01-25 09:04:00 UTC", "2016-01-25 09:09:00 UTC",
+    "2016-01-25 09:19:00 UTC"
+  ))
+  ## drop bad points
+  ITHE[!Date %in% excludedataithess]
+
+  stop()
+
+
+
+
+
+
 
   stopifnot(all(duplicated(ITHE$Date)) == FALSE)
 
