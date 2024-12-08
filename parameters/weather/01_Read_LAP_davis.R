@@ -52,15 +52,15 @@ library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 options(warn = 2)
 
 ## INPUTS
-data_dir         <- "~/DATA_RAW/LAPWeath/LAP_roof/LAP_AUTH_davis.csv"
+data_dir    <- "~/DATA_RAW/LAPWeath/LAP_roof/LAP_AUTH_davis.csv"
 
 ## OUTPUTS
-direct_data      <- "~/DATA/WEATHER/lap"
-pdf_base         <- "~/BBand_LAP/REPORTS/REPORTS/"
+direct_data <- "~/DATA/WEATHER/lap"
 
-#+ include=T, echo=T, results="asis"
+#+ include=T, echo=F, results="asis"
 cat("\n# Parce data from LAP Davis\n\n")
 
+#+ echo=F
 ## FILTERS
 PRESSURE_LOW_LIM = 950
 TEMPERAT_HIG_LIM = 100
@@ -71,7 +71,8 @@ TEMPERAT_FRE_LIM = 11
 PRESSURE_FRE_LIM = 40
 RHUMIDIT_FRE_LIM = 40
 
-## read and drop empty data
+##  Parse all data  ------------------------------------------------------------
+
 data <- fread(data_dir)
 data <- rm.cols.NA.DT(data)
 
@@ -86,26 +87,29 @@ data[, dateTime := NULL]
 ## check for variables
 stopifnot(all(data$usUnits == 1 ))
 
-## prepare temperature
+##  Prepare temperature
 data[, outTemp := fahrenheit_to_celsius(outTemp) ]
 hist(data$outTemp, breaks = 100)
 data$outTemp[ data$outTemp >  TEMPERAT_HIG_LIM ] <- NA
 names(data)[names(data) == "outTemp"] <- "temperature"
 hist(data$temperature, breaks = 100)
 
-## prepare pressure
+##  Prepare pressure
 data[, pressure := InHg_to_mbar( pressure ) ]
 hist(data$pressure, breaks = 100)
 data$pressure[ data$pressure   <  PRESSURE_LOW_LIM ] <- NA
 hist(data$pressure, breaks = 100)
 
-## prepare humidity
+##  Prepare humidity
 hist( data$outHumidity,breaks = 100)
 names(data)[names(data) == "outHumidity"] <- "humidity"
 
-## Export data as is
+##  Export data as is
 data <- data[order(data$Date), ]
 write_RDS(data, direct_data)
+
+
+##  Plot all data  -------------------------------------------------------------
 
 ## plot params
 par(mar = c(2, 3, 1.25, .5))
@@ -115,30 +119,27 @@ years     <- unique(years_vec)
 ## ignore constants from plots
 data <- rm.cols.dups.DT(data)
 
-## plot all data
-
 #+ results="asis", echo=F
-for (col in grep(pattern = "Date", x =  colnames( data ), invert = T, value = T )) {
+for (col in grep("Date", colnames(data), invert = T, value = T)) {
   ## go through years
   for (yy in years) {
-    subdata = data[ years_vec == yy, ]
-    if (all(is.na(subdata[[col]]))) next
-    plot(  subdata$Date, subdata[[col]], type = 'l' )
-    title( main = paste(yy,col) )
+    subdata = data[years_vec == yy,]
+    if (all(is.na(subdata[[col]]))) { next }
+    plot(subdata$Date, subdata[[col]], type = 'l',
+         xlab = "", ylab = "")
+    title(main = paste(yy, col))
   }
 }
 
 #+ results="asis", echo=F
-for (col in grep(pattern = "Date", x =  colnames( data ), invert = T, value = T )) {
+for (col in grep("Date", colnames(data), invert = T, value = T)) {
   ## go through years
   for (yy in years) {
     subdata = data[ years_vec == yy, ]
-    if (all(is.na(subdata[[col]]))) next
-    hist(  subdata[[col]], breaks = 50, main = paste(yy,col) )
+    if (all(is.na(subdata[[col]]))) { next }
+    hist(  subdata[[col]], breaks = 50, main = paste(yy, col))
   }
 }
-
-
 
 #+ results="asis", echo=FALSE
 tac <- Sys.time()

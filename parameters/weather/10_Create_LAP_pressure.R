@@ -58,18 +58,23 @@ WUithess2_f <- "/home/athan/DATA/Wunderground/ITHESSAL2.Rds"
 #+ include=T, echo=F, results="asis"
 cat("\n# Create pressure data for LAP\n\n")
 
-file.mtime(davis_lap)
+file.mtime(davis_lap) > file.mtime(DB_PRESSURE)
 
 #+ include=F
 ## load all data
-DAVI <- readRDS(davisroof_f)
+DAVI <- readRDS(davis_elect)
 ITHE <- readRDS(WUithess2_f)
 DITH <- readRDS(DIithess2_f)
-DILA <- readRDS(DIlap_f)
+DILA <- readRDS(davis_lap)
 
 stop()
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_PRESSURE))
+
+
+if (!dbExistsTable(con, "PRESSURE_RAW")) {
+
+}
 
 ##  Add new dates to main table  -----------------------------------------------
 #'
