@@ -63,7 +63,9 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_duckdb/01_Inspect_CHP1_sig_snc_temp.R"
 
 if (!interactive()) {
-  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  folder <- "~/BBand_LAP/REPORTS/RUNTIME/duck/"
+  dir.create(folder, showWarnings = FALSE, recursive = TRUE)
+  pdf(file = paste0(folder, basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------

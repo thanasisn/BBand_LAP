@@ -99,7 +99,6 @@ info "##  End inspect_duckdb STATUS:$?  ##"
 
 
 
-
 info "##  Upload results  ##"
 "$HOME/BBand_LAP/tools/Upload_reports.sh"
 info "##  Upload results STATUS:$?  ##"
