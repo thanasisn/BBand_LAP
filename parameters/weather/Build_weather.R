@@ -12,6 +12,9 @@ renv::load("~/BBand_LAP", quiet = TRUE)
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Parameters_weather/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
+##  Run old constructor  -------------------------------------------------------
+source("~/BBand_LAP/parameters/weather/combine_weather_pressure_v1.R")
+
 ##  Parse data from Davis  -----------------------------------------------------
 try({
   cat("\n\n 01. Read LAP davis \n")
