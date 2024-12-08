@@ -46,6 +46,7 @@ library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
+require(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
 
 
@@ -60,11 +61,10 @@ cat("\n# Create pressure data for LAP\n\n")
 
 file.mtime(davis_lap) > file.mtime(DB_PRESSURE)
 
+pressure_limit_low  <- 970
+
 #+ include=F
 ## load all data
-DAVI <- readRDS(davis_elect)
-ITHE <- readRDS(WUithess2_f)
-DITH <- readRDS(DIithess2_f)
 DILA <- readRDS(davis_lap)
 
 stop()
@@ -73,8 +73,91 @@ con <- dbConnect(duckdb(dbdir = DB_PRESSURE))
 
 
 if (!dbExistsTable(con, "PRESSURE_RAW")) {
+  cat("\n Initialize table", "PRESSURE_RAW", "\n\n")
+  ## create table and date variable with pure SQL call
+  res <- dbExecute(con, paste("CREATE TABLE", "PRESSURE_RAW", "(Date TIMESTAMP)"))
+
+  ##  Add static data  ---------------------------------------------------------
+
+  ## __ WUithess2  -------------------------------------------------------------
+  ## Wunderground a nearby station
+  ## data stopped being free access
+  ITHE <- readRDS(WUithess2_f)
+
+  cat(
+    "\nWUithess2: Ignoring",
+    ITHE[PressuremB < pressure_limit_low, .N],
+    "pressure points below", pressure_limit_low,
+    "hPa\n\n"
+  )
+
+  ITHE <- ITHE |>
+    select(contains(c("Date", "Pressure"))) |>
+    rename(Date               = DateUTC,
+           Pressure_WUithess2 = PressuremB) |>
+    filter(Pressure_WUithess2 > pressure_limit_low) |>
+    arrange(Date)
+
+  stopifnot(all(duplicated(ITHE$Date)) == FALSE)
+
+  res <- insert_table(con, ITHE, "PRESSURE_RAW", "Date")
+  rm(ITHE); d <- gc()
+
+
+  ## __ DIithess2  -------------------------------------------------------------
+
+  ## Direct access to ithess2 data?
+  ## Can access under request
+  DITH <- readRDS(DIithess2_f)
+  DITH <- DITH[!is.na(barometer)]
+
+  cat(
+    "\nDIithess2: Ignoring",
+    DITH[barometer < pressure_limit_low, .N],
+    "pressure points below", pressure_limit_low,
+    "hPa\n\n"
+  )
+
+  DITH <- DITH |>
+    select(Date, barometer) |>
+    rename(Pressure_DIithess2 = barometer) |>
+    filter(Pressure_DIithess2 > pressure_limit_low) |>
+    arrange(Date)
+
+  stopifnot(all(duplicated(DITH$Date)) == FALSE)
+
+  res <- insert_table(con, DITH, "PRESSURE_RAW", "Date")
+  rm(DITH); d <- gc()
+
+
+  ## __ DIithess2  -------------------------------------------------------------
+
+  ## Data from roof Davis of electronics department
+
+  DAVI <- readRDS(davis_elect)
+  DAVI
+
+  cat(
+    "\ndavis_elect: Ignoring",
+    DITH[barometer < pressure_limit_low, .N],
+    "pressure points below", pressure_limit_low,
+    "hPa\n\n"
+  )
+
+
 
 }
+
+RAW <- tbl(con, "PRESSURE_RAW")
+RAW
+
+
+RAW |>
+  ggplot() +
+  geom_point(aes(x = Date, y = Pressure_WUithess2), color = 2, size = 0.6) +
+  geom_point(aes(x = Date, y = Pressure_DIithess2), color = 3, size = 0.6)
+
+
 
 ##  Add new dates to main table  -----------------------------------------------
 #'
