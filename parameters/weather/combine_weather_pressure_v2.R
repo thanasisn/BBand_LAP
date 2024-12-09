@@ -80,7 +80,7 @@ DAVI <- DAVI[!is.na(Bar       ), Date,    Bar       ]
 DITH <- DITH[!is.na(barometer ), Date,    barometer ]
 DILA <- DILA[!is.na(pressure  ), Date,    pressure  ]
 
-names(ITHE)[names(ITHE) == "DateUTC"] <- "Date"
+# names(ITHE)[names(ITHE) == "DateUTC"] <- "Date"
 
 setorder(DAVI, Date)
 # setorder(ITHE, Date)
@@ -117,13 +117,13 @@ hist(DILA$pressure,   breaks = 100)
 #'
 #' Davis **Time resolution:** `r median(diff(DAVI$Date))`
 #'
-#' #### IThessal2 at "Kamara" data
-#'
-#' Maximum time step `r max(diff(ITHE$Date))`
-#'
-#' Minimum time step `r min(diff(ITHE$Date))`
-#'
-#' IThessal2 **Time resolution:** `r median(diff(ITHE$Date))`
+# #' #### IThessal2 at "Kamara" data
+# #'
+# #' Maximum time step `r max(diff(ITHE$Date))`
+# #'
+# #' Minimum time step `r min(diff(ITHE$Date))`
+# #'
+# #' IThessal2 **Time resolution:** `r median(diff(ITHE$Date))`
 #'
 #' #### IThessal2 at "Kamara" Direct data
 #'
@@ -146,10 +146,10 @@ hist(DILA$pressure,   breaks = 100)
 #+ include=T, echo=F
 pander(summary(DAVI))
 
-#' ### Summary of ITHE
-#'
-#+ include=T, echo=F
-pander(summary(ITHE))
+# #' ### Summary of ITHE
+# #'
+# #+ include=T, echo=F
+# pander(summary(ITHE))
 
 #' ### Summary of DITH
 #'
@@ -329,7 +329,24 @@ DITH <- DITH[!Date %in% excludedataithess]
 #' Use Davis as basis and add missing data from ITHESS ignore Direct ITHESS for
 #' now
 #'
-#'
+
+## common kamara and LAP davis
+
+library(dplyr)
+
+anti_join()
+
+common1 <- merge(DILA, DITH, by = "Date", all=T)
+
+plot(common1[, pressure, barometer])
+
+ggplot(data = common1) +
+  geom_point(aes(Date, pressure,  colour = "DILA")) +
+  geom_point(aes(Date, barometer, colour = "DITH"))
+
+ggplot(data = common1) +
+  geom_point(aes(barometer, pressure,  colour = "DILA"))
+
 
 
 
