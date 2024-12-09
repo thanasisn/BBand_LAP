@@ -31,6 +31,12 @@ try({
 # source("~/BBand_LAP/parameters/weather/combine_weather_pressure_v1.R")
 try({
   cat("\n\n 00. combine weather pressure \n")
+  rmarkdown::render(input      = "~/BBand_LAP/parameters/weather/combine_weather_pressure_v2.R",
+                    output_dir = output_dir)
+})
+
+try({
+  cat("\n\n 00. combine weather pressure \n")
   rmarkdown::render(input      = "~/BBand_LAP/parameters/weather/combine_weather_pressure_v1.R",
                     output_dir = output_dir)
 })
