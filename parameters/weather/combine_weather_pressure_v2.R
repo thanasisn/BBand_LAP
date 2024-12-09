@@ -44,6 +44,7 @@ library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(janitor,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggpmisc,    warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 
 panderOptions("table.style", "rmarkdown")
 panderOptions("table.split.table", 100)
@@ -331,15 +332,15 @@ DITH <- DITH[!Date %in% excludedataithess]
 #' now
 #'
 
-## common kamara and LAP davis
 
-library(dplyr)
+##  Common kamara and LAP davis  ---------------------------------------------
 
-anti_join()
+DAVI <- DAVI |> distinct()
+DILA <- DILA |> distinct()
+DITH <- DITH |> distinct()
 
 common1 <- merge(DILA, DITH, by = "Date")
 common2 <- merge(DAVI, DITH, by = "Date")
-
 
 plot(common1[, pressure, barometer])
 plot(common2[, Bar,      barometer])
@@ -354,7 +355,6 @@ plot(common1[, pressure - barometer, Date])
 abline(h = breakpoint, col = "red")
 
 plot(common2[, Bar - barometer, Date])
-
 
 breakdate <- common1[pressure - barometer > breakpoint, max(Date)]
 
@@ -373,7 +373,6 @@ ggplot(data = common1, aes(x = barometer, y = pressure)) +
   stat_poly_line() +
   stat_poly_eq(use_label(c("eq", "R2")))
 
-
 ggplot(data = common2, aes(x = barometer, y = Bar)) +
   geom_point() +
   stat_poly_line() +
@@ -389,12 +388,77 @@ offset2 <- median(common2[,      Bar - barometer], na.rm = TRUE)
 ggplot() +
   geom_point(data = DITH, aes(x = Date, y = barometer + offset1 , color = "DITH"), size = 0.5, alpha = .1) +
   # geom_point(data = ITHE, aes(x = Date, y = PressuremB, color = "ITHE"), size = 0.5, alpha = .1) +
-  geom_point(data = DAVI, aes(x = Date, y = Bar       , color = "DAVI"), size = 0.5, alpha = .1) +
+  geom_point(data = DAVI, aes(x = Date, y = Bar + (offset1 - offset2)      , color = "DAVI"), size = 0.5, alpha = .1) +
   geom_point(data = DILA, aes(x = Date, y = pressure  , color = "DILA"), size = 0.5, alpha = .1) +
   theme(legend.position = "bottom")
 
-offset1
-offset2
+
+##  Combine pressures  ---------------------------------------------------------
+COMB <- data.table(Date = sort(unique(DITH$Date, DILA$Date, DAVI$Date)))
+
+## get all of our Davis
+DILA[, Pressure := pressure]
+DILA[, pressure := NULL]
+DILA[, Source   := "LAP_DAVIS_RAW"]
+
+COMB <- merge(COMB, DILA, all = T)
+
+## add other roof davis
+
+DAVI[, Pressure := Bar + (offset1 - offset2)]
+DAVI[, Bar      := NULL]
+DAVI[, Source   := "ELC_DAVIS_ADJ"]
+
+any(duplicated(DAVI$Date))
+DAVI[duplicated(DAVI$Date)]
+
+ADD <- inner_join(
+  DAVI,
+  COMB |> filter(is.na(Pressure)) |> select(Date),
+  by = "Date"
+)
+
+
+# rows_patch(COMB, DAVI, by = "Date")
+
+rows_update(COMB, ADD) |> group_by(Source) |> tally()
+COMB <- rows_update(COMB, ADD)
+
+
+DITH[, Pressure  := barometer + offset1]
+DITH[, barometer := NULL]
+DITH[, Source    := "Direct_Kamara_ADJ"]
+
+DITH <- DITH |> distinct()
+
+## FIXME
+DITH <- DITH[!duplicated(Date) ]
+
+ADD <- inner_join(
+  DITH,
+  COMB |> filter(is.na(Pressure)) |> select(Date),
+  by = "Date"
+)
+
+rows_update(COMB, ADD) |> group_by(Source) |> tally()
+COMB <- rows_update(COMB, ADD)
+
+ggplot(data = COMB) +
+  geom_point(aes(Date, Pressure, colour = Source))
+
+##  Interpolate all minutes  ---------------------------------------------------
+dd <- data.table(Date = seq.POSIXt(min(COMB$Date), max(COMB$Date), by = "1 min"))
+
+COMB <- merge(COMB, dd, all = T)
+setorder(COMB, Date)
+
+COMB[is.na(Pressure), Source := "Interpolated"]
+
+COMB[, Pressure := na.approx(Pressure)]
+
+ggplot(data = COMB) +
+  geom_point(aes(Date, Pressure, colour = Source))
+
 
 #;; ITHE_valid_pressur <- ITHE[!is.na(ITHE$PressuremB), c("Date", "PressuremB")]
 #;; DAVI_valid_pressur <- DAVI[!is.na(DAVI$Bar),        c("Date", "Bar"       )]
