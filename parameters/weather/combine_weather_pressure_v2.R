@@ -362,21 +362,25 @@ common1 <- common1[Date <= breakdate]
 
 ggplot(data = common1) +
   geom_point(aes(Date, pressure,  colour = "DILA")) +
-  geom_point(aes(Date, barometer, colour = "DITH"))
+  geom_point(aes(Date, barometer, colour = "DITH")) +
+  theme(legend.position = "bottom")
 
 ggplot(data = common2) +
   geom_point(aes(Date, Bar,       colour = "DAVI")) +
-  geom_point(aes(Date, barometer, colour = "DITH"))
+  geom_point(aes(Date, barometer, colour = "DITH"))  +
+  theme(legend.position = "bottom")
 
 ggplot(data = common1, aes(x = barometer, y = pressure)) +
   geom_point() +
   stat_poly_line() +
-  stat_poly_eq(use_label(c("eq", "R2")))
+  stat_poly_eq(use_label(c("eq", "R2"))) +
+  theme(legend.position = "bottom")
 
 ggplot(data = common2, aes(x = barometer, y = Bar)) +
   geom_point() +
   stat_poly_line() +
-  stat_poly_eq(use_label(c("eq", "R2")))
+  stat_poly_eq(use_label(c("eq", "R2"))) +
+  theme(legend.position = "bottom")
 
 offset1 <- median(common1[, pressure - barometer], na.rm = TRUE)
 offset2 <- median(common2[,      Bar - barometer], na.rm = TRUE)
@@ -444,7 +448,8 @@ rows_update(COMB, ADD) |> group_by(Source) |> tally()
 COMB <- rows_update(COMB, ADD)
 
 ggplot(data = COMB) +
-  geom_point(aes(Date, Pressure, colour = Source))
+  geom_point(aes(Date, Pressure, colour = Source)) +
+  theme(legend.position = "bottom")
 
 ##  Interpolate all minutes  ---------------------------------------------------
 dd <- data.table(Date = seq.POSIXt(min(COMB$Date), max(COMB$Date), by = "1 min"))
@@ -457,7 +462,8 @@ COMB[is.na(Pressure), Source := "Interpolated"]
 COMB[, Pressure := na.approx(Pressure)]
 
 ggplot(data = COMB) +
-  geom_point(aes(Date, Pressure, colour = Source))
+  geom_point(aes(Date, Pressure, colour = Source)) +
+  theme(legend.position = "bottom")
 
 
 #;; ITHE_valid_pressur <- ITHE[!is.na(ITHE$PressuremB), c("Date", "PressuremB")]
