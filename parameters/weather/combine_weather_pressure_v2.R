@@ -43,6 +43,7 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(janitor,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
+library(ggpmisc,    warn.conflicts = FALSE, quietly = TRUE)
 
 panderOptions("table.style", "rmarkdown")
 panderOptions("table.split.table", 100)
@@ -336,19 +337,64 @@ library(dplyr)
 
 anti_join()
 
-common1 <- merge(DILA, DITH, by = "Date", all=T)
+common1 <- merge(DILA, DITH, by = "Date")
+common2 <- merge(DAVI, DITH, by = "Date")
+
 
 plot(common1[, pressure, barometer])
+plot(common2[, Bar,      barometer])
+
+common1 <- common1[!pressure - barometer < -40 ]
+common2 <- common2[!Bar - barometer < -40 ]
+common2 <- common2[!Bar - barometer >  20 ]
+
+breakpoint <- -17.5
+
+plot(common1[, pressure - barometer, Date])
+abline(h = breakpoint, col = "red")
+
+plot(common2[, Bar - barometer, Date])
+
+
+breakdate <- common1[pressure - barometer > breakpoint, max(Date)]
+
+common1 <- common1[Date <= breakdate]
 
 ggplot(data = common1) +
   geom_point(aes(Date, pressure,  colour = "DILA")) +
   geom_point(aes(Date, barometer, colour = "DITH"))
 
-ggplot(data = common1) +
-  geom_point(aes(barometer, pressure,  colour = "DILA"))
+ggplot(data = common2) +
+  geom_point(aes(Date, Bar,       colour = "DAVI")) +
+  geom_point(aes(Date, barometer, colour = "DITH"))
+
+ggplot(data = common1, aes(x = barometer, y = pressure)) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2")))
 
 
+ggplot(data = common2, aes(x = barometer, y = Bar)) +
+  geom_point() +
+  stat_poly_line() +
+  stat_poly_eq(use_label(c("eq", "R2")))
 
+offset1 <- median(common1[, pressure - barometer], na.rm = TRUE)
+offset2 <- median(common2[,      Bar - barometer], na.rm = TRUE)
+
+# offset1 <- mean(common1[, pressure - barometer], na.rm = TRUE)
+# offset2 <- mean(common2[,      Bar - barometer], na.rm = TRUE)
+
+
+ggplot() +
+  geom_point(data = DITH, aes(x = Date, y = barometer + offset1 , color = "DITH"), size = 0.5, alpha = .1) +
+  # geom_point(data = ITHE, aes(x = Date, y = PressuremB, color = "ITHE"), size = 0.5, alpha = .1) +
+  geom_point(data = DAVI, aes(x = Date, y = Bar       , color = "DAVI"), size = 0.5, alpha = .1) +
+  geom_point(data = DILA, aes(x = Date, y = pressure  , color = "DILA"), size = 0.5, alpha = .1) +
+  theme(legend.position = "bottom")
+
+offset1
+offset2
 
 #;; ITHE_valid_pressur <- ITHE[!is.na(ITHE$PressuremB), c("Date", "PressuremB")]
 #;; DAVI_valid_pressur <- DAVI[!is.na(DAVI$Bar),        c("Date", "Bar"       )]
