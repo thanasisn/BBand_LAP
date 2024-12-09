@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2024-12-08 
+At: 2024-12-09 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -27,6 +27,7 @@ At: 2024-12-08
          foreach:  1.5.2   
       reticulate:  1.40.0  
          RNetCDF:  2.9.2   
+         formatR:  1.14    
          caTools:  1.18.3  
            Hmisc:  5.2.1   
           scales:  1.3.0   
