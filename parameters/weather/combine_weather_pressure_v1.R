@@ -414,16 +414,33 @@ closeness_date <- function(a_test_date) {
     base_dates_vec <- comp$Date
 
     ## next     available date
-    after <- base_dates_vec[ min(which( base_dates_vec >= a_test_date ), na.rm = T) ]
+    after <- base_dates_vec[min(which(base_dates_vec >= a_test_date), na.rm = T)]
     ## previous available date
-    befor <- base_dates_vec[ max(which( base_dates_vec <= a_test_date ), na.rm = T) ]
+    befor <- base_dates_vec[max(which(base_dates_vec <= a_test_date), na.rm = T)]
 
     da <- difftime(a_test_date, after, units = "sec")
     db <- difftime(a_test_date, befor, units = "sec")
 
-    nearest <- min(abs(c( da, db  )),na.rm = T )
+    nearest <- min(abs(c(da, db)), na.rm = T)
     return(nearest)
 }
+
+closeness_date <- function(a_test_date) {
+    base_dates_vec <- comp$Date
+
+    ## TODO use data.table
+    ## next     available date
+    after <- base_dates_vec[which.min(base_dates_vec >= a_test_date)]
+    da    <- difftime(a_test_date, after, units = "sec")
+
+    ## previous available date
+    befor <- base_dates_vec[which.max(base_dates_vec <= a_test_date)]
+    db    <- difftime(a_test_date, befor, units = "sec")
+
+    nearest <- min(abs(c(da, db)), na.rm = T )
+    return(nearest)
+}
+
 tdifff <- unlist(lapply(DITH_valid_pressur$Date , closeness_date))
 
 yrange <- range(tdifff/3600)
@@ -441,14 +458,17 @@ names(append)[names(append) == "barometer"] <- "pressure"
 append <- unique(append)
 
 composite <- rbind(comp, append)
-composite <- composite[order(composite$Date),]
+composite <- composite[order(composite$Date), ]
 
 ## plot combined data
-plot( composite$Date, composite$pressure, pch = ".",
-      col  = as.numeric(factor( composite$Source )) + 1 ,
-      ylab = "Pressure [mB]")
+plot(composite$Date, composite$pressure,
+     pch  = ".",
+     col  = as.numeric(factor(composite$Source)) + 1 ,
+     ylab = "Pressure [mB]")
 
-#' #### Composite Pressure data
+#'
+#' ### Composite Pressure data
+#'
 #' Maximum time step `r max(diff(composite$Date))`
 #' Minimum time step `r min(diff(composite$Date))`
 #' IThessal2 **Time resolution:** `r median(diff(composite$Date))` `r mean(diff(composite$Date))`
