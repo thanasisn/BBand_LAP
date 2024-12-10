@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/inspect_db/ 
-At: 2024-12-09 
+At: 2024-12-10 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -11,6 +11,6 @@ At: 2024-12-09
            arrow:  18.1.0  
            dplyr:  1.1.4   
            gdata:  3.0.1   
-       lubridate:  1.9.3   
+       lubridate:  1.9.4   
            tools:  4.2.3   
          ggplot2:  3.5.1   

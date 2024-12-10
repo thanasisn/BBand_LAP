@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/build_duckdb/ 
-At: 2024-12-09 
+At: 2024-12-10 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -11,6 +11,6 @@ At: 2024-12-09
           duckdb:  1.1.2   
               fs:  1.6.5   
            knitr:  1.49    
-       lubridate:  1.9.3   
+       lubridate:  1.9.4   
            tools:  4.2.3   
           pander:  0.6.5   

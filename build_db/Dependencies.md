@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/build_db/ 
-At: 2024-12-09 
+At: 2024-12-10 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -9,7 +9,7 @@ At: 2024-12-09
       data.table:  1.16.4  
            dplyr:  1.1.4   
            knitr:  1.49    
-       lubridate:  1.9.3   
+       lubridate:  1.9.4   
            tools:  4.2.3   
           duckdb:  1.1.2   
           pander:  0.6.5   

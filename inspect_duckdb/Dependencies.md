@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/inspect_duckdb/ 
-At: 2024-12-09 
+At: 2024-12-10 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -11,7 +11,7 @@ At: 2024-12-09
           pander:  0.6.5   
           dbplyr:  2.5.0   
           duckdb:  1.1.2   
-       lubridate:  1.9.3   
+       lubridate:  1.9.4   
            tidyr:  1.3.1   
            tools:  4.2.3   
          ggplot2:  3.5.1   

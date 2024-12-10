@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/process/ 
-At: 2024-12-09 
+At: 2024-12-10 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -12,7 +12,7 @@ At: 2024-12-09
            dplyr:  1.1.4   
          foreach:  1.5.2   
            knitr:  1.49    
-       lubridate:  1.9.3   
+       lubridate:  1.9.4   
            gdata:  3.0.1   
           pander:  0.6.5   
            Hmisc:  5.2.1   
