@@ -446,7 +446,7 @@ COMB <- rows_update(COMB, ADD, by = "Date")
 
 
 ggplot(data = COMB) +
-  geom_point(aes(Date, Pressure, colour = Source)) +
+  geom_point(aes(Date, Pressure, colour = Source), size = 0.5, alpha = .1) +
   theme(legend.position = "bottom")
 
 ##  Interpolate for all minutes  -----------------------------------------------
@@ -460,7 +460,7 @@ COMB[is.na(Pressure), Source := "Interpolated"]
 COMB[, Pressure := na.approx(Pressure)]
 
 ggplot(data = COMB) +
-  geom_point(aes(Date, Pressure, colour = Source)) +
+  geom_point(aes(Date, Pressure, colour = Source), size = 0.5, alpha = .1) +
   theme(legend.position = "bottom")
 
 
