@@ -69,7 +69,7 @@ WUithess2_f <- "/home/athan/DATA/Wunderground/ITHESSAL2.Rds"
 
 ## OUTPUTS
 tempe_f     <- "/home/athan/DATA/WEATHER/Pressure_all_sources"
-tempe_f_M1  <- "/home/athan/DATA/WEATHER/Pressure_M1"
+tempe_f_M1  <- "/home/athan/DATA/WEATHER/Pressure_M1_v2"
 
 #+ include=F
 ##  Load all pressure data  ----------------------------------------------------
@@ -401,35 +401,38 @@ ggplot() +
 ##  Combine pressures  ---------------------------------------------------------
 COMB <- data.table(Date = sort(unique(DITH$Date, DILA$Date, DAVI$Date)))
 
-## get all of our Davis
-setnames(DILA, "pressure", "Pressure")
-DILA[, Source := "LAP_DAVIS_RAW"]
 
+## __ All data of LAP Davis into the main  -------------------------------------
+setnames(DILA, "pressure", "Pressure")
+DILA$Source <- "LAP_DAVIS_RAW"
 COMB <- merge(COMB, DILA, all = T)
 
-## add other roof davis
 
+## __ Add data from the other Davis  -------------------------------------------
 DAVI[, Bar := Bar + (offset1 - offset2)]
 setnames(DAVI, "Bar", "Pressure")
+DAVI$Source <- "ELC_DAVIS_ADJ"
 
+DAVI[duplicated(Date)]
+
+## find what to add ?
 ADD <- inner_join(
   DAVI,
   COMB |> filter(is.na(Pressure)) |> select(Date),
   by = "Date"
 )
 
+rows_update(COMB, ADD, by = "Date") |> group_by(Source) |> tally()
+COMB <- rows_update(COMB, ADD, by = "Date")
 
-rows_update(COMB, ADD) |> group_by(Source) |> tally()
-COMB <- rows_update(COMB, ADD)
 
-
+## __ Add data from Direct access Kamara  --------------------------------------
 DITH[, barometer := barometer + offset1]
 setnames(DITH, "barometer", "Pressure")
-DITH[, Source := "Direct_Kamara_ADJ"]
-
-DITH <- DITH |> distinct()
+DITH$Source <- "Direct_Kamara_ADJ"
 
 ## FIXME
+DITH[duplicated(Date)]
 DITH <- DITH[!duplicated(Date)]
 
 ADD <- inner_join(
@@ -438,14 +441,15 @@ ADD <- inner_join(
   by = "Date"
 )
 
-rows_update(COMB, ADD) |> group_by(Source) |> tally()
-COMB <- rows_update(COMB, ADD)
+rows_update(COMB, ADD, by = "Date") |> group_by(Source) |> tally()
+COMB <- rows_update(COMB, ADD, by = "Date")
+
 
 ggplot(data = COMB) +
   geom_point(aes(Date, Pressure, colour = Source)) +
   theme(legend.position = "bottom")
 
-##  Interpolate all minutes  ---------------------------------------------------
+##  Interpolate for all minutes  -----------------------------------------------
 dd <- data.table(Date = seq.POSIXt(min(COMB$Date), max(COMB$Date), by = "1 min"))
 
 COMB <- merge(COMB, dd, all = T)
@@ -536,41 +540,13 @@ ggplot(data = COMB) +
 #;; #' Minimum time step `r min(diff(composite$Date))`
 #;; #' IThessal2 **Time resolution:** `r median(diff(composite$Date))` `r mean(diff(composite$Date))`
 #;;
-#;; summary(composite)
-#;; if ( !all((as.numeric( composite$Date ) %% 60) == 0) ) {
-#;;     stop("Date not multiple of whole minute")
-#;; }
-#;;
 #;; ##  Export original temperature data without adjustment  -----------------------
 #;; write_RDS(composite, tempe_f)
-#;; #############################################################
-#;;
-#;; ## extend to all minutes
-#;; pressaprx <- approxfun(x      = composite$Date,
-#;;                        y      = composite$pressure,
-#;;                        method = "linear",
-#;;                        rule   = 2,
-#;;                        f      = 0,
-#;;                        ties   = mean )
-#;;
-#;; ## fill all minutes
-#;; alldates  <- data.frame(Date = seq(min(composite$Date), max(composite$Date), by = "min"))
-#;; composite <- merge(alldates, composite, all = T)
-#;; composite <- unique(composite)
-#;;
-#;; tofill <- is.na(composite$pressure)
-#;;
-#;; composite$pressure[tofill] <- pressaprx( composite$Date[tofill] )
-#;; composite$Source[tofill]   <- "approximation"
-#;;
-#;; ## plot combined data
-#;; plot(composite$Date, composite$pressure, pch = ".",
-#;;      col  = as.numeric(factor(composite$Source)) + 1 ,
-#;;      ylab = "Pressure [mB]")
-#;;
-#;; write_RDS(composite, tempe_f_M1)
-#;;
-#;; ## TODO Create pressure climatology for sun tracking
+
+
+write_RDS(COMB, tempe_f_M1)
+
+## TODO Create pressure climatology for sun tracking
 
 
 #+ results="asis", echo=FALSE

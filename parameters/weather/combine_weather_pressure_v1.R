@@ -433,14 +433,14 @@ plot(  DITH_valid_pressur$Date[tdifff < gap_reduction_limit],
 points(DITH_valid_pressur$Date[tdifff > gap_reduction_limit],
        tdifff[tdifff > gap_reduction_limit]/3600,
        pch = 19, cex = 0.3, col = "red")
-legend( "topright", c("uses DAVIS data", "uses ITHESS data"), col = c("green", "red"), pch = 19, bty = "n")
+legend("topright", c("uses DAVIS data", "uses ITHESS data"), col = c("green", "red"), pch = 19, bty = "n")
 
 ## use data from Direct Iama to fill Davis
-append <- DITH_valid_pressur[ tdifff > gap_reduction_limit, ]
+append <- DITH_valid_pressur[tdifff > gap_reduction_limit, ]
 names(append)[names(append) == "barometer"] <- "pressure"
 append <- unique(append)
 
-composite <- rbind( comp, append )
+composite <- rbind(comp, append)
 composite <- composite[order(composite$Date),]
 
 ## plot combined data
@@ -448,7 +448,7 @@ plot( composite$Date, composite$pressure, pch = ".",
       col  = as.numeric(factor( composite$Source )) + 1 ,
       ylab = "Pressure [mB]")
 
-#' #### Composite Pressure data ####
+#' #### Composite Pressure data
 #' Maximum time step `r max(diff(composite$Date))`
 #' Minimum time step `r min(diff(composite$Date))`
 #' IThessal2 **Time resolution:** `r median(diff(composite$Date))` `r mean(diff(composite$Date))`
@@ -460,15 +460,15 @@ if ( !all((as.numeric( composite$Date ) %% 60) == 0) ) {
 
 ##  Export original temperature data without adjustment  -----------------------
 write_RDS(composite, tempe_f)
-#############################################################
 
-## extend to all minutes
+
+##  Extend to all minutes  -----------------------------------------------------
 pressaprx <- approxfun(x      = composite$Date,
                        y      = composite$pressure,
                        method = "linear",
                        rule   = 2,
                        f      = 0,
-                       ties   = mean )
+                       ties   = mean)
 
 ## fill all minutes
 alldates  <- data.frame(Date = seq(min(composite$Date), max(composite$Date), by = "min"))
@@ -477,7 +477,7 @@ composite <- unique(composite)
 
 tofill <- is.na(composite$pressure)
 
-composite$pressure[tofill] <- pressaprx( composite$Date[tofill] )
+composite$pressure[tofill] <- pressaprx(composite$Date[tofill])
 composite$Source[tofill]   <- "approximation"
 
 ## plot combined data
