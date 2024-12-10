@@ -1,5 +1,13 @@
 
-# CM_21_GLB
+## Interactive daily plot of
+
+- Direct
+- Global
+- PIR
+- Temperatures ?
+- AOD
+- Pressure
+- Pressure RAW
 
 ## Add calibration events
 
