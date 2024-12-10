@@ -45,6 +45,7 @@ library(janitor,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggpmisc,    warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(ggpp,       warn.conflicts = FALSE, quietly = TRUE)
 
 panderOptions("table.style", "rmarkdown")
 panderOptions("table.split.table", 100)
@@ -401,20 +402,15 @@ ggplot() +
 COMB <- data.table(Date = sort(unique(DITH$Date, DILA$Date, DAVI$Date)))
 
 ## get all of our Davis
-DILA[, Pressure := pressure]
-DILA[, pressure := NULL]
-DILA[, Source   := "LAP_DAVIS_RAW"]
+setnames(DILA, "pressure", "Pressure")
+DILA[, Source := "LAP_DAVIS_RAW"]
 
 COMB <- merge(COMB, DILA, all = T)
 
 ## add other roof davis
 
-DAVI[, Pressure := Bar + (offset1 - offset2)]
-DAVI[, Bar      := NULL]
-DAVI[, Source   := "ELC_DAVIS_ADJ"]
-
-any(duplicated(DAVI$Date))
-DAVI[duplicated(DAVI$Date)]
+DAVI[, Bar := Bar + (offset1 - offset2)]
+setnames(DAVI, "Bar", "Pressure")
 
 ADD <- inner_join(
   DAVI,
@@ -423,20 +419,18 @@ ADD <- inner_join(
 )
 
 
-# rows_patch(COMB, DAVI, by = "Date")
-
 rows_update(COMB, ADD) |> group_by(Source) |> tally()
 COMB <- rows_update(COMB, ADD)
 
 
-DITH[, Pressure  := barometer + offset1]
-DITH[, barometer := NULL]
-DITH[, Source    := "Direct_Kamara_ADJ"]
+DITH[, barometer := barometer + offset1]
+setnames(DITH, "barometer", "Pressure")
+DITH[, Source := "Direct_Kamara_ADJ"]
 
 DITH <- DITH |> distinct()
 
 ## FIXME
-DITH <- DITH[!duplicated(Date) ]
+DITH <- DITH[!duplicated(Date)]
 
 ADD <- inner_join(
   DITH,
