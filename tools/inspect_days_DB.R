@@ -26,8 +26,8 @@ library(optparse,   quietly = T, warn.conflicts = F)
 library(plotly,     quietly = T, warn.conflicts = F)
 
 
-source("~/CM_21_GLB/Functions_CM21_factor.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
+source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/BBand_LAP/DEFINITIONS.R")
 
