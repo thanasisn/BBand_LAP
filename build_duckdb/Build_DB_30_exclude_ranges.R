@@ -15,9 +15,8 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
+#+ include=F
 
-#+ echo=F, include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -33,7 +32,7 @@ Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R"
 Script.ID   <- "30"
 
 if (!interactive()) {
-  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -50,6 +49,7 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 
+#+ include=T, echo=F
 ## Load CHP-1 exclusions  ------------------------------------------------------
 chp1_exclude_mtime <- file.mtime(CHP1_EXCLUDE)
 ranges_CHP1        <- read.table(CHP1_EXCLUDE,
@@ -57,14 +57,14 @@ ranges_CHP1        <- read.table(CHP1_EXCLUDE,
                                  colClasses   = "character",
                                  strip.white  = TRUE,
                                  header       = TRUE,
-                                 comment.char = "#" )
+                                 comment.char = "#")
 ranges_CHP1$From  <- as.POSIXct(strptime(ranges_CHP1$From,  format = "%F %H:%M", tz = "UTC"))
 ranges_CHP1$Until <- as.POSIXct(strptime(ranges_CHP1$Until, format = "%F %H:%M", tz = "UTC"))
 
-## check negative ranges
+## check negative exclution ranges
 if (!all((ranges_CHP1$Until - ranges_CHP1$From) >= 1)) {
-    pander(ranges_CHP1[ !ranges_CHP1$From < ranges_CHP1$Until, ])
-    stop("Inverted ranges in ", CHP1_EXCLUDE, "!!!")
+  pander(ranges_CHP1[ !ranges_CHP1$From < ranges_CHP1$Until, ])
+  stop("Inverted ranges in ", CHP1_EXCLUDE, "!!!")
 }
 ## Capitalize comments
 ranges_CHP1$Comment <- sub("(.)", "\\U\\1", ranges_CHP1$Comment, perl = TRUE)
@@ -77,17 +77,13 @@ ranges_CHP1$HourSpan <- (as.numeric(ranges_CHP1$Until) - as.numeric(ranges_CHP1$
 #'
 #+ include=T, echo=F
 hist(ranges_CHP1$HourSpan)
-cat("\n \n")
 
-temp <- ranges_CHP1[ ranges_CHP1$HourSpan > 20 , ]
+temp <- ranges_CHP1[ ranges_CHP1$HourSpan > 20, ]
 row.names(temp) <- NULL
-cat("\n\n\\footnotesize\n\n")
-pander(temp)
-cat("\n\n\\normalsize\n\n")
 
-cat("\n\n\\footnotesize\n\n")
+pander(temp)
+
 pander(data.table(table(ranges_CHP1$Comment)))
-cat("\n\n\\normalsize\n\n")
 
 
 # temp_flag <- data.table()
@@ -120,18 +116,18 @@ cat("\n\n\\normalsize\n\n")
 ##  Load CHP-1 temperature exclusions  -----------------------------------------
 chp1_temp_exclude_mtime <- file.mtime(CHP1_TEMP_EX)
 ranges_CHP1_temp        <- read.table(CHP1_TEMP_EX,
-                                sep          = ";",
-                                colClasses   = "character",
-                                strip.white  = TRUE,
-                                header       = TRUE,
-                                comment.char = "#" )
+                                      sep          = ";",
+                                      colClasses   = "character",
+                                      strip.white  = TRUE,
+                                      header       = TRUE,
+                                      comment.char = "#")
 ranges_CHP1_temp$From  <- as.POSIXct(strptime(ranges_CHP1_temp$From,  format = "%F %H:%M", tz = "UTC"))
 ranges_CHP1_temp$Until <- as.POSIXct(strptime(ranges_CHP1_temp$Until, format = "%F %H:%M", tz = "UTC"))
 
 ## check negative ranges
 if (!all((ranges_CHP1_temp$Until - ranges_CHP1_temp$From) >= 1)) {
-    pander(ranges_CHP1_temp[ !ranges_CHP1_temp$From < ranges_CHP1_temp$Until, ])
-    stop("Inverted ranges in ", CHP1_TEMP_EX, "!!!")
+  pander(ranges_CHP1_temp[ !ranges_CHP1_temp$From < ranges_CHP1_temp$Until, ])
+  stop("Inverted ranges in ", CHP1_TEMP_EX, "!!!")
 }
 ## Capitalize comments
 ranges_CHP1_temp$Comment <- sub("(.)", "\\U\\1", ranges_CHP1_temp$Comment, perl = TRUE)
@@ -144,7 +140,6 @@ ranges_CHP1_temp$HourSpan <- (as.numeric(ranges_CHP1_temp$Until) - as.numeric(ra
 #'
 #+ include=T, echo=F
 hist(ranges_CHP1_temp$HourSpan)
-cat(" \n \n")
 
 temp <- ranges_CHP1_temp[ranges_CHP1_temp$HourSpan > 20, ]
 row.names(temp) <- NULL
@@ -163,14 +158,14 @@ ranges_CM21        <- read.table(CM21_EXCLUDE,
                                  colClasses   = "character",
                                  strip.white  = TRUE,
                                  header       = TRUE,
-                                 comment.char = "#" )
+                                 comment.char = "#")
 ranges_CM21$From  <- as.POSIXct(strptime(ranges_CM21$From,  format = "%F %H:%M", tz = "UTC"))
 ranges_CM21$Until <- as.POSIXct(strptime(ranges_CM21$Until, format = "%F %H:%M", tz = "UTC"))
 
 ## check negative ranges
 if (!all((ranges_CM21$Until - ranges_CM21$From) >= 1)) {
-    pander(ranges_CM21[ !ranges_CM21$From < ranges_CM21$Until, ])
-    stop("Inverted ranges in ", CM21_EXCLUDE, "!!!")
+  pander(ranges_CM21[ !ranges_CM21$From < ranges_CM21$Until, ])
+  stop("Inverted ranges in ", CM21_EXCLUDE, "!!!")
 }
 ## Capitalize comments
 ranges_CM21$Comment <- sub("(.)", "\\U\\1", ranges_CM21$Comment, perl = TRUE)
