@@ -11,9 +11,6 @@ renv::load("~/BBand_LAP", quit = TRUE)
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/BUILD/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
-# ## Update input files  -------------------------------------------------------
-# system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
-#
 # ## Build tracker database  ---------------------------------------------------
 # ## TODO: Under development
 # try(
@@ -34,21 +31,31 @@ source("~/BBand_LAP/build_duckdb/Build_DB_06_cm21inclined.R"    )
 source("~/BBand_LAP/build_duckdb/Build_DB_07_pir.R"             )
 source("~/BBand_LAP/build_duckdb/Build_DB_16_cm21_TOT.R"        )
 
+
 ##  Flag bad data  -------------------------------------------------------------
 # source("~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R"  )
 try({
   cat("\n\n 30. Build DB exclude ranges\n")
-  rmarkdown::render(input       = "~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R",
-                    output_dir  = output_dir)
+  rmarkdown::render(input      = "~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R",
+                    output_dir = output_dir)
 })
-
 
 
 ##  Data processing  -----------------------------------------------------------
 
 ## __ Apply dark offset and convert to radiation  ------------------------------
-source("~/BBand_LAP/build_duckdb/Build_DB_42_cm21_dark_radiat.R")
-source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
+# source("~/BBand_LAP/build_duckdb/Build_DB_42_cm21_dark_radiat.R")
+try({
+  cat("\n\n 42. Build DB cm21 dark radiat\n")
+  rmarkdown::render(input      = "~/BBand_LAP/build_duckdb/Build_DB_42_cm21_dark_radiat.R",
+                    output_dir = output_dir)
+})
+# source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
+try({
+  cat("\n\n 43. Build DB chp1 dark radiat\n")
+  rmarkdown::render(input      = "~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R",
+                    output_dir = output_dir)
+})
 
 ## __ Second pass to construct missing dark  -----------------------------------
 # source("~/BBand_LAP/build_duckdb/Build_DB_42_cm21_dark_radiat.R")
@@ -58,8 +65,19 @@ source("~/BBand_LAP/build_duckdb/Build_DB_43_chp1_dark_radiat.R")
 # source("~/BBand_LAP/build_duckdb/Build_DB_44_chp1_temp_correc.R")
 
 ## Add data from other sources  ------------------------------------------------
-source("~/BBand_LAP/build_duckdb/Build_DB_50_Import_TSI.R"      )
-source("~/BBand_LAP/build_duckdb/Build_DB_51_Import_Pressure.R" )
+# source("~/BBand_LAP/build_duckdb/Build_DB_50_Import_TSI.R"      )
+try({
+  cat("\n\n 50. Build DB Import TSI\n")
+  rmarkdown::render(input      = "~/BBand_LAP/build_duckdb/Build_DB_50_Import_TSI.R",
+                    output_dir = output_dir)
+})
+# source("~/BBand_LAP/build_duckdb/Build_DB_51_Import_Pressure.R" )
+try({
+  cat("\n\n 51. Build DB Import Pressure\n")
+  rmarkdown::render(input      = "~/BBand_LAP/build_duckdb/Build_DB_51_Import_Pressure.R",
+                    output_dir = output_dir)
+})
+
 
 ## __ Create some new variables  -----------------------------------------------
 source("~/BBand_LAP/build_duckdb/Build_DB_60_Create_strict.R"   )
