@@ -146,16 +146,14 @@ ranges_CHP1_temp$HourSpan <- (as.numeric(ranges_CHP1_temp$Until) - as.numeric(ra
 hist(ranges_CHP1_temp$HourSpan)
 cat(" \n \n")
 
-temp <- ranges_CHP1_temp[ ranges_CHP1_temp$HourSpan > 20 , ]
+temp <- ranges_CHP1_temp[ranges_CHP1_temp$HourSpan > 20, ]
 row.names(temp) <- NULL
-cat("\n\n\\footnotesize\n\n")
+
 pander(temp)
-cat("\n\n\\normalsize\n\n")
+
 rm(temp)
 
-cat("\n\n\\footnotesize\n\n")
 pander(data.table(table(ranges_CHP1_temp$Comment)))
-cat("\n\n\\normalsize\n\n")
 
 
 ##  Load CM-21 exclusions  -----------------------------------------------------
@@ -186,18 +184,16 @@ ranges_CM21$HourSpan <- (as.numeric(ranges_CM21$Until) - as.numeric(ranges_CM21$
 #+ include=T, echo=F
 
 hist(ranges_CM21$HourSpan)
-cat(" \n \n")
 
 temp <- ranges_CM21[ ranges_CM21$HourSpan > 12 , ]
 row.names(temp) <- NULL
-cat("\n\\footnotesize\n\n")
+
 pander(temp)
-cat("\n\\normalsize\n\n")
+
 rm(temp)
 
-cat("\n\\footnotesize\n\n")
 pander(data.table(table(ranges_CM21$Comment)))
-cat("\n\n\\normalsize\n\n")
+
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
