@@ -10,6 +10,7 @@ At: 2024-12-11
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
           plotly:  4.10.4  
+          duckdb:  1.1.2   
       reticulate:  1.40.0  
        lubridate:  1.9.4   
             renv:  1.0.11  
