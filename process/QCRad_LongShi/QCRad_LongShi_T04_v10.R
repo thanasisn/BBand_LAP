@@ -316,7 +316,7 @@ vars <- c("Dir_First_Clim_lim", "Dir_Secon_Clim_lim", "DIR_strict")
 ylim <- c(DT |> summarise(across(all_of(vars), ~ min(., na.rm = TRUE))) |> collect() |> min(na.rm = TRUE),
           DT |> summarise(across(all_of(vars), ~ max(., na.rm = TRUE))) |> collect() |> max(na.rm = TRUE))
 
-for (ay in years) {
+for (ay in sort(years)) {
   pp <- tbl(con, "LAP") |>
     filter(Elevat > 0)  |>
     filter(year == ay)  |>
@@ -401,7 +401,7 @@ for (ay in years) {
 
 ## Yearly plots for Global
 years <- DT |> filter(!is.na(DIR_strict)) |>
-  select(year) |> distinct() |> pull()
+  select(year) |> distinct() |> pull() |> sort()
 
 ## common scale
 vars <- c("Glo_First_Clim_lim", "Glo_Secon_Clim_lim", "DIR_strict")

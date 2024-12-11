@@ -202,8 +202,8 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       Global_max := case_when(
-        TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off > 9000 ~ 9000,
-        TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off < 9000 ~ TSI_TOA * QS$Glo_SWdn_amp * cos(SZA*pi/180)^1.2 + QS$Glo_SWdn_off,
+        TSI_TOA * QS$Glo_SWdn_amp * cos(SZA * pi / 180)^1.2 + QS$Glo_SWdn_off > 9000 ~ 9000,
+        TSI_TOA * QS$Glo_SWdn_amp * cos(SZA * pi / 180)^1.2 + QS$Glo_SWdn_off < 9000 ~ TSI_TOA * QS$Glo_SWdn_amp * cos(SZA * pi / 180)^1.2 + QS$Glo_SWdn_off,
       )
     ) |>
     mutate(

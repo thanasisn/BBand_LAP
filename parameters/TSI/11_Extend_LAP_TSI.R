@@ -110,7 +110,7 @@ tsi_fun <- approxfun(
   x      = STIS$Time,
   y      = STIS$TSI,
   method = "linear",
-  rule   = 1,
+  rule   = 1:2,      ## left 1: NA outside, right 2: extend with last value
   ties   = mean
 )
 
@@ -132,6 +132,7 @@ ggplot() +
 #'
 #'  Insert raw TSIS values to the main table
 #'
+#+ message=F
 
 ## Add row TSIS values for LAP
 TEST1 <- tbl(con, "LAP_TSI")   |>
@@ -164,15 +165,15 @@ if (TEST1 |> tally() |> pull() != 0 &
 
 ##  Fill raw with interpolation  -----------------------------------------------
 #'
-#'  ## Fill TSIS TSI with interpolated values.
+#' ## Fill TSIS TSI with interpolated values.
 #'
-#'  Create a function than can fill any date
+#' Create a function than can fill any date
 #'
-#'  Assume old TSIS data do not need update,
-#'  otherwise should select old TSIS and replace them all, and also update
-#'  TSI_TOA and TSI_LAP
+#' Assume old TSIS data do not need update,
+#' otherwise should select old TSIS and replace them all, and also update
+#' TSI_TOA and TSI_LAP
 #'
-#+ echo=T
+
 some <- tbl(con, "LAP_TSI") |>
   filter(is.na(TSI) & Date > commonmin) |>
   select(Date) |> collect() |> data.table()
@@ -192,6 +193,7 @@ if (nrow(some) > 0) {
 #'
 #' ## Create values of TSI at TOA and LAP for all TSIs at 1 au.
 #'
+#+ message=F
 
 ## Dates to fill
 some <- LAP |>
@@ -211,13 +213,15 @@ SUN <- tbl(sun, "params") |>
 ##  Create data to add
 ADD <- left_join(some, SUN, copy = T) |>
   mutate(
-    TSI_TOA = TSI / Sun_Dist_Astropy^2,  ## TSI on LAP TOA
-    TSI_LAP = TSI_TOA * cos(SZA*pi/180)  ## TSI on LAP ground
+    TSI_TOA = TSI / Sun_Dist_Astropy^2,      ## TSI on LAP TOA
+    TSI_LAP = TSI_TOA * cos(SZA * pi / 180)  ## TSI on LAP ground
   ) |>
   select(Date, TSI_TOA, TSI_LAP) |>
   filter(!is.na(TSI_TOA) & !is.na(TSI_LAP))
 
+
 ##  Write only when needed
+#+ echo=F
 if (ADD |> tally() |> pull() > 0) {
   cat(paste(Script.ID, ":",
             "TOA and Ground TSI"), "\n")
@@ -225,13 +229,28 @@ if (ADD |> tally() |> pull() > 0) {
 }
 
 ##  Plot composite TSI
-tbl(con, "LAP_TSI") |> filter(!is.na(TSI)) |> # head(10000) |>
+tbl(con, "LAP_TSI") |> filter(!is.na(TSI)) # |> head(40000) |>
   ggplot() +
   geom_point(
     aes(x = Date,
         y = TSI,
         color = Source),
-    size = 0.5)
+    size  = 0.5,
+    alpha = 0.5) +
+  theme(legend.position = "bottom")
+
+stats <- tbl(con, "LAP_TSI") |>
+  filter(!is.na(TSI)) |>
+  group_by(Source)    |>
+  summarise(
+    Start = min(Date, na.rm = TRUE),
+    End   = max(Date, na.rm = TRUE),
+    Count = n()
+  ) |> collect() |> arrange(End)
+
+#+ echo=F, include=T
+pander::pander(stats)
+cat("\n\n")
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
