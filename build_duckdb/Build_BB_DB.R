@@ -8,6 +8,9 @@ Sys.setenv(TZ = "UTC")
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB.R"
 renv::load("~/BBand_LAP", quit = TRUE)
 
+output_dir <- "~/BBand_LAP/REPORTS/REPORTS/BUILD/"
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+
 # ## Update input files  -------------------------------------------------------
 # system("~/BBand_LAP/tools/Get_data_from_sirena.sh"          )
 #
@@ -32,7 +35,13 @@ source("~/BBand_LAP/build_duckdb/Build_DB_07_pir.R"             )
 source("~/BBand_LAP/build_duckdb/Build_DB_16_cm21_TOT.R"        )
 
 ##  Flag bad data  -------------------------------------------------------------
-source("~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R"  )
+# source("~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R"  )
+try({
+  cat("\n\n 30. Build DB exclude ranges\n")
+  rmarkdown::render(input       = "~/BBand_LAP/build_duckdb/Build_DB_30_exclude_ranges.R",
+                    output_dir  = output_dir)
+})
+
 
 
 ##  Data processing  -----------------------------------------------------------
