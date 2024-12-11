@@ -268,7 +268,7 @@ ignore <- grep("QCv10_0[1-5]", DT |> colnames(), value = T)
 years <- DT |>
   filter(!is.na(DIFF_strict)) |>
   select(year) |> distinct()  |>
-  collect()    |> pull()
+  collect()    |> pull() |> sort()
 
 for (ay in years) {
 
