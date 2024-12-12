@@ -82,9 +82,10 @@ temp <- ranges_CHP1[ ranges_CHP1$HourSpan > 20, ]
 row.names(temp) <- NULL
 
 pander(temp)
+cat(" /n /n")
 
 pander(data.table(table(ranges_CHP1$Comment)))
-
+cat(" /n /n")
 
 # temp_flag <- data.table()
 # for (i in 1:nrow(ranges_CHP1)) {
@@ -145,11 +146,12 @@ temp <- ranges_CHP1_temp[ranges_CHP1_temp$HourSpan > 20, ]
 row.names(temp) <- NULL
 
 pander(temp)
+cat(" /n /n")
 
 rm(temp)
 
 pander(data.table(table(ranges_CHP1_temp$Comment)))
-
+cat(" /n /n")
 
 ##  Load CM-21 exclusions  -----------------------------------------------------
 cm21_exclude_mtime <- file.mtime(CM21_EXCLUDE)
@@ -184,11 +186,12 @@ temp <- ranges_CM21[ ranges_CM21$HourSpan > 12 , ]
 row.names(temp) <- NULL
 
 pander(temp)
+cat(" /n /n")
 
 rm(temp)
 
 pander(data.table(table(ranges_CM21$Comment)))
-
+cat(" /n /n")
 
 ##  Open dataset  --------------------------------------------------------------
 con   <- dbConnect(duckdb(dbdir = DB_DUCK))
