@@ -311,7 +311,7 @@ stopifnot(DATA[, all(V6 == "mins")])
 DATA[, V6 := NULL]
 ## Check execution time
 if (is.numeric(DATA$V5)) {
-    names(DATA)[names(DATA) == "V5"] <- "Minutes"
+  names(DATA)[names(DATA) == "V5"] <- "Minutes"
 }
 ## Parse script name
 
@@ -319,18 +319,19 @@ if (is.numeric(DATA$V5)) {
 DATA[, Script   := basename(V4)]
 DATA[, Category := basename(dirname(V4))]
 DATA[, Script_2 := paste0(Category, "::", Script)]
-DATA[, V4 := NULL]
+DATA[, V4       := NULL]
 
 ## Parse host
 DATA[, c("User", "Host") := tstrsplit(V3, "@")]
 DATA[, V3 := NULL]
-
 
 ## Show only stats for the main machine
 DATA <- DATA[Host == "sagan"]
 
 ## Limit date range
 DATA <- DATA[Date > Sys.time() - (370 * 24 * 3600)]
+
+
 
 xlim <- range(DATA$Date)
 
@@ -400,6 +401,11 @@ total <- DATA[, .(Minutes = sum(Minutes),
                   .N),
               by = GID]
 
+summary(total$Minutes)
+# hist(total$Minutes)
+## Ignore unrealistic time spans
+total <- total[Minutes < 1440, ]
+
 plot(1,
      xlim = xlim,
      ylim = range(total$Minutes, na.rm = T),
@@ -420,6 +426,10 @@ partial <- DATA[, .(Minutes = sum(Minutes),
                     Date    = min(Date),
                     .N),
                 by = .(GID, Category)]
+
+# hist(partial$Minutes)
+partial[Minutes > 1440]
+partial <- partial[Minutes < 1440]
 
 for (as in unique(partial$Category)) {
     pp <- partial[Category == as]
