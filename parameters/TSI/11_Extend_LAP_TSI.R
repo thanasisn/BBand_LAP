@@ -229,7 +229,7 @@ if (ADD |> tally() |> pull() > 0) {
 }
 
 ##  Plot composite TSI
-tbl(con, "LAP_TSI") |> filter(!is.na(TSI)) |> head(40000) |>
+tbl(con, "LAP_TSI") |> filter(!is.na(TSI)) |>  # head(40000) |>
   ggplot() +
   geom_point(
     aes(x = Date,
