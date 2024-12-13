@@ -106,33 +106,30 @@ try({
 
 
 ## __ Plot daily radiation  ----------------------------------------------------
+# source("~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R")
 try({
-    cat("\n\n 30. Plot daily radiation\n")
-    source("~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R")
+  cat("\n\n 30. Plot daily radiation\n")
+  rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R",
+                    output_dir = output_dir)
 })
+# source("~/BBand_LAP/inspect_duckdb/31_Plot_daily_CM21_L1.R")
 try({
-    cat("\n\n 31. Plot daily radiation\n")
-    source("~/BBand_LAP/inspect_duckdb/31_Plot_daily_CM21_L1.R")
-})
-
-
-try({
-    cat("\n\n 60. Inspect CM-21/TOT radiation\n")
-    rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
-                      output_dir  = output_dir)
+  cat("\n\n 31. Plot daily radiation\n")
+  rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/31_Plot_daily_CM21_L1.R",
+                    output_dir = output_dir)
 })
 
-# try({
-#     cat("\n\n 80. Inspect duckdbs\n")
-#     rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/80_Inspect_duckdb.R",
-#                       output_dir  = output_dir)
-# })
-
 try({
-  cat("\n\n 4b. Inspect ERPPLAY PIR signal DIRTY\n")
+  cat("\n\n 60. Inspect CM-21/TOT radiation\n")
+  rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
+                    output_dir  = output_dir)
+})
+
+## __ Data maintainance  -------------------------------------------------------
+try({
+  cat("\n\n Duckdb plot stats\n")
   rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/Duckdb_plot_stats.R",
                     params      = list(CLEAN = FALSE),
-                    output_file = "Duckdb_plot_stats.pdf",
                     output_dir  = output_dir)
 })
 
