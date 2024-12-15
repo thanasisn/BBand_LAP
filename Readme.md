@@ -16,7 +16,7 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Sat Dec 14 03:19:15 UTC 2024 -->
+<!-- Added by: athan, at: Sun Dec 15 03:19:43 UTC 2024 -->
 
 <!--te-->
 
@@ -28,14 +28,14 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 
 | Name             |     Rows | Vars |    Values |      Size |   Fill | Bytes/Value |
 |:-----------------|---------:|-----:|----------:|----------:|-------:|------------:|
-| BBDB             | 16806430 |   81 | 533156976 |   2.6 GiB | 39.16% |        5.33 |
-| BBDB meta        |    11673 |   82 |    504054 |   2.2 MiB | 52.66% |        4.52 |
-| TrackerDB        |  8718947 |   23 |  78397081 | 168.4 MiB | 39.09% |        2.25 |
-| TrackerDB meta   |     3179 |    9 |     27859 | 364.0 KiB | 97.37% |       13.38 |
-| Raw files hashes |   812303 |    4 |   3249212 |   4.1 MiB |   100% |        1.32 |
-| **Total**        | 26352532 |  199 | 615335182 |   2.8 GiB |    NA% |        4.92 |
+| BBDB             | 16806946 |   81 | 533175674 |   2.6 GiB | 39.16% |        5.33 |
+| BBDB meta        |    11674 |   82 |    504092 |   2.2 MiB | 52.66% |        4.52 |
+| TrackerDB        |  8720796 |   23 |  78413702 | 168.5 MiB | 39.09% |        2.25 |
+| TrackerDB meta   |     3180 |    9 |     27868 | 364.0 KiB | 97.37% |       13.38 |
+| Raw files hashes |   812311 |    4 |   3249244 |   4.1 MiB |   100% |        1.32 |
+| **Total**        | 26354907 |  199 | 615370580 |   2.8 GiB |    NA% |        4.92 |
 
-Table: Datasets sizes on 2024-12-14
+Table: Datasets sizes on 2024-12-15
 
 
 
