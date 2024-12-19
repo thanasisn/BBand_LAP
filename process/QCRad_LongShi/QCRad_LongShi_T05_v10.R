@@ -159,7 +159,7 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       ## Clear Sky Sort-Wave model
-      ClrSW_ref2 := case_when(
+      ClrSW_ref := case_when(
         (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA * pi / 180)^QS$ClrSW_b > 9000
         ~ 9000,
         (QS$ClrSW_a / Sun_Dist_Astropy^2) * cos(SZA * pi / 180)^QS$ClrSW_b < 9000
@@ -170,7 +170,7 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       !!flagname_DIR := case_when(
-        GLB_strict  / ClrSW_ref2 > QS$ClrSW_lim           &
+        GLB_strict  / ClrSW_ref > QS$ClrSW_lim           &
           DIFF_strict / GLB_strict > QS$ClrSW_lim         &
           GLB_strict               > QS$glo_min           &
           Elevat                   > QS$Tracking_min_elev ~ "Possible no tracking (24)",
@@ -215,12 +215,12 @@ cat(pander(DT |> select(!!flagname_DIR) |> pull() |> table(),
 cat(" \n \n")
 
 test <- DT |>
-  select(DIR_strict, GLB_strict, DIFF_strict, ClrSW_ref2) |>
+  select(DIR_strict, GLB_strict, DIFF_strict, ClrSW_ref) |>
   collect() |> data.table()
 
 
-hist(test[GLB_strict / ClrSW_ref2 < 2,
-          GLB_strict / ClrSW_ref2], breaks = 100)
+hist(test[GLB_strict / ClrSW_ref < 2,
+          GLB_strict / ClrSW_ref], breaks = 100)
 abline(v = QS$ClrSW_lim, col = "red", lty = 3)
 cat(" \n \n")
 
@@ -267,20 +267,19 @@ if (DO_PLOTS) {
       filter(Day == ad) |>
       select(Date,
              DIR_strict, GLB_strict, HOR_strict,
-             ClrSW_ref2,
+             ClrSW_ref,
              !!flagname_DIR) |>
       collect() |> data.table()
     setorder(pp, Date)
 
-    ylim <- range(pp$ClrSW_ref2, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = TRUE)
+    ylim <- range(pp$ClrSW_ref, pp$DIR_strict, pp$GLB_strict, pp$HOR_strict, na.rm = TRUE)
     plot(pp$Date, pp$DIR_strict, "l", col = "blue",
          ylim = ylim, xlab = "", ylab = "wattDIR")
     lines(pp$Date, pp$GLB_strict, col = "green")
     lines(pp$Date, pp$HOR_strict, col = "cyan")
     title(paste("#5", as.Date(ad, origin = "1970-01-01")))
     ## plot limits
-    # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
-    lines(pp$Date, pp$ClrSW_ref2, col = "magenta")
+    lines(pp$Date, pp$ClrSW_ref, col = "magenta")
     ## mark offending data
     points(pp[!get(flagname_DIR) %in% c("empty", "pass"), DIR_strict, Date],
            col = "red", pch = 1)
