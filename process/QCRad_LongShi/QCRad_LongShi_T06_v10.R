@@ -186,7 +186,7 @@ if (Sys.info()["nodename"] == "sagan") {
     to_arrow()                                             |>
     mutate(
 
-      RaylDIFF := case_when(
+      RaylDIFF_ref := case_when(
         Rayleigh_diff(SZA = SZA, Pressure = Pressure) > 9000 ~ 9000,
         Rayleigh_diff(SZA = SZA, Pressure = Pressure) < 9000 ~
           Rayleigh_diff(SZA = SZA, Pressure = Pressure)
@@ -196,11 +196,11 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       !!flagname_BTH := case_when(
-        DIFF_strict - RaylDIFF > QS$Rayleigh_upper_lim ~
+        DIFF_strict - RaylDIFF_ref > QS$Rayleigh_upper_lim ~
           "Rayleigh diffuse limit upper (18)",
-        DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim ~
+        DIFF_strict - RaylDIFF_ref < QS$Rayleigh_lower_lim ~
           "Rayleigh diffuse limit lower broad (18)",
-        DIFF_strict - RaylDIFF     < QS$Rayleigh_lower_lim &
+        DIFF_strict - RaylDIFF_ref     < QS$Rayleigh_lower_lim &
           DIFF_strict / GLB_strict < QS$Rayleigh_dif_glo_r &
           GLB_strict               > QS$Rayleigh_glo_min ~
           "Rayleigh diffuse limit lower narrow (18)",
@@ -245,11 +245,11 @@ cat(" \n \n")
 
 pp <- DT |>
   filter(!is.na(DIFF_strict)) |>
-  filter(!is.na(RaylDIFF))    |>
-  select(DIFF_strict, RaylDIFF) |>
+  filter(!is.na(RaylDIFF_ref))    |>
+  select(DIFF_strict, RaylDIFF_ref) |>
   collect() |> data.table()
 
-hist(pp[, DIFF_strict - RaylDIFF ], breaks = 100)
+hist(pp[, DIFF_strict - RaylDIFF_ref ], breaks = 100)
 abline(v = QS$Rayleigh_lower_lim, lty = 3, col = "red")
 abline(v = QS$Rayleigh_upper_lim, lty = 3, col = "red")
 cat(" \n \n")
@@ -393,7 +393,7 @@ if (DO_PLOTS) {
     pp <- DT |>
       filter(Day == ad) |>
       select(Date, SZA, Azimuth,
-             RaylDIFF,
+             RaylDIFF_ref,
              DIFF_strict, DIR_strict, GLB_strict,
              !!flagname_BTH,
              all_of(ignore)) |>
@@ -425,12 +425,12 @@ if (DO_PLOTS) {
     par(mar = c(2, 4, 2, 1))
 
     ## plot limits
-    ylim <- range(pp$DIFF_strict, pp$RaylDIFF + QS$Rayleigh_upper_lim, na.rm = T)
+    ylim <- range(pp$DIFF_strict, pp$RaylDIFF_ref + QS$Rayleigh_upper_lim, na.rm = T)
     if (ylim[1] < -10) ylim[1] <- -10
     plot(pp$Date, pp$DIFF_strict, "l",
          ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
-    lines(pp$Date, pp$RaylDIFF, col = "magenta" )
-    lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_upper_lim, col = "red" )
+    lines(pp$Date, pp$RaylDIFF_ref, col = "magenta" )
+    lines(pp$Date, pp$RaylDIFF_ref + QS$Rayleigh_upper_lim, col = "red" )
 
     title(paste("#6", as.Date(ad, origin = "1970-01-01")))
 

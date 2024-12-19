@@ -142,8 +142,8 @@ QS$glo_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
 # Ignore too low values near horizon
 QS$dir_SWdn_too_low <-    3     # Ideal w/m^2
 QS$glo_SWdn_too_low <-    3     # Ideal w/m^2
-# datapart[Direct_max < QS$dir_SWdn_too_low, Direct_max := NA]
-# datapart[Global_max < QS$glo_SWdn_too_low, Direct_max := NA]
+# datapart[Direct_max_ref < QS$dir_SWdn_too_low, Direct_max_ref := NA]
+# datapart[Global_max < QS$glo_SWdn_too_low, Direct_max_ref := NA]
 
 if (Sys.info()["nodename"] == "sagan") {
 
@@ -172,7 +172,7 @@ if (Sys.info()["nodename"] == "sagan") {
     arrow::to_arrow()                                      |>
     mutate(
 
-      Direct_max := case_when(
+      Direct_max_ref := case_when(
         TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off > 9000 ~ 9000,
         TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off < 9000 ~ TSI_TOA * QS$Dir_SWdn_amp * cos(SZA*pi/180)^0.2 + QS$Dir_SWdn_off
       )
@@ -181,7 +181,7 @@ if (Sys.info()["nodename"] == "sagan") {
 
       !!flagname_DIR := case_when(
         DIR_strict <  QS$dir_SWdn_min_ext ~ "Extremely rare limits min (3)",
-        DIR_strict >= Direct_max          ~ "Extremely rare limits max (4)",
+        DIR_strict >= Direct_max_ref      ~ "Extremely rare limits max (4)",
 
         .default = "pass"
       )
@@ -256,14 +256,14 @@ cat(pander(DT |> select(!!flagname_GLB) |> pull() |> table(),
 cat("\n \n")
 
 test <- DT |>
-  mutate(dir = Direct_max - DIR_strict,
+  mutate(dir = Direct_max_ref - DIR_strict,
          glo = Global_max - GLB_strict) |>
   select(dir, glo) |> collect()
 
 cat("\n", range(test$dir, na.rm = TRUE), "\n")
 
 hist(test$dir, breaks = 100,
-     main = "Direct_max - DIR_strict")
+     main = "Direct_max_ref - DIR_strict")
 abline(v = QS$dir_SWdn_too_low)
 abline(v = QS$dir_SWdn_min_ext, col = "red")
 cat("\n \n")
@@ -308,14 +308,14 @@ if (DO_PLOTS) {
     pp  <- DT |> filter(Day == ddd) |> collect() |> data.table()
     setorder(pp, Date)
 
-    ylim <- range(pp$Direct_max, pp$DIR_strict, na.rm = T)
+    ylim <- range(pp$Direct_max_ref, pp$DIR_strict, na.rm = T)
     plot(pp$Date, pp$DIR_strict, "l", col = "blue",
          ylim = ylim, xlab = "", ylab = "wattDIR")
     title(paste("#2", as.Date(ad, origin = "1970-01-01"),
                 "N:", pp[!QCv10_02_dir_flag %in% c("empty", "pass"), .N]))
 
     ## plot limits
-    lines(pp$Date, pp$Direct_max, col = "red")
+    lines(pp$Date, pp$Direct_max_ref, col = "red")
     ## mark offending data
     points(pp[!QCv10_02_dir_flag %in% c("empty", "pass"),
               DIR_strict, Date],
