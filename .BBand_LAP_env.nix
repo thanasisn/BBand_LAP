@@ -17,18 +17,39 @@ let
       ## for rendering
       formatR
       knitr
-      lintr
+      rmarkdown
       ## for data analysis
+      RNetCDF
       arrow
+      caTools
       data_table
+      dbplyr
+      digest
+      doMC
       dplyr
+      foreach
       janitor
+      lubridate
       metrica
-      renv
+      reticulate
+      zoo
       ## for data display
       ggplot2
+      ggpmisc
+      ggpp
+      htmlwidgets
       pander
       plotly
+      scales
+      tidyr
+      ## general use
+      Hmisc
+      fs
+      gdata
+      lintr
+      optparse
+      renv
+      stringr
       ;
   };
 

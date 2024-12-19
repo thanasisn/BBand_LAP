@@ -34,3 +34,4 @@ try(loadhistory("/tmp/Rhistory"), silent = TRUE)
 .First <- function() try(loadhistory("/tmp/Rhistory"), silent = TRUE)
 .Last  <- function() try(savehistory("/tmp/Rhistory"), silent = TRUE)
 
+
