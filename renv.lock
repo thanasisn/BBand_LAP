@@ -368,7 +368,7 @@
     },
     "cluster": {
       "Package": "cluster",
-      "Version": "2.1.7",
+      "Version": "2.1.8",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -378,7 +378,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "669a8ff0ccc1d9ea17639c773978b44e"
+      "Hash": "b361779da7f8b129a1859b6cf243ba58"
     },
     "codetools": {
       "Package": "codetools",
@@ -828,6 +828,21 @@
         "utils"
       ],
       "Hash": "588d091c35389f1f4a9d533c8d709b35"
+    },
+    "hardhat": {
+      "Package": "hardhat",
+      "Version": "1.4.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "cli",
+        "glue",
+        "rlang",
+        "tibble",
+        "vctrs"
+      ],
+      "Hash": "e7aabf81944f6c6cbbcec1f85827a279"
     },
     "here": {
       "Package": "here",
@@ -1598,7 +1613,7 @@
     },
     "survival": {
       "Package": "survival",
-      "Version": "3.7-0",
+      "Version": "3.8-3",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1610,7 +1625,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "5aaa9cbaf4aba20f8e06fdea1850a398"
+      "Hash": "fe42836742a4f065b3f3f5de81fccab9"
     },
     "sys": {
       "Package": "sys",
@@ -1788,6 +1803,27 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "51dab85c6c98e50a18d7551e9d49f76c"
+    },
+    "yardstick": {
+      "Package": "yardstick",
+      "Version": "1.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "cli",
+        "dplyr",
+        "generics",
+        "hardhat",
+        "lifecycle",
+        "rlang",
+        "tibble",
+        "tidyselect",
+        "utils",
+        "vctrs",
+        "withr"
+      ],
+      "Hash": "9ce4117141b326c4fffc7c42e56e0f88"
     },
     "zoo": {
       "Package": "zoo",
