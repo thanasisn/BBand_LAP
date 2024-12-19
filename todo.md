@@ -1,4 +1,6 @@
 
+## Rename all constructed reference data to include _ref_ in the name
+
 ## Interactive daily plot of
 
 - Direct
