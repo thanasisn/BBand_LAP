@@ -177,12 +177,12 @@ if (Sys.info()["nodename"] == "sagan") {
     to_arrow()                                             |>
     mutate(
 
-      Dir_First_Clim_lim := case_when(
+      Dir_First_Clim_lim_ref := case_when(
         TSI_TOA * QS$clim_lim_F3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_F3_off > 9000 ~ 9000,
         TSI_TOA * QS$clim_lim_F3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_F3_off < 9000 ~ TSI_TOA * QS$clim_lim_F3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_F3_off
       ),
 
-      Dir_Secon_Clim_lim := case_when(
+      Dir_Secon_Clim_lim_ref := case_when(
         TSI_TOA * QS$clim_lim_S3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_S3_off > 9000 ~ 9000,
         TSI_TOA * QS$clim_lim_S3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_S3_off < 9000 ~ TSI_TOA * QS$clim_lim_S3_fct * cos(SZA * pi / 180)^0.2 + QS$clim_lim_S3_off
       ),
@@ -191,8 +191,8 @@ if (Sys.info()["nodename"] == "sagan") {
     mutate(
 
       !!flagname_DIR := case_when(
-        DIR_strict > Dir_First_Clim_lim ~ "First climatological limit (17)",
-        DIR_strict > Dir_Secon_Clim_lim ~ "Second climatological limit (16)",
+        DIR_strict > Dir_First_Clim_lim_ref ~ "First climatological limit (17)",
+        DIR_strict > Dir_Secon_Clim_lim_ref ~ "Second climatological limit (16)",
 
         .default = "pass"
       )
@@ -280,16 +280,16 @@ test <- DT |>
   select(Date,
          DIR_strict,
          GLB_strict,
-         Dir_First_Clim_lim, Dir_Secon_Clim_lim,
+         Dir_First_Clim_lim_ref, Dir_Secon_Clim_lim_ref,
          Glo_First_Clim_lim, Glo_Secon_Clim_lim,
          !!flagname_DIR, !!flagname_GLB) |>
   collect() |> data.table()
 
-hist(test[, DIR_strict - Dir_First_Clim_lim], breaks = 100,
+hist(test[, DIR_strict - Dir_First_Clim_lim_ref], breaks = 100,
      main = "Departure Direct from first climatological limit")
 cat(" \n \n")
 
-hist(test[, DIR_strict - Dir_Secon_Clim_lim], breaks = 100,
+hist(test[, DIR_strict - Dir_Secon_Clim_lim_ref], breaks = 100,
      main = "Departure Direct from second climatological limit")
 cat(" \n \n")
 
@@ -313,7 +313,7 @@ years <- DT |> filter(!is.na(DIR_strict)) |>
             select(year) |> distinct() |> pull()
 
 ## common scale for plots
-vars <- c("Dir_First_Clim_lim", "Dir_Secon_Clim_lim", "DIR_strict")
+vars <- c("Dir_First_Clim_lim_ref", "Dir_Secon_Clim_lim_ref", "DIR_strict")
 ylim <- c(DT |> summarise(across(all_of(vars), ~ min(., na.rm = TRUE))) |> collect() |> min(na.rm = TRUE),
           DT |> summarise(across(all_of(vars), ~ max(., na.rm = TRUE))) |> collect() |> max(na.rm = TRUE))
 
@@ -323,7 +323,7 @@ for (ay in sort(years)) {
     filter(year == ay)  |>
     select(Date, SZA, Azimuth,
            DIR_strict,
-           Dir_Secon_Clim_lim, Dir_First_Clim_lim,
+           Dir_Secon_Clim_lim_ref, Dir_First_Clim_lim_ref,
            !!flagname_DIR) |>
     collect() |> data.table()
 
@@ -335,9 +335,9 @@ for (ay in sort(years)) {
        ylab = "Direct Irradiance")
 
   ## 4. Second climatological limit (16)
-  points(pp$SZA, pp$Dir_Secon_Clim_lim, cex = .2, col = alpha("red",  0.01))
+  points(pp$SZA, pp$Dir_Secon_Clim_lim_ref, cex = .2, col = alpha("red",  0.01))
   ## 4. First climatological limit (17)
-  points(pp$SZA, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
+  points(pp$SZA, pp$Dir_First_Clim_lim_ref, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
   points(pp[get(flagname_DIR) == "First climatological limit (17)",  DIR_strict, SZA], cex = .7, col = "cyan"   )
@@ -359,9 +359,9 @@ for (ay in sort(years)) {
        ylab = "Direct Irradiance")
 
   ## 4. Second climatological limit (16)
-  points(pp$Azimuth, pp$Dir_Secon_Clim_lim, cex = .2, col = alpha("red",  0.01))
+  points(pp$Azimuth, pp$Dir_Secon_Clim_lim_ref, cex = .2, col = alpha("red",  0.01))
   ## 4. First climatological limit (17)
-  points(pp$Azimuth, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
+  points(pp$Azimuth, pp$Dir_First_Clim_lim_ref, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
   points(pp[get(flagname_DIR) == "First climatological limit (17)",  DIR_strict, Azimuth], cex = .7, col = "cyan"   )
@@ -383,9 +383,9 @@ for (ay in sort(years)) {
        ylab = "Direct Irradiance")
 
   ## 4. Second climatological limit (16)
-  points(pp$Date, pp$Dir_Secon_Clim_lim, cex = .2, col = alpha("red",  0.01))
+  points(pp$Date, pp$Dir_Secon_Clim_lim_ref, cex = .2, col = alpha("red",  0.01))
   ## 4. First climatological limit (17)
-  points(pp$Date, pp$Dir_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
+  points(pp$Date, pp$Dir_First_Clim_lim_ref, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
   points(pp[get(flagname_DIR) == "First climatological limit (17)",  DIR_strict, Date], cex = .7, col = "cyan"   )
@@ -525,20 +525,20 @@ if (DO_PLOTS) {
       # filter(!is.na(DIR_strict)) |>
       select(Date,
              DIR_strict,
-             Dir_First_Clim_lim, Dir_Secon_Clim_lim,
+             Dir_First_Clim_lim_ref, Dir_Secon_Clim_lim_ref,
              !!flagname_DIR) |>
       collect() |> data.table()
     setorder(pp, Date)
 
-    ylim <- range(pp$Dir_First_Clim_lim,
-                  pp$Dir_Secon_Clim_lim,
+    ylim <- range(pp$Dir_First_Clim_lim_ref,
+                  pp$Dir_Secon_Clim_lim_ref,
                   pp$DIR_strict, na.rm = T)
     plot(pp$Date, pp$DIR_strict, "l", col = "blue",
          ylim = ylim, ylab = "DIR_strict", xlab = "")
     title(paste("#4", as.Date(ad, origin = "1970-01-01")))
     ## plot limits
-    lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
-    lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
+    lines(pp$Date, pp$Dir_First_Clim_lim_ref, col = "pink")
+    lines(pp$Date, pp$Dir_Secon_Clim_lim_ref, col = "red" )
     ## mark offending data
     points(pp[!get(flagname_DIR) %in% c("empty", "pass"), DIR_strict, Date],
            col = "red", pch = 1)
