@@ -8,12 +8,15 @@ Sys.setenv(TZ = "UTC")
 Script.Name <- "~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_run.R"
 renv::load("~/BBand_LAP")
 
+output_dir <- "~/BBand_LAP/REPORTS/REPORTS/CSid_RenoHansen/"
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 ##  Run training  --------------------------------------------------------------
-
-# make each filter a script with parameters
-# use the set of filters for training and application of CS
-
+source("~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_01_alldata_optim_v15.R")
+try({
+  rmarkdown::render(input      = "~/BBand_LAP/CSid_RenoHansen/CSid_RenoHansen_01_alldata_optim_v15.R",
+                    output_dir = output_dir)
+})
 
 ##  Run tests  -----------------------------------------------------------------
 
