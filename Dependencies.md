@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2024-12-18 
+At: 2024-12-21 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -32,8 +32,12 @@ At: 2024-12-18
          janitor:  2.2.0   
          ggpmisc:  0.6.1   
             ggpp:  0.5.8.1 
-           Hmisc:  5.2.1   
+         metrica:  2.1.0   
+    RColorBrewer:  1.1.3   
           scales:  1.3.0   
+            base:  4.2.3   
+       yardstick:  1.3.1   
+           Hmisc:  5.2.1   
           digest:  0.6.37  
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
