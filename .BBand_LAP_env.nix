@@ -49,6 +49,7 @@ let
       lintr
       optparse
       renv
+      rlang
       stringr
       ;
   };
