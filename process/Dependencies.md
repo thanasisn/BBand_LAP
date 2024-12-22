@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/process/ 
-At: 2024-12-21 
+At: 2024-12-22 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -13,6 +13,7 @@ At: 2024-12-21
          metrica:  2.1.0   
           pander:  0.6.5   
     RColorBrewer:  1.1.3   
+           rlang:  1.1.4   
           scales:  1.3.0   
             base:  4.2.3   
        lubridate:  1.9.4   
