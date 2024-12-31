@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/inspect_duckdb/ 
-At: 2024-12-30 
+At: 2024-12-31 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -14,7 +14,9 @@ At: 2024-12-30
        lubridate:  1.9.4   
            tidyr:  1.3.1   
            tools:  4.2.3   
+       rmarkdown:  2.29    
+        bookdown:  0.41    
+           shiny:  1.9.1   
          ggplot2:  3.5.1   
               fs:  1.6.5   
             renv:  1.0.11  
-       rmarkdown:  2.29    
