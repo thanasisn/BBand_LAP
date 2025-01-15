@@ -226,7 +226,7 @@ for (YYYY in sort(years_to_do)) {
     cex  = .1,
     main = paste(YYYY, av, ", Elevat <", DARK_ELEV, "°"),
     xlab = "",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    ylab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   abline(h = pplims$low, col = "red", lty = 3)
   abline(h = pplims$upe, col = "red", lty = 3)
@@ -258,7 +258,7 @@ for (YYYY in sort(years_to_do)) {
     cex  = .1,
     main = paste(YYYY, av, ", Elevat <", DARK_ELEV, "°"),
     xlab = "",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    ylab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   abline(h = pplims$low, col = "red", lty = 3)
   abline(h = pplims$upe, col = "red", lty = 3)
@@ -290,7 +290,7 @@ for (YYYY in sort(years_to_do)) {
     cex  = .1,
     main = paste(YYYY, av, ", Elevat <", 0, "°"),
     xlab = "",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    ylab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   abline(h = pplims$low, col = "red", lty = 3)
   abline(h = pplims$upe, col = "red", lty = 3)
@@ -323,7 +323,7 @@ for (YYYY in sort(years_to_do)) {
     cex  = .1,
     main = paste(YYYY, av, ", Elevat <", 0, "°"),
     xlab = "",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    ylab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   abline(h = pplims$low, col = "red", lty = 3)
   abline(h = pplims$upe, col = "red", lty = 3)
@@ -340,7 +340,7 @@ for (YYYY in sort(years_to_do)) {
   }
 
 
-  ## _ Distribution of direct and SD -----------------------------------------
+  ## _ Distribution of Global and SD -----------------------------------------
   hist(year_data[Elevat < DARK_ELEV, GLB_wpsm],
        main = paste(YYYY, "GHI Elevat <", DARK_ELEV, "°"),
        breaks = 100 , las = 1, probability = T, xlab = "Watt/m^2")
@@ -356,7 +356,7 @@ for (YYYY in sort(years_to_do)) {
     cex  = .1,
     main = paste(YYYY, "GHI SD, Elevat >", 0, "°"),
     xlab = "",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    ylab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   cat('\n\n')
 
@@ -369,7 +369,7 @@ for (YYYY in sort(years_to_do)) {
     breaks = 100,
     las = 1,
     probability = T,
-    xlab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    xlab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   lines(density(year_data$GLB_wpsm, na.rm = T), col = "orange", lwd = 3)
   cat('\n\n')
@@ -380,7 +380,7 @@ for (YYYY in sort(years_to_do)) {
     breaks = 100,
     las = 1,
     probability = T,
-    xlab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    xlab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   lines(density(year_data$GLB_SD_wpsm, na.rm = T), col = "orange", lwd = 3)
   cat('\n\n')
@@ -393,7 +393,7 @@ for (YYYY in sort(years_to_do)) {
     cex  = .1,
     main = paste("Global radiation ", YYYY),
     xlab = "Elevation [°]",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    ylab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   cat('\n\n')
 
@@ -403,7 +403,7 @@ for (YYYY in sort(years_to_do)) {
     cex  = .1,
     main = paste("Global radiation ", YYYY),
     xlab = "Azimuth [°]",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    ylab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   cat('\n\n')
 
@@ -415,7 +415,7 @@ for (YYYY in sort(years_to_do)) {
     cex  = .1,
     main = paste("Global radiation ", YYYY),
     xlab = "",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    ylab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   cat('\n\n')
 
@@ -428,7 +428,7 @@ for (YYYY in sort(years_to_do)) {
     col  = "blue",
     main = paste("Global ", YYYY),
     xlab = "Elevation [°]",
-    ylab = expression(paste("Direct Irradiance [", Watt/m^2, "]"))
+    ylab = expression(paste("Global Irradiance [", Watt/m^2, "]"))
   )
   points(
     year_data[preNoon == TRUE, GLB_wpsm, Elevat],
