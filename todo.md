@@ -1,7 +1,9 @@
 
 ## Rename all constructed reference data to include _ref_ in the name
 
-## Interactive daily plot of
+## Interactive daily plot 
+
+- option to read a list of dates from file
 
 - Direct
 - Global
