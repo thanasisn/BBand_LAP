@@ -401,11 +401,11 @@ for (ay in sort(years)) {
 
 
 ## Yearly plots for Global
-years <- DT |> filter(!is.na(DIR_strict)) |>
+years <- DT |> filter(!is.na(GLB_strict)) |>
   select(year) |> distinct() |> pull() |> sort()
 
 ## common scale
-vars <- c("Glo_First_Clim_lim", "Glo_Secon_Clim_lim", "DIR_strict")
+vars <- c("Glo_First_Clim_lim", "Glo_Secon_Clim_lim", "GLB_strict")
 ylim <- c(DT |> summarise(across(all_of(vars), ~ min(., na.rm = T))) |> collect() |> min(na.rm = T),
           DT |> summarise(across(all_of(vars), ~ max(., na.rm = T))) |> collect() |> max(na.rm = T))
 
@@ -414,13 +414,13 @@ for (ay in years) {
     filter(Elevat > 0)  |>
     filter(year == ay)  |>
     select(Date, SZA, Azimuth,
-           DIR_strict,
+           GLB_strict,
            Glo_Secon_Clim_lim, Glo_First_Clim_lim,
            !!flagname_GLB) |>
     collect() |> data.table()
 
   ## plot direct by SZA
-  plot(pp$SZA, pp$DIR_strict,
+  plot(pp$SZA, pp$GLB_strict,
        cex  = .1,
        ylim = ylim,
        xlab = "SZA",
@@ -432,8 +432,8 @@ for (ay in years) {
   points(pp$SZA, pp$Glo_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
-  points(pp[get(flagname_GLB) == "First climatological limit (17)",  DIR_strict, SZA], cex = .7, col = "cyan"   )
-  points(pp[get(flagname_GLB) == "Second climatological limit (16)", DIR_strict, SZA], cex = .7, col = "magenta")
+  points(pp[get(flagname_GLB) == "First climatological limit (17)",  GLB_strict, SZA], cex = .7, col = "cyan"   )
+  points(pp[get(flagname_GLB) == "Second climatological limit (16)", GLB_strict, SZA], cex = .7, col = "magenta")
 
   title(main = paste("Global climatological test 4.", ay))
   legend("topright",
@@ -443,8 +443,8 @@ for (ay in years) {
   cat(" \n \n")
 
 
-  ## plot direct by Azimuth
-  plot(pp$Azimuth, pp$DIR_strict,
+  ## plot Global by Azimuth
+  plot(pp$Azimuth, pp$GLB_strict,
        cex  = .1,
        ylim = ylim,
        xlab = "Azimuth",
@@ -456,8 +456,8 @@ for (ay in years) {
   points(pp$Azimuth, pp$Glo_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
-  points(pp[get(flagname_GLB) == "First climatological limit (17)",  DIR_strict, Azimuth], cex = .7, col = "cyan"   )
-  points(pp[get(flagname_GLB) == "Second climatological limit (16)", DIR_strict, Azimuth], cex = .7, col = "magenta")
+  points(pp[get(flagname_GLB) == "First climatological limit (17)",  GLB_strict, Azimuth], cex = .7, col = "cyan"   )
+  points(pp[get(flagname_GLB) == "Second climatological limit (16)", GLB_strict, Azimuth], cex = .7, col = "magenta")
 
   title(main = paste("Global Beam climatological test 4.", ay))
   legend("topright",
@@ -467,8 +467,8 @@ for (ay in years) {
   cat(" \n \n")
 
 
-  ## plot direct by Date
-  plot(pp$Date, pp$DIR_strict,
+  ## plot Global by Date
+  plot(pp$Date, pp$GLB_strict,
        cex  = .1,
        ylim = ylim,
        xlab = "",
@@ -480,8 +480,8 @@ for (ay in years) {
   points(pp$Date, pp$Glo_First_Clim_lim, cex = .2, col = alpha("blue", 0.01))
 
   ## plot flagged
-  points(pp[get(flagname_GLB) == "First climatological limit (17)",  DIR_strict, Date], cex = .7, col = "cyan"   )
-  points(pp[get(flagname_GLB) == "Second climatological limit (16)", DIR_strict, Date], cex = .7, col = "magenta")
+  points(pp[get(flagname_GLB) == "First climatological limit (17)",  GLB_strict, Date], cex = .7, col = "cyan"   )
+  points(pp[get(flagname_GLB) == "Second climatological limit (16)", GLB_strict, Date], cex = .7, col = "magenta")
 
   title(main = paste("Direct Beam climatological test 4.", ay))
   legend("topright",
