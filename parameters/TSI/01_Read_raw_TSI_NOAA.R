@@ -99,10 +99,10 @@ for (af in 1:nrow(ncfiles)) {
   stopifnot(grepl(dateorigin, att.get.nc(anc, "time",      "units")))
   stopifnot(grepl(dateorigin, att.get.nc(anc, "time_bnds", "units")))
   ## format data
-  data$Time          <- as.Date(    data$Time,     origin = dateorigin)
-  data$Time          <- as.POSIXct( data$Time ) + 12 * 3600 + 30 ## shift to match LAP
-  data$time_low      <- as.Date(    data$time_low, origin = dateorigin)
-  data$time_upp      <- as.Date(    data$time_upp, origin = dateorigin)
+  data$Time          <- as.Date(   data$Time,     origin = dateorigin)
+  data$Time          <- as.POSIXct(data$Time) + 12 * 3600 + 30 ## shift to match LAP
+  data$time_low      <- as.Date(   data$time_low, origin = dateorigin)
+  data$time_upp      <- as.Date(   data$time_upp, origin = dateorigin)
   # data$file          <- ll$file
   data$file_Version  <- ll$version
   data$file_Creation <- ll$created
@@ -139,7 +139,7 @@ if (!dbExistsTable(con, "TSI_NOAA")) {
   if (nrow(new) > 0) {
     cat("New data for import\n")
 
-    ## always drop preliminar data from DB
+    ## always drop preliminary data from DB
     CCC <- tbl(con, "TSI_NOAA") |>
       filter(prelimi == T) |>
       mutate(TSI           = NA,
@@ -168,7 +168,4 @@ if (!dbExistsTable(con, "TSI_NOAA")) {
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
 #+ results="asis", echo=FALSE
-tac <- Sys.time()
-cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+goodbye()
