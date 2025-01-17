@@ -256,6 +256,8 @@ DT <- tbl(con, "LAP")                  |>
   filter(Day    < QCrad_plot_date_max) |>
   filter(Elevat > QS$plot_elev_T04)
 
+DT |> summarise(max(Date))
+
 ## TODO when plotting ignore previous flagged data or not, but fully apply flag
 
 #' \FloatBarrier
@@ -323,6 +325,7 @@ for (ay in sort(years)) {
     filter(year == ay)  |>
     select(Date, SZA, Azimuth,
            DIR_strict,
+           TSI_TOA, # for testdd
            Dir_Secon_Clim_lim_ref, Dir_First_Clim_lim_ref,
            !!flagname_DIR) |>
     collect() |> data.table()
