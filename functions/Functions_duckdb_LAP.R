@@ -275,3 +275,34 @@ upsert_table <- function(con, new_data, table, matchvar, quiet = FALSE) {
 }
 
 
+
+#' Helper function for scripts end
+#'
+#' @param logfile    The global file for output
+#' @param ScriptName The current script name
+#' @param .tic       Starting datetime
+#'
+#' @return           Outputs stings on the terminal and/or file
+#' @export
+#'
+goodbye <- function(
+    logfile     = "~/BBand_LAP/REPORTS/LOGs/Run.log",
+    ScriptName  = Script.Name,
+    .tic        = tic
+) {
+  .tac <- Sys.time()
+  ## output for knitr and terminal
+  cat(
+    sprintf("\n**END** %s %s@%s %s %f mins\n\n",
+            Sys.time(), Sys.info()["login"], Sys.info()["nodename"], ScriptName, difftime(.tac, .tic, units = "mins"))
+    )
+  ## logging to master log file
+  if (!interactive()) {
+    cat(
+      sprintf("%s %s@%s %s %f mins\n",
+              Sys.time(), Sys.info()["login"], Sys.info()["nodename"], ScriptName, difftime(.tac, .tic, units = "mins")),
+      file = logfile, append = TRUE)
+  }
+}
+
+
