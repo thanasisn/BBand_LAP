@@ -85,7 +85,7 @@ Script.ID   <- "01"
 memlimit    <- 66666
 
 if (!interactive()) {
-  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
