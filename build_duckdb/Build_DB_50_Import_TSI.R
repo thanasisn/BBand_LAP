@@ -8,7 +8,7 @@
 #'
 #' - `Sun_Dist_Astropy`
 #' - `TSI_TOA`
-#' - `TSI_1au`
+#' - `TSI_LAP`
 #' - `TSI_source`
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
@@ -33,8 +33,7 @@ Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_50_Import_TSI.R"
 Script.ID   <- "50"
 
 if (!interactive()) {
-  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
-  sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -51,27 +50,20 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Import  TSI  data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_DUCK))
+tsi <- dbConnect(duckdb(dbdir = DB_TSI, read_only = TRUE))
 
 ##  Load all TSI data  ---------------------------------------------------------
-if (!file.exists(COMP_TSI)) { stop("Missing TSI file:", COMP_TSI) }
-TSI <- readRDS(COMP_TSI)
-TSI <- TSI[!is.na(TSIextEARTH_comb)]
-names(TSI)[names(TSI) == "sun_dist"        ] <- "Sun_Dist_Astropy"
-names(TSI)[names(TSI) == "TSIextEARTH_comb"] <- "TSI_TOA"
-names(TSI)[names(TSI) == "tsi_1au_comb"    ] <- "TSI_1au"
-names(TSI)[names(TSI) == "Source"          ] <- "TSI_source"
-TSI$measur_error_comb <- NULL
-dummy <- gc()
+TSI <- tbl(tsi, "LAP_TSI") |>
+  rename(TSI_source = Source)
 
 ## TODO check TSI accuracy digits!!
 cat(Script.ID, ": ", "TODO Check TSI accuracy digits!\n")
 
 ## Remove all TSI data from database in order to update all
 remove_column(con, "LAP", "TSI_TOA")
-remove_column(con, "LAP", "TSI_1au")
+remove_column(con, "LAP", "TSI_LAP")
 remove_column(con, "LAP", "TSI_source")
-
 
 ##  Update TSI data in DB  -----------------------------------------------------
 TSI <- right_join(TSI,
@@ -79,16 +71,19 @@ TSI <- right_join(TSI,
                     filter(Elevat > -1) |> ## We don't use TSI below horizon
                     select(Date)        |>
                     collect(),
-                  by = "Date")
-TSI <- TSI[!is.na(TSI_source)]
+                  by   = "Date",
+                  copy = TRUE) |>
+  filter(!is.na(TSI_source)) |>
+  select(-Updated)
 
-##  Create categorical column
-categories <- unique(c("empty", TSI$TSI_source))
+##  Create categorical column  -------------------------------------------------
+categories <- unique(c("empty",
+                       TSI |> select(TSI_source) |> distinct() |> pull()))
 make_categorical_column("TSI_source", categories, con, "LAP")
 
 ##  Add all TSI data to the database  ------------------------------------------
-if (nrow(TSI) > 0) {
-  cat(Script.ID, ": ", nrow(TSI), "rows of TSI data to add\n")
+if (TSI |> tally() |> pull() > 0) {
+  cat(Script.ID, ": ", TSI |> tally() |> pull(), "rows of TSI data to add\n")
 
   update_table(con      = con,
                new_data = TSI,
@@ -104,7 +99,5 @@ tbl(con, "LAP") |> group_by(TSI_source) |> tally()
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
-tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+#+ results="asis", echo=FALSE
+goodbye()
