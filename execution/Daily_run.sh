@@ -88,7 +88,7 @@ info "##  Start QCRad LongShi  ##"
 info "##  End QCRad LongShi STATUS:$?  ##"
 
 
-info "##  Start QCRad ThanaisN  ##"
+info "##  Start QCRad ThanasisN  ##"
 "$HOME/BBand_LAP/process/QCRad_ThanasisN/QCRad_ThanasisN_run.R"
 info "##  End QCRad ThanaisN STATUS:$?  ##"
 
@@ -96,7 +96,6 @@ info "##  End QCRad ThanaisN STATUS:$?  ##"
 info "##  Start inspect_duckdb  ##"
 "$HOME/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R"
 info "##  End inspect_duckdb STATUS:$?  ##"
-
 
 
 info "##  Upload results  ##"
