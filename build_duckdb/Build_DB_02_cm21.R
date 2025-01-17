@@ -1,7 +1,47 @@
-# /* !/usr/bin/env Rscript */
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
+#' ---
+#' title:         "Radiation processing for LAP"
+#' author:        "Natsis Athanasios"
+#' institute:     "AUTH"
+#' affiliation:   "Laboratory of Atmospheric Physics"
 #'
-#' Reads CM-21 signal from `[0-9]*06.LAP$``
+#' documentclass: article
+#' classoption:   a4paper,oneside
+#' fontsize:      10pt
+#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+#'
+#' link-citations:  yes
+#' colorlinks:      yes
+#'
+#' header-includes:
+#' - \usepackage{caption}
+#' - \usepackage{placeins}
+#' - \captionsetup{font=small}
+#'
+#' output:
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  9
+#'     fig_height: 4
+#'   bookdown::pdf_document2:
+#'     number_sections:  no
+#'     fig_caption:      no
+#'     keep_tex:         no
+#'     keep_md:          no
+#'     latex_engine:     xelatex
+#'     toc:              yes
+#'     toc_depth:        4
+#'     fig_width:        8
+#'     fig_height:       5
+#'
+#' date: "`r format(Sys.time(), '%F')`"
+#'
+#' ---
+#+ include=F
+
+#'
+#' # Reads CM-21 signal from `[0-9]*06.LAP$``
 #'
 #' Populates:
 #'  - CM21_sig
@@ -11,15 +51,22 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=F
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+                      )
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
@@ -29,8 +76,7 @@ Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_02_cm21.R"
 Script.ID   <- "02"
 
 if (!interactive()) {
-  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
-  sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -45,6 +91,8 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
+
+#+ include=T, echo=F, results="asis"
 cat("\n Import  CM-21  data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
@@ -222,12 +270,8 @@ if (interactive()) {
   tbl(con, "LAP")  |> filter(!is.na(CM21_sig)) |> tally()
 }
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
-
-#+ include=T, echo=F, results="asis"
-tac <- Sys.time()
-cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+#+ results="asis", echo=FALSE
+goodbye()
