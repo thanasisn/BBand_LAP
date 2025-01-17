@@ -257,7 +257,4 @@ dbDisconnect(con, shutdown = TRUE); rm(con)
 dbDisconnect(sun, shutdown = TRUE); rm(sun)
 
 #+ results="asis", echo=FALSE
-tac <- Sys.time()
-cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+goodbye()
