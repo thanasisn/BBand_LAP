@@ -45,6 +45,7 @@
 #' ---
 #+ include=F
 
+#'
 #' **QCRad T04**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
@@ -58,7 +59,7 @@ knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
-knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(fig.pos   = "!h"    )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
                         indent       = 4,
@@ -457,7 +458,4 @@ if (DO_PLOTS) {
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
 #+ results="asis", echo=FALSE
-tac <- Sys.time()
-cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+goodbye()

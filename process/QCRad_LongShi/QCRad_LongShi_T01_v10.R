@@ -45,6 +45,7 @@
 #' ---
 #+ include=F
 
+#'
 #' **QCRad T01**
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
@@ -395,7 +396,4 @@ tbl(con, "LAP") |> summarise(max(Glo_max_ref, na.rm = T))
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
 #+ results="asis", echo=FALSE
-tac <- Sys.time()
-cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+goodbye()
