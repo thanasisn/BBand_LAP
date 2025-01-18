@@ -28,17 +28,19 @@ List of tags
 
 New List of tags
 ============
+      1 CSid
+      1 INCcm21
       1 brewers
       5 broadband
       1 ccd
      30 chp1
      17 cleaning
+      1 clear_sky
      10 cm21
       1 data_corruption_certain
      12 data_loss
       2 down_time
       4 error
-      1 INCcm21
       2 inclined
       4 leveling
      14 problem
