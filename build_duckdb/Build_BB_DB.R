@@ -112,6 +112,8 @@ try({
                     output_dir = output_dir)
 })
 
+source("~/BBand_LAP/build_duckdb/Build_chp1_tracker_DB.R")
+
 ## __ Keep some stats on data bases  -------------------------------------------
 source("~/BBand_LAP/inspect_duckdb/Duckdb_save_stats.R"         )
 
