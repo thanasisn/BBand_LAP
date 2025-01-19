@@ -63,28 +63,6 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/process/Tests.R"
 renv::load("~/BBand_LAP")
 
-status_msg <- function(
-    ScriptName = Script.Name,
-    timezone   = "Europe/Athens",
-    output     = "/dev/shm/BBand_LAP.status",
-    msg        = "") {
-  cat(
-    format(Sys.time(), tz = "Europe/Athens"),
-    ScriptName,
-    msg,
-    "                    \r",
-    sep = "::",
-    file = output,
-    append = TRUE
-    )
-}
-
-for (i in 1:100) {
-  status_msg(msg = i)
-  Sys.sleep(1)
-}
-
-format(Sys.time(), tz = "Europe/Athens")
 
 
 source("~/BBand_LAP/DEFINITIONS.R")
