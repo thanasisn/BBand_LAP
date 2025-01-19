@@ -1,4 +1,8 @@
 
+## Move TSI in the main DB
+
+at least the by minute data
+
 ## Rename all constructed reference data to include _ref_ in the name
 
 ## Interactive daily plot 
