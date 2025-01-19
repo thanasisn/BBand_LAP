@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Sat Jan 18 17:40:04 EET 2025 -->
+<!-- Added by: athan, at: Sun Jan 19 09:40:04 EET 2025 -->
 
 <!--te-->
 
@@ -1463,6 +1463,26 @@ Later in the noon we see through the camera people walking among the instruments
 :::
 
 
+\newpage
+
+# 2025
+
+::: {.columns columngap=4em column-rule="1px solid black"}
+
+
+## 2025-01-19 09:13 EET [ThanasisN]
+
+Most of the processes are done in Duckdb now.
+
+There are some secondary scripts to migrate.
+
+
+
+
+
+:::
+
+
 -------
 
 
@@ -1557,6 +1577,7 @@ New List of tags
       1 data_corruption_certain
      12 data_loss
       2 down_time
+      1 duckdb
       4 error
       2 inclined
       4 leveling

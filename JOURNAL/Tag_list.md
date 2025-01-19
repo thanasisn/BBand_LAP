@@ -40,6 +40,7 @@ New List of tags
       1 data_corruption_certain
      12 data_loss
       2 down_time
+      1 duckdb
       4 error
       2 inclined
       4 leveling

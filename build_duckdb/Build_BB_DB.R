@@ -5,7 +5,6 @@
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB.R"
 renv::load("~/BBand_LAP", quit = TRUE)
 
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/BUILD/"

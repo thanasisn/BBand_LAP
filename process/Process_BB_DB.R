@@ -5,8 +5,6 @@
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/process/Process_BB_DB.R"
 renv::load("~/BBand_LAP")
 
 library(rmarkdown)
@@ -43,11 +41,8 @@ try({
 
 ## This should be the last thing to run on the BBand_LAP
 try({
-  render(input         = "~/BBand_LAP/inspect_db/99_Self_evaluation.R",
+  render(input         = "~/BBand_LAP/inspect_duckdb/99_Self_evaluation.R",
          output_format = " bookdown::pdf_document2",
          output_dir    = output_dir)
 })
 
-
-tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
