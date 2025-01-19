@@ -306,3 +306,32 @@ goodbye <- function(
 }
 
 
+#' Output a simple message to monitor progress
+#'
+#' @param ScriptName  The name of the running script
+#' @param timezone    Timezone to use
+#' @param output      Targe file
+#' @param msg         The message to display
+#' @details
+#' Use `tail -F /dev/shm/BBand_LAP.status` to display the status
+#'
+#' @return
+#' @export
+#'
+#' @examples
+status_msg <- function(
+    ScriptName = Script.Name,
+    timezone   = "Europe/Athens",
+    output     = "/dev/shm/BBand_LAP.status",
+    msg        = "")
+{
+  cat(
+    format(Sys.time(), tz = "Europe/Athens"),
+    ScriptName,
+    msg,
+    "                    \r", ## white space padding
+    sep = "::",
+    file = output,
+    append = TRUE
+  )
+}
