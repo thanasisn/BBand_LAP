@@ -16,7 +16,7 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Sat Jan 18 03:17:21 UTC 2025 -->
+<!-- Added by: athan, at: Sun Jan 19 03:19:07 UTC 2025 -->
 
 <!--te-->
 
@@ -35,7 +35,7 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 | Raw files hashes |   812450 |    4 |   3249800 |   4.1 MiB |   100% |        1.32 |
 | **Total**        | 26463663 |  199 | 616677535 |   3.4 GiB |    NA% |        5.99 |
 
-Table: Datasets sizes on 2025-01-18
+Table: Datasets sizes on 2025-01-19
 
 
 
