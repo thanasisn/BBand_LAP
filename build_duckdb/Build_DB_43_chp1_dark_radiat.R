@@ -104,7 +104,8 @@ cc <- 0
 for (ad in sort(dayslist)) {
   ad <- as.Date(ad, origin = origin)
   cc <- cc + 1
-  cat(Script.ID, ":", paste(ad), cc, "/",length(dayslist))
+  cat(Script.ID, ":", paste(ad), cc, "/", length(dayslist))
+  status_msg(ScriptName = Script.Name, c(paste(ad), cc, length(dayslist)))
 
   ## use only valid data for dark calculation
   daydata <-
@@ -220,8 +221,5 @@ tbl(con, "META") |> group_by(chp1_dark_flag) |> tally()
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
-tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
-
+#+ results="asis", echo=FALSE
+goodbye()
