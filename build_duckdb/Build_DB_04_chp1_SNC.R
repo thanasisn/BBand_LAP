@@ -20,7 +20,16 @@ knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.cap   = " - empty caption - ")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+)
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
@@ -30,8 +39,7 @@ Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_04_chp1_SNC.R"
 Script.ID   <- "04"
 
 if (!interactive()) {
-  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
-  sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------

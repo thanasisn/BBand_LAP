@@ -95,7 +95,12 @@ info "##  End QCRad ThanaisN STATUS:$?  ##"
 
 info "##  Start inspect_duckdb  ##"
 "$HOME/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R"
-info "##  End inspect_duckdb STATUS:$?  ##"
+info "##  End Inspect_BB_DB.R STATUS:$?  ##"
+
+
+info "##  Start other process  ##"
+"$HOME/BBand_LAP/process/Process_BB_DB.R"
+info "##  End Process_BB_DB.R STATUS:$?  ##"
 
 
 info "##  Upload results  ##"
