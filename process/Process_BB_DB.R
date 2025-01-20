@@ -8,7 +8,7 @@ renv::load("~/BBand_LAP")
 
 library(rmarkdown)
 
-output_dir <- "~/BBand_LAP/REPORTS/REPORTS"
+output_dir <- "~/BBand_LAP/REPORTS/PROCESS"
 dir.create(output_dir, showWarnings = F, recursive = T)
 
 cat("\n\nCheck legacy export\n")
