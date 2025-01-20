@@ -84,7 +84,7 @@ make_categorical_column("TSI_source", categories, con, "LAP")
 ##  Add all TSI data to the database  ------------------------------------------
 if (TSI |> tally() |> pull() > 0) {
   cat(Script.ID, ": ", TSI |> tally() |> pull(), "rows of TSI data to add\n")
-  status_msg(ScriptName = Script.Name, c(TSI |> tally() |> pull(), "rows of TSI data to add"))
+  status_msg(ScriptName = Script.Name, msg = c(TSI |> tally() |> pull(), "rows of TSI data to add"))
 
   update_table(con      = con,
                new_data = TSI,
@@ -93,7 +93,7 @@ if (TSI |> tally() |> pull() > 0) {
 
 } else {
   cat(Script.ID, ": ", "No new TSI data to add\n")
-  status_msg(ScriptName = Script.Name, c("No new TSI data to add"))
+  status_msg(ScriptName = Script.Name, msg = c("No new TSI data to add"))
 }
 
 tbl(con, "LAP") |> group_by(TSI_source) |> tally()

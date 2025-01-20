@@ -103,7 +103,7 @@ for (ad in sort(dayslist)) {
   ad <- as.Date(ad, origin = origin)
   cc <- cc + 1
   cat(Script.ID, ":", paste(ad), cc, "/",length(dayslist))
-  status_msg(ScriptName = Script.Name, c(paste(ad), cc, length(dayslist)))
+  status_msg(ScriptName = Script.Name, msg = c(paste(ad), cc, length(dayslist)))
 
   ## use only valid data for dark calculation
   daydata <-
