@@ -52,7 +52,7 @@ if (Sys.info()["nodename"] == "sagan") {
 
   cat(Script.ID, ":", "Create radiometric variables \n\n")
   status_msg(ScriptName = Script.Name,
-             c("Create radiometric variables"))
+             msg        = c("Create radiometric variables"))
 
   ##  Open dataset  ------------------------------------------------------------
   con <- dbConnect(duckdb(dbdir = DB_DUCK))
@@ -81,7 +81,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
   status_msg(ScriptName = Script.Name,
-             c("Created GLB_strict"))
+             msg        = c("Created GLB_strict"))
 
 
   ## __ DNI  -------------------------------------------------------------------
@@ -106,7 +106,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
   status_msg(ScriptName = Script.Name,
-             c("Created DIR_strict"))
+             msg        = c("Created DIR_strict"))
 
   ## __  HOR  ------------------------------------------------------------------
   make_null_column(con, "LAP", "HOR_strict") ## Always create empty column
@@ -124,7 +124,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
   status_msg(ScriptName = Script.Name,
-             c("Created HOR_strict"))
+             msg        = c("Created HOR_strict"))
 
   ## __  DIFF  -----------------------------------------------------------------
   ##  DHI = GHI – DNI cos(z)
@@ -153,7 +153,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
   status_msg(ScriptName = Script.Name,
-             c("Created DIFF_strict"))
+             msg        = c("Created DIFF_strict"))
 
   ## __ Diffuse fraction  ------------------------------------------------------
   make_null_column(con, "LAP", "DiffuseFraction_kd") ## Always create empty column
@@ -174,7 +174,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
   status_msg(ScriptName = Script.Name,
-             c("Created DiffuseFraction_kd"))
+             msg        = c("Created DiffuseFraction_kd"))
 
 
   ## __  Global Transmittance  -------------------------------------------------
@@ -201,7 +201,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
   status_msg(ScriptName = Script.Name,
-             c("Created Transmittance_GLB"))
+             msg        = c("Created Transmittance_GLB"))
 
 
   ## TODO test
@@ -226,7 +226,7 @@ if (Sys.info()["nodename"] == "sagan") {
   ##  Write data in the data base
   res <- update_table(con, ADD, "LAP", "Date")
   status_msg(ScriptName = Script.Name,
-             c("Created Transmittance_DIR"))
+             msg        = c("Created Transmittance_DIR"))
 
   cat("\nTODO do some test plots\n\n")
 }

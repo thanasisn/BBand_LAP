@@ -83,7 +83,7 @@ make_categorical_column("Pressure_source", categories, con, "LAP")
 if (nrow(PRESSURE) > 0) {
   cat(Script.ID, ": ", nrow(PRESSURE), "rows of pressure data to add\n")
   status_msg(ScriptName = Script.Name,
-             c(nrow(PRESSURE), "rows of pressure data to add"))
+             msg        = c(nrow(PRESSURE), "rows of pressure data to add"))
 
 
   ## FIXME this will not update changed pressure data
@@ -95,7 +95,7 @@ if (nrow(PRESSURE) > 0) {
 } else {
   cat(Script.ID, ": ", "No new pressure data to add\n")
   status_msg(ScriptName = Script.Name,
-             c("No new pressure data to add"))
+             msg        = c("No new pressure data to add"))
 }
 
 tbl(con, "LAP") |> group_by(Pressure_source) |> tally()
