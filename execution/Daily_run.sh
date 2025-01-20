@@ -98,6 +98,11 @@ info "##  Start inspect_duckdb  ##"
 info "##  End Inspect_BB_DB.R STATUS:$?  ##"
 
 
+info "##  Start CSid_RenoHansen_run.R  ##"
+"$HOME/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_run.R"
+info "##  End CSid_RenoHansen_run.R STATUS:$?  ##"
+
+
 info "##  Start other process  ##"
 "$HOME/BBand_LAP/process/Process_BB_DB.R"
 info "##  End Process_BB_DB.R STATUS:$?  ##"
