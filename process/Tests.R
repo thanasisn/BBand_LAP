@@ -69,6 +69,7 @@ source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 source("~/BBand_LAP/functions/Functions_CHP1.R")
+source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -85,6 +86,13 @@ library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
 
 tt <- tbl(con, "LAP")
+
+for (i in 1:11) {
+  status_msg(ScriptName = Script.Name, msg = c("a","b",i))
+  Sys.sleep(1)
+}
+
+stop()
 
 ex <- tt |>
   select(Date, SZA, Azimuth, Day,
