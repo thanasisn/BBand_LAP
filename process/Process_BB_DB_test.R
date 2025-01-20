@@ -5,18 +5,21 @@
 ## __ Set environment  ---------------------------------------------------------
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/process/Process_BB_DB_test.R"
 renv::load("~/BBand_LAP")
-
 
 library(rmarkdown)
 
+output_dir <- "~/BBand_LAP/REPORTS/PROCESS"
+dir.create(output_dir, showWarnings = F, recursive = T)
 
-try({
-    render(input      = "~/BBand_LAP/process/Export_CM21_TOT.R",
-           output_dir = "~/BBand_LAP/REPORTS/REPORTS")
-})
+
+
+
+
+# try({
+#     render(input      = "~/BBand_LAP/process/Export_CM21_TOT.R",
+#            output_dir = "~/BBand_LAP/REPORTS/REPORTS")
+# })
 
 # try({
 #     render(input         = "~/BBand_LAP/process/QCRad_LongShi_v9.R",
