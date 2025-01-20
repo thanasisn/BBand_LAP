@@ -52,8 +52,16 @@ knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.cap   = " - empty caption - ")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
-
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+)
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
@@ -166,7 +174,7 @@ for (YYYY in sort(years_to_do)) {
     par("mar" = c(3, 4.5, 0, 1))
     ylim <- range(dd[, .(DIR_wpsm, HOR_strict)], na.rm = TRUE)
     plot(
-      dd$Date, dd$HOR_strict, 
+      dd$Date, dd$HOR_strict,
       type = "l",
       ylim = ylim,
       lwd  = 1.5,
