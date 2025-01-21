@@ -8,22 +8,33 @@ renv::load("~/BBand_LAP")
 
 library(rmarkdown)
 
-output_dir <- "~/BBand_LAP/REPORTS/PROCESS"
+output_dir <- "~/BBand_LAP/REPORTS/REPORTS/"
 dir.create(output_dir, showWarnings = F, recursive = T)
 
-cat("\n\nCheck legacy export\n")
 
 try({
   render(input         = "~/BBand_LAP/process/QCRad_LongShi_v9.R",
-         output_format = " bookdown::pdf_document2",
+         output_format = "bookdown::pdf_document2",
          output_dir    = output_dir)
 })
 
 
-## This should be the last thing to run on the BBand_LAP
+## This should be the last things to run on the BBand_LAP
+
+
+## __ Keep some stats on data bases  -------------------------------------------
 try({
-  render(input         = "~/BBand_LAP/inspect_duckdb/99_Self_evaluation.R",
-         output_format = " bookdown::pdf_document2",
+  source("~/BBand_LAP/inspect_duckdb/Duckdb_save_stats.R"         )
+})
+
+try({
+  render(input         = "~/BBand_LAP/tools/Duckdb_plot_stats.R",
+         output_dir    = output_dir)
+})
+
+try({
+  render(input         = "~/BBand_LAP/tools/99_Self_evaluation.R",
+         output_format = "bookdown::pdf_document2",
          output_dir    = output_dir)
 })
 
