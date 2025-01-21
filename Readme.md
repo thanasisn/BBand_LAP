@@ -16,7 +16,7 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: 2025-01-21T14:40:30 UTC -->
+<!-- Added by: athan, at: 2025-01-21T15:38:02 UTC -->
 
 <!--te-->
 
@@ -26,10 +26,11 @@ This is partial used in operational procedures ([github.com/thanasisn/CS_id](htt
 
 
 
-| Name             |   Rows | Vars |  Values |    Size | Fill | Bytes/Value |
-|:-----------------|-------:|-----:|--------:|--------:|-----:|------------:|
-| Raw files hashes | 812450 |    4 | 3249800 | 4.1 MiB | 100% |        1.33 |
-| **Total**        | 812450 |    4 | 3249800 | 4.1 MiB |  NA% |        1.33 |
+| Name                  |     Rows |    Size |    Values | Vars |   Fill | Bytes/Value |
+|:----------------------|---------:|--------:|----------:|-----:|-------:|------------:|
+| Broad Band LAP duckdb | 16875786 | 4.3 GiB | 871142232 |  140 | 60.75% |        5.34 |
+| Raw files hashes      |   812450 | 4.1 MiB |   3249800 |    4 |   100% |        1.33 |
+| **Total**             | 17688236 | 4.3 GiB | 874392032 |  144 |    NA% |        5.33 |
 
 Table: Datasets sizes on 2025-01-21
 

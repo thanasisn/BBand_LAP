@@ -86,11 +86,13 @@ if (!interactive()) {
 ## __ Load libraries  ----------------------------------------------------------
 library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 
 source("~/BBand_LAP/DEFINITIONS.R")
 source("~/BBand_LAP/functions/Functions_BBand_LAP.R")
+source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
 ##  CHP-1 raw data check  ------------------------------------------------------
 
@@ -228,15 +230,20 @@ rm(rad_names, radmon_files, sirena_files)
 #+ echo=F, include=T, results="asis"
 
 ## get a fresh hash table from meta data
-parthash <- read_parquet(DB_META_fl) |>
+con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+
+META <- tbl(con, "META")
+parthash <- META |>
   select(ends_with("_mtime",    ignore.case = TRUE),
          ends_with("_md5sum",   ignore.case = TRUE),
          ends_with("_basename", ignore.case = TRUE),
          ends_with("_parsed",   ignore.case = TRUE),
-  )
+  ) |> collect() |> data.table()
+
 ## remove constructed files
 parthash$pysolar_mtime    <- NULL
 parthash$pysolar_basename <- NULL
+
 ## unify variables
 parthash <- melt(data    = parthash,
                  measure = patterns("_mtime$",
