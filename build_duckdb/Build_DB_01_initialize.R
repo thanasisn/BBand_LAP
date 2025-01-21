@@ -110,7 +110,10 @@ sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 ##  Select Astropy data  -------------------------------------------------------
 SUN <- tbl(sun, "params") |>
   filter(!is.na(AsPy_Elevation) & Date >= DB_start_date) |>
-  select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist)  |>
+  select(Date,
+         AsPy_Azimuth,
+         AsPy_Elevation,
+         AsPy_Dist)                                      |>
   rename(Azimuth          = "AsPy_Azimuth")              |>
   rename(Sun_Dist_Astropy = "AsPy_Dist")                 |>
   rename(Elevat           = "AsPy_Elevation")
