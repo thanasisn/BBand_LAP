@@ -7,7 +7,7 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 renv::load("~/BBand_LAP", quit = TRUE)
 
-output_dir <- "~/BBand_LAP/REPORTS/REPORTS/BUILD/"
+output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Build/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 # ## Build tracker database  ---------------------------------------------------
