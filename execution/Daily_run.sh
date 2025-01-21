@@ -72,11 +72,14 @@ pids=()
 ) & pids+=($!)
 
 
-
-
 ## wait all the above to finish
 wait "${pids[@]}"; pids=()
 
+(
+  info "##  Plot broad band  ##"
+  "$HOME/BBand_LAP/tools/Plot_broad_band.R"
+  info "##  End Plot_broad_band.R STATUS:$?  ##"
+) &
 
 info "##  Start build_duckdb  ##"
 "$HOME/BBand_LAP/build_duckdb/Build_BB_DB.R"
