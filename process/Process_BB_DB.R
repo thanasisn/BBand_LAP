@@ -12,11 +12,6 @@ output_dir <- "~/BBand_LAP/REPORTS/REPORTS/"
 dir.create(output_dir, showWarnings = F, recursive = T)
 
 
-try({
-  render(input         = "~/BBand_LAP/process/QCRad_LongShi_v9.R",
-         output_format = "bookdown::pdf_document2",
-         output_dir    = output_dir)
-})
 
 
 ## This should be the last things to run on the BBand_LAP
@@ -34,7 +29,6 @@ try({
 
 try({
   render(input         = "~/BBand_LAP/tools/99_Self_evaluation.R",
-         output_format = "bookdown::pdf_document2",
          output_dir    = output_dir)
 })
 
