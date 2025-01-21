@@ -12,8 +12,7 @@
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-tic <- Sys.time()
-Script.Name <- "~/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R"
+
 renv::load("~/BBand_LAP", quiet = TRUE)
 
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Inspect/"
@@ -124,16 +123,3 @@ try({
   rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
                     output_dir  = output_dir)
 })
-
-## __ Data maintainance  -------------------------------------------------------
-try({
-  cat("\n\n Duckdb plot stats\n")
-  rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/Duckdb_plot_stats.R",
-                    params      = list(CLEAN = FALSE),
-                    output_dir  = output_dir)
-})
-
-
-
-tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
