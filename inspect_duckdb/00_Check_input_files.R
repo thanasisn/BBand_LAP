@@ -61,7 +61,7 @@ knitr::opts_chunk$set(comment    = ""      )
 knitr::opts_chunk$set(dev        = "png"   )
 knitr::opts_chunk$set(out.width  = "100%"  )
 knitr::opts_chunk$set(fig.align  = "center")
-knitr::opts_chunk$set(fig.cap   = " - empty caption - ")
+knitr::opts_chunk$set(fig.cap   = " empty caption ")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
@@ -317,9 +317,8 @@ if (nrow(tabs) > 0) {
 ## - list step
 ## - more instruments
 
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
-#+ include=T, echo=F, results="asis"
-tac <- Sys.time()
-cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+#+ results="asis", echo=FALSE
+goodbye()

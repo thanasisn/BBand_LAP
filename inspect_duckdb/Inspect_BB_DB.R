@@ -22,7 +22,6 @@ dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 try({
   cat("\n\n 0. Check files\n")
   rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/00_Check_input_files.R",
-                    params      = list(CLEAN = TRUE),
                     output_dir  = output_dir)
 })
 
