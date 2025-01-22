@@ -22,6 +22,10 @@ else
 fi
 
 ##  Get data  ------------------------------------------------------------------
+
+
+
+
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "Get signal files 'LAP' of CM-21 global"
 rsync -arvth                                   \
