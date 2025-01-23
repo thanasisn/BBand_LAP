@@ -23,6 +23,9 @@ fi
 
 ##  Get data  ------------------------------------------------------------------
 
+##  Get all broadband channels
+
+
 
 
 
@@ -65,12 +68,17 @@ rsync -arvth                                   \
     "$SOURCE/archive/Bband/CHP1_lap.DIR/"      \
     "$HOME/DATA_RAW/Bband/CHP1_lap.DIR"
 
+
+
+
+
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "Get total radiation files 'TOT.DAT'"
 rsync -arvth                                   \
     --delete                                   \
     "$SOURCE/products/Bband/AC21_lap.GLB/"     \
     "$HOME/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
+
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "get other relative files"
