@@ -33,8 +33,10 @@ if [[ $(hostname) != "sagan" ]]; then
     exit 11
 fi
 
-echo "lapauththanasis:/Aerosols/test_graphs"
+echo "lapauththanasis:/BroadBand"
 "${rclone}" ${otheropt} ${bwlimit}  --config "$config" sync "$HOME/BBand_LAP/REPORTS"   lapauththanasis:/BroadBand/
+
+
 
 info "#### END $0 ####"
 TAC=$(date +"%s"); dura="$( echo "scale=6; ($TAC-$TIC)/60" | bc)"
