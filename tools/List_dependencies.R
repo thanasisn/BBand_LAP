@@ -12,12 +12,13 @@ source("~/CODE/FUNCTIONS/R/listDependencies.R")
 ## __ Describe environment -----------------------------------------------------
 folders <- c(
   "~/BBand_LAP/",
-  "~/BBand_LAP/build_db/",
-  "~/BBand_LAP/build_duckdb/",
-  "~/BBand_LAP/inspect_db/",
-  "~/BBand_LAP/inspect_duckdb/",
-  "~/BBand_LAP/process/",
-  "~/BBand_LAP/tools/"
+  # "~/BBand_LAP/build_db/",
+  # "~/BBand_LAP/build_duckdb/",
+  # "~/BBand_LAP/inspect_db/",
+  # "~/BBand_LAP/inspect_duckdb/",
+  # "~/BBand_LAP/process/",
+  # "~/BBand_LAP/tools/",
+  NULL
 )
 
 for (af in folders) {
