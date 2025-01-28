@@ -123,6 +123,7 @@
 .Rhistory
 .Rproj.user
 .Ruserdata
+.databasestats.md
 .dupimg.list
 .excludeBacula
 .fingerprinds.db
@@ -137,4 +138,5 @@ _bookdown_files
 _publish.R
 nohup.out
 randomseed
-.databasestats.md
+renv
+renv/*
