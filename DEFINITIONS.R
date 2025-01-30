@@ -1,5 +1,5 @@
 #'
-#' Variables for the Broab Band project
+#' Variables for the Broad Band project
 #'
 
 ####    Project root folder    #################################################
