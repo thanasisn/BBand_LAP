@@ -2,8 +2,8 @@
 #' Variables for the Broad Band project
 #'
 
-####    Project root folder    #################################################
-BASED      <- "~/BBand_LAP/"
+BASED      <- "~/BBand_LAP/" ## Project root folder
+Main.Host  <- "sagan"        ## This is the main host used to build the DB
 
 ##  Input paths  ---------------------------------------------------------------
 SUN_FOLDER   <- "~/DATA_RAW/SUN/PySolar_LAP/"

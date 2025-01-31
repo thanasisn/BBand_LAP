@@ -11,34 +11,37 @@ renv::load("~/BBand_LAP")
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/CSid_RenoHansen/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
+## Run every nth day
+run_days <- 10
 
-
-try({
-  rmarkdown::render(input      = "~/BBand_LAP/process/CSid_RenoHansen/Clear_sky_id_Reno-Hansen_apply_v14.2_legacy.R",
-                    output_dir = output_dir)
-})
-
-
-
-#; ##  Run training  --------------------------------------------------------------
-#; source("~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_01_alldata_optim_v15.R")
-#; try({
-#;   rmarkdown::render(input      = "~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_01_alldata_optim_v15.R",
-#;                     output_dir = output_dir)
-#; })
-
-##  Run tests  -----------------------------------------------------------------
-
-# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R")
-# try({
-#   rmarkdown::render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R",
-#                     params      = list(CLEAN = TRUE),
-#                     output_file = "QCRad_LongShi_T02_v10_B",
-#                     output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
-# })
+if (as.numeric(Sys.Date()) %% run_days == 0)
+{
+  try({
+    rmarkdown::render(input      = "~/BBand_LAP/process/CSid_RenoHansen/Clear_sky_id_Reno-Hansen_apply_v14.2_legacy.R",
+                      output_dir = output_dir)
+  })
 
 
 
+  #; ##  Run training  --------------------------------------------------------------
+  #; source("~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_01_alldata_optim_v15.R")
+  #; try({
+  #;   rmarkdown::render(input      = "~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_01_alldata_optim_v15.R",
+  #;                     output_dir = output_dir)
+  #; })
 
-cat("\n\nEND of CSid RenoHansen \n\n")
+  ##  Run tests  -----------------------------------------------------------------
 
+  # source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R")
+  # try({
+  #   rmarkdown::render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R",
+  #                     params      = list(CLEAN = TRUE),
+  #                     output_file = "QCRad_LongShi_T02_v10_B",
+  #                     output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
+  # })
+
+  cat("\n\nEND of CSid RenoHansen \n\n")
+
+} else {
+  cat("\n\nNot time to run CSid RenoHansen yet \n\n")
+}
