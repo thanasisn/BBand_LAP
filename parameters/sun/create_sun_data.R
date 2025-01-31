@@ -134,7 +134,7 @@ if (dbExistsTable(con, "params") &
                     AsPy_Dist      = unlist(sss$X3),
                     Date           = as.POSIXct(unlist(sss$X4),
                                                 origin = "1970-01-01"))
-  ##  Put in the data base
+  ##  Put in the database
   cat(" w\n")
   res <- update_table(con, ADD, "params", "Date")
 }
