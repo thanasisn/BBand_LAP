@@ -1,7 +1,5 @@
 #+ echo=T, include=T
 
-
-
 require(data.table, quietly = TRUE, warn.conflicts = FALSE)
 require(zoo,        quietly = TRUE, warn.conflicts = FALSE)
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
@@ -39,14 +37,6 @@ if (
 #+ echo=T, include=T
 ##  Load raw data  -------------------------------------------------------------
 DATA_all   <- readRDS(raw_input_data)
-DATA_Clear <- DATA_all[TYPE == "Clear"]
-DATA_Cloud <- DATA_all[TYPE == "Cloud"]
-
-DATA_all  [, TYPE := NULL]
-DATA_Clear[, TYPE := NULL]
-DATA_Cloud[, TYPE := NULL]
-
-
 
 
 ##  ERA5 cloud data  -----------------------------------------------------------
@@ -78,10 +68,6 @@ ALL_tcc_yearly_mean[, near_tcc_zero_rel := near_tcc_zero_N / near_tcc_TN ]
 ## remove first and last non complete years
 ALL_tcc_yearly_mean <- ALL_tcc_yearly_mean[!Year %in% c(1993, 2023) ]
 
-
-
-
-
 ## plot TCC trends  ------------------------------------------------------------
 vars   <- grep("Year", names(ALL_tcc_yearly_mean), invert = T, value = T)
 dbs    <- c("ALL_tcc_yearly_mean")
@@ -103,7 +89,6 @@ for (DBn in dbs) {
         dt <- data.frame(Year = year(as.POSIXct(c("1993-01-01 00:00","2023-01-01 00:00"))))
         slopePyear <- diff(predict(lm1, dt)) / diff((dt$Year))
 
-
         ## capture lm for table
         gather <- rbind(gather,
                         data.frame(
@@ -117,7 +102,6 @@ for (DBn in dbs) {
                         ))
 
         par("mar" = c(3, 4, 2, 1))
-
 
         ## plot data
         plot(dataset$Year, dataset[[avar]],
@@ -268,10 +252,6 @@ for (DBn in dbs) {
     }
 }
 
-gather <- data.table(gather)
-gather$WattPYear <- gather$slope * Days_of_year * 24 * 3600
-gather[, Slopepercent.. :=  100 * WattPYear / Mean ]
-write.csv(x = gather, file = "./figures/tbl_longterm_trends_raw.csv")
 
 
 
@@ -1132,9 +1112,6 @@ CLOUD_1_M_bySeason_DESEAS[, Year := year(Yqrt)]
 
 
 
-
-
-
 ## TODO
 #### WRDC ? ####
 
@@ -1313,23 +1290,6 @@ CLOUD_1_M_bySeason_DESEAS[, Year := year(Yqrt)]
 # QHD_cloud[ !is.na(GLB_att), .N ]
 
 
-# ......................................................................... ----
-##  Save data ------------------------------------------------------------------
-save(file = I1_longterm,
-     list = ls(pattern = "^ALL_1_|^CLEAR_1_|^CLOUD_1_"),
-     compress = "xz")
-cat(paste("\n Long term proccessed data saved", I1_longterm, "\n\n"))
 
-
-
-
-# # ~  Universal Footer  ~ # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #' **END**
 #+ include=T, echo=F
-tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
-            Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))
-if (difftime(tac, tic, units = "sec") > 30) {
-    system("mplayer /usr/share/sounds/freedesktop/stereo/dialog-warning.oga", ignore.stdout = T, ignore.stderr = T)
-    system(paste("notify-send -u normal -t 30000 ", Script.Name, " 'FINISHED'"))
-}
