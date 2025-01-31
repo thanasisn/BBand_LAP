@@ -7,15 +7,22 @@
 #'
 #+ echo=F, include=T
 
-#+ echo=F, include=F
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
+knitr::opts_chunk$set(fig.cap   = " empty caption ")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
-
-
+knitr::opts_chunk$set(tidy = TRUE,
+                      tidy.opts = list(
+                        indent       = 4,
+                        blank        = FALSE,
+                        comment      = FALSE,
+                        args.newline = TRUE,
+                        arrow        = TRUE)
+)
 
 ## __ Set environment  ---------------------------------------------------------
 closeAllConnections()
@@ -39,6 +46,7 @@ library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
+require(tidyr,      warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Initialize params DB and/or import Sun data\n\n")
 
@@ -51,6 +59,8 @@ astropy_file <- "~/DATA_RAW/SUN/Astropy_LAP.Rds"
 
 ##  Open dataset  --------------------------------------------------------------
 sun <- dbConnect(duckdb(dbdir = DB_LAP,  read_only = TRUE))
+con <- dbConnect(duckdb(dbdir = DB_DUCK))
+
 
 ##  Choose Astropy  ------------------------------------------------------------
 SUN <- tbl(sun, "params") |>
@@ -71,6 +81,8 @@ SUN <- tbl(sun, "params") |>
 if (!file.exists(paste0(solstices_fl, ".Rds")) |
     file.mtime(paste0(solstices_fl, ".Rds")) < Sys.time() - export_hours * 3600) {
 
+  cat("## Find solstices \n\n")
+
   Solstices <- SUN                              |>
     group_by(year = year(Date))                 |>
     filter(Elevat == max(Elevat, na.rm = TRUE)) |>
@@ -84,32 +96,57 @@ if (!file.exists(paste0(solstices_fl, ".Rds")) |
 }
 
 ##  Detect sunsets, sunrises  --------------------------------------------------
+cat("## Find sunsets and sunrises \n\n")
+
+Sunsets <- SUN |>
+  filter(Elevat > 0) |>
+  group_by(Day = as.Date(Date), preNoon) |>
+  filter(Elevat == min(Elevat, na.rm = T)) |>
+  mutate(Sun = case_when(
+    preNoon == TRUE  ~ "Sunrise",
+    preNoon == FALSE ~ "Sunset"
+  )) |>
+  collect() |>
+  arrange(Date) |>
+  data.table() |>
+  select(-preNoon)
+
+## Add sunset times to main DB
+if (Sys.info()["nodename"] == Main.Host &
+    dbExistsTable(con, "META"))
+{
+  ADD <- pivot_wider(Sunsets,
+                     id_cols = Day,
+                     names_from = Sun,
+                     names_glue = "{Sun}_{.value}",
+                     values_from = -any_of(c("Day", "Sun")))
+
+  res <- update_table(con, ADD, "META", "Day")
+}
+
 if (!file.exists(paste0(sunsets_fl, ".Rds")) |
     file.mtime(paste0(sunsets_fl, ".Rds")) < Sys.time() - 30 * 3600) {
-
-  Sunsets <- SUN |>
-    filter(Elevat > 0) |>
-    group_by(Day = as.Date(Date), preNoon) |>
-    filter(Elevat == min(Elevat, na.rm = T)) |>
-    mutate(Sun = case_when(
-      preNoon == TRUE  ~ "Sunrise",
-      preNoon == FALSE ~ "Sunset"
-    )) |>
-    collect() |>
-    arrange(Date) |>
-    data.table() |>
-    select(-preNoon)
 
   write_RDS(Sunsets, paste0(sunsets_fl, ".Rds"), notes = Script.Name)
   write.csv(Sunsets, paste0(sunsets_fl, ".csv"), quote = F)
 }
 
 ##  Compute daylength  ---------------------------------------------------------
+cat("## Find sunsets and sunrises \n\n")
+
+Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60),
+                      by = Day]
+
+## Add daylength main DB
+if (Sys.info()["nodename"] == Main.Host &
+    dbExistsTable(con, "META"))
+{
+  res <- update_table(con, Daylengths, "META", "Day")
+}
+
+
 if (!file.exists(paste0(daylength_fl, ".Rds")) |
     file.mtime(paste0(daylength_fl, ".Rds")) < Sys.time() - 30 * 3600) {
-
-  Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60),
-                        by = Day]
 
   write_RDS(Daylengths, paste0(daylength_fl, ".Rds"), notes = Script.Name)
   write.csv(Daylengths, paste0(daylength_fl, ".csv"), quote = F)
@@ -202,7 +239,7 @@ dbDisconnect(sun, shutdown = TRUE); rm("sun"); closeAllConnections()
 # cor(test$lap_sza, test$LAP_SZA_middle, use = "complete.obs")
 
 
-tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("\n%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+
+#+ results="asis", echo=FALSE
+goodbye()
+
