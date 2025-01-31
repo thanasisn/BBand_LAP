@@ -54,13 +54,7 @@ library(zoo,        quietly = TRUE, warn.conflicts = FALSE)
 # library(forecast,   quietly = TRUE, warn.conflicts = FALSE)
 library(astsa,      quietly = TRUE, warn.conflicts = FALSE)
 
-
-
-panderOptions("table.alignment.default", "right")
-panderOptions("table.split.table",        120   )
-
 ## __ Load external functions --------------------------------------------------
-## Functions from `https://github.com/thanasisn/IStillBreakStuff/tree/main/FUNCTIONS/R`
 source("~/CODE/FUNCTIONS/R/sumNA.R")
 source("~/CODE/FUNCTIONS/R/linear_fit_stats.R")
 source("~/CODE/FUNCTIONS/R/cor_test_stats.R")
@@ -69,9 +63,7 @@ source("~/CODE/FUNCTIONS/R/data.R")
 
 
 ## __ Source initial scripts ---------------------------------------------------
-# source("./DHI_GHI_0_data_input.R")
 source("./DHI_GHI_0_variables.R")
-source("~/CODE/R_myRtools/myRtools/R/write_.R")
 source("./var_translation.R")
 
 ## check previous steps
@@ -90,15 +82,6 @@ if (! file.exists(I1_longterm) |
 ## load data
 load(I1_longterm)
 
-tic <- Sys.time()
-
-## notification function
-options(error = function() {
-    if (interactive()) {
-        system("mplayer /usr/share/sounds/freedesktop/stereo/dialog-warning.oga", ignore.stdout = T, ignore.stderr = T)
-        system(paste("notify-send -u normal -t 30000 ", Script.Name, " 'An error occurred!'"))
-    }
-})
 
 ## __ Flags --------------------------------------------------------------------
 
@@ -116,21 +99,15 @@ FIGURESGRID <- TRUE
 LOESS_CRITERIO <-  c("aicc", "gcv")[1]
 
 
-
-
-
 ALL_1_daily_DESEAS[           GLB_att_des == 0]
 CLOUD_1_daily_DESEAS[         GLB_att_des == 0]
 # test <- CLEAR_1_daily_DESEAS[ GLB_att_des == 0]
 # test <- rm.cols.dups.DT(test)
 CLEAR_1_daily_DESEAS[         GLB_att_des == 0, GLB_att_des := NA]
 
-
-
 stopifnot(ALL_1_daily_DESEAS[   GLB_att_des == 0, .N ] == 0)
 stopifnot(CLOUD_1_daily_DESEAS[ GLB_att_des == 0, .N ] == 0)
 stopifnot(CLEAR_1_daily_DESEAS[ GLB_att_des == 0, .N ] == 0)
-
 
 
 #+ echo=F, include=T
