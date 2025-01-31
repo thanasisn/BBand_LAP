@@ -184,6 +184,22 @@ if (!dbExistsTable(con, "META")) {
   )
 }
 
+
+##  Create decimal date variable  ----------------------------------------------
+LAP <- tbl(con, "LAP")
+
+make_new_column(con, "LAP", "Decimal_date")
+
+ADD <- LAP |>
+  filter(is.na("Decimal_date")) |>
+  select(Date)                  |>
+  collect()                     |>
+  data.table()                  |>
+  mutate(Decimal_date := decimal_date(Date))
+
+res <- update_table(con, ADD, "LAP", "Date")
+
+
 ##  Checks  --------------------------------------------------------------------
 stopifnot(tbl(con, "LAP") |> filter(is.na(Date))    |> collect() |> nrow() == 0)
 stopifnot(tbl(con, "LAP") |> filter(is.na(Elevat))  |> collect() |> nrow() == 0)
