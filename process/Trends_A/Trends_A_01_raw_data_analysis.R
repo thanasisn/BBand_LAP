@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript
+# /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Trends A"
@@ -49,6 +49,7 @@
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(message   = FALSE   )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.cap   = " empty caption ")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
@@ -83,6 +84,7 @@ library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
+library(ggpubr,     warn.conflicts = FALSE, quietly = TRUE)
 
 
 #+ include=T, echo=F, results="asis"
@@ -91,18 +93,17 @@ con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 LAP  <- tbl(con, "LAP")
 
-
-LAP <- LAP |> select(Date,
-              ends_with("_trnd_A"),
-              Decimal_date,
-              SKY)
-
+LAP <- LAP |> select(
+  Date,
+  ends_with("_trnd_A"),
+  Decimal_date,
+  SKY
+)
 
 ##  Create data sets  ----------------------------------------------------------
 ALL   <- LAP                           |> select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
-
 
 ##  All data points  -----------------------------------------------------------
 vars <- c(
@@ -119,26 +120,30 @@ dbs <- c(
 )
 
 for (DBn in dbs) {
-    DATA <- get(DBn)
+  DATA <- get(DBn)
 
-    for (avar in vars) {
-      ## test
-      DATA <- DATA |>
+  cat(paste("\n\\FloatBarier\n\n"))
+  cat(paste("\n##", var_name(DBn), "\n\n"))
+
+  for (avar in vars) {
+    ## test
+    pp <- DATA |>
       filter(!is.na(!!sym(avar))) |>
-        collect() |>
-        sample_n(100000)
-      # .data[[column]]
-      DATA |>
-      ggplot() +
-        geom_point(aes(x = Decimal_date, y = !!sym(avar)))
+      collect() |>
+      sample_n(10000)
 
-      paste(var_name(avar), var_name(DBn), var_col(avar))
-stop()
-    }
+    p <- pp |>
+      ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
+      geom_point(col = var_col(avar), size = 0.6) +
+      geom_smooth(method = 'lm', colour = "red", fill = "red") +
+      stat_regline_equation() +
+      labs(x = element_blank(),
+           y = bquote(.(var_name(avar)) ~ ~ group("[", W/m^2, "]")),
+           subtitle = paste(var_name(DBn), var_name(avar))) +
+      theme_bw()
+    show(p)
+  }
 }
-
-stop()
-
 
 
 #+ Clean_exit, echo=FALSE
