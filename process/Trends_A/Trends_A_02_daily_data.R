@@ -104,9 +104,10 @@ LAP <- LAP |> select(
 )
 
 ##  Create data sets  ----------------------------------------------------------
-ALL   <- LAP                           |> select(-SKY)
-CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
-CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
+##  cloud and clear are prepared for this analysis
+ALL   <- LAP |> filter(SKY %in% c("Cloud", "Clear")) |> select(-SKY)
+CLOUD <- LAP |> filter(SKY == "Cloud")               |> select(-SKY)
+CLEAR <- LAP |> filter(SKY == "Clear")               |> select(-SKY)
 
 
 vars <- c(
@@ -129,6 +130,7 @@ for (DBn in dbs) {
   cat(paste("\n##", var_name(DBn), "\n\n"))
 
   ## drop data to datatable
+  ## This needs ~ 4Gb of ram
   DATA <- DATA |> collect() |> data.table()
 
   daily <- DATA[, .(
