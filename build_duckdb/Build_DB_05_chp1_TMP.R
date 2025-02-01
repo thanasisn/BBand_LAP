@@ -55,7 +55,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Import  CHP-1 temperature data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 ##  Get tracker sync files  ----------------------------------------------------
 inp_filelist <- list.files(path        = CHPTMP_DIR,
@@ -221,7 +221,7 @@ if (interactive()) {
     group_by(Async_step_count) |>
     tally()
 
-  fs::file_size(DB_DUCK)
+  fs::file_size(DB_BROAD)
 
   tbl(con, "LAP")  |> colnames()
   tbl(con, "META") |> colnames()

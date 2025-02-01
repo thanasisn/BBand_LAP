@@ -133,7 +133,7 @@ MIN_Elevation <- 5            ## Sun elevation for optimization input data
 
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 DT <- tbl(con, "LAP")
 

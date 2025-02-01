@@ -121,7 +121,7 @@ QS$plot_elev_T08 <- 2
 if (FALSE | Sys.info()["nodename"] == "sagan") {
 
   ##  Open dataset  ------------------------------------------------------------
-  con <- dbConnect(duckdb(dbdir = DB_DUCK))
+  con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
   ## 8. Test for inverted values  --------------------------------------------
   #'
@@ -205,7 +205,7 @@ if (FALSE | Sys.info()["nodename"] == "sagan") {
 ##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
-con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 ## Select data to plot
 DT <- tbl(con, "LAP")                  |>

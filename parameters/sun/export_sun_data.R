@@ -59,7 +59,7 @@ astropy_file <- "~/DATA_RAW/SUN/Astropy_LAP.Rds"
 
 ##  Open dataset  --------------------------------------------------------------
 sun <- dbConnect(duckdb(dbdir = DB_LAP,  read_only = TRUE))
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 
 ##  Choose Astropy  ------------------------------------------------------------
