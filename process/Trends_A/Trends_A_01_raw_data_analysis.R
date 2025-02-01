@@ -87,7 +87,7 @@ library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
 #+ include=T, echo=F, results="asis"
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_BROAD))
+con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 LAP  <- tbl(con, "LAP")
 
@@ -103,17 +103,35 @@ ALL   <- LAP                           |> select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
+ALL |> colnames()
+
+##  All data points  --------------------------------------------------------------
+
+vars <- c(
+  "GLB_trnd_A",
+  "DIR_trnd_A",
+  "HOR_trnd_A",
+  "DIFF_trnd_A"
+)
+
+dbs <- c(
+  "ALL",
+  "CLOUD",
+  "CLEAR"
+)
 
 
 
-ALL |> filter(!is.na(Decimal_date))
+for (DBn in dbs) {
+    DATA <- get(DBn)
 
+    for (avar in vars) {
+        DATA |> filter(!is.na(avar))
 
+      DATA |> ggplot()
 
-
-
-
-
+    }
+}
 
 stop()
 
