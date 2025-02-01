@@ -18,6 +18,9 @@ renv::load("~/BBand_LAP", quiet = TRUE)
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Inspect/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
+## Run every nth day
+run_days <- 10
+
 ## __ Check inputs  ------------------------------------------------------------
 try({
   cat("\n\n 0. Check files\n")
@@ -65,13 +68,16 @@ try({
                     output_dir  = output_dir)
 })
 
-try({
-  cat("\n\n 4b. Inspect ERPPLAY PIR signal DIRTY\n")
-  rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/04_Inspect_PIR_sig.R",
-                    params      = list(CLEAN = FALSE),
-                    output_file = "04_Inspect_PIR_sig_DIRTY.pdf",
-                    output_dir  = output_dir)
-})
+if (as.numeric(Sys.Date()) %% run_days == 0)
+{
+  try({
+    cat("\n\n 4b. Inspect ERPPLAY PIR signal DIRTY\n")
+    rmarkdown::render(input       = "~/BBand_LAP/inspect_duckdb/04_Inspect_PIR_sig.R",
+                      params      = list(CLEAN = FALSE),
+                      output_file = "04_Inspect_PIR_sig_DIRTY.pdf",
+                      output_dir  = output_dir)
+  })
+}
 
 ## __ Plot daily signal  -------------------------------------------------------
 try({
@@ -117,8 +123,11 @@ try({
                     output_dir = output_dir)
 })
 
-try({
-  cat("\n\n 60. Inspect CM-21/TOT radiation\n")
-  rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
-                    output_dir  = output_dir)
-})
+if (as.numeric(Sys.Date()) %% run_days == 0)
+{
+  try({
+    cat("\n\n 60. Inspect CM-21/TOT radiation\n")
+    rmarkdown::render(input      = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
+                      output_dir  = output_dir)
+  })
+}
