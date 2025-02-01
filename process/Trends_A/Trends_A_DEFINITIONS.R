@@ -40,7 +40,7 @@ var_name <- function(x) {
   for (ax in x) {
     ## get match
     amatch <- as.vector(unlist(
-      dictionary[stringr::str_detect(ax, names(dictionary))]
+      dictionary[agrep(ax, names(dictionary))]
     ))
     ## return same if not found
     if (is.null(amatch)) {
@@ -54,10 +54,10 @@ var_name <- function(x) {
 
 
 coldict <- list(
-  DIR   = "#2166ac",
-  HOR   = "#4244ac",
-  DIFF  = "#9970ab",
-  GLB   = "#1a9850"
+  DIR_trnd   = "#2166ac",
+  HOR_trnd   = "#4244ac",
+  DIFF_trnd  = "#9970ab",
+  GLB_trnd   = "#1a9850"
 )
 
 var_col <- function(x) {
@@ -65,7 +65,7 @@ var_col <- function(x) {
   for (ax in x) {
     ## get match
     amatch <- as.vector(unlist(
-      coldict[stringr::str_detect(ax, names(coldict))]
+      coldict[agrep(ax, names(coldict))]
     ))
     ## return same if not found
     if (is.null(amatch)) {
@@ -76,5 +76,3 @@ var_col <- function(x) {
   }
   return(res)
 }
-
-var_name("DIFF_traf_A")
