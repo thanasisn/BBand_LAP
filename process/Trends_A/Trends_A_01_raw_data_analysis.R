@@ -103,10 +103,8 @@ ALL   <- LAP                           |> select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
-ALL |> colnames()
 
-##  All data points  --------------------------------------------------------------
-
+##  All data points  -----------------------------------------------------------
 vars <- c(
   "GLB_trnd_A",
   "DIR_trnd_A",
@@ -120,8 +118,6 @@ dbs <- c(
   "CLEAR"
 )
 
-
-
 for (DBn in dbs) {
     DATA <- get(DBn)
 
@@ -129,7 +125,7 @@ for (DBn in dbs) {
         DATA |> filter(!is.na(avar))
 
       DATA |> ggplot() +
-        geom_point(aes(x = Decimal_date, y = avar))
+        geom_point(aes(x = Decimal_date, y = {{avar}}))
 
       paste(var_name(avar), var_name(DBn), var_col(avar))
 
