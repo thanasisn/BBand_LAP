@@ -11,10 +11,14 @@ renv::load("~/BBand_LAP", quiet = TRUE)
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Trends_A/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
+library(rmarkdown)
 
 ##  Run tests  -----------------------------------------------------------------
 # source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T06_v10.R")
 
 
-rmarkdown::render(input       = "~/BBand_LAP/process/Trends_A/Trends_A_00_raw_data.R",
-                  output_dir  = output_dir)
+render(input      = "~/BBand_LAP/process/Trends_A/Trends_A_00_raw_data.R",
+       output_dir = output_dir)
+
+render(input      = "~/BBand_LAP/process/Trends_A/Trends_A_01_raw_data_analysis.R",
+       output_dir = output_dir)

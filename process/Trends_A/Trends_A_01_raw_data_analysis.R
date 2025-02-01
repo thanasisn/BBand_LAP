@@ -42,6 +42,9 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
+#' Trends from all one minute data, except some days with
+#' too few valid points.
+#'
 
 
 #+ include=F
@@ -122,21 +125,22 @@ dbs <- c(
 for (DBn in dbs) {
   DATA <- get(DBn)
 
-  cat(paste("\n\\FloatBarier\n\n"))
+  cat("\n\\FloatBarrier\n\n")
   cat(paste("\n##", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
-    ## test
-    pp <- DATA |>
-      filter(!is.na(!!sym(avar))) |>
-      collect() |>
-      sample_n(10000)
+    pp <- DATA
+    # ## test
+    # pp <- DATA |>
+    #   filter(!is.na(!!sym(avar))) |>
+    #   collect() |>
+    #   sample_n(10000)
 
     p <- pp |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
-      geom_point(col = var_col(avar), size = 0.6) +
+      geom_point(col = var_col(avar), size = 0.6)    +
       geom_smooth(method = 'lm', colour = "red", fill = "red") +
-      stat_regline_equation() +
+      stat_regline_equation(label.y.npc = 1) +
       labs(x = element_blank(),
            y = bquote(.(var_name(avar)) ~ ~ group("[", W/m^2, "]")),
            subtitle = paste(var_name(DBn), var_name(avar))) +
@@ -144,7 +148,6 @@ for (DBn in dbs) {
     show(p)
   }
 }
-
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
