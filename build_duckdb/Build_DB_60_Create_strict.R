@@ -63,7 +63,7 @@ if (Sys.info()["nodename"] == "sagan") {
              msg        = c("Create radiometric variables"))
 
   ##  Open dataset  ------------------------------------------------------------
-  con <- dbConnect(duckdb(dbdir = DB_DUCK))
+  con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
   DT <- tbl(con, "LAP") |>
     filter(Elevat > Sun_elev_MIN)  ## sun is up

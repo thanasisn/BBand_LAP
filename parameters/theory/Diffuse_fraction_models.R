@@ -270,7 +270,7 @@ Rein_info = data.frame( latitude  = c(  42.7,  28.4, 55.7, 53.5, 51.95, 59.56 ),
 #+ include=T, echo=F
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 LAP <- tbl(con, "LAP")
 

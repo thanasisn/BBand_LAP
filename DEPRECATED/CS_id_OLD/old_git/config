@@ -1,0 +1,12 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+    symlinks = true
+[user]
+    name = thanasisn
+    email = 11601717+thanasisn@users.noreply.github.com
+[branch "main"]
+	remote = origin
+	merge = refs/heads/main

@@ -140,3 +140,6 @@ nohup.out
 randomseed
 renv
 renv/*
+DEPRECATED/CS_id_OLD/old_git
+DEPRECATED/RAD_QC_OLD/old_git
+DEPRECATED/TSI_OLD/.git

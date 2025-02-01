@@ -291,7 +291,7 @@ FCSlim <- MS$nt
 
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 DT <- tbl(con, "LAP")
 

@@ -165,7 +165,7 @@ gather   <- c(gather, list(res))
 
 
 ##  Broadband info  ------------------------------------------------------------
-res      <- duckdb_stats(DB_DUCK)
+res      <- duckdb_stats(DB_BROAD)
 res$host <- Sys.info()["nodename"]
 res$date <- Sys.time()
 gather   <- c(gather, list(res))

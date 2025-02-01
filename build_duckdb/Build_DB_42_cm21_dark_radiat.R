@@ -61,7 +61,7 @@ library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 ##  Create a dummy column if not existing
 make_new_column(con, "META", "cm21_dark_flag", "character")

@@ -62,7 +62,7 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 stop("todo")
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 
 
