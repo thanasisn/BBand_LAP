@@ -186,15 +186,18 @@ if (!dbExistsTable(con, "META")) {
 
 
 ##  Create decimal date variable  ----------------------------------------------
+#'
+#' This steps will consume a lot of memory at first run, it can be moved at start
+#'
 LAP <- tbl(con, "LAP")
-
+## make sure the column exist in order to query for NAs
 make_new_column(con, "LAP", "Decimal_date")
 
 ADD <- LAP |>
-  filter(is.na("Decimal_date")) |>
-  select(Date)                  |>
-  collect()                     |>
-  data.table()                  |>
+  filter(is.na(Decimal_date)) |>
+  select(Date)                |>
+  collect()                   |>
+  data.table()                |>
   mutate(Decimal_date := decimal_date(Date))
 
 res <- update_table(con, ADD, "LAP", "Date")

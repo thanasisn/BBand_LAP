@@ -93,7 +93,8 @@ LAP  <- tbl(con, "LAP")
 
 
 LAP <- LAP |> select(Date,
-              ends_with("_trnd"),
+              ends_with("_trnd_A"),
+              Decimal_date,
               SKY)
 
 
@@ -105,7 +106,7 @@ CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
 
 
-
+ALL |> filter(!is.na(Decimal_date))
 
 
 
