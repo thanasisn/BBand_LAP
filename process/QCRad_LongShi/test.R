@@ -52,7 +52,7 @@ PLOT_LAST  <- as_date("2024-01-01")
 flagname_DIR <- "QCv10_02_dir_flag"
 flagname_GLB <- "QCv10_02_glb_flag"
 
-con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = T))
+con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = T))
 
 
 

@@ -230,7 +230,7 @@ rm(rad_names, radmon_files, sirena_files)
 #+ echo=F, include=T, results="asis"
 
 ## get a fresh hash table from meta data
-con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 META <- tbl(con, "META")
 parthash <- META |>

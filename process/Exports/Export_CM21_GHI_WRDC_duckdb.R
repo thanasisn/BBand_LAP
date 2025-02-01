@@ -130,7 +130,7 @@ cat("\n",
     "\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 
 #+ include=TRUE, echo=T, results="asis", messages=F

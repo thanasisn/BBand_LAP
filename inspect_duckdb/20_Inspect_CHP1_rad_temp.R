@@ -94,7 +94,7 @@ TEST  <- FALSE
 # TEST  <- TRUE
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 DT  <- tbl(con, "LAP")
 
 DT <- DT |>

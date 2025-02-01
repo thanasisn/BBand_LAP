@@ -59,7 +59,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Import  TSI  data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 tsi <- dbConnect(duckdb(dbdir = DB_TSI, read_only = TRUE))
 
 ##  Load all TSI data  ---------------------------------------------------------

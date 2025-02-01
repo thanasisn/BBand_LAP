@@ -112,7 +112,7 @@ if (length(args) > 0) {
 cat(paste("\n**CLEAN:", CLEAN, "**\n"))
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 ## years in the data base
 datayears <- tbl(con, "LAP")  |>

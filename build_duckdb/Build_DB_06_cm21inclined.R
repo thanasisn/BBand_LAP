@@ -56,7 +56,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Import  INCLINED CM-21  data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 ##  Get CM-21 files  -----------------------------------------------------------
 inp_filelist <- list.files(path        = SIRENA_INC,
@@ -218,7 +218,7 @@ stopifnot(DD[!Day %in% days_to_ignore, .N] == 0)
 ##  Do some inspection  --------------------------------------------------------
 if (interactive()) {
 
-  fs::file_size(DB_DUCK)
+  fs::file_size(DB_BROAD)
 
   tbl(con, "LAP")  |> colnames()
   tbl(con, "META") |> colnames()

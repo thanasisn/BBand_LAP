@@ -151,7 +151,7 @@ par(mar = c(2, 4, 2, 1))
 
 
 ##  Load all data from duckdb  -----------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 LAP <- tbl(con, "LAP")
 

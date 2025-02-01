@@ -97,7 +97,7 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 cex <- 0.6
 
 ## __ Open database  -----------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 DT  <- tbl(con, "LAP")
 MT  <- tbl(con, "META")
 

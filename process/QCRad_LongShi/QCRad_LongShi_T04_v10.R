@@ -122,7 +122,7 @@ flagname_GLB     <- "QCv10_04_glb_flag"
 QS$plot_elev_T04 <- 2
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 ## 4. Climatological (configurable) Limits  ------------------------------------
 #'
@@ -249,7 +249,7 @@ if (Sys.info()["nodename"] == "sagan") {
 ##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
-con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 ## Select data to plot
 DT <- tbl(con, "LAP")                  |>

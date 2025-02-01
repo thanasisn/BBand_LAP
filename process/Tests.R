@@ -91,7 +91,7 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(scales,     warn.conflicts = FALSE, quietly = TRUE)
 library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
-con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 tt <- tbl(con, "LAP")
 

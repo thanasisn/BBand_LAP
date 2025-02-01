@@ -121,7 +121,7 @@ QS$plot_elev_T07 <- 2
 if (Sys.info()["nodename"] == "sagan") {
 
   ##  Open dataset  ------------------------------------------------------------
-  con <- dbConnect(duckdb(dbdir = DB_DUCK))
+  con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
   ## 7. Test for obstacles  --------------------------------------------------
   #'
@@ -164,7 +164,7 @@ if (Sys.info()["nodename"] == "sagan") {
 ##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
-con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 ## Select data to plot
 DT <- tbl(con, "LAP")                  |>

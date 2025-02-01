@@ -121,7 +121,7 @@ QS$plot_elev_T02 <- 2
 
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 ## 2. Extremely rare limits per BSRN  ------------------------------------------
 #'
@@ -232,7 +232,7 @@ if (Sys.info()["nodename"] == "sagan") {
 ##  Plots  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  ----
 
 ##  Open dataset
-con <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 ## Select data to plot
 DT <- tbl(con, "LAP")                  |>

@@ -119,7 +119,7 @@ if (!(MINSTEP <= STEP & STEP <= MAXSTEP)) {
 
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK, read_only = TRUE))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 BB <- tbl(con, "LAP")
 
 

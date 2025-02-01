@@ -100,7 +100,7 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 #+ include=TRUE, echo=T, results="asis", messages=F
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
 LAP <- tbl(con, "LAP")

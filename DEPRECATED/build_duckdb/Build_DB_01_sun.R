@@ -54,7 +54,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Initialize DB and/or import Sun data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 ##  Get Astropy files  ---------------------------------------------------------
 SUN <- data.table(readRDS(ASTROPY_FL))

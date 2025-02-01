@@ -57,7 +57,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Import  Pressure  data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 ##  Load all Pressure data  ----------------------------------------------------
 PRESSURE <- data.table(readRDS(COMP_PRES))

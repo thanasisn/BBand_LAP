@@ -36,7 +36,7 @@ CHP1_TEMP_EX <- "~/Aerosols/source_R/PARAMS/Skip_ranges_CHP1_Temp.dat"
 ##  DB specifications  ---------------------------------------------------------
 # DB_LAP              <- "~/DATA_RAW/LAP/LAP_parameters.duckdb"
 DB_LAP              <- "~/DATA_RAW/SUN/LAP_SUN.duckdb"
-DB_DUCK             <- "~/DATA/Broad_Band/Broad_Band_LAP.duckdb"
+DB_BROAD             <- "~/DATA/Broad_Band/Broad_Band_LAP.duckdb"
 DB_TSI              <- "~/DATA/SUN/TSI.duckdb"
 DB_PRESSURE         <- "~/DATA/WEATHER/Pressure.duckdb"
 DB_TRACKER          <- "~/DATA/Broad_Band/CHP1_tracker.duckdb"

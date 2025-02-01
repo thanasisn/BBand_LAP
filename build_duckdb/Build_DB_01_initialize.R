@@ -104,7 +104,7 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 cat("\n Initialize DB and/or import Sun data\n\n")
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_DUCK))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
 ##  Select Astropy data  -------------------------------------------------------
@@ -218,7 +218,7 @@ if (all(tbl(con, "LAP") |> select(Date) |> arrange(Date) |> collect() |> pull() 
 ##  Do some inspection  --------------------------------------------------------
 if (interactive()) {
 
-  fs::file_size(DB_DUCK)
+  fs::file_size(DB_BROAD)
 
   tbl(con, "LAP") |> tally()
   tbl(con, "LAP") |> glimpse()

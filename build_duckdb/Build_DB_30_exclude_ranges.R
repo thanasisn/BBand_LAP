@@ -203,7 +203,7 @@ pander(data.table(table(ranges_CM21$Comment)))
 cat(" /n /n")
 
 ##  Open dataset  --------------------------------------------------------------
-con   <- dbConnect(duckdb(dbdir = DB_DUCK))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 ## fill all days in meta data until today
 {
