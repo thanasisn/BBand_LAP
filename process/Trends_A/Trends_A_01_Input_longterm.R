@@ -38,19 +38,13 @@ if (
 ##  Load raw data  -------------------------------------------------------------
 DATA_all   <- readRDS(raw_input_data)
 
-
 ##  ERA5 cloud data  -----------------------------------------------------------
-
-hist(DATA_all$near_tcc, breaks = 100)
-cat(" \n \n")
-
 ## create ERA5 cloud subset variables
 cf_lim <- 0.1
 DATA_all[near_tcc == 0,      near_tcc_zero   := TRUE    ]
 DATA_all[near_tcc >  0,      near_tcc_NOzero := near_tcc]
 DATA_all[near_tcc <  cf_lim, near_tcc_clear  := near_tcc]
 DATA_all[near_tcc >  cf_lim, near_tcc_cloud  := near_tcc]
-
 
 ALL_tcc_yearly_mean <-
     DATA_all[,.(
@@ -78,17 +72,12 @@ for (DBn in dbs) {
     for (avar in vars) {
         dataset <- DB
 
-        if (all(is.na(dataset[[avar]]))) next()
-
         ## linear model by day step
         lm1 <- lm(get(avar) ~ Year, data = dataset)
-
         ## correlation test
         cor1 <- cor.test(x = dataset[[avar]], y = as.numeric(dataset$Year), method = 'pearson')
-
         dt <- data.frame(Year = year(as.POSIXct(c("1993-01-01 00:00","2023-01-01 00:00"))))
         slopePyear <- diff(predict(lm1, dt)) / diff((dt$Year))
-
         ## capture lm for table
         gather <- rbind(gather,
                         data.frame(
@@ -100,9 +89,6 @@ for (DBn in dbs) {
                             Mean       = mean(dataset[[avar]], na.rm = TRUE),
                             N          = sum(!is.na(dataset[[avar]]))
                         ))
-
-        par("mar" = c(3, 4, 2, 1))
-
         ## plot data
         plot(dataset$Year, dataset[[avar]],
              pch  = 19,
@@ -115,137 +101,28 @@ for (DBn in dbs) {
         )
         # y axis
         axis(2, pretty(dataset[[avar]]), las = 2 )
-
         # x axis
         axis(1,
              at = seq(1993, max(dataset$Year), by = 1),
              # format = "%Y",
              labels = NA,
              tcl = -0.25)
-
         ## plot fit line
         abline(lm1, lwd = 2)
-
         title(paste("ERA5  ", translate(avar)))
-
         ## display trend on graph
         fit <- lm1[[1]]
-
         legend("top", lty = 1, bty = "n", lwd = 2, cex = 1,
                paste("Trend: ",
                      if (fit[2] > 0) "+" else "-",
                      signif(abs(fit[2]) , 3),
                      "?/y")
         )
-        cat(" \n \n")
     }
 }
 
 
 
-
-
-# ......................................................................... ----
-##  1. long-term  --------------------------------------------------------------
-
-## plot raw trends  -------------------------------------------------------------
-gather <- data.frame()
-for (DBn in dbs) {
-    DB <- get(DBn)
-
-    for (avar in vars) {
-        dataset <- DB
-
-        if (all(is.na(dataset[[avar]]))) next()
-
-        ## linear model by day step
-        # lm1 <- lm(dataset[[avar]] ~ dataset$Date)
-        lm1 <- lm(get(avar) ~ Date, data = dataset)
-
-        ## correlation test
-        cor1 <- cor.test(x = dataset[[avar]], y = as.numeric(dataset$Date), method = 'pearson')
-
-        dt <- data.frame(Date = (as.POSIXct(c("1993-01-01 00:00","2023-01-01 00:00"))))
-        slopePyear <- diff(predict(lm1, dt)) / diff(year(dt$Date))
-
-
-        ## capture lm for table
-        gather <- rbind(gather,
-                        data.frame(
-                            linear_fit_stats(lm1, confidence_interval = Daily_confidence_limit),
-                            cor_test_stats(cor1),
-                            slopePyear = slopePyear,
-                            DATA       = DBn,
-                            var        = avar,
-                            Mean       = mean(dataset[[avar]], na.rm = TRUE),
-                            N          = sum(!is.na(dataset[[avar]]))
-                        ))
-
-        par("mar" = c(3, 4, 2, 1))
-
-
-        ## plot data
-        plot(dataset$Date, dataset[[avar]],
-             pch  = ".",
-             col  = "#1a9850",
-             cex      = 2,
-             # main     = paste(translate(DBn), translate(avar)),
-             cex.main = 0.8,
-             yaxt     = "n",
-             xlab     = "",
-             ylab     = bquote("Wm^-2")
-        )
-        # y axis
-        axis(2, pretty(dataset[[avar]]), las = 2 )
-
-        # x axis
-        axis.Date(1,
-                  at = seq(as.Date("1993-01-01"), as.Date(max(dataset$Date)), by = "year"),
-                  format = "%Y",
-                  labels = NA,
-                  tcl = -0.25)
-
-        ## plot fit line
-        abline(lm1, lwd = 2)
-
-        title(paste(DBn, translate(avar)))
-
-        if (FALSE) {
-            ## Running mean
-            first <- head(which(!is.na(dataset[[avar]])),1)
-            last  <- tail(which(!is.na(dataset[[avar]])),1)
-
-            rm <- frollmean(dataset[[avar]][first:last],
-                            round(running_mean_window_days),
-                            na.rm = TRUE,
-                            algo  = "exact",
-                            align = "center")
-
-            # points(dataset$Date, rm, col = "red", cex = 0.5)
-            lines(dataset$Date[first:last], rm, col = "red", lwd = 1.5)
-
-            ## LOESS curve
-            vec <- !is.na(dataset[[avar]])
-            FTSE.lo3 <- loess.as(dataset$Date[vec], dataset[[avar]][vec],
-                                 degree = 1,
-                                 criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
-            FTSE.lo.predict3 <- predict(FTSE.lo3, dataset$Date)
-            lines(dataset$Date, FTSE.lo.predict3, col = "cyan", lwd = 2.5)
-        }
-
-
-        ## display trend on graph
-        fit <- lm1[[1]]
-
-        legend("top", lty = 1, bty = "n", lwd = 2, cex = 1,
-               paste("Trend: ",
-                     if (fit[2] > 0) "+" else "-",
-                     signif(abs(fit[2]) * Days_of_year * 24 * 3600, 3),
-                     "W/y")
-        )
-        cat(" \n \n")
-    }
-}
 
 
 
@@ -373,24 +250,6 @@ warning("This breaks other variables for Clear and Cloud!!")
 CLEAR_1_daily_mean <- CLEAR_1_daily_mean[!is.na(GLB_att) & GLB_att_N / DayLength > Clear_daily_ratio_lim, ]
 CLOUD_1_daily_mean <- CLOUD_1_daily_mean[!is.na(GLB_att) & GLB_att_N / DayLength > Cloud_daily_ratio_lim, ]
 ## HACK !!!!
-
-
-## _ Margin of error for confidence interval  ----------------------------------
-conf_param  <- 1 - ( 1 - Daily_confidence_limit ) / 2
-suppressWarnings({
-    ALL_1_daily_mean[,   DIR_att_EM    := qt(conf_param,df=DIR_att_N - 1) * DIR_att_sd    / sqrt(DIR_att_N)]
-    ALL_1_daily_mean[,   HOR_att_EM    := qt(conf_param,df=HOR_att_N - 1) * HOR_att_sd    / sqrt(HOR_att_N)]
-    ALL_1_daily_mean[,   GLB_att_EM    := qt(conf_param,df=GLB_att_N - 1) * GLB_att_sd    / sqrt(GLB_att_N)]
-    ALL_1_daily_mean[,   DIR_transp_EM := qt(conf_param,df=DIR_att_N - 1) * DIR_transp_sd / sqrt(DIR_att_N)]
-    CLEAR_1_daily_mean[, DIR_att_EM    := qt(conf_param,df=DIR_att_N - 1) * DIR_att_sd    / sqrt(DIR_att_N)]
-    CLEAR_1_daily_mean[, HOR_att_EM    := qt(conf_param,df=HOR_att_N - 1) * HOR_att_sd    / sqrt(HOR_att_N)]
-    CLEAR_1_daily_mean[, GLB_att_EM    := qt(conf_param,df=GLB_att_N - 1) * GLB_att_sd    / sqrt(GLB_att_N)]
-    CLEAR_1_daily_mean[, DIR_transp_EM := qt(conf_param,df=DIR_att_N - 1) * DIR_transp_sd / sqrt(DIR_att_N)]
-    CLOUD_1_daily_mean[, DIR_att_EM    := qt(conf_param,df=DIR_att_N - 1) * DIR_att_sd    / sqrt(DIR_att_N)]
-    CLOUD_1_daily_mean[, HOR_att_EM    := qt(conf_param,df=HOR_att_N - 1) * HOR_att_sd    / sqrt(HOR_att_N)]
-    CLOUD_1_daily_mean[, GLB_att_EM    := qt(conf_param,df=GLB_att_N - 1) * GLB_att_sd    / sqrt(GLB_att_N)]
-    CLOUD_1_daily_mean[, DIR_transp_EM := qt(conf_param,df=DIR_att_N - 1) * DIR_transp_sd / sqrt(DIR_att_N)]
-})
 
 
 
