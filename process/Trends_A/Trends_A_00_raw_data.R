@@ -1,4 +1,4 @@
-# /*#!/usr/bin/env Rscript */
+# /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Trends"
@@ -67,7 +67,7 @@ knitr::opts_chunk$set(tidy = TRUE,
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/Trends/Trends_00_raw_data.R"
+Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_00_raw_data.R"
 
 if (!interactive()) {
   pdf(file = paste0("~/BBand_LAP/REPORTS/REPORTS/Trends_A", basename(sub("\\.R$", ".pdf", Script.Name))))
