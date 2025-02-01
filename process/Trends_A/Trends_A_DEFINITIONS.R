@@ -40,7 +40,7 @@ var_name <- function(x) {
   for (ax in x) {
     ## get match
     amatch <- as.vector(unlist(
-      dictionary[agrep(ax, names(dictionary))]
+      dictionary[agrep(ax, names(dictionary), max.distance = 1)]
     ))
     ## return same if not found
     if (is.null(amatch)) {
@@ -65,14 +65,17 @@ var_col <- function(x) {
   for (ax in x) {
     ## get match
     amatch <- as.vector(unlist(
-      coldict[agrep(ax, names(coldict))]
+      coldict[agrep(ax, names(coldict), max.distance = 1)]
     ))
     ## return same if not found
     if (is.null(amatch)) {
-      amatch <- ax
+      amatch <- "#000000"
     }
     ## gather results
     res <- c(res, amatch)
   }
   return(res)
 }
+var_col("DIR_trnd")
+var_col("DIR_trnd_A")
+unlist(coldict[stringr::str_detect("DIR_trnd", names(coldict))])

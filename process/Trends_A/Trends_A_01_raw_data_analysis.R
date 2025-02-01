@@ -106,9 +106,9 @@ CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
 ##  All data points  -----------------------------------------------------------
 vars <- c(
-  "GLB_trnd_A",
   "DIR_trnd_A",
   "HOR_trnd_A",
+  "GLB_trnd_A",
   "DIFF_trnd_A"
 )
 
@@ -122,13 +122,18 @@ for (DBn in dbs) {
     DATA <- get(DBn)
 
     for (avar in vars) {
-        DATA |> filter(!is.na(avar))
-
-      DATA |> ggplot() +
-        geom_point(aes(x = Decimal_date, y = {{avar}}))
+      ## test
+      DATA <- DATA |>
+      filter(!is.na(!!sym(avar))) |>
+        collect() |>
+        sample_n(100000)
+      # .data[[column]]
+      DATA |>
+      ggplot() +
+        geom_point(aes(x = Decimal_date, y = !!sym(avar)))
 
       paste(var_name(avar), var_name(DBn), var_col(avar))
-
+stop()
     }
 }
 
