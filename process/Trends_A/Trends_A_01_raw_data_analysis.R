@@ -128,7 +128,10 @@ for (DBn in dbs) {
     for (avar in vars) {
         DATA |> filter(!is.na(avar))
 
-      DATA |> ggplot()
+      DATA |> ggplot() +
+        geom_point(aes(x = Decimal_date, y = avar))
+
+      paste(var_name(avar), var_name(DBn), var_col(avar))
 
     }
 }
