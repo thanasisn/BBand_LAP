@@ -93,7 +93,9 @@ con <- dbConnect(duckdb(dbdir = DB_BROAD))
 LAP  <- tbl(con, "LAP")
 META <- tbl(con, "META")
 
-LAP <- LAP |> select(
+LAP <- LAP |>
+  filter(SKY %in% c("Cloud", "Clear")) |>  ## only data for trends
+  select(
   Date,
   ends_with("_trnd_A"),
   ends_with("_strict"),
@@ -105,10 +107,9 @@ LAP <- LAP |> select(
 
 ##  Create data sets  ----------------------------------------------------------
 ##  cloud and clear are prepared for this analysis
-ALL   <- LAP |> filter(SKY %in% c("Cloud", "Clear")) |> select(-SKY)
-CLOUD <- LAP |> filter(SKY == "Cloud")               |> select(-SKY)
-CLEAR <- LAP |> filter(SKY == "Clear")               |> select(-SKY)
-
+ALL   <- LAP |>                        |> select(-SKY)
+CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
+CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
 vars <- c(
   "DIR_trnd_A",
@@ -125,6 +126,24 @@ dbs <- c(
 
 for (DBn in dbs) {
   DATA <- get(DBn)
+
+  # summarise(across(
+  #   .cols = everything(),
+  #   .fns = list(
+  #     n = ~ n(),
+  #     n_na = ~ sum(case_match(is.na(.x),
+  #                             TRUE ~ 1L,
+  #                             FALSE ~0L)),
+  #     mean = ~ mean(.x, na.rm = TRUE),
+  #     n_lt_p = ~ sum(case_match(.x < p_,
+  #                               TRUE ~ 1L,
+  #                               FALSE ~0L), na.rm = TRUE),
+  #     pct_lt_p = ~ mean(case_match(.x < p_,
+  #                                  TRUE ~ 1L,
+  #                                  FALSE ~0L), na.rm = TRUE) * 100
+  #   )
+  # ))
+
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n##", var_name(DBn), "\n\n"))
