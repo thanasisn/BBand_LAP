@@ -22,3 +22,6 @@ render(input      = "~/BBand_LAP/process/Trends_A/Trends_A_00_raw_data.R",
 
 render(input      = "~/BBand_LAP/process/Trends_A/Trends_A_01_raw_data_analysis.R",
        output_dir = output_dir)
+
+render(input      = "~/BBand_LAP/process/Trends_A/Trends_A_02_daily_data.R",
+       output_dir = output_dir)
