@@ -183,6 +183,9 @@ LAP <- LAP |>
 
 
 ##  Set flag for sky conditions  -----------------------------------------------
+#'
+#' These flags describe all data for trend analysis
+#'
 LAP <- LAP |>
   mutate(
     SKY := case_when(
