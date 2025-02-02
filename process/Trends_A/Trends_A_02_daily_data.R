@@ -153,26 +153,34 @@ for (DBn in dbs) {
       N = n()
     )
 
-  DAILY |> glimpse()
-
-  left_join(
+  ## Add daylength and load all data
+  DAILY <- left_join(
     DAILY, META, by = "Day"
-  ) |> glimpse()
+  ) |> collect() |> data.table()
+
+  hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
+       main = paste(var_name(DBn), var_name(avar)))
+
+  hist(DAILY[!is.na(DIR_trnd_A_mean), DIR_trnd_A_N/Daylength], breaks = 100,
+       main = paste(var_name(DBn), var_name(avar)))
+
+  #
+  # tbl_name <- paste0("Trend_A_DAILY_", DBn)
+  # if (dbExistsTable(con , tbl_name)) {
+  #   cat("\n Remove table", tbl_name, "\n\n")
+  #   dbRemoveTable(con, tbl_name)
+  # }
+  # dbCreateTable(con, tbl_name, DAILY)
+  # db_create_table(con, tbl_name, DAILY)
+  #
+  # DAILY |> glimpse()
+
 
   ## Filter daily data
-  stop()
 
 
 
 
-
-
-
-  stop()
-  for (avar in vars) {
-    pp <- DATA
-
-  }
 }
 
 
