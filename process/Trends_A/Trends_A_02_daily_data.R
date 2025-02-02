@@ -107,7 +107,7 @@ LAP <- LAP |>
 
 ##  Create data sets  ----------------------------------------------------------
 ##  cloud and clear are prepared for this analysis
-ALL   <- LAP |>                        |> select(-SKY)
+ALL   <- LAP |>                           select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
@@ -116,6 +116,11 @@ vars <- c(
   "HOR_trnd_A",
   "GLB_trnd_A",
   "DIFF_trnd_A"
+)
+
+vars_obs <- c(
+  "GLB_strict",
+  "DIR_strict"
 )
 
 dbs <- c(
@@ -144,10 +149,25 @@ for (DBn in dbs) {
   #   )
   # ))
 
-
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n##", var_name(DBn), "\n\n"))
 
+
+  DATA |>
+    group_by(Day) |>
+    summarise(
+      across(
+        .cols = all_of(c(vars, vars_obs)),
+        .fns = list(
+          mean = ~ mean(.x, na.rm =T),
+          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L)),
+          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L)),
+        )
+      ),
+      ~ n()
+    ) |> glimpse()
+
+  stop()
   ## drop data to datatable
   ## This needs ~ 4Gb of ram
   DATA <- DATA |> collect() |> data.table()
