@@ -134,7 +134,7 @@ for (DBn in dbs) {
   DATA <- get(DBn)
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n##", var_name(DBn), "\n\n"))
+  cat(paste("\n## Daily means", var_name(DBn), "\n\n"))
 
   ## Create daily values and stats
   DAILY <- DATA |>
@@ -158,28 +158,25 @@ for (DBn in dbs) {
     DAILY, META, by = "Day"
   ) |> collect() |> data.table()
 
+  ## inspect fill ratios for observations
   hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
        main = paste(var_name(DBn), var_name(avar)))
 
   hist(DAILY[!is.na(DIR_trnd_A_mean), DIR_trnd_A_N/Daylength], breaks = 100,
        main = paste(var_name(DBn), var_name(avar)))
 
-  #
-  # tbl_name <- paste0("Trend_A_DAILY_", DBn)
-  # if (dbExistsTable(con , tbl_name)) {
-  #   cat("\n Remove table", tbl_name, "\n\n")
-  #   dbRemoveTable(con, tbl_name)
-  # }
-  # dbCreateTable(con, tbl_name, DAILY)
-  # db_create_table(con, tbl_name, DAILY)
-  #
-  # DAILY |> glimpse()
+  if (Sys.info()["nodename"] == Main.Host) {
 
+    ## Store daily values as is
+    tbl_name <- paste0("Trend_A_DAILY_", DBn)
+    if (dbExistsTable(con , tbl_name)) {
+      cat("\n Remove table", tbl_name, "\n\n")
+      dbRemoveTable(con, tbl_name)
+    }
 
-  ## Filter daily data
-
-
-
+    dbCreateTable(con, tbl_name, DAILY)
+    cat("\n Created", tbl_name, "\n\n")
+  }
 
 }
 
@@ -187,8 +184,7 @@ for (DBn in dbs) {
 
 
 
-stop()
-
+#
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
 

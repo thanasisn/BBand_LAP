@@ -3,6 +3,7 @@
 #'
 
 DB_BROAD  <- "~/DATA/Broad_Band/Broad_Band_LAP.duckdb"
+Main.Host <- "sagan"        ## This is the main host used to build the DB
 
 LAST_DAY  <- as.POSIXct("2025-01-01 00:00:00")
 FIRST_DAY <- as.POSIXct("1900-01-01 00:00:00")

@@ -214,6 +214,8 @@ remove_column(con, "LAP", "HOR_trnd_A" )
 remove_column(con, "LAP", "DIFF_trnd_A")
 remove_column(con, "LAP", "SKY"        )
 
+
+
 res <- update_table(con, ADD, "LAP", "Date")
 
 # for (ad in sample(unique(test$Day), 10)) {
