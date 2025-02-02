@@ -91,7 +91,8 @@ library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 LAP  <- tbl(con, "LAP")
-META <- tbl(con, "META")
+META <- tbl(con, "META") |> select( Day, Daylength)
+
 
 LAP <- LAP |>
   filter(SKY %in% c("Cloud", "Clear")) |>  ## only data for trends
@@ -132,64 +133,35 @@ dbs <- c(
 for (DBn in dbs) {
   DATA <- get(DBn)
 
-  # summarise(across(
-  #   .cols = everything(),
-  #   .fns = list(
-  #     n = ~ n(),
-  #     n_na = ~ sum(case_match(is.na(.x),
-  #                             TRUE ~ 1L,
-  #                             FALSE ~0L)),
-  #     mean = ~ mean(.x, na.rm = TRUE),
-  #     n_lt_p = ~ sum(case_match(.x < p_,
-  #                               TRUE ~ 1L,
-  #                               FALSE ~0L), na.rm = TRUE),
-  #     pct_lt_p = ~ mean(case_match(.x < p_,
-  #                                  TRUE ~ 1L,
-  #                                  FALSE ~0L), na.rm = TRUE) * 100
-  #   )
-  # ))
-
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n##", var_name(DBn), "\n\n"))
 
-
-  DATA |>
+  ## Create daily values and stats
+  DAILY <- DATA |>
     group_by(Day) |>
     summarise(
+      ## stats on every variable
       across(
         .cols = all_of(c(vars, vars_obs)),
-        .fns = list(
+        .fns  = list(
           mean = ~ mean(.x, na.rm =T),
           NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L)),
-          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L)),
+          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L))
         )
       ),
-      ~ n()
-    ) |> glimpse()
+      ## Stats on every group
+      N = n()
+    )
 
+  DAILY |> glimpse()
+
+  left_join(
+    DAILY, META, by = "Day"
+  ) |> glimpse()
+
+  ## Filter daily data
   stop()
-  ## drop data to datatable
-  ## This needs ~ 4Gb of ram
-  DATA <- DATA |> collect() |> data.table()
 
-  daily <- DATA[, .(
-    DIR_trnd_A      = mean(DIR_trnd_A,  na.rm = T),
-    HOR_trnd_A      = mean(HOR_trnd_A,  na.rm = T),
-    GLB_trnd_A      = mean(GLB_trnd_A,  na.rm = T),
-    DIFF_trnd_A     = mean(DIFF_trnd_A, na.rm = T),
-    DIR_trnd_A_NAs  = sum( is.na(DIR_trnd_A)),
-    DIR_trnd_A_N    = sum(!is.na(DIR_trnd_A)),
-    HOR_trnd_A_NAs  = sum( is.na(HOR_trnd_A)),
-    HOR_trnd_A_N    = sum(!is.na(HOR_trnd_A)),
-    GLB_trnd_A_NAs  = sum( is.na(GLB_trnd_A)),
-    GLB_trnd_A_N    = sum(!is.na(GLB_trnd_A)),
-    DIFF_trnd_A_NAs = sum( is.na(DIFF_trnd_A)),
-    DIFF_trnd_A_N   = sum(!is.na(DIFF_trnd_A)),
-    DIR_strict      = sum(!is.na(DIR_strict)),
-    GLB_strict      = sum(!is.na(GLB_strict)),
-    DIFF_strict     = sum(!is.na(DIFF_strict))
-  ),
-  by = Day]
 
 
 
