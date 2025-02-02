@@ -96,12 +96,14 @@ con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 LAP  <- tbl(con, "LAP")
 
-LAP <- LAP |> select(
-  Date,
-  ends_with("_trnd_A"),
-  Decimal_date,
-  SKY
-)
+LAP <- LAP |>
+  filter(SKY %in% c("Cloud", "Clear")) |>  ## only data for trends
+  select(
+    Date,
+    ends_with("_trnd_A"),
+    Decimal_date,
+    SKY
+  )
 
 ##  Create data sets  ----------------------------------------------------------
 ALL   <- LAP                           |> select(-SKY)
