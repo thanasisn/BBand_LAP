@@ -205,7 +205,7 @@ ADD <- LAP |>
     HOR_trnd_A,
     DIFF_trnd_A,
     SKY
-  )
+  ) |> collect()  ## have to load data before removing LAP column
 
 ## make sure we update all data
 remove_column(con, "LAP", "DIR_trnd_A" )
