@@ -17,7 +17,6 @@ if (
     file.mtime(raw_input_data) < file.mtime("./DHI_GHI_00_raw_data.R")
 ) {
     source("./DHI_GHI_00_raw_data.R")
-    dummy <- gc()
 }
 
 ## check current steps
@@ -122,22 +121,7 @@ for (DBn in dbs) {
 }
 
 
-
-
 ##  Daily means  ---------------------------------------------------------------
-
-
-
-
-## _ Exclude days with few data for Clear and cloud  ---------------------------
-
-## HACK !!!!
-warning("This breaks other variables for Clear and Cloud!!")
-CLEAR_1_daily_mean <- CLEAR_1_daily_mean[!is.na(GLB_att) & GLB_att_N / DayLength > Clear_daily_ratio_lim, ]
-CLOUD_1_daily_mean <- CLOUD_1_daily_mean[!is.na(GLB_att) & GLB_att_N / DayLength > Cloud_daily_ratio_lim, ]
-## HACK !!!!
-
-
 
 
 ## _ Daily seasonal values from daily ------------------------------------------
@@ -248,10 +232,6 @@ suppressWarnings({
 ALL_1_daily_DESEAS <- merge(  ALL_1_daily_mean,   ALL_1_daily_seas, by = "doy", all = T)
 CLEAR_1_daily_DESEAS <- merge(CLEAR_1_daily_mean, CLEAR_1_daily_seas, by = "doy", all = T)
 CLOUD_1_daily_DESEAS <- merge(CLOUD_1_daily_mean, CLOUD_1_daily_seas, by = "doy", all = T)
-
-setorder(  ALL_1_daily_DESEAS, Date)
-setorder(CLEAR_1_daily_DESEAS, Date)
-setorder(CLOUD_1_daily_DESEAS, Date)
 
 ## Using the % departure from seasonal values
 
@@ -373,31 +353,6 @@ ALL_1_monthly_daily_mean[   DIR_att_N <= Monthly_aggegation_N_lim, DIR_att_EM   
 ALL_1_monthly_daily_mean[   GLB_att_N <= Monthly_aggegation_N_lim, GLB_att_EM    := NA]
 ALL_1_monthly_daily_mean[   DIR_att_N <= Monthly_aggegation_N_lim, DIR_transp_EM := NA]
 
-# CLEAR_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_att       := NA]
-# CLEAR_1_monthly_daily_mean[ HOR_att_N <= Monthly_aggegation_N_lim/2, HOR_att       := NA]
-# CLEAR_1_monthly_daily_mean[ GLB_att_N <= Monthly_aggegation_N_lim/2, GLB_att       := NA]
-# CLEAR_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_transp    := NA]
-# CLEAR_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_att_sd    := NA]
-# CLEAR_1_monthly_daily_mean[ HOR_att_N <= Monthly_aggegation_N_lim/2, HOR_att_sd    := NA]
-# CLEAR_1_monthly_daily_mean[ GLB_att_N <= Monthly_aggegation_N_lim/2, GLB_att_sd    := NA]
-# CLEAR_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_transp_sd := NA]
-# CLEAR_1_monthly_daily_mean[ HOR_att_N <= Monthly_aggegation_N_lim/2, HOR_att_EM    := NA]
-# CLEAR_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_att_EM    := NA]
-# CLEAR_1_monthly_daily_mean[ GLB_att_N <= Monthly_aggegation_N_lim/2, GLB_att_EM    := NA]
-# CLEAR_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_transp_EM := NA]
-
-# CLOUD_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_att       := NA]
-# CLOUD_1_monthly_daily_mean[ HOR_att_N <= Monthly_aggegation_N_lim/2, HOR_att       := NA]
-# CLOUD_1_monthly_daily_mean[ GLB_att_N <= Monthly_aggegation_N_lim/2, GLB_att       := NA]
-# CLOUD_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_transp    := NA]
-# CLOUD_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_att_sd    := NA]
-# CLOUD_1_monthly_daily_mean[ HOR_att_N <= Monthly_aggegation_N_lim/2, HOR_att_sd    := NA]
-# CLOUD_1_monthly_daily_mean[ GLB_att_N <= Monthly_aggegation_N_lim/2, GLB_att_sd    := NA]
-# CLOUD_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_transp_sd := NA]
-# CLOUD_1_monthly_daily_mean[ HOR_att_N <= Monthly_aggegation_N_lim/2, HOR_att_EM    := NA]
-# CLOUD_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_att_EM    := NA]
-# CLOUD_1_monthly_daily_mean[ GLB_att_N <= Monthly_aggegation_N_lim/2, GLB_att_EM    := NA]
-# CLOUD_1_monthly_daily_mean[ DIR_att_N <= Monthly_aggegation_N_lim/2, DIR_transp_EM := NA]
 
 
 
@@ -465,11 +420,6 @@ CLEAR_1_D_monthly_DESEAS <- merge(CLEAR_1_monthly_daily_mean, CLEAR_1_monthly_da
 CLOUD_1_D_monthly_DESEAS <- merge(CLOUD_1_monthly_daily_mean, CLOUD_1_monthly_daily_seas, by = "Month", all = T)
 
 
-## forget data
-rm(  ALL_1_monthly_daily_mean,   ALL_1_monthly_daily_seas,
-     CLEAR_1_monthly_daily_mean, CLEAR_1_monthly_daily_seas,
-     CLOUD_1_monthly_daily_mean, CLOUD_1_monthly_daily_seas)
-dummy <- gc()
 
 
 ## create date
@@ -665,18 +615,6 @@ warning("Years in by Season are shifted by a month to match seasons")
 ALL_1_D_bySeason_DESEAS[, Year := year(Yqrt)]
 CLEAR_1_D_bySeason_DESEAS[, Year := year(Yqrt)]
 CLOUD_1_D_bySeason_DESEAS[, Year := year(Yqrt)]
-
-
-setorder(  ALL_1_D_bySeason_DESEAS, Yqrt)
-setorder(CLEAR_1_D_bySeason_DESEAS, Yqrt)
-setorder(CLOUD_1_D_bySeason_DESEAS, Yqrt)
-
-
-rm(ALL_1_daily_mean,   ALL_1_daily_seas,
-   CLEAR_1_daily_mean, CLEAR_1_daily_seas,
-   CLOUD_1_daily_mean, CLOUD_1_daily_seas)
-dummy <- gc()
-
 
 
 
@@ -1029,7 +967,3 @@ CLOUD_1_M_bySeason_DESEAS[, Year := year(Yqrt)]
 # QHD_clear[ !is.na(GLB_att), .N ]
 # QHD_cloud[ !is.na(GLB_att), .N ]
 
-
-
-#' **END**
-#+ include=T, echo=F
