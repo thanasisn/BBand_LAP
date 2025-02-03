@@ -14,6 +14,12 @@ FIBais_Elev               <-  12
 MIN_ELEVA                 <-   5  ##  global low elevation limit
 All_daily_ratio_lim       <- 0.5  ##  ration of daily valid data
 
+## Ratio of characterizations to set as daily characterization
+Clear_daily_ratio_lim     <- 0.6  ## keep both the same!!
+Cloud_daily_ratio_lim     <- 0.6
+
+
+
 
 #### dictionary ####
 dictionary <-

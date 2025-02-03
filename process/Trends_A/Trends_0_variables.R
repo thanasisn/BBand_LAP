@@ -4,7 +4,6 @@ tag                      <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.t
 variables_fl             <- "./DHI_GHI_0_variables.R"
 data_procsess_fl         <- "./DHI_GHI_0_data_input.R"
 
-#### parameters ####
 
 ## https://www.rapidtables.com/calc/time/days-in-year.html
 # Days_of_year             <- 365.25   ## Mean Julian year
@@ -27,8 +26,4 @@ Monthly_confidence_limit  <-   0.99
 Daily_aggregation_N_lim   <-   0        # replaced with relative daylight filter
 Monthly_aggegation_N_lim  <-  20
 SZA_aggregation_N_lim     <-   4
-
-Clear_daily_ratio_lim     <- 0.6 ## keep both the same!!
-Cloud_daily_ratio_lim     <- 0.6
-
 
