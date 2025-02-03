@@ -246,7 +246,8 @@ for (DBn in dbs) {
   DATA |> colnames()
 
 
-  test <- DATA |>
+  ##  Compute seasonal daily values --------------------------------------------
+  SEAS <- DATA |>
     group_by(yday(Day)) |>
     summarise(
       across(
@@ -265,6 +266,12 @@ for (DBn in dbs) {
       ),
       N = n()
     ) |> collect() |> data.table()
+
+
+  ## Plot seasonal values
+
+
+  ## Create deseasonal values
 
 
   stop()
