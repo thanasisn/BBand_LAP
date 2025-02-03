@@ -175,46 +175,56 @@ for (DBn in dbs) {
       cat("\n Remove table", tbl_name, "\n\n")
       dbRemoveTable(con, tbl_name)
     }
-    dbCreateTable(con, tbl_name, DAILY)
+    dbCreateTable(conn = con, name = tbl_name, DAILY)
+    res <- insert_table(con, DAILY, tbl_name, "Day")
     cat("\n Created", tbl_name, "\n\n")
   }
 }
 
-
-# ## HACK !!!!
-# warning("This breaks other variables for Clear and Cloud!!")
-# CLEAR_1_daily_mean <- CLEAR_1_daily_mean[!is.na(GLB_att) & GLB_att_N / DayLength > Clear_daily_ratio_lim, ]
-# CLOUD_1_daily_mean <- CLOUD_1_daily_mean[!is.na(GLB_att) & GLB_att_N / DayLength > Cloud_daily_ratio_lim, ]
-# ## HACK !!!!
-
-
-dbs <- c(
-  "CLOUD",
-  "CLEAR"
-)
-
-dbListTables(con)
-tbl(con, "Trend_A_DAILY_CLEAR") |> glimpse()
+# dbListTables(con)
+# tbl(con, "Trend_A_DAILY_CLEAR") |> glimpse()
+# tbl(con, "Trend_A_DAILY_CLOUD") |> glimpse()
 
 ##  Daily data representation  -------------------------------------------------
-for (DBn in dbs) {
-  DATA <- get(DBn)
+warning("This breaks other variables for Clear and Cloud!! This is only for GHI")
 
-  cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Daily ", var_name(DBn), "\n\n"))
+#'
+#' We choose to use a ratio of `r Cloud_daily_ratio_lim` to set the
+#' sky type characterization for the whole day.
+#'
+#' **Daily data representation applied only on GHI!!**
+#'
 
-  DATA
+CLOUD <- tbl(con, "Trend_A_DAILY_CLOUD")
+CLOUD <- CLOUD |>
+  mutate(
+    GLB_trnd_A_mean := case_when(
+      GLB_trnd_A_N / Daylength >  Cloud_daily_ratio_lim ~ GLB_trnd_A_mean,
+      GLB_trnd_A_N / Daylength <= Cloud_daily_ratio_lim ~ NA )
+  )
+res <- update_table(con, CLOUD, "Trend_A_DAILY_CLOUD", "Day")
+
+CLOUD <- CLOUD |> collect() |> data.table()
+hist(CLOUD[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
+     main = paste(var_name("CLOUD"), var_name("GLB_trnd_A_N")),
+     ylab = "Valid data ratio")
 
 
-stop()
+CLEAR <- tbl(con, "Trend_A_DAILY_CLEAR")
+CLEAR <- CLEAR |>
+  mutate(
+    GLB_trnd_A_mean := case_when(
+      GLB_trnd_A_N / Daylength >  Clear_daily_ratio_lim ~ GLB_trnd_A_mean,
+      GLB_trnd_A_N / Daylength <= Clear_daily_ratio_lim ~ NA )
+  )
+res <- update_table(con, CLEAR, "Trend_A_DAILY_CLEAR", "Day")
 
-}
+CLEAR <- CLEAR |> collect() |> data.table()
+hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
+     main = paste(var_name("CLEAR"), var_name("GLB_trnd_A_N")),
+     ylab = "Valid data ratio")
 
 
-stop()
-
-
-#
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
