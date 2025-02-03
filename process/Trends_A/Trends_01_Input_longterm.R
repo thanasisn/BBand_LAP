@@ -124,30 +124,12 @@ for (DBn in dbs) {
 
 
 
-
-
-
-
 ##  Daily means  ---------------------------------------------------------------
 
 
 
 
 ## _ Exclude days with few data for Clear and cloud  ---------------------------
-hist(CLEAR_1_daily_mean[, GLB_att_N / DayLength], breaks = 100)
-abline(v = Clear_daily_ratio_lim, col = "red")
-
-hist(CLOUD_1_daily_mean[, GLB_att_N / DayLength], breaks = 100)
-abline(v = Cloud_daily_ratio_lim, col = "red")
-
-
-# ## proper way to apply filter
-# CLEAR_1_daily_mean[GLB_att_N / DayLength < Clear_daily_ratio_lim, GLB_att    := NA]
-# CLEAR_1_daily_mean[GLB_att_N / DayLength < Clear_daily_ratio_lim, GLB_att_N  := NA]
-# CLEAR_1_daily_mean[GLB_att_N / DayLength < Clear_daily_ratio_lim, GLB_att_sd := NA]
-# CLOUD_1_daily_mean[GLB_att_N / DayLength < Cloud_daily_ratio_lim, GLB_att    := NA]
-# CLOUD_1_daily_mean[GLB_att_N / DayLength < Cloud_daily_ratio_lim, GLB_att_N  := NA]
-# CLOUD_1_daily_mean[GLB_att_N / DayLength < Cloud_daily_ratio_lim, GLB_att_sd := NA]
 
 ## HACK !!!!
 warning("This breaks other variables for Clear and Cloud!!")
