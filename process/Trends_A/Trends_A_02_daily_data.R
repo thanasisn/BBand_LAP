@@ -130,14 +130,14 @@ dbs <- c(
   "CLEAR"
 )
 
+##  Create daily values  -------------------------------------------------------
 for (DBn in dbs) {
   DATA <- get(DBn)
-
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily means", var_name(DBn), "\n\n"))
 
   ## Create daily values and stats
-  DAILY <- DATA |>
+  DAILY <- DATA   |>
     group_by(Day) |>
     summarise(
       ## stats on every variable
@@ -166,22 +166,49 @@ for (DBn in dbs) {
        main = paste(var_name(DBn), var_name(avar)))
 
   if (Sys.info()["nodename"] == Main.Host) {
-
     ## Store daily values as is
     tbl_name <- paste0("Trend_A_DAILY_", DBn)
     if (dbExistsTable(con , tbl_name)) {
       cat("\n Remove table", tbl_name, "\n\n")
       dbRemoveTable(con, tbl_name)
     }
-
     dbCreateTable(con, tbl_name, DAILY)
     cat("\n Created", tbl_name, "\n\n")
   }
+}
+
+
+# ## HACK !!!!
+# warning("This breaks other variables for Clear and Cloud!!")
+# CLEAR_1_daily_mean <- CLEAR_1_daily_mean[!is.na(GLB_att) & GLB_att_N / DayLength > Clear_daily_ratio_lim, ]
+# CLOUD_1_daily_mean <- CLOUD_1_daily_mean[!is.na(GLB_att) & GLB_att_N / DayLength > Cloud_daily_ratio_lim, ]
+# ## HACK !!!!
+
+
+dbs <- c(
+  "CLOUD",
+  "CLEAR"
+)
+
+dbListTables(con)
+tbl(con, "Trend_A_DAILY_CLEAR") |> glimpse()
+
+##  Daily data representation  -------------------------------------------------
+for (DBn in dbs) {
+  DATA <- get(DBn)
+
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Daily ", var_name(DBn), "\n\n"))
+
+  DATA
+
+
+stop()
 
 }
 
 
-
+stop()
 
 
 #
