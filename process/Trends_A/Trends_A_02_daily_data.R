@@ -42,8 +42,7 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' Create raw data to use for investigating long terms changes of radiation
-#' due to interaction with the atmosphere
+#' Create daily data and deseasonalize data
 #'
 
 #+ include=F
@@ -144,9 +143,9 @@ for (DBn in dbs) {
       across(
         .cols = all_of(c(vars, vars_obs)),
         .fns  = list(
-          mean = ~ mean(.x, na.rm =T),
-          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm =T),
-          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm =T)
+          mean = ~ mean(.x, na.rm = TRUE),
+          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
+          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
         )
       ),
       ## Stats on every group
@@ -181,10 +180,6 @@ for (DBn in dbs) {
   }
 }
 
-# dbListTables(con)
-# tbl(con, "Trend_A_DAILY_CLEAR") |> glimpse()
-# tbl(con, "Trend_A_DAILY_CLOUD") |> glimpse()
-
 ##  Daily data representation  -------------------------------------------------
 warning("This breaks other variables for Clear and Cloud!! This is only for GHI")
 
@@ -202,7 +197,9 @@ CLOUD <- CLOUD |>
       GLB_trnd_A_N / Daylength >  Cloud_daily_ratio_lim ~ GLB_trnd_A_mean,
       GLB_trnd_A_N / Daylength <= Cloud_daily_ratio_lim ~ NA )
   )
-res <- update_table(con, CLOUD, "Trend_A_DAILY_CLOUD", "Day")
+if (Sys.info()["nodename"] == Main.Host) {
+  res <- update_table(con, CLOUD, "Trend_A_DAILY_CLOUD", "Day")
+}
 
 CLOUD <- CLOUD |> collect() |> data.table()
 hist(CLOUD[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
@@ -217,12 +214,65 @@ CLEAR <- CLEAR |>
       GLB_trnd_A_N / Daylength >  Clear_daily_ratio_lim ~ GLB_trnd_A_mean,
       GLB_trnd_A_N / Daylength <= Clear_daily_ratio_lim ~ NA )
   )
-res <- update_table(con, CLEAR, "Trend_A_DAILY_CLEAR", "Day")
-
+if (Sys.info()["nodename"] == Main.Host) {
+  res <- update_table(con, CLEAR, "Trend_A_DAILY_CLEAR", "Day")
+}
 CLEAR <- CLEAR |> collect() |> data.table()
 hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
      main = paste(var_name("CLEAR"), var_name("GLB_trnd_A_N")),
      ylab = "Valid data ratio")
+
+
+
+# dbListTables(con)
+# tbl(con, "Trend_A_DAILY_CLEAR") |> glimpse()
+# tbl(con, "Trend_A_DAILY_CLOUD") |> glimpse()
+
+
+##  Daily deseasonal values  ---------------------------------------------------
+
+dbs <- c(
+  "Trend_A_DAILY_ALL",
+  "Trend_A_DAILY_CLOUD",
+  "Trend_A_DAILY_CLEAR"
+)
+
+##  Create daily values  -------------------------------------------------------
+for (DBn in dbs) {
+  DATA <- tbl(con, DBn)
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
+
+  DATA |> colnames()
+
+
+  test <- DATA |>
+    group_by(yday(Day)) |>
+    summarise(
+      across(
+        .cols = ends_with("mean"),
+        .fns  = list(
+          seas = ~ mean(.x, na.rm = TRUE),
+          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
+          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+        )
+      ),
+      across(
+        .cols = ends_with(c("NAs", "N")),
+        .fns  = list(
+          total = ~ sum(.x, na.rm = TRUE)
+        )
+      ),
+      N = n()
+    ) |> collect() |> data.table()
+
+
+  stop()
+}
+
+stop()
+
+
 
 
 #+ Clean_exit, echo=FALSE
