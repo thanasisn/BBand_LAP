@@ -145,8 +145,8 @@ for (DBn in dbs) {
         .cols = all_of(c(vars, vars_obs)),
         .fns  = list(
           mean = ~ mean(.x, na.rm =T),
-          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L)),
-          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L))
+          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm =T),
+          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm =T)
         )
       ),
       ## Stats on every group
@@ -158,12 +158,15 @@ for (DBn in dbs) {
     DAILY, META, by = "Day"
   ) |> collect() |> data.table()
 
+
   ## inspect fill ratios for observations
   hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
-       main = paste(var_name(DBn), var_name(avar)))
+       main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
+       ylab = "Valid data ratio")
 
   hist(DAILY[!is.na(DIR_trnd_A_mean), DIR_trnd_A_N/Daylength], breaks = 100,
-       main = paste(var_name(DBn), var_name(avar)))
+       main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
+       ylab = "Valid data ratio")
 
   if (Sys.info()["nodename"] == Main.Host) {
     ## Store daily values as is
