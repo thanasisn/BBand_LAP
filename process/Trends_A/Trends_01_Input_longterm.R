@@ -59,10 +59,8 @@ dbs    <- c("ALL_tcc_yearly_mean")
 gather <- data.frame()
 for (DBn in dbs) {
     DB <- get(DBn)
-
     for (avar in vars) {
         dataset <- DB
-
         ## linear model by day step
         lm1 <- lm(get(avar) ~ Year, data = dataset)
         ## correlation test
@@ -112,11 +110,9 @@ for (DBn in dbs) {
     }
 }
 
-
 ## _ Daily de-seasonal anomaly -------------------------------------------------
 
 ## add TSI data process
-## data departure from mean value
 ALL_1_daily_mean    [, tsi1au_att_des := 100*(tsi1au_att - mean(tsi1au_att)) / mean(tsi1au_att)]
 ALL_1_daily_mean <-
     merge(ALL_1_daily_DESEAS,

@@ -149,7 +149,7 @@ for (DBn in dbs) {
         )
       ),
       ## Stats on every group
-      N = n()
+      Day_N = n()
     )
 
   ## Add daylength and load all data
@@ -272,7 +272,7 @@ for (DBn in dbs) {
           total = ~ sum(.x, na.rm = TRUE)
         )
       ),
-      N = n()
+      Seas_N = n()
     ) |> collect() |> data.table()
 
 
@@ -297,7 +297,6 @@ for (DBn in dbs) {
     copy = TRUE
   ) |> collect() |> data.table()
 
-
   for (av in vars) {
     cat("Compute anomaly for ", av, "\n")
     # grep(av, DATA |> colnames(), value = T)
@@ -308,6 +307,10 @@ for (DBn in dbs) {
     DATA <- DATA |> mutate(
       !!anomvar := 100 * (get(av) - get(seasvar)) / get(seasvar)
     ) |> collect()
+
+    ## protect database numeric type
+    DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
+    DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
   ## Store anomaly data
