@@ -90,7 +90,7 @@ library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 LAP  <- tbl(con, "LAP")
-META <- tbl(con, "META") |> select( Day, Daylength)
+META <- tbl(con, "META") |> select(Day, Daylength)
 
 
 LAP <- LAP |>
@@ -295,15 +295,19 @@ for (DBn in dbs) {
     SEAS,
     by = "DOY",
     copy = TRUE
-  )
+  ) |> collect() |> data.table()
+
 
   for (av in vars) {
     cat("Compute anomaly for ", av, "\n")
     # grep(av, DATA |> colnames(), value = T)
 
+    seasvar <- paste0(av, "_seas")
+    anomvar <- paste0(av, "_anom")
+
     DATA <- DATA |> mutate(
-      !!paste0(av, "_anom") := 100 * (!!av - !!paste0(av, "_seas")) / !!paste0(av, "_seas")
-    )
+      !!anomvar := 100 * (get(av) - get(seasvar)) / get(seasvar)
+    ) |> collect()
   }
 
   ## Store anomaly data
