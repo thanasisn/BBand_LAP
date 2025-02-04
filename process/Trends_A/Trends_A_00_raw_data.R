@@ -167,7 +167,7 @@ removedays_DIFF <- left_join(
 LAP <- LAP |> mutate(
   GLB_strict  := case_when(Day %in% removedays_GLB  ~ NA, .default = GLB_strict ),
   DIR_strict  := case_when(Day %in% removedays_DIR  ~ NA, .default = DIR_strict ),
-  HOR_strict  := case_when(Day %in% removedays_DIR  ~ NA, .default = DIR_strict ),
+  HOR_strict  := case_when(Day %in% removedays_DIR  ~ NA, .default = HOR_strict ),
   DIFF_strict := case_when(Day %in% removedays_DIFF ~ NA, .default = DIFF_strict)
 )
 

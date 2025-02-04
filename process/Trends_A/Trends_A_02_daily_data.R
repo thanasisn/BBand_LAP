@@ -237,6 +237,14 @@ dbs <- c(
   "Trend_A_DAILY_CLEAR"
 )
 
+vars <- c(
+  "DIR_trnd_A_mean",
+  "HOR_trnd_A_mean",
+  "GLB_trnd_A_mean",
+  "DIFF_trnd_A_mean",
+  "GLB_strict_mean"
+)
+
 ##  Create daily values  -------------------------------------------------------
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
@@ -248,7 +256,7 @@ for (DBn in dbs) {
 
   ##  Compute seasonal daily values --------------------------------------------
   SEAS <- DATA |>
-    group_by(yday(Day)) |>
+    group_by(DOY = yday(Day)) |>
     summarise(
       across(
         .cols = ends_with("mean"),
@@ -269,9 +277,31 @@ for (DBn in dbs) {
 
 
   ## Plot seasonal values
+  p <- SEAS |> select(DOY,
+                      GLB_strict_mean_seas,
+                      ends_with(c("trnd_A_mean_seas"))) |>
+    melt(id.vars = 'DOY', variable.name = 'Radiation') |>
+    ggplot(aes(x = DOY, y = value)) +
+    geom_point(aes(colour = Radiation)) +
+    labs(subtitle = paste("Daily climatology for ", var_name(DBn)),
+         y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
+    theme_bw()
+  show(p)
 
 
   ## Create deseasonal values
+
+  DATA <- left_join(
+    DATA |> mutate(DOY = yday(Day)),
+    SEAS,
+    copy = TRUE
+  )
+
+  for (av in vars) {
+    cat(av, "\n")
+    DATA |> colnames() |> grep("GLB", .)
+  }
+
 
 
   stop()
