@@ -251,7 +251,7 @@ for (DBn in dbs) {
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
 
-  DATA |> colnames()
+  # DATA |> colnames()
 
 
   ##  Compute seasonal daily values --------------------------------------------
@@ -289,25 +289,29 @@ for (DBn in dbs) {
   show(p)
 
 
-  ## Create deseasonal values
-
+  ## Create deseasonal anomaly
   DATA <- left_join(
     DATA |> mutate(DOY = yday(Day)),
     SEAS,
+    by = "DOY",
     copy = TRUE
   )
 
   for (av in vars) {
-    cat(av, "\n")
-    DATA |> colnames() |> grep("GLB", .)
+    cat("Compute anomaly for ", av, "\n")
+    # grep(av, DATA |> colnames(), value = T)
+
+    DATA <- DATA |> mutate(
+      !!paste0(av, "_anom") := 100 * (!!av - !!paste0(av, "_seas")) / !!paste0(av, "_seas")
+    )
   }
 
+  ## Store anomaly data
+  if (Sys.info()["nodename"] == Main.Host) {
+    res <- update_table(con, DATA, DBn, "Day")
+  }
 
-
-  stop()
 }
-
-stop()
 
 
 

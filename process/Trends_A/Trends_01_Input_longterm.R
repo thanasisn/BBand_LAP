@@ -1,13 +1,5 @@
-#+ echo=T, include=T
 
-require(data.table, quietly = TRUE, warn.conflicts = FALSE)
-require(zoo,        quietly = TRUE, warn.conflicts = FALSE)
-source("~/CODE/FUNCTIONS/R/trig_deg.R")
-source("~/CODE/FUNCTIONS/R/data.R")
-source("~/CODE/FUNCTIONS/R/linear_fit_stats.R")
-source("~/CODE/FUNCTIONS/R/cor_test_stats.R")
 source("./DHI_GHI_0_variables.R")
-source("./var_translation.R")
 
 ##  Prepare raw data if needed  ------------------------------------------------
 ## check previous steps
@@ -121,36 +113,7 @@ for (DBn in dbs) {
 }
 
 
-
 ## _ Daily de-seasonal anomaly -------------------------------------------------
-
-ALL_1_daily_DESEAS <- merge(  ALL_1_daily_mean,   ALL_1_daily_seas, by = "doy", all = T)
-CLEAR_1_daily_DESEAS <- merge(CLEAR_1_daily_mean, CLEAR_1_daily_seas, by = "doy", all = T)
-CLOUD_1_daily_DESEAS <- merge(CLOUD_1_daily_mean, CLOUD_1_daily_seas, by = "doy", all = T)
-
-## Using the % departure from seasonal values
-
-ALL_1_daily_DESEAS[, DIR_att_des         := 100*( DIR_att    - DIR_att_seas    ) / DIR_att_seas   ]
-ALL_1_daily_DESEAS[, HOR_att_des         := 100*( HOR_att    - HOR_att_seas    ) / HOR_att_seas   ]
-ALL_1_daily_DESEAS[, GLB_att_des         := 100*( GLB_att    - GLB_att_seas    ) / GLB_att_seas   ]
-ALL_1_daily_DESEAS[, DIR_transp_des      := 100*( DIR_transp - DIR_transp_seas ) / DIR_transp_seas]
-ALL_1_daily_DESEAS[, wattGLB_des         := wattGLB             - wattGLB_seas                    ]
-ALL_1_daily_DESEAS[, near_tcc_att_des    := near_tcc_att        - near_tcc_att_seas               ]
-ALL_1_daily_DESEAS[, bilin_tcc_att_des   := bilin_tcc_att       - bilin_tcc_att_seas              ]
-ALL_1_daily_DESEAS[, near_tcc_zero_des   := near_tcc_zero_att   - near_tcc_zero_att_seas          ]
-ALL_1_daily_DESEAS[, near_tcc_NOzero_des := near_tcc_NOzero_att - near_tcc_NOzero_att_seas        ]
-ALL_1_daily_DESEAS[, near_tcc_clear_des  := near_tcc_clear_att  - near_tcc_clear_att_seas         ]
-ALL_1_daily_DESEAS[, near_tcc_cloud_des  := near_tcc_cloud_att  - near_tcc_cloud_att_seas         ]
-CLEAR_1_daily_DESEAS[, DIR_att_des       := 100*( DIR_att    - DIR_att_seas    ) / DIR_att_seas   ]
-CLEAR_1_daily_DESEAS[, HOR_att_des       := 100*( HOR_att    - HOR_att_seas    ) / HOR_att_seas   ]
-CLEAR_1_daily_DESEAS[, GLB_att_des       := 100*( GLB_att    - GLB_att_seas    ) / GLB_att_seas   ]
-CLEAR_1_daily_DESEAS[, DIR_transp_des    := 100*( DIR_transp - DIR_transp_seas ) / DIR_transp_seas]
-CLEAR_1_daily_DESEAS[, wattGLB_des       := wattGLB - wattGLB_seas]
-CLOUD_1_daily_DESEAS[, DIR_att_des       := 100*( DIR_att    - DIR_att_seas    ) / DIR_att_seas   ]
-CLOUD_1_daily_DESEAS[, HOR_att_des       := 100*( HOR_att    - HOR_att_seas    ) / HOR_att_seas   ]
-CLOUD_1_daily_DESEAS[, GLB_att_des       := 100*( GLB_att    - GLB_att_seas    ) / GLB_att_seas   ]
-CLOUD_1_daily_DESEAS[, DIR_transp_des    := 100*( DIR_transp - DIR_transp_seas ) / DIR_transp_seas]
-CLOUD_1_daily_DESEAS[, wattGLB_des       := wattGLB - wattGLB_seas]
 
 ## add TSI data process
 ## data departure from mean value
@@ -314,17 +277,6 @@ ALL_1_D_monthly_DESEAS <- merge(  ALL_1_monthly_daily_mean,   ALL_1_monthly_dail
 CLEAR_1_D_monthly_DESEAS <- merge(CLEAR_1_monthly_daily_mean, CLEAR_1_monthly_daily_seas, by = "Month", all = T)
 CLOUD_1_D_monthly_DESEAS <- merge(CLOUD_1_monthly_daily_mean, CLOUD_1_monthly_daily_seas, by = "Month", all = T)
 
-
-
-
-## create date
-ALL_1_D_monthly_DESEAS[, Date := as.Date(paste(Year, Month, "1"), format = "%Y %m %d")]
-CLEAR_1_D_monthly_DESEAS[, Date := as.Date(paste(Year, Month, "1"), format = "%Y %m %d")]
-CLOUD_1_D_monthly_DESEAS[, Date := as.Date(paste(Year, Month, "1"), format = "%Y %m %d")]
-
-setorder(  ALL_1_D_monthly_DESEAS, Date)
-setorder(CLEAR_1_D_monthly_DESEAS, Date)
-setorder(CLOUD_1_D_monthly_DESEAS, Date)
 
 
 ## Using the % departure from seasonal values
