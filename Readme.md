@@ -15,7 +15,7 @@ under the [Data display](https://thanasisn.github.io/data_display.html) section.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Mon Feb  3 05:06:25 UTC 2025 -->
+<!-- Added by: athan, at: Tue Feb  4 05:29:33 UTC 2025 -->
 
 <!--te-->
 
@@ -28,10 +28,10 @@ under the [Data display](https://thanasisn.github.io/data_display.html) section.
 | Name                  |     Rows |    Size |    Values | Vars |   Fill | Bytes/Value |
 |:----------------------|---------:|--------:|----------:|-----:|-------:|------------:|
 | Broad Band LAP duckdb | 16875786 | 4.3 GiB | 871142232 |  140 | 60.75% |        5.34 |
-| Raw files hashes      |   850637 | 4.6 MiB |   3402548 |    4 |   100% |        1.41 |
-| **Total**             | 17726423 | 4.3 GiB | 874544780 |  144 |    NA% |        5.32 |
+| Raw files hashes      |   850643 | 4.6 MiB |   3402572 |    4 |   100% |        1.41 |
+| **Total**             | 17726429 | 4.3 GiB | 874544804 |  144 |    NA% |        5.32 |
 
-Table: Datasets sizes on 2025-02-03
+Table: Datasets sizes on 2025-02-04
 
 
 
