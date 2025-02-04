@@ -313,6 +313,7 @@ for (DBn in dbs) {
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
+  stop()
   ## Store anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, DATA, DBn, "Day")
