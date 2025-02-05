@@ -313,7 +313,7 @@ for (DBn in dbs) {
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
-
+## function to choose data type
   duckdb_datatypes <- function(column) {
     case_match(
       is_whole(column) & all(column)
