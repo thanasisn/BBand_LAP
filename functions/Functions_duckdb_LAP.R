@@ -45,6 +45,10 @@ duckdb_datatypes <- function(column, rela = 1) {
 #' @param con      Data base connection
 #' @param new_data An R table used to add data in the data base
 #' @param table    The name of the data base table to add
+#' @details
+#' Hopefully the table used to initialize the new columns have the appropriate
+#' values to infer the correct data type for  duckdb
+#'
 #'
 #' @return         Nothing. It executes an DQL query
 #' @export
@@ -378,4 +382,22 @@ status_msg <- function(
     file = output,
     append = TRUE
   )
+}
+
+
+
+## test data types  ----------------------------------------------
+if (FALSE) {
+  summary(DATA)
+
+  test <- data.table(c(-10,2147483648.1),
+                     c(  0,      214741),
+                     c(  1, 9223372036854775807),
+                     c(as.POSIXct("1970-01-01")),
+                     as.Date("1990-09-09")
+  )
+
+  for (ac in colnames(DATA)) {
+    cat(ac, duckdb_datatypes( DATA[[ac]] ),"\n")
+  }
 }

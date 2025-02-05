@@ -188,6 +188,7 @@ warning("This breaks other variables for Clear and Cloud!! This is only for GHI"
 #' sky type characterization for the whole day.
 #'
 #' **Daily data representation applied only on GHI!!**
+#' i.e. GLB_trnd_A_mean for CLOUD and CLEAR
 #'
 
 CLOUD <- tbl(con, "Trend_A_DAILY_CLOUD")
@@ -246,12 +247,12 @@ vars <- c(
 )
 
 ##  Create daily values  -------------------------------------------------------
+#'
+#' Compute daily anomaly `_anom` from `_mean` - `_seas`
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
-
-  # DATA |> colnames()
 
   ##  Compute seasonal daily values --------------------------------------------
   SEAS <- DATA |>
@@ -273,8 +274,6 @@ for (DBn in dbs) {
         )
       )
     ) |> collect() |> data.table()
-
-
 
 
   ## Plot seasonal values
@@ -305,7 +304,8 @@ for (DBn in dbs) {
     anomvar <- paste0(av, "_anom")
 
     DATA <- DATA |> mutate(
-      !!anomvar := 100 * (get(av) - get(seasvar)) / get(seasvar)
+      !!anomvar := 100 * (get(av) - get(seasvar)) / get(seasvar),
+      Decimal_date := decimal_date(Day)
     ) |> collect()
 
     ## protect database numeric type
@@ -313,24 +313,10 @@ for (DBn in dbs) {
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
-  if (FALSE) {
-    summary(DATA)
-
-    test <- data.table(c(-10,2147483648.1),
-                       c(  0,      214741),
-                       c(  1, 9223372036854775807),
-                       c(as.POSIXct("1970-01-01")),
-                       as.Date("1990-09-09")
-    )
-
-    for (ac in colnames(DATA)) {
-      cat(ac, duckdb_datatypes( DATA[[ac]] ),"\n")
-    }
-  }
-
   ## Store anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, DATA, DBn, "Day")
+    cat("\nTable", DBn, "updated\n\n")
   }
 
 }
