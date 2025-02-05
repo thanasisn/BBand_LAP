@@ -1,4 +1,7 @@
 
+require(dplyr)
+require(lubridate)
+
 
 #' Check if is an integer for R
 #'
@@ -24,6 +27,7 @@ is_whole <- function(x) {
 #'
 duckdb_datatypes <- function(column, rela = 1) {
   case_when(
+    is.character(column)                                                                                      ~         "VARCHAR",
     is.Date(column)                                                                                           ~            "DATE",
     is.POSIXt(column)                                                                                         ~    "TIMESTAMP_MS",
     is_whole(column) & all(column >=                   0 * rela) & all(column <=                65535 * rela) ~       "USMALLINT",
@@ -384,20 +388,18 @@ status_msg <- function(
   )
 }
 
-
-
 ## test data types  ----------------------------------------------
 if (FALSE) {
-  summary(DATA)
 
-  test <- data.table(c(-10,2147483648.1),
+  test <- data.frame(c(-10,2147483648.1),
                      c(  0,      214741),
                      c(  1, 9223372036854775807),
                      c(as.POSIXct("1970-01-01")),
+                     c("ddd", "ddddddd"),
                      as.Date("1990-09-09")
   )
 
-  for (ac in colnames(DATA)) {
-    cat(ac, duckdb_datatypes( DATA[[ac]] ),"\n")
+  for (ac in colnames(test)) {
+    cat(ac, duckdb_datatypes( test[[ac]] ),"\n")
   }
 }
