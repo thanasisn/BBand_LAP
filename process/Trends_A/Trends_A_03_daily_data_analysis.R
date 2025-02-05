@@ -105,7 +105,7 @@ vars <- c(
 )
 
 ##  Plot daily mean values
-#+ daily_mean_trends, include=T, echo=F, results="asis"
+#+ daily-mean-trends, include=T, echo=F, results="asis"
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
@@ -133,7 +133,7 @@ for (DBn in dbs) {
 
 
 ##  Plot daily anomaly values
-#+ daily_anomaly_trends, include=T, echo=F, results="asis"
+#+ daily-anomaly-trends, include=T, echo=F, results="asis"
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
