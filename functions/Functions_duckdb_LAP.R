@@ -1,5 +1,45 @@
 
 
+#' Check if is an integer for R
+#'
+#' @param  x   A vector or column
+#'
+#' @return    `TRUE` when is integer
+#' @export
+#'
+is_whole <- function(x) {
+  if (!is.numeric(x)) return(FALSE)
+  all(floor(x) == x)
+}
+
+
+
+#' Give an appropriate duckdb data type, for this project
+#'
+#' @param column  An R column or vector or scalar
+#' @param rela    An expansion factor for the default ranges
+#'
+#' @return        A string of the duck data type
+#' @export
+#'
+duckdb_datatypes <- function(column, rela = 1) {
+  case_when(
+    is.Date(column)                                                                                           ~            "DATE",
+    is.POSIXt(column)                                                                                         ~    "TIMESTAMP_MS",
+    is_whole(column) & all(column >=                   0 * rela) & all(column <=                65535 * rela) ~       "USMALLINT",
+    is_whole(column) & all(column >=                   0 * rela) & all(column <=           4294967295 * rela) ~        "UINTEGER",
+    is_whole(column) & all(column >=                   0 * rela) & all(column <= 18446744073709551615 * rela) ~         "UBIGINT",
+    is_whole(column) & all(column >               -32768 * rela) & all(column <=                32767 * rela) ~        "SMALLINT",
+    is_whole(column) & all(column >          -2147483648 * rela) & all(column <=           2147483647 * rela) ~         "INTEGER",
+    is_whole(column) & all(column > -9223372036854775808 * rela) & all(column <=  9223372036854775807 * rela) ~          "BIGINT",
+    is.numeric(column)                                                                                        ~ "DECIMAL(18, 14)",
+    .default = "Have to include more data types"
+  )
+}
+
+
+
+
 #' Create all columns for a table with default types
 #'
 #' @param con      Data base connection
@@ -24,12 +64,16 @@ create_missing_columns <- function(con, new_data, table) {
 
     for (i in 1:nrow(new_vars)) {
 
-      ## translate data types to duckdb
-      ctype <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
-                      POSIXctPOSIXt = "TIMESTAMP_MS",    ## all dates except radiation date
-                      numeric       = "DECIMAL(18, 14)", ## change default numeric values for all data
-                                                         ## ~9999.99999999999999
-                      unlist(new_vars$types[i]))
+      # ## translate data types to duckdb
+      # ctype <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
+      #                 POSIXctPOSIXt = "TIMESTAMP_MS",    ## all dates except radiation date
+      #                 numeric       = "DECIMAL(18, 14)", ## change default numeric values for all data
+      #                                                    ## ~9999.99999999999999
+      #                 unlist(new_vars$types[i]))
+
+      ## a new more general approach
+      ctype <- duckdb_datatypes(new_data[[new_vars$names[i]]])
+
 
       ## info
       cat("\nNEW VAR:", paste(new_vars[i, ]), "->", ctype, "\n")
