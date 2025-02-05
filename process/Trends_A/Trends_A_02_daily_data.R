@@ -313,6 +313,28 @@ for (DBn in dbs) {
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
+
+  duckdb_datatypes <- function(column) {
+    case_match(
+      is_whole(column) & all(column)
+
+    )
+  }
+
+  is_whole <- function(x) {
+    if (!is.numeric(x)) return(FALSE)
+    all(floor(x) == x)
+  }
+
+  select_if(DATA, is_whole)
+
+  is.Date(DATA$Day)
+  is.numeric(DATA$Day)
+
+  is_whole(DATA$Day)
+  is_whole(DATA$GLB_trnd_A_mean)
+  is_whole(DATA$GLB_trnd_A_N)
+
   stop()
   ## Store anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
