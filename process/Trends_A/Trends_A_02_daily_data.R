@@ -96,14 +96,14 @@ META <- tbl(con, "META") |> select(Day, Daylength)
 LAP <- LAP |>
   filter(SKY %in% c("Cloud", "Clear")) |>  ## only data for trends
   select(
-  Date,
-  ends_with("_trnd_A"),
-  ends_with("_strict"),
-  Decimal_date,
-  TSI,
-  Day,
-  SKY
-)
+    Date,
+    ends_with("_trnd_A"),
+    ends_with("_strict"),
+    Decimal_date,
+    TSI,
+    Day,
+    SKY
+  )
 
 ##  Create data sets  ----------------------------------------------------------
 ##  cloud and clear are prepared for this analysis
@@ -253,52 +253,25 @@ for (DBn in dbs) {
 
   # DATA |> colnames()
 
-
   ##  Compute seasonal daily values --------------------------------------------
-  ##
-  ##
-
-  DATA |>
-    group_by(DOY = yday(Day)) |>
-    summarise(
-      across(
-        .cols = ends_with("mean"),
-        .fns  = list(
-          seas = ~ mean(.x, na.rm = TRUE),
-          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
-        )
-      ),
-      across(
-        .cols = ends_with(c("NAs", "N")),
-        .fns  = list(
-          total = ~ sum(.x, na.rm = TRUE)
-        )
-      ),
-      Seas_N = n()
-    ) |> explain()
-
-
-
-  stop()
   SEAS <- DATA |>
     group_by(DOY = yday(Day)) |>
     summarise(
+      Seas_N = n(),
       across(
-        .cols = ends_with("mean"),
+        .cols = ends_with(c("_NAs", "_N")),
+        .fns  = list(
+          total = ~ sum(.x, na.rm = TRUE)
+        )
+      ),
+      across(
+        .cols = ends_with("_mean"),
         .fns  = list(
           seas = ~ mean(.x, na.rm = TRUE),
           NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
           N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
         )
-      ),
-      across(
-        .cols = ends_with(c("NAs", "N")),
-        .fns  = list(
-          total = ~ sum(.x, na.rm = TRUE)
-        )
-      ),
-      Seas_N = n()
+      )
     ) |> collect() |> data.table()
 
 
@@ -327,7 +300,6 @@ for (DBn in dbs) {
 
   for (av in vars) {
     cat("Compute anomaly for ", av, "\n")
-    # grep(av, DATA |> colnames(), value = T)
 
     seasvar <- paste0(av, "_seas")
     anomvar <- paste0(av, "_anom")
@@ -341,24 +313,21 @@ for (DBn in dbs) {
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
-  summary(DATA)
+  if (FALSE) {
+    summary(DATA)
 
-stop()
+    test <- data.table(c(-10,2147483648.1),
+                       c(  0,      214741),
+                       c(  1, 9223372036854775807),
+                       c(as.POSIXct("1970-01-01")),
+                       as.Date("1990-09-09")
+    )
 
-  test <- data.table(c(-10,2147483648.1),
-                     c(  0,      214741),
-                     c(  1, 9223372036854775807),
-                     c(as.POSIXct("1970-01-01")),
-                     as.Date("1990-09-09")
-                     )
-
-  for (ac in colnames(DATA)) {
-    cat(ac, duckdb_datatypes( DATA[[ac]] ),"\n")
+    for (ac in colnames(DATA)) {
+      cat(ac, duckdb_datatypes( DATA[[ac]] ),"\n")
+    }
   }
 
-
-
-  stop()
   ## Store anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, DATA, DBn, "Day")
