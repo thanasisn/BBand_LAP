@@ -313,20 +313,40 @@ for (DBn in dbs) {
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
-## function to choose data type
-  duckdb_datatypes <- function(column) {
-    case_match(
-      is_whole(column) & all(column)
-
-    )
-  }
-
   is_whole <- function(x) {
     if (!is.numeric(x)) return(FALSE)
     all(floor(x) == x)
   }
 
-  select_if(DATA, is_whole)
+  ## function to choose data type
+  duckdb_datatypes <- function(column, rela = 1) {
+    case_when(
+      is_whole(column) & all(column >               -32768 * rela) & all(column <                32767 * rela) ~ "SMALLINT",
+      is_whole(column) & all(column >          -2147483648 * rela) & all(column <           2147483647 * rela) ~ "INTEGER",
+      is_whole(column) & all(column > -9223372036854775808 * rela) & all(column <  9223372036854775807 * rela) ~ "BIGINT",
+      is_whole(column) & all(column >=                   0 * rela) & all(column <                65535 * rela) ~ "USMALLINT",
+      is_whole(column) & all(column >=                   0 * rela) & all(column <           4294967295 * rela) ~ "UINTEGER",
+      is_whole(column) & all(column >=                   0 * rela) & all(column < 18446744073709551615 * rela) ~ "UBIGINT",
+    )
+  }
+
+
+  test <- data.table(c(-3333333333,2147483648))
+  duckdb_datatypes(test$V1)
+
+
+  test |>
+  case_match(
+    all(floor(.x) == .x) & all(.x > -32768 * rela) & all(.x < 32767 * rela) ~ "SMALLINT"
+  )
+  switch()
+
+  test <- data.table(c(1,1))
+
+  duckdb_datatypes(column = test, rela = 1)
+
+
+  select_if(test, duckdb_datatypes)
 
   is.Date(DATA$Day)
   is.numeric(DATA$Day)
