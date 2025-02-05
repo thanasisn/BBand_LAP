@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Tue Jan 28 10:00:10 EET 2025 -->
+<!-- Added by: athan, at: Wed Feb  5 10:20:04 EET 2025 -->
 
 <!--te-->
 
@@ -1491,6 +1491,19 @@ Cleaning of broadband and brewers windows at:
 
 
 
+## 2025-02-05 10:12 EET [ThanasisN]
+
+Broadband, brewers, and Phaethon windows cleaning at
+
+10:09 - 10:11 LT
+
+08:09 - 08:11 UTC
+
+
+
+
+
+
 :::
 
 
@@ -1582,7 +1595,7 @@ New List of tags
       5 broadband
       1 ccd
      30 chp1
-     18 cleaning
+     19 cleaning
       1 clear_sky
      10 cm21
       1 data_corruption_certain
