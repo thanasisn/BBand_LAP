@@ -255,6 +255,32 @@ for (DBn in dbs) {
 
 
   ##  Compute seasonal daily values --------------------------------------------
+  ##
+  ##
+
+  DATA |>
+    group_by(DOY = yday(Day)) |>
+    summarise(
+      across(
+        .cols = ends_with("mean"),
+        .fns  = list(
+          seas = ~ mean(.x, na.rm = TRUE),
+          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
+          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+        )
+      ),
+      across(
+        .cols = ends_with(c("NAs", "N")),
+        .fns  = list(
+          total = ~ sum(.x, na.rm = TRUE)
+        )
+      ),
+      Seas_N = n()
+    ) |> explain()
+
+
+
+  stop()
   SEAS <- DATA |>
     group_by(DOY = yday(Day)) |>
     summarise(
@@ -274,6 +300,8 @@ for (DBn in dbs) {
       ),
       Seas_N = n()
     ) |> collect() |> data.table()
+
+
 
 
   ## Plot seasonal values
@@ -313,57 +341,22 @@ for (DBn in dbs) {
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
-  is_whole <- function(x) {
-    if (!is.numeric(x)) return(FALSE)
-    all(floor(x) == x)
-  }
+  summary(DATA)
 
-  ## function to choose data type
-  duckdb_datatypes <- function(column, rela = 1) {
-    case_when(
-      is.Date(column)    ~ "DATE",
-      is.POSIXt(column)  ~ "TIMESTAMP_MS",
-      is_whole(column) & all(column >=                   0 * rela) & all(column <                65535 * rela) ~ "USMALLINT",
-      is_whole(column) & all(column >=                   0 * rela) & all(column <           4294967295 * rela) ~  "UINTEGER",
-      is_whole(column) & all(column >=                   0 * rela) & all(column < 18446744073709551615 * rela) ~   "UBIGINT",
-      is_whole(column) & all(column >               -32768 * rela) & all(column <                32767 * rela) ~  "SMALLINT",
-      is_whole(column) & all(column >          -2147483648 * rela) & all(column <           2147483647 * rela) ~   "INTEGER",
-      is_whole(column) & all(column > -9223372036854775808 * rela) & all(column <  9223372036854775807 * rela) ~    "BIGINT",
-      is.numeric(column)                                                                                       ~ "DECIMAL(18, 14)",
-      .default = "Include more data types"
-    )
+stop()
+
+  test <- data.table(c(-10,2147483648.1),
+                     c(  0,      214741),
+                     c(  1, 9223372036854775807),
+                     c(as.POSIXct("1970-01-01")),
+                     as.Date("1990-09-09")
+                     )
+
+  for (ac in colnames(DATA)) {
+    cat(ac, duckdb_datatypes( DATA[[ac]] ),"\n")
   }
 
 
-  ## translate data types to duckdb
-  ctype <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
-                  POSIXctPOSIXt = "TIMESTAMP_MS",    ## all dates except radiation date
-                  numeric       = "DECIMAL(18, 14)", ## change default numeric values for all data
-                  ## ~9999.99999999999999
-                  unlist(new_vars$types[i]))
-
-  test <- data.table(c(-10,2147483648.1))
-  test <- data.table(c(as.POSIXct("1970-01-01")))
-
-   duckdb_datatypes(test$V1)
-
- is.numeric(test$V1)
- is.Date(test$V1)
-
-
-  test <- data.table(c(1,1))
-
-  duckdb_datatypes(column = test, rela = 1)
-
-
-  select_if(test, duckdb_datatypes)
-
-  is.Date(DATA$Day)
-  is.numeric(DATA$Day)
-
-  is_whole(DATA$Day)
-  is_whole(DATA$GLB_trnd_A_mean)
-  is_whole(DATA$GLB_trnd_A_N)
 
   stop()
   ## Store anomaly data
