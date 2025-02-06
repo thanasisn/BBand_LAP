@@ -1,5 +1,5 @@
-#!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* !/usr/bin/env Rscript */
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Reads tracker synchronization data form `sun_tracker_.*.snc$`
 #'
@@ -12,9 +12,8 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=F
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -233,10 +232,9 @@ if (interactive()) {
   # dd <- tbl(con, "META") |> collect() |> data.table()
 }
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
 
-tac <- Sys.time()
-cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
+
+#+ results="asis", echo=FALSE
+goodbye()

@@ -1,5 +1,5 @@
-#!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* !/usr/bin/env Rscript */
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Compute or construct dark signal offset for CHP-1.
 #'
@@ -20,9 +20,8 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=F
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -228,8 +227,8 @@ tbl(con, "META") |> group_by(chp1_dark_flag) |> tally()
 #   filter(is.na(chp1_dark_flag) & !is.na(chp1_basename))
 
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
 #+ results="asis", echo=FALSE
 goodbye()

@@ -1,5 +1,5 @@
-#!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* !/usr/bin/env Rscript */
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Apply flags on data
 #'
@@ -15,8 +15,8 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ include=F
 
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -272,11 +272,11 @@ make_categorical_column("cm21_bad_data_flag", categories, con, "LAP")
 # make_null_column(con, "LAP", "cm21_bad_data_flag", "character")
 ##  Apply flags
 res <- update_table(
-             con      = con,
-             new_data = temp_flag,
-             table    = "LAP",
-             matchvar = "Date",
-             quiet    = TRUE
+  con      = con,
+  new_data = temp_flag,
+  table    = "LAP",
+  matchvar = "Date",
+  quiet    = TRUE
 )
 rm(temp_flag)
 
@@ -310,11 +310,11 @@ make_categorical_column("chp1_bad_data_flag", categories, con, "LAP")
 # make_null_column(con, "LAP", "chp1_bad_data_flag", "character")
 ##  Apply flags
 res <- update_table(
-             con      = con,
-             new_data = temp_flag,
-             table    = "LAP",
-             matchvar = "Date",
-             quiet    = TRUE
+  con      = con,
+  new_data = temp_flag,
+  table    = "LAP",
+  matchvar = "Date",
+  quiet    = TRUE
 )
 rm(temp_flag)
 
@@ -348,11 +348,11 @@ make_categorical_column("chp1_bad_temp_flag", categories, con, "LAP")
 # make_null_column(con, "LAP", "chp1_bad_temp_flag", "character")
 ##  Apply flags
 res <- update_table(
-             con = con, 
-             new_data = temp_flag,
-             table = "LAP",
-             matchvar = "Date",
-quiet = TRUE)
+  con      = con,
+  new_data = temp_flag,
+  table    = "LAP",
+  matchvar = "Date",
+  quiet    = TRUE)
 rm(temp_flag)
 
 
@@ -381,9 +381,8 @@ tbl(con, "LAP") |>
   tally()
 
 
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
-tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+#+ results="asis", echo=FALSE
+goodbye()
