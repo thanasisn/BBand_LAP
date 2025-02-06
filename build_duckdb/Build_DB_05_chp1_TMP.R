@@ -186,10 +186,11 @@ if (nrow(inp_filelist) > 0) {
 
     ## Add data and metadata
     {
-      update_table(con      = con,
-                   new_data = day_data,
-                   table    = "LAP",
-                   matchvar = "Date")
+      res <- update_table(con      = con,
+                          new_data = day_data,
+                          table    = "LAP",
+                          matchvar = "Date",
+                          quiet    = TRUE)
       ## Add metadata
       if (!dbExistsTable(con, "META")) {
         ## Create new table
@@ -197,10 +198,11 @@ if (nrow(inp_filelist) > 0) {
         dbWriteTable(con, "META", file_meta)
       }
       ## Append new data
-      update_table(con      = con,
-                   new_data = file_meta,
-                   table    = "META",
-                   matchvar = "Day")
+      res <- update_table(con      = con,
+                          new_data = file_meta,
+                          table    = "META",
+                          matchvar = "Day",
+                          quiet    = TRUE)
       cat(" w\n")
     }
   }

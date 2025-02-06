@@ -23,12 +23,14 @@ library(rmarkdown)
 
 ## Run every nth day
 run_days <- 10
+run_days <- 1
 
 ## __ Check inputs  ------------------------------------------------------------
 try({
   cat("\n\n 0. Check files\n")
-  render(input       = "~/BBand_LAP/inspect_duckdb/00_Check_input_files.R",
-         output_dir  = output_dir)
+  render(input         = "~/BBand_LAP/inspect_duckdb/00_Check_input_files.R",
+         output_format = output_format,
+         output_dir    = output_dir)
 })
 
 try({
@@ -101,14 +103,16 @@ try({
 ## __ Check Radiation  ---------------------------------------------------------
 try({
   cat("\n\n 20. Inspect CHP-1 radiation\n")
-  render(input      = "~/BBand_LAP/inspect_duckdb/20_Inspect_CHP1_rad_temp.R",
-         output_dir = output_dir)
+  render(input         = "~/BBand_LAP/inspect_duckdb/20_Inspect_CHP1_rad_temp.R",
+         output_format = output_format,
+         output_dir    = output_dir)
 })
 
 try({
   cat("\n\n 21. Inspect CM-21 radiation\n")
-  render(input      = "~/BBand_LAP/inspect_duckdb/21_Inspect_CM21_rad.R",
-         output_dir = output_dir)
+  render(input         = "~/BBand_LAP/inspect_duckdb/21_Inspect_CM21_rad.R",
+         output_format = output_format,
+         output_dir    = output_dir)
 })
 
 
@@ -116,22 +120,25 @@ try({
 # source("~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R")
 try({
   cat("\n\n 30. Plot daily radiation\n")
-  render(input      = "~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R",
-         output_dir = output_dir)
+  render(input         = "~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R",
+         output_format = output_format,
+         output_dir    = output_dir)
 })
 # source("~/BBand_LAP/inspect_duckdb/31_Plot_daily_CM21_L1.R")
 try({
   cat("\n\n 31. Plot daily radiation\n")
-  render(input      = "~/BBand_LAP/inspect_duckdb/31_Plot_daily_CM21_L1.R",
-         output_dir = output_dir)
+  render(input         = "~/BBand_LAP/inspect_duckdb/31_Plot_daily_CM21_L1.R",
+         output_format = output_format,
+         output_dir    = output_dir)
 })
 
 if (as.numeric(Sys.Date()) %% run_days == 0)
 {
   try({
     cat("\n\n 60. Inspect CM-21/TOT radiation\n")
-    render(input      = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
-           output_dir  = output_dir)
+    render(input         = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
+           output_format = output_format,
+           output_dir    = output_dir)
   })
 }
 
