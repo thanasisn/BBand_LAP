@@ -11,14 +11,17 @@ renv::load("~/BBand_LAP")
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/CSid_RenoHansen/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
+library(rmarkdown)
+
 ## Run every nth day
 run_days <- 10
+run_days <- 1
 
 if (as.numeric(Sys.Date()) %% run_days == 0)
 {
   try({
-    rmarkdown::render(input      = "~/BBand_LAP/process/CSid_RenoHansen/Clear_sky_id_Reno-Hansen_apply_v14.2_legacy.R",
-                      output_dir = output_dir)
+    render(input      = "~/BBand_LAP/process/CSid_RenoHansen/Clear_sky_id_Reno-Hansen_apply_v14.2_legacy.R",
+           output_dir = output_dir)
   })
 
 
