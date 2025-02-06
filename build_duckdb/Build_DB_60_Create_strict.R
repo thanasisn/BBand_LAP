@@ -1,4 +1,4 @@
-# /* #!/opt/R/4.2.3/bin/Rscript */
+# /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
@@ -14,9 +14,8 @@
 #'  - Transmittance_GLB
 #'  - Transmittance_DIR
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=F
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -51,8 +50,8 @@ source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
-require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 
 ##  Create strict radiation data  ----------------------------------------------
@@ -241,11 +240,8 @@ if (Sys.info()["nodename"] == "sagan") {
 
 
 
-##  Clean exit  ----------------------------------------------------------------
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
-#+ include=T, echo=F, results="asis"
-tac <- Sys.time()
-cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+#+ results="asis", echo=FALSE
+goodbye()

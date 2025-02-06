@@ -1,5 +1,5 @@
-#!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* !/usr/bin/env Rscript */
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Compute or construct dark signal offset for CM-21.
 #'
@@ -17,9 +17,8 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=F
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -53,7 +52,6 @@ source("~/BBand_LAP/functions/Functions_dark_calculation.R")
 source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
 
-# library(arrow,      warn.conflicts = FALSE, quietly = TRUE)
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
@@ -226,8 +224,8 @@ tbl(con, "META") |> group_by(cm21_dark_flag) |> tally()
 #   filter(is.na(cm21_dark_flag) & !is.na(cm21_basename))
 
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
 #+ results="asis", echo=FALSE
 goodbye()

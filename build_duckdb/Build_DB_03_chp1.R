@@ -1,4 +1,4 @@
-#!/opt/R/4.2.3/bin/Rscript
+# /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Read CHP-1 signal from `[0-9]*03.LAP$`
@@ -11,9 +11,8 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=F
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -232,10 +231,9 @@ if (interactive()) {
   tbl(con, "LAP")  |> filter(!is.na(CHP1_sig)) |> tally()
 }
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
-tac <- Sys.time()
-cat(sprintf("**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
-cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
-    file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
+
+#+ results="asis", echo=FALSE
+goodbye()
