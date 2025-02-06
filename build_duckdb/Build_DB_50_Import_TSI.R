@@ -95,19 +95,6 @@ if (TSI |> tally() |> pull() > 0) {
   cat(Script.ID, ": ", TSI |> tally() |> pull(), "rows of TSI data to add\n")
   status_msg(ScriptName = Script.Name, msg = c(TSI |> tally() |> pull(), "rows of TSI data to add"))
 
-  test_missing_columns(con      = con,
-                      new_data = TSI,
-                      table    = "LAP")
-
-  is.numeric(TSI |> select(TSI_TOA)|>pull())
-  TSI |> select(TSI_TOA) |> duckdb_datatypes()
-  TSI  |>
-    mutate_at("TSI_TOA",
-      ~ duckdb_datatypes(.x)
-    )
-
-  is.data.frame(TSI)
-
   res <- update_table(con      = con,
                       new_data = TSI,
                       table    = "LAP",
