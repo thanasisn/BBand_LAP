@@ -58,7 +58,7 @@ duckdb_datatypes <- function(column, rela = 1) {
 #' @return         Nothing. It executes an DQL query
 #' @export
 #'
-create_missing_columns <- function(con, new_data, table, quiet = FALSE) {
+create_missing_columns <- function(con, new_data, table, quiet = TRUE) {
   ## detect data types
   tt1 <- data.table(names = colnames(tbl(con, table)),
                     types = tbl(con, table) |> head(1) |> collect() |> sapply(class))
@@ -417,6 +417,27 @@ if (FALSE) {
   for (ac in colnames(test)) {
     cat(ac, duckdb_datatypes( test[[ac]] ),"\n")
   }
-is.logical(test$c.F..T.)
+
+
+  helper <- function(c=1, ...) {
+    if (!exists(quiet)) quiet = T
+    cat("Q1", quiet,"\n")
+  }
+
+  important <- function(a, b =2, quiet = F){
+    environment(helper) <- environment()
+    cat("Q2", quiet,"\n")
+
+    # return(list(...))
+  }
+
+
+  important(1, quiet = F)
+  helper()
+  helper(quiet = T)
+
+
+
 
 }
+
