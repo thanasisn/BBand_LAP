@@ -8,36 +8,6 @@
 #' abstract:
 #'   "Study of GHI and DNI radiation for 'clear sky' and all sly conditions."
 #'
-#' documentclass:  article
-#' classoption:    a4paper,oneside
-#' fontsize:       10pt
-#' geometry:       "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#' link-citations: yes
-#' colorlinks:     yes
-#'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAbElEQVR4Xs2RQQrAMAgEfZgf7W9LAguybljJpR3wEse5JOL3ZObDb4x1loDhHbBOFU6i2Ddnw2KNiXcdAXygJlwE8OFVBHDgKrLgSInN4WMe9iXiqIVsTMjH7z/GhNTEibOxQswcYIWYOR/zAjBJfiXh3jZ6AAAAAElFTkSuQmCC
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections: no
-#'     fig_caption:     no
-#'     keep_tex:        yes
-#'     latex_engine:    xelatex
-#'     toc:             yes
-#'     toc_depth:       4
-#'     fig_width:       7
-#'     fig_height:      4.5
-#'   html_document:
-#'     toc:             true
-#'     keep_md:         yes
-#'     fig_width:       7
-#'     fig_height:      4.5
-#'
-#' date: "`r format(Sys.time(), '%F')`"
-#'
 #' ---
 stop()
 
@@ -88,9 +58,6 @@ load(I1_longterm)
 DRAFT <- TRUE
 DRAFT <- FALSE
 
-## override plot options
-par(pch = ".")
-
 ## choose to grid some plots
 FIGURESGRID <- TRUE
 # FIGURESGRID <- FALSE
@@ -105,9 +72,6 @@ CLOUD_1_daily_DESEAS[         GLB_att_des == 0]
 # test <- rm.cols.dups.DT(test)
 CLEAR_1_daily_DESEAS[         GLB_att_des == 0, GLB_att_des := NA]
 
-stopifnot(ALL_1_daily_DESEAS[   GLB_att_des == 0, .N ] == 0)
-stopifnot(CLOUD_1_daily_DESEAS[ GLB_att_des == 0, .N ] == 0)
-stopifnot(CLEAR_1_daily_DESEAS[ GLB_att_des == 0, .N ] == 0)
 
 
 #+ echo=F, include=T
@@ -143,32 +107,6 @@ data_list <- c(  "ALL_1_D_monthly_DESEAS",
 
 
 
-by_var     <- c("doy")
-#+ echo=F, include=F
-for (i in data_list) {
-    ## get data and y vars to plot
-    Dplot  <- get(i)
-    wecare <- grep("HOR|GLB|DIR", names(Dplot), value = T)
-    ## loop existing x vars
-    for (xvar in names(Dplot)[names(Dplot) %in% by_var]) {
-        for (yvar in wecare) {
-            if (grepl("wattGLB", yvar)) {
-                col <- "green"
-            } else {
-                col <- get(paste0(c("col", unlist(strsplit(yvar, split = "_"))[1:2]),
-                                  collapse = "_"))
-            }
-            vect <- Dplot[[yvar]]
-            if (all(is.na(vect))) next()
-            plot(Dplot[[xvar]], vect,
-                 pch  = 19,
-                 cex  = .3,
-                 col  = col,
-                 main = paste(i, yvar),
-                 xlab = xvar, ylab = yvar)
-        }
-    }
-}
 
 ## ____ Histograms Plots all data ----------------------------------------------
 #+ echo=F, include=F
@@ -247,16 +185,10 @@ for (DBn in dbs) {
 
             ## _ Arima tests  --------------------------------------------------
 
-            # amodelo   <- arima(dd[, avar], order = c(1, 0, 0), method = "ML")
-            # amod_test <- lmtest::coeftest(amodelo)
-            # cat("My arima:", round(amod_test[1,], 4), "\n")
-
             ## _ auto reggression arima Tourpali -------------------------------
             ## create a time variable (with lag of 1 day ?)
             dataset[, ts := (year(Date) - min(year(Date))) + ( doy - 1 ) / Hmisc::yearDays(Date) ]
             tmodelo <- arima(x = dataset[[avar]], order = c(1,0,0), xreg = dataset$ts, method = "ML")
-
-            # coef(tmodelo)
 
             ## trend per year with auto correlation
             Tres <- data.frame(t(lmtest::coeftest(tmodelo)[3,]))
@@ -265,12 +197,6 @@ for (DBn in dbs) {
 
             cat("Tourpali:", paste(round(Tres, 4)), "\n\n")
 
-
-            # sarima(dd[, avar], 1,0,0, details = F, method = "ML", no.constant = T)
-            # sarima(dd[, avar], 1,0,0, details = F, method = "ML")
-            # lmtest::coeftest(amodelo)
-            # lmtest::coeftest(lm1)
-            # lmtest::coeftest(tmodelo)
 
             lag   <- 1
             dd    <- acf(dataset[[avar]], na.action = na.pass, plot = FALSE)
@@ -307,14 +233,6 @@ for (DBn in dbs) {
             )
 
 
-            if (grepl("near_tcc", avar)) {
-                acol <- "cyan"
-            } else {
-                acol <- get(paste0(c("col", unlist(strsplit(avar, split = "_"))[1:2]),
-                                   collapse = "_"))
-            }
-
-
             ## plot data
             plot(dataset$Date, dataset[[avar]],
                  pch      = ".",
@@ -329,41 +247,6 @@ for (DBn in dbs) {
 
             ## plot fit line lm
             abline(lm1, lwd = 2)
-
-            # abline(coef = coef(lm1), col = "blue")
-
-            # Tres[1] / Days_of_year
-
-            # Tint[1] / Days_of_year
-
-            # coef(lm1)[1] / Tint[1]
-
-            ## arima first order line
-            # abline(coef = c(Tint[1], Tres[1]/Days_of_year) , col = "red")
-
-            # abline(coef = c(Tint[1]/Days_of_year - 4   , Tres[1]/Days_of_year ) , col = "red")
-
-            # abline(h=0,col= "cyan")
-
-
-            # y axis
-            axis(2, pretty(dataset[[avar]]), las = 2 )
-
-            # x axis
-            axis.Date(1,
-                      at = seq(as.Date("1993-01-01"), max(dataset$Date), by = "year"),
-                      format = "%Y",
-                      labels = NA,
-                      tcl = -0.25)
-
-
-            if (DRAFT == TRUE) {
-                title(main = paste(translate(DBn), translate(avar)),
-                      cex.main = 0.8 )
-            }
-
-
-            # ylab = bquote("Deseas." ~ .(translate(avar)) ~ "[" ~ Watt/m^2 ~ "]" ) )
 
 
             if (DRAFT == TRUE) {
@@ -669,10 +552,6 @@ pander(pprint,
 #' \normalsize
 #+ echo=F, include=T
 
-## __ Store Daily trends table for use  ----------------------------------------
-write_dat(pprint,
-          "./figures/tbl_longterm_trends.dat",
-          clean = TRUE)
 
 
 
@@ -1475,9 +1354,6 @@ pander(pprint,
        cap = "Slope is in %/year")
 #+ echo=F, include=F
 
-write_dat(pprint,
-          "./figures/tbl_longterm_trends_season.dat",
-          clean = TRUE)
 
 
 
@@ -1834,11 +1710,6 @@ pander(pprint,
        cap = "Slope is in %/year")
 #+ echo=F, include=F
 
-write_dat(pprint,
-          "./figures/tbl_longterm_trends_season_byM.dat",
-          clean = TRUE)
-
-
 
 
 
@@ -2061,27 +1932,3 @@ pander(pprint,
 #' \normalsize
 #+ echo=F, include=T
 
-write_dat(pprint,
-          "./figures/tbl_longterm_trends_monthly.dat",
-          clean = TRUE)
-
-
-
-
-
-plot(ALL_1_daily_DESEAS[, near_tcc_att, Date])
-lm1 <- lm(ALL_1_daily_DESEAS[, Date, near_tcc_att])
-abline(lm1 , col = "red")
-coefficients(lm1)[2] * Days_of_year
-
-
-
-#' **END**
-#+ include=T, echo=F
-tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
-            Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))
-if (interactive() & difftime(tac, tic, units = "sec") > 30) {
-    system("mplayer /usr/share/sounds/freedesktop/stereo/dialog-warning.oga", ignore.stdout = T, ignore.stderr = T)
-    system(paste("notify-send -u normal -t 30000 ", Script.Name, " 'R script ended'"))
-}
