@@ -64,6 +64,12 @@ create_missing_columns <- function(con, new_data, table) {
   dd1 <- data.table(names = colnames(new_data),
                     types = new_data |> head(1) |> collect() |> sapply(class))
 
+  if (is.data.frame(new_data) | is.data.table(new_data)) {
+    cat("is R data")
+  } else {
+    cat("is NOT R data")
+  }
+
   ## check columns names
   new_vars <- dd1[!names %in% tt1$names, ]
 
@@ -96,6 +102,48 @@ create_missing_columns <- function(con, new_data, table) {
     }
   }
 }
+
+
+test_missing_columns <- function(con, new_data, table) {
+  ## detect data types
+  tt1 <- data.table(names = colnames(tbl(con, table)),
+                    types = tbl(con, table) |> head(1) |> collect() |> sapply(class))
+  dd1 <- data.table(names = colnames(new_data),
+                    types = new_data |> head(1) |> collect() |> sapply(class))
+
+  if (is.data.frame(new_data) | is.data.table(new_data)) {
+    cat("is R data")
+  } else {
+    cat("is NOT R data")
+  }
+
+  ## check columns names
+  new_vars <- dd1[!names %in% tt1$names, ]
+
+  if (sum(!is.na(new_vars)) > 0) {
+    # cat("New", new_vars$names)
+
+    for (i in 1:nrow(new_vars)) {
+
+      # ## translate data types to duckdb
+      ctype_old <- switch(paste0(unlist(new_vars$types[i]), collapse = ""),
+                      POSIXctPOSIXt = "TIMESTAMP_MS",    ## all dates except radiation date
+                      numeric       = "DECIMAL(18, 14)", ## change default numeric values for all data
+                                                         ## ~9999.99999999999999
+                      unlist(new_vars$types[i]))
+
+      ## a new more general approach
+      ctype <- duckdb_datatypes(new_data[[new_vars$names[i]]])
+
+
+      ## info
+      cat("\nNEW VAR:", paste(new_vars[i, ]), "->", ctype, ctype_old, "\n")
+
+    }
+  }
+}
+
+
 
 
 
@@ -402,4 +450,6 @@ if (FALSE) {
   for (ac in colnames(test)) {
     cat(ac, duckdb_datatypes( test[[ac]] ),"\n")
   }
+
+
 }

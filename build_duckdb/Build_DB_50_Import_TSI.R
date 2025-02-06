@@ -23,7 +23,7 @@ knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
-knitr::opts_chunk$set(fig.cap   = " - empty caption - ")
+knitr::opts_chunk$set(fig.cap   = " empty caption ")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
@@ -95,10 +95,23 @@ if (TSI |> tally() |> pull() > 0) {
   cat(Script.ID, ": ", TSI |> tally() |> pull(), "rows of TSI data to add\n")
   status_msg(ScriptName = Script.Name, msg = c(TSI |> tally() |> pull(), "rows of TSI data to add"))
 
-  update_table(con      = con,
-               new_data = TSI,
-               table    = "LAP",
-               matchvar = "Date")
+  test_missing_columns(con      = con,
+                      new_data = TSI,
+                      table    = "LAP")
+
+  is.numeric(TSI |> select(TSI_TOA)|>pull())
+  TSI |> select(TSI_TOA) |> duckdb_datatypes()
+  TSI  |>
+    mutate_at("TSI_TOA",
+      ~ duckdb_datatypes(.x)
+    )
+
+  is.data.frame(TSI)
+
+  res <- update_table(con      = con,
+                      new_data = TSI,
+                      table    = "LAP",
+                      matchvar = "Date")
 
 } else {
   cat(Script.ID, ": ", "No new TSI data to add\n")
