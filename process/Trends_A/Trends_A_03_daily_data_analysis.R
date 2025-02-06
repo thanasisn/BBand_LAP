@@ -106,7 +106,7 @@ vars <- c(
 
 ##  Plot daily mean values
 #'
-#' Daily mean values
+#' ## Daily mean values
 #'
 #+ daily-mean-trends, include=T, echo=F, results="asis"
 for (DBn in dbs) {
@@ -123,7 +123,7 @@ for (DBn in dbs) {
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
-      geom_smooth(method = 'lm', colour = "red", fill = "red") +
+      geom_smooth(method = 'lm', formula = y ~ x, colour = "red", fill = "red") +
       stat_regline_equation(label.y.npc = 1) +
       labs(x = element_blank(),
            y = bquote(.(var_name(avar)) ~ ~ group("[", W/m^2, "]")),
@@ -137,7 +137,7 @@ for (DBn in dbs) {
 
 ##  Plot daily anomaly values
 #'
-#' Daily departure from the climatology
+#' ## Daily departure from the climatology
 #'
 #+ daily-anomaly-trends, include=T, echo=F, results="asis"
 for (DBn in dbs) {
@@ -152,10 +152,10 @@ for (DBn in dbs) {
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
-      geom_smooth(method = 'lm', colour = "red", fill = "red") +
+      geom_smooth(method = 'lm', formula = y ~ x, colour = "red", fill = "red") +
       stat_regline_equation(label.y.npc = 1) +
       labs(x = element_blank(),
-           y = bquote(.(var_name(avar)) ~ ~ group("[", W/m^2, "]")),
+           y = bquote(.(var_name(avar)) ~ ~ group("[","%","]")),
            subtitle = paste(var_name(DBn), var_name(avar))) +
       theme_bw()
     show(p)
