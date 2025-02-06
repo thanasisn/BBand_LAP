@@ -105,7 +105,7 @@ if (TSI |> tally() |> pull() > 0) {
   status_msg(ScriptName = Script.Name, msg = c("No new TSI data to add"))
 }
 
-tbl(con, "LAP") |> group_by(TSI_source) |> tally()
+pander::pander(tbl(con, "LAP") |> group_by(TSI_source) |> tally() |> collect())
 
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()

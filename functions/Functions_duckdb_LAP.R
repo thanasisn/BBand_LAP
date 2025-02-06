@@ -27,6 +27,7 @@ is_whole <- function(x) {
 #'
 duckdb_datatypes <- function(column, rela = 1) {
   case_when(
+    is.logical(column)                                                                                        ~         "BOOLEAN",
     is.character(column)                                                                                      ~         "VARCHAR",
     is.Date(column)                                                                                           ~            "DATE",
     is.POSIXt(column)                                                                                         ~    "TIMESTAMP_MS",
@@ -57,17 +58,19 @@ duckdb_datatypes <- function(column, rela = 1) {
 #' @return         Nothing. It executes an DQL query
 #' @export
 #'
-create_missing_columns <- function(con, new_data, table) {
+create_missing_columns <- function(con, new_data, table, quiet = FALSE) {
   ## detect data types
   tt1 <- data.table(names = colnames(tbl(con, table)),
                     types = tbl(con, table) |> head(1) |> collect() |> sapply(class))
   dd1 <- data.table(names = colnames(new_data),
                     types = new_data |> head(1) |> collect() |> sapply(class))
 
-  if (is.data.frame(new_data) | is.data.table(new_data)) {
-    cat("Is R data\n")
-  } else {
-    cat("Is NOT R data\n")
+  if (!quiet) {
+    if (is.data.frame(new_data) | is.data.table(new_data)) {
+      cat("Is R data\n")
+    } else {
+      cat("Is NOT R data\n")
+    }
   }
 
   ## check columns names
@@ -407,12 +410,13 @@ if (FALSE) {
                      c(  1, 9223372036854775807),
                      c(as.POSIXct("1970-01-01")),
                      c("ddd", "ddddddd"),
+                     c(F, T),
                      as.Date("1990-09-09")
   )
 
   for (ac in colnames(test)) {
     cat(ac, duckdb_datatypes( test[[ac]] ),"\n")
   }
-
+is.logical(test$c.F..T.)
 
 }
