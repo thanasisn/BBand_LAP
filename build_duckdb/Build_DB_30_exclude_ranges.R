@@ -225,7 +225,7 @@ con   <- dbConnect(duckdb(dbdir = DB_BROAD))
               y        = missingdays,
               copy     = TRUE,
               conflict = "ignore",
-              in_place = T)
+              in_place = TRUE)
 }
 
 
@@ -271,7 +271,13 @@ make_categorical_column("cm21_bad_data_flag", categories, con, "LAP")
 ##  Remove any previous flags
 # make_null_column(con, "LAP", "cm21_bad_data_flag", "character")
 ##  Apply flags
-update_table(con, temp_flag, "LAP", "Date")
+res <- update_table(
+             con      = con,
+             new_data = temp_flag,
+             table    = "LAP",
+             matchvar = "Date",
+             quiet    = TRUE
+)
 rm(temp_flag)
 
 
@@ -303,7 +309,13 @@ make_categorical_column("chp1_bad_data_flag", categories, con, "LAP")
 ##  Remove any previous flags
 # make_null_column(con, "LAP", "chp1_bad_data_flag", "character")
 ##  Apply flags
-update_table(con, temp_flag, "LAP", "Date")
+res <- update_table(
+             con      = con,
+             new_data = temp_flag,
+             table    = "LAP",
+             matchvar = "Date",
+             quiet    = TRUE
+)
 rm(temp_flag)
 
 
@@ -335,7 +347,12 @@ make_categorical_column("chp1_bad_temp_flag", categories, con, "LAP")
 ##  Remove any previous flags
 # make_null_column(con, "LAP", "chp1_bad_temp_flag", "character")
 ##  Apply flags
-update_table(con, temp_flag, "LAP", "Date")
+res <- update_table(
+             con = con, 
+             new_data = temp_flag,
+             table = "LAP",
+             matchvar = "Date",
+quiet = TRUE)
 rm(temp_flag)
 
 

@@ -98,7 +98,8 @@ if (TSI |> tally() |> pull() > 0) {
   res <- update_table(con      = con,
                       new_data = TSI,
                       table    = "LAP",
-                      matchvar = "Date")
+                      matchvar = "Date",
+                      quiet    = TRUE)
 
 } else {
   cat(Script.ID, ": ", "No new TSI data to add\n")

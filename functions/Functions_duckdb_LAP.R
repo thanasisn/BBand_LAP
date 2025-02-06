@@ -2,7 +2,6 @@
 require(dplyr)
 require(lubridate)
 
-
 #' Check if is an integer for R
 #'
 #' @param  x   A vector or column
@@ -14,7 +13,6 @@ is_whole <- function(x) {
   if (!is.numeric(x)) return(FALSE)
   all(floor(x) == x)
 }
-
 
 
 #' Give an appropriate duckdb data type, for this project
@@ -44,7 +42,6 @@ duckdb_datatypes <- function(column, rela = 1) {
 
 
 
-
 #' Create all columns for a table with default types
 #'
 #' @param con      Data base connection
@@ -55,10 +52,10 @@ duckdb_datatypes <- function(column, rela = 1) {
 #' values to infer the correct data type for  duckdb
 #'
 #'
-#' @return         Nothing. It executes an DQL query
+#' @return         Nothing. It executes an SQL query
 #' @export
 #'
-create_missing_columns <- function(con, new_data, table, quiet = TRUE) {
+create_missing_columns <- function(con, new_data, table, quiet = FALSE) {
   ## detect data types
   tt1 <- data.table(names = colnames(tbl(con, table)),
                     types = tbl(con, table) |> head(1) |> collect() |> sapply(class))
@@ -376,7 +373,7 @@ goodbye <- function(
 #'
 #' @param ScriptName  The name of the running script
 #' @param timezone    Timezone to use
-#' @param output      Targe file
+#' @param output      Target file
 #' @param msg         The message to display
 #' @details
 #' Use `tail -F /dev/shm/BBand_LAP.status` to display the status
@@ -435,9 +432,6 @@ if (FALSE) {
   important(1, quiet = F)
   helper()
   helper(quiet = T)
-
-
-
 
 }
 

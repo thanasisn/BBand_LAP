@@ -203,12 +203,14 @@ for (ad in sort(dayslist)) {
   res <- update_table(con      = con,
                       new_data = daydata,
                       table    = "LAP",
-                      matchvar = "Date")
+                      matchvar = "Date",
+                      quiet    = TRUE)
   cat(" w")
   res <- update_table(con      = con,
                       new_data = meta_day,
                       table    = "META",
-                      matchvar = "Day")
+                      matchvar = "Day",
+                      quiet    = TRUE)
   cat(" w")
   cat("\n")
 }
