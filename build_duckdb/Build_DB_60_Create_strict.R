@@ -22,7 +22,7 @@ knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(fig.align = "center")
-knitr::opts_chunk$set(fig.cap   = " - empty caption - ")
+knitr::opts_chunk$set(fig.cap   = " empty caption ")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
@@ -37,8 +37,8 @@ knitr::opts_chunk$set(tidy = TRUE,
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/build_duckdb/Build_DB_60_Create_strict.R"
-Script.ID    <- "60"
+Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_60_Create_strict.R"
+Script.ID   <- "60"
 
 if (!interactive()) {
   pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
