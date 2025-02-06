@@ -105,6 +105,9 @@ vars <- c(
 )
 
 ##  Plot daily mean values
+#'
+#' Daily mean values
+#'
 #+ daily-mean-trends, include=T, echo=F, results="asis"
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
@@ -112,7 +115,7 @@ for (DBn in dbs) {
   DATA |> colnames()
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n##", var_name(DBn), "\n\n"))
+  cat(paste("\n###", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
     avar <- paste0(avar, "_mean")
@@ -133,12 +136,15 @@ for (DBn in dbs) {
 
 
 ##  Plot daily anomaly values
+#'
+#' Daily departure from the climatology
+#'
 #+ daily-anomaly-trends, include=T, echo=F, results="asis"
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n##", var_name(DBn), "\n\n"))
+  cat(paste("\n###", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
     avar <- paste0(avar, "_mean_anom")

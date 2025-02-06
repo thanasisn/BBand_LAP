@@ -23,10 +23,11 @@ Cloud_daily_ratio_lim     <- 0.6
 
 #### dictionary ####
 dictionary <-
-  list(DIR_trnd            = 'DNI',
-       HOR_trnd            = 'Dir. Irrad. horizontal plane',
-       DIFF_trnd           = 'Diffuse. Irrad.',
-       GLB_trnd            = "GHI",
+  list(DIR_trnd_A            = "DNI",
+       HOR_trnd_A            = "Dir. Irrad. horizontal plane",
+       DIFF_trnd_A           = "Diffuse. Irrad.",
+       DIFF_trnd_A_mean_anom = "Diffuse. Irrad. Anomaly",
+       GLB_trnd_A            = "GHI",
        tsi1au_att          = "TSI at 1au",
        near_tcc_des        = "TCCn deseasonalized",
        near_tcc_att        = "TCC nearest",
@@ -58,6 +59,13 @@ var_name <- function(x) {
   }
   return(res)
 }
+
+var_name("DIFF_trnd_A_mean_anom")
+
+dictionary[agrep("DIFF_trnd_mean_anom", (names(dictionary)))]
+dictionary[agrep("DIFF_trnd_A_mean_anom", (names(dictionary)))]
+dictionary[agrep("DIFF_trnd_A_anom", (names(dictionary)))]
+
 
 
 coldict <- list(
