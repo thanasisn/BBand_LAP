@@ -1,5 +1,5 @@
-#!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+# /* !/usr/bin/env Rscript */
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
 #' Add TSI data in DB from pre-existent data
 #' [`github.com/thanasisn/TSI`](`https://github.com/thanasisn/TSI`)
@@ -15,9 +15,8 @@
 #'
 #' **Data display: [`thanasisn.github.io`](https://thanasisn.github.io/)**
 #'
-#+ echo=F, include=T
 
-#+ echo=F, include=F
+#+ include=F
 ## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
@@ -52,9 +51,9 @@ source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
+library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
-require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Import  TSI  data\n\n")
 
@@ -108,8 +107,10 @@ if (TSI |> tally() |> pull() > 0) {
 
 pander::pander(tbl(con, "LAP") |> group_by(TSI_source) |> tally() |> collect())
 
-## clean exit
-dbDisconnect(con, shutdown = TRUE); rm(con); closeAllConnections()
+
+
+#+ Clean_exit, echo=FALSE
+dbDisconnect(con, shutdown = TRUE); rm(con)
 
 #+ results="asis", echo=FALSE
 goodbye()

@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript
+# /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Radiation processing for LAP"
