@@ -176,25 +176,25 @@ if (!file.exists(pysolar_file) |
   rm(pysolar); gc()
 }
 
-## __ Export Astropy for old and forgotten processes  --------------------------
-if (!file.exists(astropy_file) |
-    file.mtime(pysolar_file) < Sys.time() - 30 * 3600) {
-
-  astropy <- tbl(sun, "params") |>
-    filter(!is.na(AsPy_Azimuth))                          |>
-    filter(!is.na(AsPy_Elevation))                        |>
-    filter(Date >= as.POSIXct("1993-01-01 00:00"))        |>
-    select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist) |>
-    rename(Azimuth          = "AsPy_Azimuth")             |>
-    rename(Dist             = "AsPy_Dist")                |>
-    rename(Elevation        = "AsPy_Elevation")           |>
-    collect()                                             |>
-    arrange(Date)                                         |>
-    data.table()
-
-  write_RDS(astropy, astropy_file, notes = Script.Name)
-  rm(astropy); gc()
-}
+# ## __ Export Astropy for old and forgotten processes  --------------------------
+# if (!file.exists(astropy_file) |
+#     file.mtime(pysolar_file) < Sys.time() - 30 * 3600) {
+# 
+#   astropy <- tbl(sun, "params") |>
+#     filter(!is.na(AsPy_Azimuth))                          |>
+#     filter(!is.na(AsPy_Elevation))                        |>
+#     filter(Date >= as.POSIXct("1993-01-01 00:00"))        |>
+#     select(Date, AsPy_Azimuth, AsPy_Elevation, AsPy_Dist) |>
+#     rename(Azimuth          = "AsPy_Azimuth")             |>
+#     rename(Dist             = "AsPy_Dist")                |>
+#     rename(Elevation        = "AsPy_Elevation")           |>
+#     collect()                                             |>
+#     arrange(Date)                                         |>
+#     data.table()
+# 
+#   write_RDS(astropy, astropy_file, notes = Script.Name)
+#   rm(astropy); gc()
+# }
 
 
 ## clean exit
