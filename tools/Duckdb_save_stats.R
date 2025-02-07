@@ -73,8 +73,8 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_duckdb/Duckdb_save_stats.R"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
-    sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
+  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  # sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/duck/",    basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -86,10 +86,9 @@ library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
-library(pander,     warn.conflicts = FALSE, quietly = TRUE)
+library(cloc,       warn.conflicts = FALSE, quietly = TRUE)
+# install.packages("hrbrmstr/cloc")
 
-panderOptions("table.alignment.default", "right")
-panderOptions("table.split.table",        120   )
 
 overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size_duckdb.Rds"
 
@@ -182,10 +181,44 @@ for (adb in databases) {
   ## chose to remove
   dt  <- dt[duplicated(dt$day, fromLast = TRUE)]
   res <- sapply(gather, "[[", "base_name") == adb &
-         sapply(gather, "[[", "date") %in% dt$date
+    sapply(gather, "[[", "date") %in% dt$date
   ## drop data
   gather <- gather[!res]
 }
+
+
+
+##  Source code statistics  ----------------------------------------------------
+## override previous file
+overview_data <- "~/BBand_LAP/SIDE_DATA/Source_code_stats.Rds"
+codemetrics   <- data.frame()
+
+dir_list <- list.dirs("~/BBand_LAP", recursive = FALSE)
+dir_list <- grep(".Rproj.user|.git|REPORTS|RESOURCES|PARAMS|renv|SIDE_DATA", dir_list, invert = T, value = T)
+
+for (adir in dir_list) {
+  codestats   <- data.table(cloc(adir))
+  codestats[, Date := Sys.Date()]
+  codestats   <- codestats[!language %in% c("HTML", "SUM", "TeX", "Markdown", "JSON", "Rmd")]
+  codemetrics <- rbind(codemetrics, codestats)
+}
+
+## Gather results
+if (!file.exists(overview_data)) {
+  saveRDS(codemetrics, overview_data)
+} else {
+  DATA <- readRDS(overview_data)
+
+  DATA <- rows_upsert(DATA,
+                      codemetrics,
+                      by = c("Date", "source","language")) |>
+    distinct()
+  saveRDS(DATA, overview_data)
+}
+
+
+
+
 
 ## Save data
 saveRDS(gather, overview_data)
