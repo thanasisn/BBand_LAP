@@ -1,5 +1,5 @@
-#!/opt/R/4.2.3/bin/Rscript
-# /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
+#!/usr/bin/env Rscript
+# /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Daily CM-21 radiation data **L1** "
 #' author:        "Natsis Athanasios"
@@ -64,7 +64,6 @@ knitr::opts_chunk$set(tidy = TRUE,
 )
 
 ## __ Set environment  ---------------------------------------------------------
-closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_duckdb/31_Plot_daily_CM21_L1.R"
@@ -150,8 +149,9 @@ for (YYYY in sort(years_to_do)) {
 
   for (aday in sort(daystodo)) {
     dd   <- year_data[as.Date(Date) == aday]
-    setorder(dd, Date)
     aday <- as.Date(aday, origin = "1970-01-01")
+    setorder(dd, Date)
+    status_msg(ScriptName = Script.Name, msg = c(YYYY, paste(aday), length(daystodo)))
 
     layout(matrix(c(1,2,2,2,2), 5, 1, byrow = TRUE))
 
@@ -207,10 +207,9 @@ for (YYYY in sort(years_to_do)) {
 ## clean exit
 dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
 
-#' **END**
-#+ include=T, echo=F
+#+ include=T, echo=F, results="asis"
 tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+cat(sprintf("\n**END** %s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
 cat(sprintf("%s %s@%s %s %f mins\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")),
     file = "~/BBand_LAP/REPORTS/LOGs/Run.log", append = TRUE)
 
