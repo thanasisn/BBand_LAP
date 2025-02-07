@@ -528,6 +528,13 @@ for (as in last$Script_2) {
 }
 
 
+library(cloc)
+
+cloc_git("~/BBand_LAP/")
+cloc("~/BBand_LAP/")
+
+system.file()
+
 ## _ Update Readme.md  ---------------------------------------------------------
 system("~/BBand_LAP/.update_readme.sh")
 
