@@ -1,4 +1,4 @@
-# /* !/usr/bin/env Rscript */
+#!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Daily raw CM-21 data **SIG** "
@@ -47,7 +47,7 @@
 #+ echo=F, include=T
 
 #+ echo=F, include=F
-## __ Document options ---------------------------------------------------------
+## __ Document options  --------------------------------------------------------
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
@@ -64,13 +64,12 @@ knitr::opts_chunk$set(tidy = TRUE,
 )
 
 ## __ Set environment  ---------------------------------------------------------
-closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_duckdb/11_Plot_daily_CM21_sig.R"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/duck/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -110,8 +109,8 @@ plotfiles <- data.table(path = list.files(path    = OUT_FOLDER,
                                           ignore.case = TRUE))
 plotfiles[, mtime := file.mtime(path)]
 plotfiles[, year  := as.numeric(sub(OUT_PREFIX, "",
-                           sub("\\.pdf", "",
-                               basename(path))))]
+                                    sub("\\.pdf", "",
+                                        basename(path))))]
 
 ## find what needs update
 selected    <- merge(metalist, plotfiles, all = TRUE)
@@ -151,6 +150,7 @@ for (YYYY in sort(years_to_do)) {
     dd   <- year_data[as.Date(Date) == aday]
     aday <- as.Date(aday, origin = "1970-01-01")
     setorder(dd, Date)
+    status_msg(ScriptName = Script.Name, msg = c(YYYY, paste(aday), length(daystodo)))
 
     layout(matrix(c(1,2,3,3,3,3), 6, 1, byrow = TRUE))
 
