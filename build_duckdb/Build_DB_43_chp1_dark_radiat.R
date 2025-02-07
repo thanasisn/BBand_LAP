@@ -65,7 +65,9 @@ library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 ##  Create a dummy column if not existing
-make_new_column(con, "META", "chp1_dark_flag", "character")
+if (Sys.info()["nodename"] == Main.Host) {
+  make_new_column(con, "META", "chp1_dark_flag", "character")
+}
 
 ##  Create a dark construct!  --------------------------------------------------
 ## create construct if are available data
@@ -115,10 +117,11 @@ for (ad in sort(dayslist)) {
   status_msg(ScriptName = Script.Name, msg = c(paste(ad), cc, length(dayslist)))
 
   ## use only valid data for dark calculation
+  ## !!!! We need all Elevation values for the day for the dark functions to work !!!
   daydata <-
     tbl(con, "LAP")                                     |>
     filter(Day == ad)                                   |> ## this day only
-    filter(!is.na(CHP1_sig))                            |> ## valid measurements
+    ## NO!! filter(!is.na(CHP1_sig))                            |> ## valid measurements
     filter(chp1_bad_data_flag  %in% c("pass", "empty")) |> ## not bad data
     filter(chp1_sig_limit_flag %in% c("pass", "empty")) |> ## acceptable values range
     collect() |> data.table()
@@ -142,6 +145,12 @@ for (ad in sort(dayslist)) {
     dstretch   = DSTRETCH
   )
 
+  # plot(daydata$Date, daydata$CHP1_sig)
+  # abline(v = dark_day$dark_Mor_sta, col = 1)
+  # abline(v = dark_day$dark_Mor_end, col = 2)
+  # abline(v = dark_day$dark_Eve_sta, col = 3)
+  # abline(v = dark_day$dark_Eve_end, col = 4)
+
   ## __ Resolve problematic dark calculations  ---------------------------------
 
   if (all(is.na(daydata$CHP1_sig))) {
@@ -149,6 +158,7 @@ for (ad in sort(dayslist)) {
     dark_flag              <- "NO SIGNAL DATA"
     todays_dark_correction <- as.numeric(NA)
     missingdark            <- as.numeric(NA)
+  ## data to compute dark is missing
   } else if ( !((!is.na(dark_day$dark_Mor_med) & dark_day$dark_Mor_cnt >= DCOUNTLIM) |
                 (!is.na(dark_day$dark_Eve_med) & dark_day$dark_Eve_cnt >= DCOUNTLIM))) {
     todays_dark_correction <- as.numeric(NA)
@@ -199,6 +209,8 @@ for (ad in sort(dayslist)) {
   ) |> mutate_if(is.numeric, function(x) ifelse(is.nan(x), NA, x))
 
   ## __  Store data in the database  -------------------------------------------
+  if (Sys.info()["nodename"] == Main.Host) {
+
   res <- update_table(con      = con,
                       new_data = daydata,
                       table    = "LAP",
@@ -211,15 +223,13 @@ for (ad in sort(dayslist)) {
                       matchvar = "Day",
                       quiet    = TRUE)
   cat(" w")
+  }
   cat("\n")
 }
 
 tbl(con, "META") |> group_by(chp1_dark_flag) |> tally()
 
 
-# tbl(con, "META") |> glimpse()
-# tbl(con, "LAP")  |> glimpse()
-#
 # tbl(con, "LAP") |> filter(!is.na(chp1_bad_data_flag)) |> glimpse()
 # tbl(con, "LAP") |> filter(chp1_sig_limit_flag == 0)
 #
