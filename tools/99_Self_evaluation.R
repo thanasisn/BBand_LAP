@@ -83,7 +83,8 @@ library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(gdata,      warn.conflicts = FALSE, quietly = TRUE)
-
+library(cloc,       warn.conflicts = FALSE, quietly = TRUE)
+# install.packages("hrbrmstr/cloc")
 
 ##  Evaluate data sizes  -------------------------------------------------------
 
@@ -528,12 +529,19 @@ for (as in last$Script_2) {
 }
 
 
-library(cloc)
 
-cloc_git("~/BBand_LAP/")
-cloc("~/BBand_LAP/")
+dir_list <- list.dirs("~/BBand_LAP", recursive = FALSE)
+dir_list <- grep(".Rproj.user|.git|REPORTS|RESOURCES|PARAMS|renv", dir_list, invert = T, value = T)
 
-system.file()
+codemetrics <- data.table()
+for (adir in dir_list) {
+  codestats  <- data.table(cloc(adir))
+  codestats[, Date := Sys.Date()]
+  codestats   <- codestats[!language %in% c("HTML", "SUM", "TeX", "Markdown", "JSON", "Rmd")]
+  codemetrics <- rbind(codemetrics, codestats)
+}
+
+
 
 ## _ Update Readme.md  ---------------------------------------------------------
 system("~/BBand_LAP/.update_readme.sh")
