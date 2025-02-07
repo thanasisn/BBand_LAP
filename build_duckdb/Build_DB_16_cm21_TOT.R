@@ -110,7 +110,8 @@ if (nrow(inp_filelist) > 0) {
     cat(Script.ID, ": ",
         basename(ff$fullname),
         paste(ff$Day),
-        ll,"/",nrow(inp_filelist), "\n")
+        ll, "/", nrow(inp_filelist), "\n")
+    status_msg(ScriptName = Script.Name, msg = c(paste(ff$Day), ll, nrow(inp_filelist)))
 
     ## __ Check data base is ready for import  ---------------------------------
     if (tbl(con, "LAP") |> filter(Day == ff$Day) |> tally() |> pull() != 1440) {
