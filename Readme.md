@@ -15,7 +15,7 @@ under the [Data display](https://thanasisn.github.io/data_display.html) section.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Fri Feb  7 06:30:14 UTC 2025 -->
+<!-- Added by: athan, at: 2025-02-07T09:16:33 UTC -->
 
 <!--te-->
 
