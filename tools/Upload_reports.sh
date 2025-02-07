@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#### 4. Upload data to different locations for other uses
+#### Upload data to different locations for other uses
 
 exec 9>"/dev/shm/$(basename $0).lock"
 if ! flock -n 9  ; then
@@ -30,7 +30,7 @@ bwlimit=" --bwlimit=${bwlim}k "
 
 if [[ $(hostname) != "sagan" ]]; then
     echo "This should run only by sagan"
-    exit 11
+    exit 9
 fi
 
 echo "lapauththanasis:/BroadBand"
