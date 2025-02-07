@@ -151,6 +151,7 @@ for (YYYY in sort(years_to_do)) {
     dd   <- year_data[as.Date(Date) == aday]
     aday <- as.Date(aday, origin = "1970-01-01")
     setorder(dd, Date)
+    status_msg(ScriptName = Script.Name, msg = c(YYYY, paste(aday), length(daystodo)))
 
     layout(matrix(c(1,2,3,3,3,3), 6, 1, byrow = TRUE))
 
