@@ -139,81 +139,9 @@ add <- cbind(
 )
 
 
-
+## override previous file
 overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size.Rds"
 gather <- data.frame()
-
-# ## Broad band parquet data base
-# BB <- opendata()
-# gather <- data.frame(
-#     Name = "BBDB",
-#     Rows = BB |> nrow(),
-#     Vars = BB |> ncol(),
-#     Valu = BB |> summarise(across(everything(), ~ sum(!is.na(.)))) |>
-#         collect() |> rowwise() |> sum(),
-#     Size = strsplit(
-#         system(
-#             paste("du -s", DB_DIR),
-#             intern = TRUE),
-#         "\t")[[1]][1]
-# )
-# rm(BB)
-
-# ## Broad band parquet data base meta data
-# BB <- open_dataset(DB_META_fl)
-# gather <- rbind(gather,
-#                 data.frame(
-#                     Name = "BBDB meta",
-#                     Rows = BB |> nrow(),
-#                     Vars = BB |> ncol(),
-#                     Valu = BB |> summarise(across(everything(), ~ sum(!is.na(.)))) |>
-#                         collect() |> rowwise() |> sum(),
-#                     Size = strsplit(
-#                         system(
-#                             paste("du -s", DB_META_fl),
-#                             intern = TRUE),
-#                         "\t")[[1]][1]
-#                 )
-# )
-# rm(BB)
-
-
-
-## Tracker parquet data base
-# BB <- open_dataset(DB_Steps_DIR)
-# gather <- rbind(gather,
-#                 data.frame(
-#                     Name = "TrackerDB",
-#                     Rows = BB |> nrow(),
-#                     Vars = BB |> ncol(),
-#                     Valu = BB |> summarise(across(everything(), ~ sum(!is.na(.)))) |>
-#                         collect() |> rowwise() |> sum(),
-#                     Size = strsplit(
-#                         system(
-#                             paste("du -s", DB_Steps_DIR),
-#                             intern = TRUE),
-#                         "\t")[[1]][1]
-#                 )
-# )
-# rm(BB)
-
-# ## Tracker parquet data base meta data
-# BB <- open_dataset(DB_Steps_META_fl)
-# gather <- rbind(gather,
-#                 data.frame(
-#                     Name = "TrackerDB meta",
-#                     Rows = BB |> nrow(),
-#                     Vars = BB |> ncol(),
-#                     Valu = BB |> summarise(across(everything(), ~ sum(!is.na(.)))) |>
-#                         collect() |> rowwise() |> sum(),
-#                     Size = strsplit(
-#                         system(
-#                             paste("du -s", DB_Steps_META_fl),
-#                             intern = TRUE),
-#                         "\t")[[1]][1]
-#                 )
-# )
-# rm(BB)
 
 ## Broad Band data hash file storage
 BB <- open_dataset(DB_HASH_fl)
@@ -296,67 +224,6 @@ pander(pp, justify = "lrrrrrr")
 cat(" \n \n")
 
 
-# ## _ Plot data size ------------------------------------------------------------
-#
-# #'
-# #' ## Data size plots
-# #'
-# #' \footnotesize
-# #'
-# #+ echo=F, include=T, results = "asis"
-# vars <- grep("Name|Date", names(DATA), value = TRUE, invert = TRUE)
-#
-# for (av in vars) {
-#
-#     types <- unique(DATA$Name)
-#     ylim  <- range(DATA[, .(get(av))], na.rm = T)
-#     xlim  <- range(DATA[, Date], na.rm = T)
-#
-#     par("mar" = c(2, 5, 4, 0.1))
-#
-#     plot(1,
-#          xlab = "",
-#          ylab = av,
-#          ylim = ylim,
-#          xlim = xlim,
-#          las  = 1,
-#          xaxt = "n",
-#          yaxt = "n")
-#     axis.POSIXct(1, pretty(DATA[, Date]))
-#
-#     if (av == "Size") {
-#         axis(2,
-#              at     = pretty(DATA[[av]]),
-#              labels = humanReadable(pretty(DATA[[av]])),
-#              las    = 2)
-#     } else if (av == "Rows") {
-#         axis(2,
-#              at     = pretty(DATA[[av]]),
-#              labels = paste(pretty(DATA[[av]])/1000000, "M"),
-#              las    = 2)
-#     } else {
-#         axis(2, pretty(DATA[[av]]), las = 2)
-#     }
-#
-#     cc <- 1
-#     for (at in types) {
-#         pp <- DATA[Name == at , .(get(av), Date)]
-#         cc <- cc + 1
-#         lines(pp$Date, pp$V1, col = cc)
-#     }
-#
-#     par(xpd = TRUE)
-#     legend("topleft",
-#            inset  = c(-.2, -.17),
-#            legend = types,
-#            bty    = "n",
-#            lty    = 1,
-#            col    = 2:(length(types) + 2),
-#            ncol   = 3)
-#     par(xpd = FALSE)
-#     cat(" \n \n")
-# }
-#
 
 
 ##  Evaluate execution times  --------------------------------------------------
@@ -530,16 +397,6 @@ for (as in last$Script_2) {
 
 
 
-dir_list <- list.dirs("~/BBand_LAP", recursive = FALSE)
-dir_list <- grep(".Rproj.user|.git|REPORTS|RESOURCES|PARAMS|renv", dir_list, invert = T, value = T)
-
-codemetrics <- data.table()
-for (adir in dir_list) {
-  codestats  <- data.table(cloc(adir))
-  codestats[, Date := Sys.Date()]
-  codestats   <- codestats[!language %in% c("HTML", "SUM", "TeX", "Markdown", "JSON", "Rmd")]
-  codemetrics <- rbind(codemetrics, codestats)
-}
 
 
 
