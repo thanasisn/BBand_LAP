@@ -91,7 +91,7 @@ dark_calculations <- function(elevatio,
 #' @param dstretch   Duration of dark signal sample
 #' @param values     Vector of signal values
 #'
-#' @details          Improved from `dark_calculations` to hanlde missing data
+#' @details          Improved from `dark_calculations` to handle missing data
 #'                   better.
 #'
 #' @return           Data frame with dark signal statistical values

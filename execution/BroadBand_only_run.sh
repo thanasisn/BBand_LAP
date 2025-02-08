@@ -50,6 +50,16 @@ info "##  Start inspect_duckdb  ##"
 info "##  End inspect_duckdb STATUS:$?  ##"
 
 
+info "##  Start CSid_RenoHansen  ##"
+"$HOME/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_run.R"
+info "##  End CSid_RenoHansen STATUS:$?  ##"
+
+
+info "##  Start Trends_A  ##"
+"$HOME/BBand_LAP/process/Trends_A/Trends_A_run.R"
+info "##  End Trends_A STATUS:$?  ##"
+
+
 info "#### END $0 ####"
 TAC=$(date +"%s"); dura="$( echo "scale=6; ($TAC-$TIC)/60" | bc)"
 printf "%s %-10s %-10s %-10s %f\n" "$(date +"%F %H:%M:%S")" "$HOSTNAME" "$USER" "$(basename $0)" "$dura"
