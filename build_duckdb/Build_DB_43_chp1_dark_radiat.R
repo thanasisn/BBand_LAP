@@ -62,7 +62,11 @@ library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_BROAD))
+if (Sys.info()["nodename"] == Main.Host) {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD))
+} else {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
+}
 
 ##  Create a dummy column if not existing
 if (Sys.info()["nodename"] == Main.Host) {
@@ -211,18 +215,18 @@ for (ad in sort(dayslist)) {
   ## __  Store data in the database  -------------------------------------------
   if (Sys.info()["nodename"] == Main.Host) {
 
-  res <- update_table(con      = con,
-                      new_data = daydata,
-                      table    = "LAP",
-                      matchvar = "Date",
-                      quiet    = TRUE)
-  cat(" w")
-  res <- update_table(con      = con,
-                      new_data = meta_day,
-                      table    = "META",
-                      matchvar = "Day",
-                      quiet    = TRUE)
-  cat(" w")
+    res <- update_table(con      = con,
+                        new_data = daydata,
+                        table    = "LAP",
+                        matchvar = "Date",
+                        quiet    = TRUE)
+    cat(" w")
+    res <- update_table(con      = con,
+                        new_data = meta_day,
+                        table    = "META",
+                        matchvar = "Day",
+                        quiet    = TRUE)
+    cat(" w")
   }
   cat("\n")
 }

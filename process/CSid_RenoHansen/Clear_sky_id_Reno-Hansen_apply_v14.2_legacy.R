@@ -151,7 +151,11 @@ par(mar = c(2, 4, 2, 1))
 
 
 ##  Load all data from duckdb  -----------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_BROAD))
+if (Sys.info()["nodename"] == Main.Host) {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD))
+} else {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
+}
 
 LAP <- tbl(con, "LAP")
 
@@ -222,45 +226,47 @@ if (IGNORE_DIRE) {
 
 ##  Variables initialization  --------------------------------------------------
 
-MS <- data.frame( nt                   = 11,          ##     Window size prefer odd numbers so not to be left right bias
-                  MeanVIP_fct          =  1,          ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
-                  CS_ref_rm_VIP_low    = 70,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
-                  CS_ref_rm_VIP_upp    = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
-                  CS_ref_rm_VIP_RelUpp =  0.095,      ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_RelLow =  0.09,       ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_UppOff = 30,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  CS_ref_rm_VIP_LowOff = 20,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
-                  MaxVIP_fct           =  1 ,         ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIP_off_upp       = 75,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIP_off_low       = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
-                  MaxVIL_fct           =  1.3,        ##  3. MAX Factor Variability in irradiance by the length (VIL)
-                  MinVIL_fct           =  1,          ##  3. MIN Factor Variability in irradiance by the length (VIL)
-                  offVIL_upl           = 13,          ##  3. MAX Offset Variability in irradiance by the length (VIL)
-                  offVIL_dwl           =  5,          ##  3. MIN Offset Variability in irradiance by the length (VIL)
-                  offVCT               =  0.00011,    ##  4. Variance of Changes in the Time series (VCT)
-                  offVSM               =  7.5,        ##  5. Variability in the Shape of the irradiance Measurements (VSM)
-                  alpha                =  1,
-                  relative_CS          =  0.3,        ## limit of CS day acceptance 0.3: 30% of the data points have to be id as clear within a day
-                  sample_n_days        = SAMPLE_DAYS, ## Sample of that much days to be evaluated
-                  tolerance            =  0.02,       ## Optimization algorithm tolerance
-                  start_day            = START_DAY,   ## The first day of the data we are using
-                  DIR_s_T_fact         = 25           ## percentage of direct under simple threshold CS_ref_DIR (TESTING)
+MS <- data.frame(
+  nt                   = 11,          ##     Window size prefer odd numbers so not to be left right bias
+  MeanVIP_fct          =  1,          ##  1. Factor Mean Value of Irradiance during the time Period (MeanVIP)
+  CS_ref_rm_VIP_low    = 70,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
+  CS_ref_rm_VIP_upp    = 80,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) Old
+  CS_ref_rm_VIP_RelUpp =  0.095,      ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+  CS_ref_rm_VIP_RelLow =  0.09,       ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+  CS_ref_rm_VIP_UppOff = 30,          ##  1. MAX Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+  CS_ref_rm_VIP_LowOff = 20,          ##  1. MIN Offset Mean Value of Irradiance during the time Period (MeanVIP) New
+  MaxVIP_fct           =  1 ,         ##  2. Factor Max Value of Irradiance during the time Period (MaxVIP)
+  MaxVIP_off_upp       = 75,          ##  2. MAX Offset Max Value of Irradiance during the time Period (MaxVIP)
+  MaxVIP_off_low       = 75,          ##  2. MIN Offset Max Value of Irradiance during the time Period (MaxVIP)
+  MaxVIL_fct           =  1.3,        ##  3. MAX Factor Variability in irradiance by the length (VIL)
+  MinVIL_fct           =  1,          ##  3. MIN Factor Variability in irradiance by the length (VIL)
+  offVIL_upl           = 13,          ##  3. MAX Offset Variability in irradiance by the length (VIL)
+  offVIL_dwl           =  5,          ##  3. MIN Offset Variability in irradiance by the length (VIL)
+  offVCT               =  0.00011,    ##  4. Variance of Changes in the Time series (VCT)
+  offVSM               =  7.5,        ##  5. Variability in the Shape of the irradiance Measurements (VSM)
+  alpha                =  1,
+  relative_CS          =  0.3,        ## limit of CS day acceptance 0.3: 30% of the data points have to be id as clear within a day
+  sample_n_days        = SAMPLE_DAYS, ## Sample of that much days to be evaluated
+  tolerance            =  0.02,       ## Optimization algorithm tolerance
+  start_day            = START_DAY,   ## The first day of the data we are using
+  DIR_s_T_fact         = 25           ## percentage of direct under simple threshold CS_ref_DIR (TESTING)
 )
 
 
-CS_flags <- c( "MeanVIP",   #1
-               "MaxVIP",    #2
-               "VIL",       #3
-               "VCT",       #4
-               "VSM",       #5
-               "LDI",       #6
-               "LGI",       #7
-               "FCS",       #8
-               "FDP",       #9
-               "NA",        #10
-               "DsT",       #11
-               NULL
-             )
+CS_flags <- c(
+  "MeanVIP",   #1
+  "MaxVIP",    #2
+  "VIL",       #3
+  "VCT",       #4
+  "VSM",       #5
+  "LDI",       #6
+  "LGI",       #7
+  "FCS",       #8
+  "FDP",       #9
+  "NA",        #10
+  "DsT",       #11
+  NULL
+)
 
 
 #'
@@ -274,15 +280,15 @@ CS_flags <- c( "MeanVIP",   #1
 
 ## select diffuse model
 CS_models_list <- c(
-                    "DPP",
-                    "KC",
-                    "HAU",
-                    # "BD",       ## too poor results
-                    "ABCG",
-                    "RS",
-                    "KASTEN",
-                    "INEICHEN"
-                  )
+  "DPP",
+  "KC",
+  "HAU",
+  # "BD",       ## too poor results
+  "ABCG",
+  "RS",
+  "KASTEN",
+  "INEICHEN"
+)
 
 
 #'
@@ -413,6 +419,7 @@ for (yyyy in years) {
     mont  <- as.numeric(format(aday, "%m"))
     nt_hw <- MS$nt %/% 2
     if (interactive()) cat(paste(aday),"\n")
+    status_msg(ScriptName = Script.Name, msg = c(paste(aday), length(subdayslist)))
 
     if (MONTHLY) {
       ## get alpha for month
@@ -425,7 +432,6 @@ for (yyyy in years) {
       stopifnot( typeof(alpha) == "double" )
       MS$alpha <- alpha
     }
-
 
     ## empty daily variables
     MeanVIPcnt <- NA
@@ -1077,7 +1083,9 @@ for (yyyy in years) {
 
   pander(table(gather$CSRHv14_2_flag))
 
-  res <- update_table(con, gather, "LAP", "Date")
+  if (Sys.info()["nodename"] == Main.Host) {
+    res <- update_table(con, gather, "LAP", "Date")
+  }
 } ##END year loop
 
 write_RDS(object = daily_stats,
