@@ -48,12 +48,12 @@
 
 #+ include=F
 ## __ Document options  --------------------------------------------------------
-knitr::opts_chunk$set(comment    = ""      )
-knitr::opts_chunk$set(dev        = "png"   )
-knitr::opts_chunk$set(out.width  = "100%"  )
-knitr::opts_chunk$set(fig.align  = "center")
+knitr::opts_chunk$set(comment   = ""      )
+knitr::opts_chunk$set(dev       = "png"   )
+knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.cap   = " empty caption ")
-knitr::opts_chunk$set(fig.pos    = '!h'    )
+knitr::opts_chunk$set(fig.pos   = '!h'    )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
                         indent       = 4,
@@ -71,7 +71,7 @@ Script.Name    <- "~/BBand_LAP/process/CSid_RenoHansen/Clear_sky_id_Reno-Hansen_
 Script.Version <- "14.2"
 
 if (!interactive()) {
-  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -154,7 +154,7 @@ plotsbase <- paste0("~/BBand_LAP/REPORTS/DAILY/CSid_RenoHansen/",
 par(mar = c(2, 4, 2, 1))
 
 
-##  Load all data from duckdb  -----------------------------------------------------
+##  Load all data from duckdb  -------------------------------------------------
 if (Sys.info()["nodename"] == Main.Host) {
   con <- dbConnect(duckdb(dbdir = DB_BROAD))
 } else {
@@ -219,11 +219,11 @@ FAST_SKIP      <- FALSE  ## allow faster skip of filters also reduce data kept
 ## For GHI Trends
 IGNORE_DIRE     <- TRUE
 if (IGNORE_DIRE) {
-    cat("\nIgnoring filters using Direct radiation For Trends!!\n\n")
-    LDI_active <- FALSE  ##  6. Low Direct Irradiance limit (LDI)
-    DST_active <- FALSE  ## 11. Too low direct radiation (DsT)
-    LGI_active <- FALSE  ##  7. Low Global Irradiance limit (LGI) Allow all data for trends
-    FCS_active <- FALSE  ##  9. Too Few data point for the day (FDP) No need can be done after
+  cat("\nIgnoring filters using Direct radiation For Trends!!\n\n")
+  LDI_active <- FALSE  ##  6. Low Direct Irradiance limit (LDI)
+  DST_active <- FALSE  ## 11. Too low direct radiation (DsT)
+  LGI_active <- FALSE  ##  7. Low Global Irradiance limit (LGI) Allow all data for trends
+  FCS_active <- FALSE  ##  9. Too Few data point for the day (FDP) No need can be done after
 }
 
 
@@ -408,7 +408,7 @@ for (yyyy in years) {
   #' ### Baseline value for direct irradiance
   #'
   #' See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf
-  strong[, CS_ref_HOR := (TSI_TOA * 0.7 ^ AM(SZA) ^ 0.678) * cosde(SZA) ]
+  strong[, CS_ref_HOR := (TSI_TOA * 0.7 ^ AM(SZA) ^ 0.678) * cosde(SZA)]
   #+ include=T, echo=F
 
   ## add id column
@@ -417,12 +417,12 @@ for (yyyy in years) {
   ##  Iterate all days
   for (aa in subdayslist) {
     ## Day variables
-    aday  <- as.Date(aa , origin = "1970-01-01")
+    aday  <- as.Date(aa, origin = "1970-01-01")
     sell  <- as.Date(strong$Date) == aday
     doy   <- as.numeric(format(aday, "%j"))
     mont  <- as.numeric(format(aday, "%m"))
     nt_hw <- MS$nt %/% 2
-    if (interactive()) cat(paste(aday),"\n")
+    if (interactive()) cat(paste(aday), "\n")
     status_msg(ScriptName = Script.Name, msg = c(paste(aday), length(subdayslist)))
 
     if (MONTHLY) {
@@ -463,7 +463,7 @@ for (yyyy in years) {
 
     ## create a more logical model
     CS_ref_safe <- CS_ref
-    CS_ref_safe[ CS_ref_safe < 0 ] <- NA
+    CS_ref_safe[CS_ref_safe < 0] <- NA
 
 
     ## Create some empty columns
@@ -483,7 +483,7 @@ for (yyyy in years) {
       if (nrow(subday) > 0 & tot_p <= FDPlim ) {
         subday$CSRHv14_2_flag <- Flag_key
         subday[[paste0("CSRHv14_2_flag_", Flag_key)]] <- TRUE
-        cat(paste("Skip day FDP:", aday, tot_p),"\n")
+        cat(paste("Skip day FDP:", aday, tot_p), "\n")
         next
       }
     }
@@ -492,7 +492,7 @@ for (yyyy in years) {
     #---- 1. Mean value of irradiance during the time period (MeanVIP) -----
     if (MeanVIP_active & any(have_glb)) {
       Flag_key <- 1L
-      ## create running mean of modeled values
+      ## create running mean of modelled values
       CS_ref_rm_base    <- runmean(x = CS_ref_safe, k = MS$nt, alg = "C")
       # ## first implementation with offset from reference limits
       # CS_ref_rm_VIP_low_0 <- MS$MeanVIP_fct * CS_ref_rm_base - MS$CS_ref_rm_VIP_low
@@ -510,10 +510,10 @@ for (yyyy in years) {
       GLB_rm            <- runmean(x = subday$GLB_strict, k = MS$nt, alg = "C")
 
       ## don't allow negative values on models
-      CS_ref_rm_base[    CS_ref_rm_base    < 0 ] <- NA
-      CS_ref_rm_VIP_low[ CS_ref_rm_VIP_low < 0 ] <- NA
-      CS_ref_rm_VIP_upp[ CS_ref_rm_VIP_upp < 0 ] <- NA
-      GLB_rm[            GLB_rm            < 0 ] <- NA
+      CS_ref_rm_base[   CS_ref_rm_base    < 0] <- NA
+      CS_ref_rm_VIP_low[CS_ref_rm_VIP_low < 0] <- NA
+      CS_ref_rm_VIP_upp[CS_ref_rm_VIP_upp < 0] <- NA
+      GLB_rm[           GLB_rm            < 0] <- NA
 
       ## do characterization if pass as clear
       # MeanVIP_pass =  GLB_rm > CS_ref_rm_VIP_low                              ## apply only lower limit (default)
@@ -541,10 +541,10 @@ for (yyyy in years) {
       GLB_rmax            <- runmax(x = subday$GLB_strict, k = MS$nt, alg = "C")
 
       ## TEST feature
-      CS_ref_rmax_base[    CS_ref_rmax_base    < 0 ] <- NA
-      CS_ref_rmax_VIP_upp[ CS_ref_rmax_VIP_upp < 0 ] <- NA
-      CS_ref_rmax_VIP_low[ CS_ref_rmax_VIP_low < 0 ] <- NA
-      GLB_rmax[            GLB_rmax            < 0 ] <- NA
+      CS_ref_rmax_base[   CS_ref_rmax_base    < 0] <- NA
+      CS_ref_rmax_VIP_upp[CS_ref_rmax_VIP_upp < 0] <- NA
+      CS_ref_rmax_VIP_low[CS_ref_rmax_VIP_low < 0] <- NA
+      GLB_rmax[           GLB_rmax            < 0] <- NA
 
       ##  pass as clear
       # MaxVIP_pass = GLB_rmax < CS_ref_rmax_VIP_upp                                 ## apply only upper filter (default)
@@ -606,14 +606,14 @@ for (yyyy in years) {
           if (is.na(pass)) pass <- FALSE
 
           ## set VIL flag
-          subday$CSRHv14_2_flag[w_sta:w_end][ (!subday$CSRHv14_2_flag[w_sta:w_end] == 0)  &
-                                                ( subday$CSRHv14_2_flag[w_sta:w_end] == 99) &
-                                                pass                                ] <- 0
+          subday$CSRHv14_2_flag[w_sta:w_end][(!subday$CSRHv14_2_flag[w_sta:w_end] == 0)  &
+                                               ( subday$CSRHv14_2_flag[w_sta:w_end] == 99) &
+                                               pass                                ] <- 0
         } ##END for loop all points
         ## store comparison values ?
-        subday$VIL_GLB   <- GLB_length
-        subday$VIL_upp   <- MS$MaxVIL_fct * CS_ref_length + MS$offVIL_upl
-        subday$VIL_low   <- MS$MinVIL_fct * CS_ref_length - MS$offVIL_dwl
+        subday$VIL_GLB <- GLB_length
+        subday$VIL_upp <- MS$MaxVIL_fct * CS_ref_length + MS$offVIL_upl
+        subday$VIL_low <- MS$MinVIL_fct * CS_ref_length - MS$offVIL_dwl
       }
 
       #### if it is not clear is VIL
@@ -633,12 +633,12 @@ for (yyyy in years) {
 
         for (i in indx_todo) {
           ## resolve window by index
-          walk(i, nt_hw , tot_p )
+          walk(i, nt_hw, tot_p)
 
           ## Do calculation ##
           data_win_glb <- subday$GLB_strict[w_sta:w_end]
           DeltaVSq_GLB <- (data.table::shift(data_win_glb) - data_win_glb) ##  /(t_i+i  - t_i)
-          s_bar        <- sum(DeltaVSq_GLB, na.rm = T) / ( MS$nt - 1 )
+          s_bar        <- sum(DeltaVSq_GLB, na.rm = T) / (MS$nt - 1)
 
           GLB_sigma[i] <- sqrt( sum( (s_i[w_sta:w_end] - s_bar)**2 , na.rm = TRUE ) / ( MS$nt - 1 ) ) /
             sum( data_win_glb , na.rm = T) / MS$nt
@@ -648,16 +648,16 @@ for (yyyy in years) {
           if (is.na(pass)) { pass <- FALSE }
 
           ## set VCT flag
-          subday$CSRHv14_2_flag[w_sta:w_end][ ( ! subday$CSRHv14_2_flag[w_sta:w_end] == 0)  &
-                                                (   subday$CSRHv14_2_flag[w_sta:w_end] == 99) &
-                                                pass                                ] <- 0
+          subday$CSRHv14_2_flag[w_sta:w_end][( ! subday$CSRHv14_2_flag[w_sta:w_end] == 0)  &
+                                               (   subday$CSRHv14_2_flag[w_sta:w_end] == 99) &
+                                               pass                                ] <- 0
         } ##END for loop all points
       }
       #### if it is not clear is VCT
       ## set newer flag
-      subday[[paste0("CSRHv14_2_flag_", Flag_key)]][ subday$CSRHv14_2_flag == 99 ] <- TRUE
+      subday[[paste0("CSRHv14_2_flag_", Flag_key)]][subday$CSRHv14_2_flag == 99] <- TRUE
       ## set old flag
-      subday$CSRHv14_2_flag[subday$CSRHv14_2_flag == 99]                           <- Flag_key
+      subday$CSRHv14_2_flag[subday$CSRHv14_2_flag == 99]                         <- Flag_key
     }
 
 
@@ -665,7 +665,7 @@ for (yyyy in years) {
     if (VSM_active) {
       Flag_key  <- 5L
       indx_todo <- which(have_glb)
-      if ( length(indx_todo) > 0 ) {
+      if (length(indx_todo) > 0) {
         ## start with old clear as 99
         subday$CSRHv14_2_flag[subday$CSRHv14_2_flag == 0] <- 99
         x_i_CS <- data.table::shift(CS_ref) - CS_ref
@@ -699,15 +699,15 @@ for (yyyy in years) {
           }
 
           ## set VCT flag
-          subday$CSRHv14_2_flag[w_sta:w_end][ ( !subday$CSRHv14_2_flag[w_sta:w_end] == 0)  &
-                                                (  subday$CSRHv14_2_flag[w_sta:w_end] == 99) &
-                                                pass                                ] <- 0
+          subday$CSRHv14_2_flag[w_sta:w_end][( !subday$CSRHv14_2_flag[w_sta:w_end] == 0)  &
+                                               (  subday$CSRHv14_2_flag[w_sta:w_end] == 99) &
+                                               pass                                ] <- 0
 
         } ##END for loop all points
       }
       #### if it is not clear is VCT
-      subday[[paste0("CSRHv14_2_flag_", Flag_key)]][ subday$CSRHv14_2_flag == 99 ] <- TRUE
-      subday$CSRHv14_2_flag[subday$CSRHv14_2_flag == 99]                           <- Flag_key
+      subday[[paste0("CSRHv14_2_flag_", Flag_key)]][subday$CSRHv14_2_flag == 99] <- TRUE
+      subday$CSRHv14_2_flag[subday$CSRHv14_2_flag == 99]                         <- Flag_key
     }
 
 
@@ -718,28 +718,28 @@ for (yyyy in years) {
       ## probably we know sun was obscured
       subday[CSRHv14_2_flag == 0 &
                HOR_strict < MS$LDIlim,
-             CSRHv14_2_flag := Flag_key ]
+             CSRHv14_2_flag := Flag_key]
 
       subday[CSRHv14_2_flag == 99 &
                HOR_strict < MS$LDIlim,
-             CSRHv14_2_flag := Flag_key ]
+             CSRHv14_2_flag := Flag_key]
 
       subday[HOR_strict < MS$LDIlim,
-             paste0("CSRHv14_2_flag_", Flag_key) := TRUE ]
+             paste0("CSRHv14_2_flag_", Flag_key) := TRUE]
 
       subday[HOR_strict < MS$LDIlim,
-             paste0("CSRHv14_2_flag_", Flag_key) := TRUE ]
+             paste0("CSRHv14_2_flag_", Flag_key) := TRUE]
     }
 
 
     #---- 7. Low Global Irradiance limit (LGI) -----------------------------
     if (LGI_active) {
       Flag_key  <- 7L
-      subday[(CSRHv14_2_flag == 0 ) & (GLB_strict < MS$VGIlim), CSRHv14_2_flag := Flag_key ]
-      subday[(CSRHv14_2_flag == 99) & (GLB_strict < MS$VGIlim), CSRHv14_2_flag := Flag_key ]
+      subday[(CSRHv14_2_flag == 0 ) & (GLB_strict < MS$VGIlim), CSRHv14_2_flag := Flag_key]
+      subday[(CSRHv14_2_flag == 99) & (GLB_strict < MS$VGIlim), CSRHv14_2_flag := Flag_key]
 
-      subday[GLB_strict < MS$VGIlim, paste0("CSRHv14_2_flag_", Flag_key) := TRUE ]
-      subday[GLB_strict < MS$VGIlim, paste0("CSRHv14_2_flag_", Flag_key) := TRUE ]
+      subday[GLB_strict < MS$VGIlim, paste0("CSRHv14_2_flag_", Flag_key) := TRUE]
+      subday[GLB_strict < MS$VGIlim, paste0("CSRHv14_2_flag_", Flag_key) := TRUE]
     }
 
 
@@ -785,21 +785,21 @@ for (yyyy in years) {
     # }
 
     ## Clear sky statistics  -----
-    RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$GLB_strict[clear_sky], na_rm = T)
+    RMSE_r <- rmse_vec(CS_ref_safe[clear_sky], subday$GLB_strict[clear_sky], na_rm = TRUE)
 
-    MBE  <- mean(CS_ref_safe[clear_sky] - subday$GLB_strict[clear_sky], na.rm = T) /
-      mean(subday$GLB_strict[clear_sky], na.rm = T)
+    MBE  <- mean(CS_ref_safe[clear_sky] - subday$GLB_strict[clear_sky], na.rm = TRUE) /
+      mean(subday$GLB_strict[clear_sky], na.rm = TRUE)
 
-    cost <- sum( ( subday$GLB_strict[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = T) /
-      sum(clear_sky, na.rm = T)
+    cost <- sum( ( subday$GLB_strict[clear_sky] - CS_ref_safe[clear_sky] )**2 , na.rm = TRUE) /
+      sum(clear_sky, na.rm = TRUE)
 
 
     ## ID statistics
-    MeanVIPcnt <- sum(subday$CSRHv14_2_flag == 1, na.rm = T)
-    MaxVIPcnt  <- sum(subday$CSRHv14_2_flag == 2, na.rm = T)
-    VILcnt     <- sum(subday$CSRHv14_2_flag == 3, na.rm = T)
-    VCTcnt     <- sum(subday$CSRHv14_2_flag == 4, na.rm = T)
-    VSMcnt     <- sum(subday$CSRHv14_2_flag == 5, na.rm = T)
+    MeanVIPcnt <- sum(subday$CSRHv14_2_flag == 1, na.rm = TRUE)
+    MaxVIPcnt  <- sum(subday$CSRHv14_2_flag == 2, na.rm = TRUE)
+    VILcnt     <- sum(subday$CSRHv14_2_flag == 3, na.rm = TRUE)
+    VCTcnt     <- sum(subday$CSRHv14_2_flag == 4, na.rm = TRUE)
+    VSMcnt     <- sum(subday$CSRHv14_2_flag == 5, na.rm = TRUE)
 
 
 
@@ -929,15 +929,15 @@ for (yyyy in years) {
           cex.main = 1)
 
     legend("topright", bty = "n",
-           legend = c( paste("CS GLB: ", Clear_cnt),
-                       paste("MeanVIP:", MeanVIPcnt),
-                       paste("MaxVIP: ", MaxVIPcnt),
-                       paste("VIL:    ", VILcnt),
-                       paste("VCT:    ", VCTcnt),
-                       paste("VSM:    ", VSMcnt),
-                       paste("LDI:    ", LDIcnt),
-                       paste("VGIlim: ", VGLcnt),
-                       paste("DsT:    ", DsTcnt)   ),
+           legend = c(paste("CS GLB: ", Clear_cnt),
+                      paste("MeanVIP:", MeanVIPcnt),
+                      paste("MaxVIP: ", MaxVIPcnt),
+                      paste("VIL:    ", VILcnt),
+                      paste("VCT:    ", VCTcnt),
+                      paste("VSM:    ", VSMcnt),
+                      paste("LDI:    ", LDIcnt),
+                      paste("VGIlim: ", VGLcnt),
+                      paste("DsT:    ", DsTcnt)   ),
            col    = c("green",
                       kcols[1],
                       kcols[2],
@@ -951,13 +951,13 @@ for (yyyy in years) {
 
 
 
-    ## _ Filter Plots ------------------------------------------------------
+    ## _ Filter Plots  ---------------------------------------------------------
     layou_n <- sum(MeanVIP_active, MaxVIP_active, VIL_active, VCT_active, VSM_active)
     layout(matrix(c(1,2,3,4,5), nrow = layou_n, ncol = 1, byrow = TRUE))
 
     par("mar" = c(.5, 4.2, .5, 1) )
 
-    ## __ 1. Mean value of irradiance during the time period ---------------
+    ## __ 1. Mean value of irradiance during the time period  ------------------
     if (MeanVIP_active & any(have_glb)){
       par("mar" = c(0, 4.2, .5, 1) )
 
@@ -973,7 +973,7 @@ for (yyyy in years) {
       ## new style relative thresholds
       ylim <- range(GLB_rm - CS_ref_rm_base,
                     CS_ref_rm_VIP_low - CS_ref_rm_base,
-                    CS_ref_rm_VIP_upp - CS_ref_rm_base,na.rm = T)
+                    CS_ref_rm_VIP_upp - CS_ref_rm_base, na.rm = TRUE)
       plot(subday$Date, GLB_rm - CS_ref_rm_base,
            pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Mean VIP")
       lines(subday$Date, CS_ref_rm_VIP_low - CS_ref_rm_base, col = kcols[1], lty = 2)
@@ -981,7 +981,7 @@ for (yyyy in years) {
 
     }
 
-    ## __ 2. Max value of irradiance during the time period ----------------
+    ## __ 2. Max value of irradiance during the time period  -------------------
     if (MaxVIP_active & any(have_glb)) {
       par("mar" = c(0, 4.2, 0, 1) )
       ylim <- range(c( MS$MaxVIP_off_upp * 1.7, -MS$MaxVIP_off_low * 1.7  ), na.rm = T)
@@ -993,7 +993,7 @@ for (yyyy in years) {
       text(x = subday$Date[20], y =  MS$MaxVIP_off_upp, labels =  MS$MaxVIP_off_upp, pos = 1)
     }
 
-    ## __ 3. Variability in irradiance by the length (VIL) -----------------
+    ## __ 3. Variability in irradiance by the length (VIL)  --------------------
     if (VIL_active) {
       par("mar" = c(0, 4.2, 0, 1) )
       ## old plots
@@ -1020,7 +1020,7 @@ for (yyyy in years) {
     }
 
     if (VCT_active) {
-      par("mar" = c(0, 4.2, 0, 1) )
+      par("mar" = c(0, 4.2, 0, 1))
       ylim <- range(c(0, MS$offVCT*5), na.rm = T)
       plot(subday$Date, GLB_sigma, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VCT")
       abline(h = MS$offVCT, lty = 2, col = kcols[4] , lwd = 2)
@@ -1028,7 +1028,7 @@ for (yyyy in years) {
     }
 
     if (VSM_active) {
-      par("mar" = c(.5, 4.2, 0, 1) )
+      par("mar" = c(.5, 4.2, 0, 1))
       ylim <- range(c(0, MS$offVSM*5), na.rm = T)
       plot(subday$Date, GLB_Xi, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VSM")
       abline(h = MS$offVSM, lty = 2, col = kcols[5] , lwd = 2)
@@ -1091,6 +1091,11 @@ for (yyyy in years) {
   daily_stats <- daily_stats |> mutate(across(where(is.numeric), ~ ifelse(is.nan(.), NA, .)))
 
   if (Sys.info()["nodename"] == Main.Host) {
+    ## create non standard columns
+    make_new_column(con      = con,
+                    table    = "META",
+                    acolname = "CSRHv14_2_cost",
+                    acoltype = "DECIMAL(18, 13)")
     res <- update_table(con, gather,      "LAP",  "Date")
     res <- update_table(con, daily_stats, "META", "Day")
   }
@@ -1101,7 +1106,7 @@ par(def.par)  # reset to default
 layout(matrix(c(1), nrow = 1, ncol = 1, byrow = TRUE))
 
 #'
-#' | CS Flag | Test |
+#' | CS Flag | Test                                                          |
 #' |:-------:|:--------------------------------------------------------------|
 #' |   NA    | Undefined, untested                                           |
 #' |    0    | Passed as clear sky                                           |
@@ -1126,7 +1131,9 @@ LAP <- tbl(con, "LAP")
 pander(
   LAP |>
     group_by(CSRHv14_2_flag) |>
-    tally() |> collect() |> data.table()
+    tally()                  |>
+    collect()                |>
+    data.table()
 )
 
 
