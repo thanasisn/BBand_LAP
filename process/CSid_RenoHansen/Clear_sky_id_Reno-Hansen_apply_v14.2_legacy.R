@@ -1090,6 +1090,10 @@ for (yyyy in years) {
   daily_stats <- daily_stats |> rename_with(~ paste0("CSRHv14_2_", .), -Day)
   daily_stats <- daily_stats |> mutate_all(~ ifelse(is.nan(.), NA, .))
 
+
+    ## re create date
+    daily_stats$Day <- as.Date(daily_stats$Day, origin = "1970-01-01")
+
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, gather,      "LAP",  "Date")
     res <- update_table(con, daily_stats, "META", "Day")
