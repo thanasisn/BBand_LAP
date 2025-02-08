@@ -1083,15 +1083,16 @@ for (yyyy in years) {
 
   pander(table(gather$CSRHv14_2_flag))
 
+  daily_stats <- daily_stats |> rename("Day" = "Date")
+  daily_stats <- daily_stats |> rename_with(~ paste0("CSRHv14_2_", .), -Day)
+
+
   if (Sys.info()["nodename"] == Main.Host) {
-    res <- update_table(con, gather, "LAP", "Date")
+    res <- update_table(con, gather,      "LAP",  "Date")
+    res <- update_table(con, daily_stats, "META", "Day")
   }
 } ##END year loop
 
-write_RDS(object = daily_stats,
-          file = paste0("/home/athan/DATA/Broad_Band/CS_id/Daily_stats_",
-                        sub("\\.", "_", sub("\\.R$", "", basename(Script.Name))))
-)
 
 par(def.par)  # reset to default
 layout(matrix(c(1), nrow = 1, ncol = 1, byrow = TRUE))

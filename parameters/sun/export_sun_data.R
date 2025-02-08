@@ -124,12 +124,15 @@ if (Sys.info()["nodename"] == Main.Host &
   res <- update_table(con, ADD, "META", "Day")
 }
 
-if (!file.exists(paste0(sunsets_fl, ".Rds")) |
-    file.mtime(paste0(sunsets_fl, ".Rds")) < Sys.time() - 30 * 3600) {
 
-  write_RDS(Sunsets, paste0(sunsets_fl, ".Rds"), notes = Script.Name)
-  write.csv(Sunsets, paste0(sunsets_fl, ".csv"), quote = F)
-}
+# ##  Export sunsets sunrises for legacy use
+# if (!file.exists(paste0(sunsets_fl, ".Rds")) |
+#     file.mtime(paste0(sunsets_fl, ".Rds")) < Sys.time() - 30 * 3600) {
+# 
+#   write_RDS(Sunsets, paste0(sunsets_fl, ".Rds"), notes = Script.Name)
+#   write.csv(Sunsets, paste0(sunsets_fl, ".csv"), quote = F)
+# }
+
 
 ##  Compute daylength  ---------------------------------------------------------
 cat("## Find sunsets and sunrises \n\n")
@@ -145,12 +148,13 @@ if (Sys.info()["nodename"] == Main.Host &
 }
 
 
-if (!file.exists(paste0(daylength_fl, ".Rds")) |
-    file.mtime(paste0(daylength_fl, ".Rds")) < Sys.time() - 30 * 3600) {
-
-  write_RDS(Daylengths, paste0(daylength_fl, ".Rds"), notes = Script.Name)
-  write.csv(Daylengths, paste0(daylength_fl, ".csv"), quote = F)
-}
+# ##  Export daylength for legacy use
+# if (!file.exists(paste0(daylength_fl, ".Rds")) |
+#     file.mtime(paste0(daylength_fl, ".Rds")) < Sys.time() - 30 * 3600) {
+# 
+#   write_RDS(Daylengths, paste0(daylength_fl, ".Rds"), notes = Script.Name)
+#   write.csv(Daylengths, paste0(daylength_fl, ".csv"), quote = F)
+# }
 
 
 ##  Export legacy  -------------------------------------------------------------
