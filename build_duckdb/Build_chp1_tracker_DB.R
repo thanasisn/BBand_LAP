@@ -207,9 +207,10 @@ if (nrow(inp_filelist) > 0) {
     }
 
     step_temp <- merge(dt_azim, dt_elev, all = TRUE)
-    step_temp[, Tracker_event := "Step"]
+    # step_temp[, Tracker_event := "Step"]
+    ## date matching observations
+    step_temp[, Date30 := 30 + as.POSIXct((as.numeric(Date) %/% 60) * 60, origin = "1970-01-01")]
     cat(" p")
-
 
     ## _ Get metadata for steps file  --------------------------------------
     step_meta <- data.table(Day                 = step_temp[, unique(as.Date(Date))],
@@ -280,6 +281,7 @@ setorder(inp_filelist, Day)
 inp_filelist <- inp_filelist[Day < as.Date(Sys.Date())]
 cat("\n**Parse:",paste(nrow(inp_filelist), "Tracker steps files**\n\n"))
 
+stop("check steps")
 
 ## _ Import Async files  -------------------------------------------------------
 if (nrow(inp_filelist) > 0) {
@@ -324,7 +326,9 @@ if (nrow(inp_filelist) > 0) {
     }
 
     sync_temp <- rbind(dt_azim, dt_elev, fill = TRUE)
-    sync_temp[, Tracker_event := "Async"]
+    # sync_temp[, Tracker_event := "Async"]
+
+    stop("date30")
     cat(" p")
 
 
@@ -354,27 +358,39 @@ if (nrow(inp_filelist) > 0) {
   }
 }
 
-stop()
 
 
-## Inspect data
+##  Inspect data  --------------------------------------------------------------
 source("~/CODE/FUNCTIONS/R/data.R")
 
+SS <- tbl(con, "TRACKER_Steps")
 
-SS <- data.table(open_dataset(DB_Steps_DIR) |>  collect())
 
-stdate <- min(SS$Date) - 120
-eddate <- max(SS$Date) + 120
+datesr <- SS |> summarise(
+  stdate = min(Date, na.rm = TRUE),
+  eddate = max(Date, na.rm = TRUE)
+) |> collect()
 
+stdate <- datesr$stdate - 120
+eddate <- datesr$eddate + 120
+
+
+stop()
+
+broad  <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 BB <- data.table(open_dataset(DB_DIR)                      |>
                    filter(Date > stdate & Date < eddate) |>
                    select(Date, Elevat, Azimuth)         |> collect())
 
 
-## Check mimutes and steps takem
+## Check minutes and steps taken
 
-ST <- SS[Tracker_event == "Step"]
+SS <- SS |> filter(Tracker_event== "Step")
+
+SS |> mutate(
+  Date30 := 30 + as.POSIXct((as.numeric(Date) %/% 60) * 60)
+)
 
 ST[, Date30 := 30 + as.POSIXct((as.numeric(Date) %/% 60) * 60, origin = "1970-01-01") ]
 
