@@ -154,7 +154,7 @@ plotsbase <- paste0("~/BBand_LAP/REPORTS/DAILY/CSid_RenoHansen/",
 par(mar = c(2, 4, 2, 1))
 
 
-##  Load all data from duckdb  -------------------------------------------------
+##  Load all data from duckdb  -----------------------------------------------------
 if (Sys.info()["nodename"] == Main.Host) {
   con <- dbConnect(duckdb(dbdir = DB_BROAD))
 } else {
@@ -408,7 +408,7 @@ for (yyyy in years) {
   #' ### Baseline value for direct irradiance
   #'
   #' See: Clear sky direct normal irradiance estimation based on adjustable inputs and error correction_Zhu2019.pdf
-  strong[, CS_ref_HOR := (TSI_TOA * 0.7 ^ AM(SZA) ^ 0.678) * cosde(SZA)]
+  strong[, CS_ref_HOR := (TSI_TOA * 0.7 ^ AM(SZA) ^ 0.678) * cosde(SZA) ]
   #+ include=T, echo=F
 
   ## add id column
@@ -417,12 +417,12 @@ for (yyyy in years) {
   ##  Iterate all days
   for (aa in subdayslist) {
     ## Day variables
-    aday  <- as.Date(aa, origin = "1970-01-01")
+    aday  <- as.Date(aa , origin = "1970-01-01")
     sell  <- as.Date(strong$Date) == aday
     doy   <- as.numeric(format(aday, "%j"))
     mont  <- as.numeric(format(aday, "%m"))
     nt_hw <- MS$nt %/% 2
-    if (interactive()) cat(paste(aday), "\n")
+    if (interactive()) cat(paste(aday),"\n")
     status_msg(ScriptName = Script.Name, msg = c(paste(aday), length(subdayslist)))
 
     if (MONTHLY) {
@@ -1091,7 +1091,6 @@ for (yyyy in years) {
   daily_stats <- daily_stats |> mutate(across(where(is.numeric), ~ ifelse(is.nan(.), NA, .)))
 
   if (Sys.info()["nodename"] == Main.Host) {
-    make_new_column(con = con, table = "META", acolname = "CSRHv14_2_cost", acoltype = "DECIMAL(18, 13)")
     res <- update_table(con, gather,      "LAP",  "Date")
     res <- update_table(con, daily_stats, "META", "Day")
   }
