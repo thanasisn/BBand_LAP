@@ -378,6 +378,9 @@ eddate <- datesr$eddate + 120
 stop()
 
 broad  <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
+tbl(broad, "LAP") |>
+  filter(Date > stdate & Date < eddate) |>
+  select(Date, Elevat, Azimuth)
 
 BB <- data.table(open_dataset(DB_DIR)                      |>
                    filter(Date > stdate & Date < eddate) |>
