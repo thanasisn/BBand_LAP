@@ -47,17 +47,21 @@ info "##  End QCRad ThanaisN STATUS:$?  ##"
 
 info "##  Start inspect_duckdb  ##"
 "$HOME/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R"
-info "##  End inspect_duckdb STATUS:$?  ##"
+info "##  End Inspect_BB_DB.R STATUS:$?  ##"
 
 
-info "##  Start CSid_RenoHansen  ##"
+info "##  Start CSid_RenoHansen_run.R  ##"
 "$HOME/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_run.R"
-info "##  End CSid_RenoHansen STATUS:$?  ##"
+info "##  End CSid_RenoHansen_run.R STATUS:$?  ##"
 
 
 info "##  Start Trends_A  ##"
 "$HOME/BBand_LAP/process/Trends_A/Trends_A_run.R"
 info "##  End Trends_A STATUS:$?  ##"
+
+info "##  Start other process  ##"
+"$HOME/BBand_LAP/process/Process_BB_DB.R"
+info "##  End Process_BB_DB.R STATUS:$?  ##"
 
 
 info "#### END $0 ####"
