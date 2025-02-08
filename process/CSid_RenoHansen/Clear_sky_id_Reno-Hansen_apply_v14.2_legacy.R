@@ -95,6 +95,9 @@ library(pander,       warn.conflicts = FALSE, quietly = TRUE)
 library(scales,       warn.conflicts = FALSE, quietly = TRUE)
 library(yardstick,    warn.conflicts = FALSE, quietly = TRUE)
 
+## TESTS
+warning("THIS IS A TEST")
+Main.Host <- Sys.info()["nodename"]
 
 ## some plot configs ####
 def.par <- par(no.readonly = TRUE) # save default, for resetting...
@@ -1085,7 +1088,7 @@ for (yyyy in years) {
 
   daily_stats <- daily_stats |> rename("Day" = "Date")
   daily_stats <- daily_stats |> rename_with(~ paste0("CSRHv14_2_", .), -Day)
-
+  daily_stats <- daily_stats |> mutate_all(~ ifelse(is.nan(.), NA, .))
 
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, gather,      "LAP",  "Date")
