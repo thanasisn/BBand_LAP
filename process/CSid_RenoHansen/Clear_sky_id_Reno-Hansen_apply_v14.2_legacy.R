@@ -1085,14 +1085,14 @@ for (yyyy in years) {
   gather[, Date := as.POSIXct(Date, origin = "1970-01-01")]
 
   pander(table(gather$CSRHv14_2_flag))
-stop()
+
   daily_stats <- daily_stats |> rename("Day" = "Date")
   daily_stats <- daily_stats |> rename_with(~ paste0("CSRHv14_2_", .), -Day)
-  daily_stats <- daily_stats |> mutate_all(~ ifelse(is.nan(.), NA, .))
+  daily_stats <- daily_stats |> mutate(across(where(is.numeric), ~ ifelse(is.nan(.), NA, .)))
 
   ## re create date
-  daily_stats$Day <- as.Date(daily_stats$Day, origin = "1970-01-01")
-stop()
+  # daily_stats$Day <- as.Date(daily_stats$Day, origin = "1970-01-01")
+
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, gather,      "LAP",  "Date")
     res <- update_table(con, daily_stats, "META", "Day")
