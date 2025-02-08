@@ -110,7 +110,7 @@ create_missing_columns <- function(con, new_data, table, quiet = TRUE) {
 
 
 
-#' Create a null column eve if exists
+#' Create a null column even if it already exists
 #'
 #' @param con      A connection to duckdb
 #' @param table    The name of the table to create column in
@@ -153,16 +153,17 @@ make_null_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)")
 #' @return Nothing create the column with an SQL query
 #' @export
 #'
-make_new_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") {
-
-  if (any(dbListFields(con, table) %in% acolname)) {
+make_new_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)")
+{
+  if (any(dbListFields(con, table) %in% acolname))
+  {
     cat(" Column ", acolname, " already exist! >> No new column to be created!! <<\n\n")
     return()
   } else {
     ## create new columns with a query
-    qq <- paste0("ALTER TABLE  ",   table,
-                 "  ADD COLUMN  ",  acolname,
-                 "  ",              acoltype,
+    qq <- paste0("ALTER TABLE  ",  table,
+                 "  ADD COLUMN  ", acolname,
+                 "  ",             acoltype,
                  "  DEFAULT null")
     cat(qq, "\n\n")
     res <- dbSendQuery(con, qq)
@@ -181,9 +182,10 @@ make_new_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)") 
 #' @return           Nothing, it creates an categorical column in the data base
 #' @export
 #'
-make_categorical_column <- function(flagname, categories, con, table) {
-
-  if (any(dbListFields(con, table) %in% flagname)) {
+make_categorical_column <- function(flagname, categories, con, table)
+{
+  if (any(dbListFields(con, table) %in% flagname))
+  {
     cat(" Column ", flagname, " already exist! >> No new column to be created!! <<\n\n")
     return()
   } else {
@@ -203,9 +205,9 @@ make_categorical_column <- function(flagname, categories, con, table) {
     res <- dbSendQuery(con, qq)
 
     ## add a column for the "enum" type
-    qq <- paste0("ALTER TABLE  ",   table,
-                 "  ADD COLUMN  ",  flagname,
-                 "  ",              flagname,
+    qq <- paste0("ALTER TABLE  ",  table,
+                 "  ADD COLUMN  ", flagname,
+                 "  ",             flagname,
                  "  DEFAULT 'empty'")
     cat(qq, "\n\n")
     res <- dbSendQuery(con, qq)

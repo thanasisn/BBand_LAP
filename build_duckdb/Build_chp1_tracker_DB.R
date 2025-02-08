@@ -100,6 +100,15 @@ con   <- dbConnect(duckdb(dbdir = DB_TRACKER))
 
 if (!dbExistsTable(con, "TRACKER_Steps")) {
   dbExecute(con, "CREATE TABLE TRACKER_Steps (Date TIMESTAMP)")
+  ##  Create non default columns
+  make_new_column(con      = con,
+                  table    = "TRACKER_Steps",
+                  acolname = "Step_feq_Azim",
+                  acoltype = "DECIMAL(18, 13)")
+  make_new_column(con      = con,
+                  table    = "TRACKER_Steps",
+                  acolname = "Step_feq_Elev",
+                  acoltype = "DECIMAL(18, 13)")
 }
 
 if (!dbExistsTable(con, "TRACKER_META_Steps")) {
@@ -113,7 +122,6 @@ if (!dbExistsTable(con, "TRACKER_Async")) {
 if (!dbExistsTable(con, "TRACKER_META_Async")) {
   dbExecute(con, "CREATE TABLE TRACKER_META_Async (Day DATE)")
 }
-
 
 
 
@@ -201,6 +209,7 @@ if (nrow(inp_filelist) > 0) {
     step_temp <- merge(dt_azim, dt_elev, all = TRUE)
     step_temp[, Tracker_event := "Step"]
     cat(" p")
+
 
     ## _ Get metadata for steps file  --------------------------------------
     step_meta <- data.table(Day                 = step_temp[, unique(as.Date(Date))],
