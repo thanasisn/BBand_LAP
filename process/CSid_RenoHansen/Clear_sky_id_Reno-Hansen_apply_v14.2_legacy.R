@@ -154,6 +154,9 @@ par(mar = c(2, 4, 2, 1))
 ##  Load all data from duckdb  -------------------------------------------------
 if (Sys.info()["nodename"] == Main.Host) {
   con <- dbConnect(duckdb(dbdir = DB_BROAD))
+
+  ## create non standard columns
+  make_new_column(con, "META", "CSRHv14_2_cost", "DECIMAL(18, 12)") ## cost gets up to 6 digits
 } else {
   con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 }
@@ -944,19 +947,20 @@ for (yyyy in years) {
                       kcols[6],
                       kcols[7],
                       kcols[11]),
-           pch    = c(8) ,cex = 1.1)
+           pch    = c(8),
+           cex    = 1.1)
 
 
 
     ## _ Filter Plots  ---------------------------------------------------------
     layou_n <- sum(MeanVIP_active, MaxVIP_active, VIL_active, VCT_active, VSM_active)
-    layout(matrix(c(1,2,3,4,5), nrow = layou_n, ncol = 1, byrow = TRUE))
+    layout(matrix(c(1, 2, 3, 4, 5), nrow = layou_n, ncol = 1, byrow = TRUE))
 
-    par("mar" = c(.5, 4.2, .5, 1) )
+    par("mar" = c(.5, 4.2, .5, 1))
 
     ## __ 1. Mean value of irradiance during the time period  ------------------
-    if (MeanVIP_active & any(have_glb)){
-      par("mar" = c(0, 4.2, .5, 1) )
+    if (MeanVIP_active && any(have_glb)) {
+      par("mar" = c(0, 4.2, .5, 1))
 
       # ## Old style offset thresholds
       # ylim <- range(c( - MS$CS_ref_rm_VIP_low * 1.7, MS$CS_ref_rm_VIP_upp * 1.7 ), na.rm = T)
@@ -975,12 +979,11 @@ for (yyyy in years) {
            pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Mean VIP")
       lines(subday$Date, CS_ref_rm_VIP_low - CS_ref_rm_base, col = kcols[1], lty = 2)
       lines(subday$Date, CS_ref_rm_VIP_upp - CS_ref_rm_base, col = kcols[1], lty = 2)
-
     }
 
     ## __ 2. Max value of irradiance during the time period  -------------------
-    if (MaxVIP_active & any(have_glb)) {
-      par("mar" = c(0, 4.2, 0, 1) )
+    if (MaxVIP_active && any(have_glb)) {
+      par("mar" = c(0, 4.2, 0, 1))
       ylim <- range(c( MS$MaxVIP_off_upp * 1.7, -MS$MaxVIP_off_low * 1.7  ), na.rm = T)
       plot(  subday$Date, GLB_rmax - CS_ref_rmax_base , pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "Max VIP")
       abline( h =   MS$MaxVIP_off_upp, lty = 2, col = kcols[2], lwd = 2)
@@ -992,7 +995,7 @@ for (yyyy in years) {
 
     ## __ 3. Variability in irradiance by the length (VIL)  --------------------
     if (VIL_active) {
-      par("mar" = c(0, 4.2, 0, 1) )
+      par("mar" = c(0, 4.2, 0, 1))
       ## old plots
       # ylim <- range(c( MS$offVIL_upl * 1.7, - MS$offVIL_dwl * 1.7), na.rm = T )
       # plot( subday$Date,  GLB_length - CS_ref_length, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL (3)")
@@ -1005,10 +1008,10 @@ for (yyyy in years) {
 
       ## new plots
       if (any(grepl("VIL_", names(subday)))) {
-        ylim <- range(subday[, .(VIL_low, VIL_upp)], na.rm = T)
+        ylim <- range(subday[, .(VIL_low, VIL_upp)], na.rm = TRUE)
         ylim <- c(- abs(max(ylim)), 2 * abs(max(ylim)))
 
-        plot( subday$Date, subday$VIL_GLB, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL" )
+        plot( subday$Date, subday$VIL_GLB, pch = 18, cex = .8, col = "green", ylim = ylim, ylab = "VIL")
         lines(subday$Date, subday$VIL_upp, lty = 3, col = kcols[3], lwd = 2)
         lines(subday$Date, subday$VIL_low, lty = 2, col = kcols[3], lwd = 2)
       } else {
@@ -1090,11 +1093,6 @@ for (yyyy in years) {
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, gather,      "LAP",  "Date")
 
-    ## create non standard columns
-    make_new_column(con      = con,
-                    table    = "META",
-                    acolname = "CSRHv14_2_cost",
-                    acoltype = "DECIMAL(18, 13)")
     res <- update_table(con, daily_stats, "META", "Day")
   }
 } ##END year loop
