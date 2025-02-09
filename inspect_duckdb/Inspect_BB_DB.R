@@ -117,14 +117,12 @@ try({
 
 
 ## __ Plot daily radiation  ----------------------------------------------------
-# source("~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R")
 try({
   cat("\n\n 30. Plot daily radiation\n")
   render(input         = "~/BBand_LAP/inspect_duckdb/30_Plot_daily_CHP1_L1.R",
          output_format = output_format,
          output_dir    = output_dir)
 })
-# source("~/BBand_LAP/inspect_duckdb/31_Plot_daily_CM21_L1.R")
 try({
   cat("\n\n 31. Plot daily radiation\n")
   render(input         = "~/BBand_LAP/inspect_duckdb/31_Plot_daily_CM21_L1.R",
@@ -132,11 +130,22 @@ try({
          output_dir    = output_dir)
 })
 
+
 if (as.numeric(Sys.Date()) %% run_days == 0)
 {
   try({
     cat("\n\n 60. Inspect CM-21/TOT radiation\n")
     render(input         = "~/BBand_LAP/inspect_duckdb/60_Inspect_TOT_GLB.R",
+           output_format = output_format,
+           output_dir    = output_dir)
+  })
+}
+
+if (as.numeric(Sys.Date()) %% run_days == 0)
+{
+  try({
+    cat("\n\n 70. Inspect Level 1 data statistics\n")
+    render(input         = "~/BBand_LAP/inspect_duckdb/70_Level_1_stats.R",
            output_format = output_format,
            output_dir    = output_dir)
   })
