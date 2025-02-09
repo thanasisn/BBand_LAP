@@ -44,9 +44,9 @@ try({
                     output_dir = output_dir)
 })
 
-
-##  This will be removed  ------------------------------------------------------
-source("~/BBand_LAP/parameters/TSI/30_Export_LAP_TSI_legacy.R")
+## Export data used in some articles
+# ##  This will be removed  ------------------------------------------------------
+# source("~/BBand_LAP/parameters/TSI/30_Export_LAP_TSI_legacy.R")
 
 
 tac <- Sys.time()
