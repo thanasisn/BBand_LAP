@@ -1091,12 +1091,13 @@ for (yyyy in years) {
   daily_stats <- daily_stats |> mutate(across(where(is.numeric), ~ ifelse(is.nan(.), NA, .)))
 
   if (Sys.info()["nodename"] == Main.Host) {
+    res <- update_table(con, gather,      "LAP",  "Date")
+
     ## create non standard columns
     make_new_column(con      = con,
                     table    = "META",
                     acolname = "CSRHv14_2_cost",
                     acoltype = "DECIMAL(18, 13)")
-    res <- update_table(con, gather,      "LAP",  "Date")
     res <- update_table(con, daily_stats, "META", "Day")
   }
 } ##END year loop
