@@ -1,5 +1,5 @@
 
-## Define the names and descriptions of the varariables
+## Define the names and descriptions of the variables
 
 ##  BB DB Dictionary  ----------------------------------------------------------
 dict_BB_DB <- list(
@@ -38,17 +38,17 @@ tot_glb               = c("GHI Sirena",                "GHI from Sirena",       
 tot_glb_sd            = c("GHI Sirena SD",             "GHI from Sirena SD",                                 "GHI from Sirena SD",                                                          "float"),
 lap_sza               = c("SZA Sirena",                "SZA from Sirena",                                    "SZA from Sirena",                                                             "float"),
 DIR_SD_wpsm           = c("DNI SD",                    "Direct Normal Irradiance SD",                        "Direct Normal Irradiance SD",                                                 "float"),
-DIR_strict            = c("DNI QCRad",                 "Direct Normal Irradiance no negagives",              "Direct Normal Irradiance where negative values were replaced with zeros",     "float"),
+DIR_strict            = c("DNI QCRad",                 "Direct Normal Irradiance no negatives",              "Direct Normal Irradiance where negative values were replaced with zeros",     "float"),
 DIR_wpsm              = c("DNI",                       "Direct Normal Irradiance",                           "Direct Normal Irradiance",                                                    "float"),
 DIR_wpsm_temp_cor     = c("DNI temp. cor.",            "Direct Normal Irradiance Temperature corrected",     "Direct Normal Irradiance Temperature corrected",                              "float"),
 GLB_SD_wpsm           = c("GHI SD",                    "Global Horizontal Irradiance SD",                    "Global Horizontal Irradiance SD",                                             "float"),
-GLB_strict            = c("GHI QCRad",                 "Global Horizontal Irradiance no negagives",          "Global Horizontal Irradiance where negative values were replaced with zeros", "float"),
+GLB_strict            = c("GHI QCRad",                 "Global Horizontal Irradiance no negatives",          "Global Horizontal Irradiance where negative values were replaced with zeros", "float"),
 GLB_wpsm              = c("GHI",                       "Global Horizontal Irradiance",                       "Global Horizontal Irradiance",                                                "float"),
 GLBINC_SD_wpsm        = c("Inc. GHI SD",               NA,                                                   NA,                                                                            NA),
 GLBINC_strict         = c("Inc. GHI QCRad",            NA,                                                   NA,                                                                            NA),
 GLBINC_wpsm           = c("Inc. GHI",                  NA,                                                   NA,                                                                            NA),
 HOR_SD_wpsm           = c("DHI SD",                    "Direct Horizontal Irradiance SD",                    "Direct Horizontal Irradiance SD",                                             "float"),
-HOR_strict            = c("DHI QCRad",                 "Direct Horizontal Irradiance no negagives",          "Direct Horizontal Irradiance where negative values were replaced with zeros", "float"),
+HOR_strict            = c("DHI QCRad",                 "Direct Horizontal Irradiance no negatives",          "Direct Horizontal Irradiance where negative values were replaced with zeros", "float"),
 HOR_wpsm              = c("DHI",                       "Direct Horizontal Irradiance",                       "Direct Horizontal Irradiance",                                                "float"),
 HOR_wpsm_temp_cor     = c("DHI temp. cor.",            "Direct Horizontal Irradiance Temperature corrected", "Direct Horizontal Irradiance Temperature corrected",                          "float"),
 DIFF_strict           = c("Diffuse Ir.",               "Diffuse Irradiance",                                 "Diffuse Irradiance",                                                          "float"),
@@ -87,7 +87,7 @@ Relative_diffuse      = c("Relative Diffuse",          NA,                      
 
 
 
-#' Get nice name for a variable in BB DB
+#' Get nice name for a variable used in BB DB
 #'
 #' @param x    Name of a column
 #' @param type What to return one of c("short", "long", "description", "data")
@@ -100,17 +100,16 @@ tr_var <- function(x, type = "short") {
   types <- c("short", "long", "description", "data")
 
   if (!type %in% types) {
-    cat("No such column:", type, "\n")
+    cat("No such type:", type, "\n")
     return(NA)
   }
 
   ty  <- which(type == types)
   res <- c()
   for (ax in x) {
-    res <- c(res,
-             as.vector(
-               unlist(dict_BB_DB[str_detect(ax, names(dict_BB_DB))])[[ty]]
-             )
+    res <- c(
+      res,
+      as.vector(unlist(dict_BB_DB[str_detect(ax, names(dict_BB_DB))])[[ty]])
     )
   }
   return(res)
