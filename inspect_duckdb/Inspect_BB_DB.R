@@ -139,13 +139,17 @@ if (as.numeric(Sys.Date()) %% run_days == 0)
            output_format = output_format,
            output_dir    = output_dir)
   })
-}
 
-if (as.numeric(Sys.Date()) %% run_days == 0)
-{
   try({
     cat("\n\n 70. Inspect Level 1 data statistics\n")
     render(input         = "~/BBand_LAP/inspect_duckdb/70_Level_1_stats.R",
+           output_format = output_format,
+           output_dir    = output_dir)
+  })
+
+  try({
+    cat("\n\n 71. Inspect Level 2 data statistics\n")
+    render(input         = "~/BBand_LAP/inspect_duckdb/71_Level_2_stats.R",
            output_format = output_format,
            output_dir    = output_dir)
   })
