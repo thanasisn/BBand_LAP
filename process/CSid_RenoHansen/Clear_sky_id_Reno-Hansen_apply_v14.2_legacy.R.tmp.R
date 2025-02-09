@@ -154,6 +154,12 @@ par(mar = c(2, 4, 2, 1))
 ##  Load all data from duckdb  -------------------------------------------------
 if (Sys.info()["nodename"] == Main.Host) {
   con <- dbConnect(duckdb(dbdir = DB_BROAD))
+
+  ## create non standard columns
+  make_new_column(con      = con,
+                  table    = "META",
+                  acolname = "CSRHv14_2_cost",
+                  acoltype = "DECIMAL(18, 12)")
 } else {
   con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 }
@@ -1090,11 +1096,6 @@ for (yyyy in years) {
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, gather,      "LAP",  "Date")
 
-    ## create non standard columns
-    make_new_column(con      = con,
-                    table    = "META",
-                    acolname = "CSRHv14_2_cost",
-                    acoltype = "DECIMAL(18, 13)")
     res <- update_table(con, daily_stats, "META", "Day")
   }
 } ##END year loop
