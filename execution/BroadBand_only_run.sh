@@ -26,9 +26,6 @@ echo "###################################"
 echo "####    $(date +"%F %T")    ####"
 echo "###################################"
 
-## ignore errors
-set +e
-
 
 info "##  Start build_duckdb  ##"
 "$HOME/BBand_LAP/build_duckdb/Build_BB_DB.R"
@@ -59,7 +56,8 @@ info "##  Start Trends_A  ##"
 "$HOME/BBand_LAP/process/Trends_A/Trends_A_run.R"
 info "##  End Trends_A STATUS:$?  ##"
 
-info "##  Start other process  ##"
+
+info "##  Start other processes  ##"
 "$HOME/BBand_LAP/process/Process_BB_DB.R"
 info "##  End Process_BB_DB.R STATUS:$?  ##"
 
