@@ -37,7 +37,14 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 
 cat("\n Extend TSI data for LAP with TSIS\n\n")
 
-# Data file:      /home/athan/DATA/SUN/TSI_COMPOSITE.Rds
+#'
+#' Data file: /home/athan/DATA/SUN/TSI_COMPOSITE.Rds
+#'
+#' This was used in some articles as input.
+#'
+
+# File structure:
+#
 # $ Date             : POSIXct, format: "1993-01-01 00:00:30" "1993-01-01 00:01:30" ...
 # $ sun_dist         : num  0.983 0.983 0.983 0.983 0.983 ...
 # $ TSIextEARTH_comb : num  NA NA NA NA NA NA NA NA NA NA ...
