@@ -1,9 +1,6 @@
 
 #### Paths ####
 tag                      <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
-variables_fl             <- "./DHI_GHI_0_variables.R"
-data_procsess_fl         <- "./DHI_GHI_0_data_input.R"
-
 
 ## https://www.rapidtables.com/calc/time/days-in-year.html
 # Days_of_year             <- 365.25   ## Mean Julian year
