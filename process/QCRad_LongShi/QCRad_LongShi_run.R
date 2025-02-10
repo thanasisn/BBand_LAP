@@ -16,7 +16,6 @@ library(rmarkdown)
 
 ## Run every nth day
 run_days <- 10
-run_days <- 1
 
 ##  Run tests  -----------------------------------------------------------------
 # source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T01_v10.R")
