@@ -1,5 +1,4 @@
 
-source("./DHI_GHI_0_variables.R")
 
 ##  Prepare raw data if needed  ------------------------------------------------
 ## check previous steps

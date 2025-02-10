@@ -72,7 +72,7 @@ tic <- Sys.time()
 Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_01_raw_data_analysis.R"
 
 if (!interactive()) {
-  pdf(file = paste0("~/BBand_LAP/REPORTS/REPORTS/Trends_A", basename(sub("\\.R$", ".pdf", Script.Name))))
+  pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
