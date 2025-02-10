@@ -15,7 +15,6 @@ library(rmarkdown)
 
 ## Run every nth day
 run_days <- 10
-run_days <- 1
 
 if (as.numeric(Sys.Date()) %% run_days == 0)
 {
