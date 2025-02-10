@@ -66,7 +66,7 @@ knitr::opts_chunk$set(tidy = TRUE,
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_02_daily_data.R"
+Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_04_monthly_data.R"
 
 if (!interactive()) {
   pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -87,30 +87,16 @@ library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
 #+ include=T, echo=F, results="asis"
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_BROAD))
+if (Sys.info()["nodename"] == Main.Host) {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD))
+} else {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
+}
 
-LAP  <- tbl(con, "LAP")
 META <- tbl(con, "META") |> select(Day, Daylength)
 
 
-LAP <- LAP |>
-  filter(SKY %in% c("Cloud", "Clear")) |>  ## only data for trends
-  select(
-    Date,
-    ends_with("_trnd_A"),
-    ends_with("_strict"),
-    Decimal_date,
-    TSI,
-    Day,
-    SKY
-  )
-
-##  Create data sets  ----------------------------------------------------------
-##  cloud and clear are prepared for this analysis
-ALL   <- LAP |>                           select(-SKY)
-CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
-CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
-
+##  Create monthly data sets  ---------------------------------------------------
 vars <- c(
   "DIR_trnd_A",
   "HOR_trnd_A",
@@ -118,24 +104,20 @@ vars <- c(
   "DIFF_trnd_A"
 )
 
-vars_obs <- c(
-  "GLB_strict",
-  "DIR_strict"
-)
+dbs <- grep("Trend_A_DAILY", dbListTables(con), value = TRUE)
 
-dbs <- c(
-  "ALL",
-  "CLOUD",
-  "CLEAR"
-)
-
-##  Create daily values  -------------------------------------------------------
+##  Create monthly values  -------------------------------------------------------
 for (DBn in dbs) {
-  DATA <- get(DBn)
+  DATA <- tbl(con, DBn)
+  type <- sub(".*_", "", DBn)
+
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily means", var_name(DBn), "\n\n"))
 
-  ## Create daily values and stats
+  DATA |> colnames()
+
+  stop()
+  ## Create monthly values and stats
   DAILY <- DATA   |>
     group_by(Day) |>
     summarise(
@@ -152,10 +134,6 @@ for (DBn in dbs) {
       Day_N = n()
     )
 
-  ## Add daylength and load all data
-  DAILY <- left_join(
-    DAILY, META, by = "Day"
-  ) |> collect() |> data.table()
 
 
   ## inspect fill ratios for observations
@@ -167,7 +145,6 @@ for (DBn in dbs) {
        main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
        ylab = "Valid data ratio")
 
-  if (Sys.info()["nodename"] == Main.Host) {
     ## Store daily values as is
     tbl_name <- paste0("Trend_A_DAILY_", DBn)
     if (dbExistsTable(con , tbl_name)) {
@@ -177,7 +154,6 @@ for (DBn in dbs) {
     dbCreateTable(conn = con, name = tbl_name, DAILY)
     res <- insert_table(con, DAILY, tbl_name, "Day")
     cat("\n Created", tbl_name, "\n\n")
-  }
 }
 
 ##  Daily data representation  -------------------------------------------------
