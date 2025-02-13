@@ -1,17 +1,5 @@
-# /* #!/usr/bin/env Rscript */
-# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
-#' ---
-#' title:         "Trends of SDR in Thessaloniki "
-#' author:
-#'   - Natsis Athanasios^[Laboratory of Atmospheric Physics, AUTH, natsisphysicist@gmail.com]
-#'   - Alkiviadis Bais^[Laboratory of Atmospheric Physics, AUTH]
-#' abstract:
-#'   "Study of GHI and DNI radiation for 'clear sky' and all sly conditions."
-#'
-#' ---
-stop()
 
-
+02
 
 #+ echo=F, include=T
 library(fANCOVA,    quietly = TRUE, warn.conflicts = FALSE)
@@ -27,36 +15,12 @@ source("~/CODE/FUNCTIONS/R/cor_test_stats.R")
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/CODE/FUNCTIONS/R/data.R")
 
-
-## __ Source initial scripts ---------------------------------------------------
 source("./DHI_GHI_0_variables.R")
 source("./var_translation.R")
 
-## check previous steps
-if (! file.exists(I1_longterm) |
-    file.mtime(I1_longterm) < file.mtime("./DHI_GHI_0_variables.R") |
-    file.mtime(I1_longterm) < file.mtime("./DHI_GHI_00_raw_data.R") |
-    file.mtime(I1_longterm) < file.mtime("./DHI_GHI_01_Input_longterm.R") )
-{
-    # source("./DHI_GHI_01_Input_longterm.R")
-    tryCatch(source("./DHI_GHI_01_Input_longterm.R"), exit=function(cond) {
-        message( conditionMessage(cond) )
-    })
-    dummy <- gc()
-}
-
-## load data
-load(I1_longterm)
-
-
-
-## choose to grid some plots
-FIGURESGRID <- TRUE
-# FIGURESGRID <- FALSE
 
 ## choose loess criterion for span
 LOESS_CRITERIO <-  c("aicc", "gcv")[1]
-
 
 ALL_1_daily_DESEAS[           GLB_att_des == 0]
 CLOUD_1_daily_DESEAS[         GLB_att_des == 0]
@@ -66,7 +30,6 @@ CLEAR_1_daily_DESEAS[         GLB_att_des == 0, GLB_att_des := NA]
 
 
 
-#+ echo=F, include=T
 #'
 #' ## 1. Long term anomaly trends
 #'
@@ -96,8 +59,6 @@ data_list <- c(  "ALL_1_D_monthly_DESEAS",
                      "ALL_1_daily_DESEAS",
                    "CLEAR_1_daily_DESEAS",
                    "CLEAR_1_daily_DESEAS")
-
-
 
 
 ## __ Plot data trends  --------------------------------------------------------

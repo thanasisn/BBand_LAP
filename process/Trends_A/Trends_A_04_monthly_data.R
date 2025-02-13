@@ -163,82 +163,60 @@ for (DBn in dbs) {
 }
 
 
-stop("wait")
+##  Monthly data representation  -------------------------------------------------
+dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 
-##  Daily data representation  -------------------------------------------------
-warning("This breaks other variables for Clear and Cloud!! This is only for GHI")
 
 #'
-#' We choose to use a ratio of `r Cloud_daily_ratio_lim` to set the
-#' sky type characterization for the whole day.
-#'
-#' **Daily data representation applied only on GHI!!**
-#' i.e. GLB_trnd_A_mean for CLOUD and CLEAR
+#' We choose to use monthly values only if `r Monthly_aggegation_N_lim` days
+#' with data exist for each month.
 #'
 
-CLOUD <- tbl(con, "Trend_A_DAILY_CLOUD")
-CLOUD <- CLOUD |>
-  mutate(
-    GLB_trnd_A_mean := case_when(
-      GLB_trnd_A_N / Daylength >  Cloud_daily_ratio_lim ~ GLB_trnd_A_mean,
-      GLB_trnd_A_N / Daylength <= Cloud_daily_ratio_lim ~ NA )
-  )
-if (Sys.info()["nodename"] == Main.Host) {
-  res <- update_table(con, CLOUD, "Trend_A_DAILY_CLOUD", "Day")
+for (DBn in dbs) {
+  DATA <- tbl(con, DBn) |> collect() |> data.table()
+  type <- sub(".*_", "", DBn)
+
+  varstochech <- DATA |> select(contains("_mean_mean")) |> colnames()
+
+  ## set means on days with less than n days to NA
+  for (av in varstochech) {
+    paste(av)
+    tv <- paste0(sub("_mean$", "", av), "_N")
+    DATA[get(tv) < Monthly_aggegation_N_lim, eval(av) := NA ]
+  }
+
+  ## store data to db
+  dbRemoveTable(con, DBn)
+  dbCreateTable(conn = con, name = DBn, DATA)
+  res <- insert_table(con, DATA, DBn, "Day")
+  cat("\n Re-created filtered:", DBn, "table\n\n")
+
+  hist(DATA[!is.na(av), get(tv)], breaks = 100,
+       ylab = "Valid data days")
+
 }
 
-CLOUD <- CLOUD |> collect() |> data.table()
-hist(CLOUD[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
-     main = paste(var_name("CLOUD"), var_name("GLB_trnd_A_N")),
-     ylab = "Valid data ratio")
-
-
-CLEAR <- tbl(con, "Trend_A_DAILY_CLEAR")
-CLEAR <- CLEAR |>
-  mutate(
-    GLB_trnd_A_mean := case_when(
-      GLB_trnd_A_N / Daylength >  Clear_daily_ratio_lim ~ GLB_trnd_A_mean,
-      GLB_trnd_A_N / Daylength <= Clear_daily_ratio_lim ~ NA )
-  )
-if (Sys.info()["nodename"] == Main.Host) {
-  res <- update_table(con, CLEAR, "Trend_A_DAILY_CLEAR", "Day")
-}
-CLEAR <- CLEAR |> collect() |> data.table()
-hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
-     main = paste(var_name("CLEAR"), var_name("GLB_trnd_A_N")),
-     ylab = "Valid data ratio")
 
 
 
-# dbListTables(con)
-# tbl(con, "Trend_A_DAILY_CLEAR") |> glimpse()
-# tbl(con, "Trend_A_DAILY_CLOUD") |> glimpse()
 
+##  Monthly deseasonal values  -------------------------------------------------
+dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 
-##  Daily deseasonal values  ---------------------------------------------------
-
-dbs <- c(
-  "Trend_A_DAILY_ALL",
-  "Trend_A_DAILY_CLOUD",
-  "Trend_A_DAILY_CLEAR"
-)
-
-vars <- c(
-  "DIR_trnd_A_mean",
-  "HOR_trnd_A_mean",
-  "GLB_trnd_A_mean",
-  "DIFF_trnd_A_mean",
-  "GLB_strict_mean"
-)
-
-##  Create daily values  -------------------------------------------------------
+##  Create monthly anomaly  ----------------------------------------------------
 #'
-#' Compute daily anomaly `_anom` from `_mean` - `_seas`
+#' Compute monthly anomaly `_mean_anom` from `_mean_mean` - `_mean_seas`
+#'
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
-  cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
+  type <- sub(".*_", "", DBn)
 
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Monthly deseasonal", type, "\n\n"))
+
+  vars <- DATA |> select(contains("_mean_mean")) |> colnames()
+
+  stop()
   ##  Compute seasonal daily values --------------------------------------------
   SEAS <- DATA |>
     group_by(DOY = yday(Day)) |>

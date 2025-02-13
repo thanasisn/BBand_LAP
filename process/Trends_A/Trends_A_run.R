@@ -14,9 +14,6 @@ output_format <- bookdown::pdf_document2()
 
 library(rmarkdown)
 
-##  Run tests  -----------------------------------------------------------------
-# source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T06_v10.R")
-
 
 render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_00_raw_data.R",
        output_format = output_format,
@@ -31,5 +28,9 @@ render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_02_daily_data.R",
        output_dir    = output_dir)
 
 render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_03_daily_data_analysis.R",
+       output_format = output_format,
+       output_dir    = output_dir)
+
+render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_04_monthly_data.R",
        output_format = output_format,
        output_dir    = output_dir)
