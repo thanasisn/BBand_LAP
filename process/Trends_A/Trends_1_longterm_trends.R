@@ -14,10 +14,6 @@ stop()
 
 
 #+ echo=F, include=T
-library(data.table, quietly = TRUE, warn.conflicts = FALSE)
-library(pander,     quietly = TRUE, warn.conflicts = FALSE)
-library(lubridate,  quietly = TRUE, warn.conflicts = FALSE)
-library(ggplot2,    quietly = TRUE, warn.conflicts = FALSE)
 library(fANCOVA,    quietly = TRUE, warn.conflicts = FALSE)
 library(xts,        quietly = TRUE, warn.conflicts = FALSE)
 library(zoo,        quietly = TRUE, warn.conflicts = FALSE)
@@ -53,10 +49,6 @@ if (! file.exists(I1_longterm) |
 load(I1_longterm)
 
 
-## __ Flags --------------------------------------------------------------------
-
-DRAFT <- TRUE
-DRAFT <- FALSE
 
 ## choose to grid some plots
 FIGURESGRID <- TRUE
@@ -106,39 +98,6 @@ data_list <- c(  "ALL_1_D_monthly_DESEAS",
                    "CLEAR_1_daily_DESEAS")
 
 
-
-
-## ____ Histograms Plots all data ----------------------------------------------
-#+ echo=F, include=F
-for (i in data_list) {
-    ## get data and y vars to plot
-    Dplot  <- get(i)
-    wecare <- grep("HOR|GLB|DIR", names(Dplot), value = TRUE)
-    for (yvar in wecare) {
-        if (!yvar %in% names(Dplot))   next()
-        if (all(is.na(Dplot[[yvar]]))) next()
-
-        if (grepl("wattGLB", yvar)) {
-            col <- "green"
-        } else {
-            col <- get(paste0(c("col", unlist(strsplit(yvar, split = "_"))[1:2]),
-                              collapse = "_"))
-        }
-
-        hist(Dplot[[yvar]],
-             main   = paste(i, yvar),
-             xlab   = yvar,
-             breaks = 100, col = col)
-    }
-}
-#+ echo=F, include=F
-rm(data_list)
-
-
-
-
-
-##  TOTAL TRENDS  ##############################################################
 
 
 ## __ Plot data trends  --------------------------------------------------------
@@ -1915,20 +1874,4 @@ pprint[, Rsqrd              := NULL]
 pprint[, RsqrdAdj           := NULL]
 pprint[, slope.ConfInt_0.99 := NULL]
 pprint[, slope.ConfInt_0.95 := NULL]
-
-setorder(pprint, DATA, var, Month)
-
-
-# \scriptsize
-# \footnotesize
-# \small
-
-#+ echo=F, include=T
-#' \scriptsize
-#+ echo=F, include=T
-pander(pprint,
-           cap = "Slope is in %/year")
-#'
-#' \normalsize
-#+ echo=F, include=T
 
