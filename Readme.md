@@ -15,7 +15,7 @@ under the [Data display](https://thanasisn.github.io/data_display.html) section.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Mon Feb 10 05:40:23 UTC 2025 -->
+<!-- Added by: athan, at: Thu Feb 13 05:30:16 UTC 2025 -->
 
 <!--te-->
 
@@ -28,10 +28,10 @@ under the [Data display](https://thanasisn.github.io/data_display.html) section.
 | Name                  |     Rows |    Size |    Values | Vars |   Fill | Bytes/Value |
 |:----------------------|---------:|--------:|----------:|-----:|-------:|------------:|
 | Broad Band LAP duckdb | 16875786 | 4.3 GiB | 871142232 |  140 | 60.75% |        5.34 |
-| Raw files hashes      |   927095 | 4.9 MiB |   3708380 |    4 |   100% |        1.39 |
-| **Total**             | 17802881 | 4.3 GiB | 874850612 |  144 |    NA% |        5.32 |
+| Raw files hashes      |   927112 | 4.9 MiB |   3708448 |    4 |   100% |        1.39 |
+| **Total**             | 17802898 | 4.3 GiB | 874850680 |  144 |    NA% |        5.32 |
 
-Table: Datasets sizes on 2025-02-10
+Table: Datasets sizes on 2025-02-13
 
 
 
@@ -70,19 +70,39 @@ Table: Datasets sizes on 2025-02-10
 
 ### For CHP-1 tracker
 
- - Digest async and step files for later analysis 
+ - Digest async and step files for later analysis
 
 
 ### Other processes
 
-- Quality Check of radiation data (QCRad)   
+- Quality Check of radiation data (QCRad)
   - Flags data using mainly the algorithm of C. N. Long and Y. Shi (2006)
 - Clear sky identification (CSid)
   - Flags data as affected by clouds or not with the algorithm of M. J. Reno and C.
     W. Hansen (2016)
+- Investigate long-term trends (Work in progress)
+  - Process similar to A. Natsis, A. Bais and C. Meleti (2023)
 - Creates TSI data used in analysis
 - Imports atmospheric pressure data from proxies
 - Keeps an `md5sum` of all input files to check for bit rot and other data corruption.
+
+### For EPPLEY-IR
+
+- Digest raw data
+  - Signal from EPPLEY-IR
+
+
+### For Inclined CM-21
+
+- Digest raw data
+  - Signal from an Inclined CHP-1
+
+
+### For TOT
+
+- Parse Global radiation data prepared with an external and independent process
+  - Read *.TOT files
+  - Do some plots and comparisons
 
 
 ### Tools
