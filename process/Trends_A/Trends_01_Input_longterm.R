@@ -1,32 +1,5 @@
 
-
-##  Prepare raw data if needed  ------------------------------------------------
-## check previous steps
-if (
-    file.exists(raw_input_data) == FALSE |
-    file.mtime(raw_input_data) < file.mtime("./DHI_GHI_0_variables.R") |
-    file.mtime(raw_input_data) < file.mtime("./DHI_GHI_00_raw_data.R")
-) {
-    source("./DHI_GHI_00_raw_data.R")
-}
-
-## check current steps
-if (
-    file.exists(I1_longterm) == FALSE |
-    file.mtime(I1_longterm) < file.mtime("./DHI_GHI_01_Input_longterm.R")
-) {
-    cat(paste("\n Have to create Long term proccessed data\n\n"))
-} else {
-    cat(paste("\n Long term proccessed data are ready\n\n"))
-    cond = structure(list(message = "Long term proccessed data are already done"),
-                     class = c("exit", "condition"))
-    signalCondition(cond)
-    stop("Normal to exit here")
-}
-
-#+ echo=T, include=T
-##  Load raw data  -------------------------------------------------------------
-DATA_all   <- readRDS(raw_input_data)
+01
 
 ##  ERA5 cloud data  -----------------------------------------------------------
 ## create ERA5 cloud subset variables
@@ -130,26 +103,6 @@ CLOUD_1_daily_mean <-
 
 
 
-## Monthly means from daily means ----------------------------------------------
-
-
-## _ Exclude means with less than Monthly_aggegation_N_lim data points ---------
-ALL_1_monthly_daily_mean[   DIR_att_N <= Monthly_aggegation_N_lim, DIR_att       := NA]
-ALL_1_monthly_daily_mean[   HOR_att_N <= Monthly_aggegation_N_lim, HOR_att       := NA]
-ALL_1_monthly_daily_mean[   GLB_att_N <= Monthly_aggegation_N_lim, GLB_att       := NA]
-ALL_1_monthly_daily_mean[   DIR_att_N <= Monthly_aggegation_N_lim, DIR_transp    := NA]
-ALL_1_monthly_daily_mean[   DIR_att_N <= Monthly_aggegation_N_lim, DIR_att_sd    := NA]
-ALL_1_monthly_daily_mean[   HOR_att_N <= Monthly_aggegation_N_lim, HOR_att_sd    := NA]
-ALL_1_monthly_daily_mean[   GLB_att_N <= Monthly_aggegation_N_lim, GLB_att_sd    := NA]
-ALL_1_monthly_daily_mean[   DIR_att_N <= Monthly_aggegation_N_lim, DIR_transp_sd := NA]
-ALL_1_monthly_daily_mean[   HOR_att_N <= Monthly_aggegation_N_lim, HOR_att_EM    := NA]
-ALL_1_monthly_daily_mean[   DIR_att_N <= Monthly_aggegation_N_lim, DIR_att_EM    := NA]
-ALL_1_monthly_daily_mean[   GLB_att_N <= Monthly_aggegation_N_lim, GLB_att_EM    := NA]
-ALL_1_monthly_daily_mean[   DIR_att_N <= Monthly_aggegation_N_lim, DIR_transp_EM := NA]
-
-
-
-
 ## _ Seasonal monthly daily values ---------------------------------------------
 
 ALL_1_monthly_daily_seas <-
@@ -204,7 +157,6 @@ cat(" \n \n")
 plot(CLOUD_1_monthly_daily_seas[, GLB_att_seas, Month],pch= 1, cex = 1,
      main = "CLOUD_1_monthly_daily_seas[, GLB_att_seas, Month]")
 cat(" \n \n")
-
 
 
 ## _ Monthly daily de-seasonal anomaly -----------------------------------------
