@@ -132,65 +132,6 @@ CLOUD_1_daily_mean <-
 
 ## Monthly means from daily means ----------------------------------------------
 
-ALL_1_monthly_daily_mean <-
-    ALL_1_daily_mean[,.(DIR_att    = mean(DIR_att,    na.rm = T),
-                        GLB_att    = mean(GLB_att,    na.rm = T),
-                        HOR_att    = mean(HOR_att,    na.rm = T),
-                        DIR_transp = mean(DIR_transp, na.rm = T),
-                        DIR_att_sd = sd(  DIR_att,    na.rm = T),
-                        HOR_att_sd = sd(  HOR_att,    na.rm = T),
-                        GLB_att_sd = sd(  GLB_att,    na.rm = T),
-                        GLB_att_N  = sum(!is.na(GLB_att)),
-                        HOR_att_N  = sum(!is.na(HOR_att)),
-                        DIR_att_N  = sum(!is.na(DIR_att))  ),
-                     by = .(
-                         Year = year(Date),
-                         Month = month(Date)
-                     ) ]
-
-CLEAR_1_monthly_daily_mean <-
-    CLEAR_1_daily_mean[,.(DIR_att    = mean(DIR_att,    na.rm = T),
-                          GLB_att    = mean(GLB_att,    na.rm = T),
-                          HOR_att    = mean(HOR_att,    na.rm = T),
-                          DIR_transp = mean(DIR_transp, na.rm = T),
-                          DIR_att_sd = sd(  DIR_att,    na.rm = T),
-                          HOR_att_sd = sd(  HOR_att,    na.rm = T),
-                          GLB_att_sd = sd(  GLB_att,    na.rm = T),
-                          GLB_att_N  = sum(!is.na(GLB_att)),
-                          HOR_att_N  = sum(!is.na(HOR_att)),
-                          DIR_att_N  = sum(!is.na(DIR_att))  ),
-                       by = .(
-                           Year  = year(Date),
-                           Month = month(Date)
-                       ) ]
-
-CLOUD_1_monthly_daily_mean <-
-    CLOUD_1_daily_mean[,.(DIR_att    = mean(DIR_att,    na.rm = T),
-                          GLB_att    = mean(GLB_att,    na.rm = T),
-                          HOR_att    = mean(HOR_att,    na.rm = T),
-                          DIR_transp = mean(DIR_transp, na.rm = T),
-                          DIR_att_sd = sd(  DIR_att,    na.rm = T),
-                          HOR_att_sd = sd(  HOR_att,    na.rm = T),
-                          GLB_att_sd = sd(  GLB_att,    na.rm = T),
-                          GLB_att_N  = sum(!is.na(GLB_att)),
-                          HOR_att_N  = sum(!is.na(HOR_att)),
-                          DIR_att_N  = sum(!is.na(DIR_att))  ),
-                       by = .(
-                           Year  = year(Date),
-                           Month = month(Date)
-                       ) ]
-
-
-hist(ALL_1_monthly_daily_mean$GLB_att, breaks = 100)
-cat(" \n \n")
-
-hist(CLEAR_1_monthly_daily_mean$GLB_att, breaks = 100)
-cat(" \n \n")
-
-hist(CLOUD_1_monthly_daily_mean$GLB_att, breaks = 100)
-cat(" \n \n")
-
-
 
 ## _ Exclude means with less than Monthly_aggegation_N_lim data points ---------
 ALL_1_monthly_daily_mean[   DIR_att_N <= Monthly_aggegation_N_lim, DIR_att       := NA]

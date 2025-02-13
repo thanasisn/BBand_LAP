@@ -21,6 +21,5 @@ SZA_confidence_limit      <-   0.99
 Monthly_confidence_limit  <-   0.99
 
 Daily_aggregation_N_lim   <-   0        # replaced with relative daylight filter
-Monthly_aggegation_N_lim  <-  20
 SZA_aggregation_N_lim     <-   4
 
