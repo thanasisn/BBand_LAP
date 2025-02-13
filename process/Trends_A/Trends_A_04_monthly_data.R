@@ -102,7 +102,7 @@ dbs <- grep("Trend_A_DAILY", dbListTables(con), value = TRUE)
 #'
 #' Use daily data to create monthly values
 #'
-#' compute mean of daily means, not anomaly
+#' will compute mean of daily means, not anomaly
 #'
 
 vars <- c(
@@ -121,11 +121,6 @@ for (DBn in dbs) {
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Monthly means", var_name(DBn), "\n\n"))
 
-  DATA |> colnames()
-
-  DATA |> select(ends_with("mean")) |> colnames()
-
-  stop()
   ## Create monthly values and stats
   MONTHLY <- DATA   |>
     group_by(Year = year(Day), Month =  month(Day)) |>
@@ -135,41 +130,40 @@ for (DBn in dbs) {
         .cols = all_of(vars),
         .fns  = list(
           mean = ~ mean(.x, na.rm = TRUE),
+          sd   = ~ sd  (.x, na.rm = TRUE),
           NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          dd   = ~ min(Day, na.rm = T)
+          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
         )
       ),
       ## Stats on every group
-      Day_N = n()
+      Month_N = n(),
+      .groups = "drop"
     ) |> collect() |> data.table()
-
-
   MONTHLY$Day <- as.Date(strptime(paste(MONTHLY$Year, MONTHLY$Month, "01"), "%Y %m %d"))
 
-  MONTHLY[, Day - DIR_trnd_A_mean_dd]
 
-  ## inspect fill ratios for observations
+  ## inspect fill ratios of valid observations
   hist(MONTHLY[!is.na(GLB_trnd_A_mean_mean), GLB_trnd_A_mean_N], breaks = 100,
-       main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
-       ylab = "Valid data ratio")
+       main = paste("Occurance of days with data", var_name("GLB_trnd_A_mean_N")),
+       ylab = "Occurances")
 
-  plot(MONTHLY[, GLB_trnd_A_mean_mean, Day])
+  hist(MONTHLY[!is.na(DIR_trnd_A_mean_mean), DIR_trnd_A_mean_N], breaks = 100,
+       main = paste("Occurance of days with data", var_name("DIR_trnd_A_mean_N")),
+       ylab = "Occurances")
 
-  hist(MONTHLY[!is.na(DIR_trnd_A_mean_mean), DIR_trnd_A_N/Daylength], breaks = 100,
-       main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
-       ylab = "Valid data ratio")
-
-    ## Store daily values as is
-    tbl_name <- paste0("Trend_A_DAILY_", DBn)
-    if (dbExistsTable(con , tbl_name)) {
-      cat("\n Remove table", tbl_name, "\n\n")
-      dbRemoveTable(con, tbl_name)
-    }
-    dbCreateTable(conn = con, name = tbl_name, DAILY)
-    res <- insert_table(con, DAILY, tbl_name, "Day")
-    cat("\n Created", tbl_name, "\n\n")
+  ## Store monthly values as is
+  tbl_name <- paste0("Trend_A_MONTHLY_", type)
+  if (dbExistsTable(con , tbl_name)) {
+    cat("\n Remove table", tbl_name, "\n\n")
+    dbRemoveTable(con, tbl_name)
+  }
+  dbCreateTable(conn = con, name = tbl_name, MONTHLY)
+  res <- insert_table(con, MONTHLY, tbl_name, "Day")
+  cat("\n Created", tbl_name, "\n\n")
 }
+
+
+stop("wait")
 
 ##  Daily data representation  -------------------------------------------------
 warning("This breaks other variables for Clear and Cloud!! This is only for GHI")
