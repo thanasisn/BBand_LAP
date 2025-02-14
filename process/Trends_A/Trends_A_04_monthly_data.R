@@ -40,6 +40,8 @@
 #+ include=F
 
 #'
+#' # Create monthly values from daily
+#'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
 #' Create daily data and deseasonalize data
@@ -101,8 +103,9 @@ META <- tbl(con, "META") |> select(Day, Daylength)
 dbs <- grep("Trend_A_DAILY", dbListTables(con), value = TRUE)
 
 #'
-#' Use daily data to create monthly values
+#' ## Create monthly values
 #'
+#' Use daily data to create monthly values
 #' will compute mean of daily means, not anomaly
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
@@ -163,6 +166,8 @@ for (DBn in dbs) {
 dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 
 #'
+#' ## Filter monthly values
+#'
 #' We choose to use monthly values only if `r Monthly_aggegation_N_lim` days
 #' with data exist for each month.
 #'
@@ -199,6 +204,8 @@ for (DBn in dbs) {
 dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 
 ##  Create monthly anomaly  ----------------------------------------------------
+#'
+#' ## Departure from monthly climatology
 #'
 #' Compute monthly anomaly `_mean_anom` from `_mean_mean` - `_mean_seas`
 #'
