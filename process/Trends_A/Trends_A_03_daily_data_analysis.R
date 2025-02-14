@@ -172,8 +172,9 @@ for (DBn in dbs) {
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n"))
 
+  vars <- DATA |> select(ends_with("_mean_anom")) |> colnames()
+
   for (avar in vars) {
-    avar <- paste0(avar, "_mean_anom")
 
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
