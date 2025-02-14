@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends"
+#' title:         "Trends A"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -40,9 +40,9 @@
 #+ include=F
 
 #'
-#' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
+#' # Create daily means, and deseasonal anomaly
 #'
-#' Create daily data and deseasonalize data
+#' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
 
 #+ include=F
@@ -106,7 +106,6 @@ LAP <- LAP |>
   )
 
 ##  Create data sets  ----------------------------------------------------------
-##  cloud and clear are prepared for this analysis
 ALL   <- LAP |>                           select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
@@ -130,6 +129,10 @@ dbs <- c(
 )
 
 ##  Create daily values  -------------------------------------------------------
+#'
+#' ## Crate daily means for each data set
+#'
+#+ include=T, echo=T, results="asis", warnings=FALSE
 for (DBn in dbs) {
   DATA <- get(DBn)
   cat("\n\\FloatBarrier\n\n")
@@ -171,12 +174,12 @@ for (DBn in dbs) {
     ## Store daily values as is
     tbl_name <- paste0("Trend_A_DAILY_", DBn)
     if (dbExistsTable(con , tbl_name)) {
-      cat("\n Remove table", tbl_name, "\n\n")
+      # cat("\n Remove table", tbl_name, "\n\n")
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, DAILY)
-    res <- insert_table(con, DAILY, tbl_name, "Day")
-    cat("\n Created", tbl_name, "\n\n")
+    res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
+    # cat("\n Created", tbl_name, "\n\n")
   }
 }
 
@@ -184,12 +187,15 @@ for (DBn in dbs) {
 warning("This breaks other variables for Clear and Cloud!! This is only for GHI")
 
 #'
+#' ## Apply some filtering on the data to use
+#'
 #' We choose to use a ratio of `r Cloud_daily_ratio_lim` to set the
 #' sky type characterization for the whole day.
 #'
 #' **Daily data representation applied only on GHI!!**
 #' i.e. GLB_trnd_A_mean for CLOUD and CLEAR
 #'
+#+ include=T, echo=T, results="asis", warnings=FALSE
 
 CLOUD <- tbl(con, "Trend_A_DAILY_CLOUD")
 CLOUD <- CLOUD |>
@@ -199,7 +205,7 @@ CLOUD <- CLOUD |>
       GLB_trnd_A_N / Daylength <= Cloud_daily_ratio_lim ~ NA )
   )
 if (Sys.info()["nodename"] == Main.Host) {
-  res <- update_table(con, CLOUD, "Trend_A_DAILY_CLOUD", "Day")
+  res <- update_table(con, CLOUD, "Trend_A_DAILY_CLOUD", "Day", quiet = TRUE)
 }
 
 CLOUD <- CLOUD |> collect() |> data.table()
@@ -216,7 +222,7 @@ CLEAR <- CLEAR |>
       GLB_trnd_A_N / Daylength <= Clear_daily_ratio_lim ~ NA )
   )
 if (Sys.info()["nodename"] == Main.Host) {
-  res <- update_table(con, CLEAR, "Trend_A_DAILY_CLEAR", "Day")
+  res <- update_table(con, CLEAR, "Trend_A_DAILY_CLEAR", "Day", quiet = TRUE)
 }
 CLEAR <- CLEAR |> collect() |> data.table()
 hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
@@ -224,14 +230,7 @@ hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
      ylab = "Valid data ratio")
 
 
-
-# dbListTables(con)
-# tbl(con, "Trend_A_DAILY_CLEAR") |> glimpse()
-# tbl(con, "Trend_A_DAILY_CLOUD") |> glimpse()
-
-
 ##  Daily deseasonal values  ---------------------------------------------------
-
 dbs <- c(
   "Trend_A_DAILY_ALL",
   "Trend_A_DAILY_CLOUD",
@@ -248,9 +247,14 @@ vars <- c(
 
 ##  Create daily values  -------------------------------------------------------
 #'
-#' Compute daily anomaly `_anom` from `_mean` - `_seas`
+#' ## Create seasonal data and anomaly
+#'
+#' We compute daily anomaly `_anom` as 100 (`_mean` - `_seas`) / `_seas`
+#'
+#+ include=T, echo=T, results="asis", warnings=FALSE
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
+
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
 
@@ -315,12 +319,11 @@ for (DBn in dbs) {
 
   ## Store anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
-    res <- update_table(con, DATA, DBn, "Day")
-    cat("\nTable", DBn, "updated\n\n")
+    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
+    # cat("\nTable", DBn, "updated\n\n")
   }
 
 }
-
 
 
 
