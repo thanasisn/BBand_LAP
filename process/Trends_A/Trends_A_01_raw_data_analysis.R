@@ -126,7 +126,7 @@ dbs <- c(
 )
 
 #' ## Trends from raw data
-#+ include=T, echo=F, results="asis". warning=F
+#+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
   DATA <- get(DBn)
 
