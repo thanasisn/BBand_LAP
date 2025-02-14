@@ -78,34 +78,9 @@ for (DBn in dbs) {
   for (avar in vars) {
     dataset <- DB
 
-    if (all(is.na(dataset[[avar]]))) next()
-
-    ## linear model by day step
-    lm1 <- lm(dataset[[avar]] ~ dataset$Date)
-    d   <- summary(lm1)$coefficients
-    cat("lm:      ", lm1$coefficients[2] * Days_of_year, "+/-", d[2,2] * Days_of_year,"\n\n")
-    ## correlation test
-    cor1 <- cor.test(x = dataset[[avar]], y = as.numeric(dataset$Date), method = 'pearson')
-
-
     ## create times series
     dd <- read.zoo(dataset, index.column = "Date")
     dd <- as.ts(dd)
-
-
-    ## _ Arima tests  --------------------------------------------------
-
-    ## _ auto reggression arima Tourpali -------------------------------
-    ## create a time variable (with lag of 1 day ?)
-    dataset[, ts := (year(Date) - min(year(Date))) + ( doy - 1 ) / Hmisc::yearDays(Date) ]
-    tmodelo <- arima(x = dataset[[avar]], order = c(1,0,0), xreg = dataset$ts, method = "ML")
-
-    ## trend per year with auto correlation
-    Tres <- data.frame(t(lmtest::coeftest(tmodelo)[3,]))
-    Tint <- data.frame(t(lmtest::coeftest(tmodelo)[2,]))
-    names(Tres) <- paste0("Tmod_", names(Tres))
-
-    cat("Tourpali:", paste(round(Tres, 4)), "\n\n")
 
 
     lag   <- 1
@@ -121,25 +96,6 @@ for (DBn in dbs) {
     conf_2.5  <- conf[2,1]
     conf_97.5 <- conf[2,2]
 
-    ## get daily climatology
-    dclima <- dataset[, max(get(gsub("_des", "_seas", avar))), by = doy]
-
-    ## capture lm for table
-    gather <- rbind(gather,
-                    data.frame(
-                      linear_fit_stats(lm1, confidence_interval = Daily_confidence_limit),
-                      cor_test_stats(cor1),
-                      DATA       = DBn,
-                      var        = avar,
-                      N          = sum(!is.na(dataset[[avar]])),
-                      N_eff      = N_eff,
-                      t_eff      = t_eff,
-                      t_eff_cri  = t_eff_cri,
-                      conf_2.5   = conf_2.5,
-                      conf_97.5  = conf_97.5,
-                      mean_clima = mean(dclima$V1, na.rm = T),
-                      Tres
-                    )
     )
 
 

@@ -105,7 +105,7 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 #'
 #+ daily-mean-trends, include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
-  DATA <- tbl(con, DBn)
+  DATA <- tbl(con, DBn) |> collect() |> data.table()
 
   vars <- DATA |> select(ends_with("_mean")) |> colnames()
 
@@ -116,6 +116,32 @@ for (DBn in dbs) {
 
     cat("\n\\FloatBarrier\n\n")
     cat(paste("\n####", var_name(avar), "\n\n"))
+
+    ## data date range
+    cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
+
+    ## _ Linear trend by year  -------------------------------------------------
+    lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
+    d   <- summary(lm1)$coefficients
+    cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2,2], 4), "p=", round(d[2,4], 4), "\n\n")
+
+    ## _ Correlation test
+    cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = 'pearson')
+
+    ## _ Arima auto regression Tourpali ----------------------------------------
+    ## create a time variable (with lag of 1 day ?)
+    DATA[, ts := (year(Day) - min(year(Day))) + ( yday(Day) - 1 ) / Hmisc::yearDays(Day) ]
+    tmodel <- arima(x = DATA[[avar]], order = c(1,0,0), xreg = DATA$ts, method = "ML")
+
+    ## trend per year with auto correlation
+    ## estimates, associated standard errors, test statistics and p values
+    Tres <- data.frame(t(lmtest::coeftest(tmodel)[3,]))
+    Tint <- data.frame(t(lmtest::coeftest(tmodel)[2,]))
+    names(Tres) <- paste0("Tmod_", names(Tres))
+    cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4) ), "\n\n")
+
+
+    ## _ Time series ----------------------------------------
 
 
 
