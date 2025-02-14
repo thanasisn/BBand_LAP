@@ -28,7 +28,7 @@
 #'     toc:              yes
 #'     toc_depth:        4
 #'     fig_width:        8
-#'     fig_height:       5
+#'     fig_height:       4
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  9
@@ -132,7 +132,7 @@ dbs <- c(
 #'
 #' ## Crate daily means for each data set
 #'
-#+ include=T, echo=T, results="asis", warnings=FALSE
+#+ include=T, echo=T, results="asis", warning=FALSE
 for (DBn in dbs) {
   DATA <- get(DBn)
   cat("\n\\FloatBarrier\n\n")
@@ -195,7 +195,7 @@ warning("This breaks other variables for Clear and Cloud!! This is only for GHI"
 #' **Daily data representation applied only on GHI!!**
 #' i.e. GLB_trnd_A_mean for CLOUD and CLEAR
 #'
-#+ include=T, echo=T, results="asis", warnings=FALSE
+#+ include=T, echo=T, results="asis", warning=FALSE
 
 CLOUD <- tbl(con, "Trend_A_DAILY_CLOUD")
 CLOUD <- CLOUD |>
@@ -251,7 +251,8 @@ vars <- c(
 #'
 #' We compute daily anomaly `_anom` as 100 (`_mean` - `_seas`) / `_seas`
 #'
-#+ include=T, echo=T, results="asis", warnings=FALSE
+#+ include=T, echo=T, results="asis", warning=FALSE
+#+
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
@@ -330,5 +331,6 @@ for (DBn in dbs) {
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
+#' \FloatBarrier
 #+ results="asis", echo=FALSE
 goodbye()

@@ -22,12 +22,6 @@ source("./var_translation.R")
 ## choose loess criterion for span
 LOESS_CRITERIO <-  c("aicc", "gcv")[1]
 
-ALL_1_daily_DESEAS[           GLB_att_des == 0]
-CLOUD_1_daily_DESEAS[         GLB_att_des == 0]
-# test <- CLEAR_1_daily_DESEAS[ GLB_att_des == 0]
-# test <- rm.cols.dups.DT(test)
-CLEAR_1_daily_DESEAS[         GLB_att_des == 0, GLB_att_des := NA]
-
 
 
 #'
@@ -50,15 +44,13 @@ CLEAR_1_daily_DESEAS[         GLB_att_des == 0, GLB_att_des := NA]
 #'
 #+ echo=F, include=F
 
-col_wattGLB_NA              <- "green"
-
 ## ____ Scatter plots with SZA all data ----------------------------------------
 data_list <- c(  "ALL_1_D_monthly_DESEAS",
-               "CLEAR_1_D_monthly_DESEAS",
-               "CLOUD_1_D_monthly_DESEAS",
-                     "ALL_1_daily_DESEAS",
-                   "CLEAR_1_daily_DESEAS",
-                   "CLEAR_1_daily_DESEAS")
+                 "CLEAR_1_D_monthly_DESEAS",
+                 "CLOUD_1_D_monthly_DESEAS",
+                 "ALL_1_daily_DESEAS",
+                 "CLEAR_1_daily_DESEAS",
+                 "CLEAR_1_daily_DESEAS")
 
 
 ## __ Plot data trends  --------------------------------------------------------
@@ -69,8 +61,6 @@ data_list <- c(  "ALL_1_D_monthly_DESEAS",
 #' ### Trends from daily means
 #'
 #+ LongtermTrends, echo=F, include=T, results="asis"
-# vars <- c("HOR_att","DIR_transp", "DIR_att", "GLB_att", "tsi1au_att")
-vars <- c("DIR_att_des", "GLB_att_des", "tsi1au_att", "near_tcc_att", "near_tcc_att_des")
 
 # test
 vars <- c( "GLB_att_des")
@@ -81,127 +71,127 @@ dbs         <- c("ALL_1_daily_DESEAS",                        "CLEAR_1_daily_DES
 gather <- data.frame()
 
 for (DBn in dbs) {
-    DB <- get(DBn)
-    cat("\n\\newpage\n")
-    cat("\n#### Trends on", translate(DBn), "data\n\n" )
+  DB <- get(DBn)
+  cat("\n\\newpage\n")
+  cat("\n#### Trends on", translate(DBn), "data\n\n" )
 
-        for (avar in vars) {
-            dataset <- DB
+  for (avar in vars) {
+    dataset <- DB
 
-            if (all(is.na(dataset[[avar]]))) next()
+    if (all(is.na(dataset[[avar]]))) next()
 
-            ## linear model by day step
-            lm1 <- lm(dataset[[avar]] ~ dataset$Date)
-            d   <- summary(lm1)$coefficients
-            cat("lm:      ", lm1$coefficients[2] * Days_of_year, "+/-", d[2,2] * Days_of_year,"\n\n")
-            ## correlation test
-            cor1 <- cor.test(x = dataset[[avar]], y = as.numeric(dataset$Date), method = 'pearson')
-
-
-            ## create times series
-            dd <- read.zoo(dataset, index.column = "Date")
-            dd <- as.ts(dd)
+    ## linear model by day step
+    lm1 <- lm(dataset[[avar]] ~ dataset$Date)
+    d   <- summary(lm1)$coefficients
+    cat("lm:      ", lm1$coefficients[2] * Days_of_year, "+/-", d[2,2] * Days_of_year,"\n\n")
+    ## correlation test
+    cor1 <- cor.test(x = dataset[[avar]], y = as.numeric(dataset$Date), method = 'pearson')
 
 
-            ## _ Arima tests  --------------------------------------------------
-
-            ## _ auto reggression arima Tourpali -------------------------------
-            ## create a time variable (with lag of 1 day ?)
-            dataset[, ts := (year(Date) - min(year(Date))) + ( doy - 1 ) / Hmisc::yearDays(Date) ]
-            tmodelo <- arima(x = dataset[[avar]], order = c(1,0,0), xreg = dataset$ts, method = "ML")
-
-            ## trend per year with auto correlation
-            Tres <- data.frame(t(lmtest::coeftest(tmodelo)[3,]))
-            Tint <- data.frame(t(lmtest::coeftest(tmodelo)[2,]))
-            names(Tres) <- paste0("Tmod_", names(Tres))
-
-            cat("Tourpali:", paste(round(Tres, 4)), "\n\n")
+    ## create times series
+    dd <- read.zoo(dataset, index.column = "Date")
+    dd <- as.ts(dd)
 
 
-            lag   <- 1
-            dd    <- acf(dataset[[avar]], na.action = na.pass, plot = FALSE)
-            N_eff <- sum(!is.na(dataset[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
-            se_sq <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
-            sa_sq <- se_sq / sum((dataset[[avar]] - mean(dataset[[avar]], na.rm = T))^2, na.rm = T)
-            t_eff     <- lm1$coefficients[[2]] / sa_sq
-            #find two-tailed t critical values
-            t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
+    ## _ Arima tests  --------------------------------------------------
 
-            conf      <- confint(lm1)
-            conf_2.5  <- conf[2,1]
-            conf_97.5 <- conf[2,2]
+    ## _ auto reggression arima Tourpali -------------------------------
+    ## create a time variable (with lag of 1 day ?)
+    dataset[, ts := (year(Date) - min(year(Date))) + ( doy - 1 ) / Hmisc::yearDays(Date) ]
+    tmodelo <- arima(x = dataset[[avar]], order = c(1,0,0), xreg = dataset$ts, method = "ML")
 
-            ## get daily climatology
-            dclima <- dataset[, max(get(gsub("_des", "_seas", avar))), by = doy]
+    ## trend per year with auto correlation
+    Tres <- data.frame(t(lmtest::coeftest(tmodelo)[3,]))
+    Tint <- data.frame(t(lmtest::coeftest(tmodelo)[2,]))
+    names(Tres) <- paste0("Tmod_", names(Tres))
 
-            ## capture lm for table
-            gather <- rbind(gather,
-                            data.frame(
-                                linear_fit_stats(lm1, confidence_interval = Daily_confidence_limit),
-                                cor_test_stats(cor1),
-                                DATA       = DBn,
-                                var        = avar,
-                                N          = sum(!is.na(dataset[[avar]])),
-                                N_eff      = N_eff,
-                                t_eff      = t_eff,
-                                t_eff_cri  = t_eff_cri,
-                                conf_2.5   = conf_2.5,
-                                conf_97.5  = conf_97.5,
-                                mean_clima = mean(dclima$V1, na.rm = T),
-                                Tres
-                            )
-            )
+    cat("Tourpali:", paste(round(Tres, 4)), "\n\n")
 
 
-            ## plot data
-            plot(dataset$Date, dataset[[avar]],
-                 pch      = ".",
-                 col      = acol,
-                 cex      = 2,
-                 # main     = paste(translate(DBn), translate(avar)),
-                 cex.main = 0.8,
-                 yaxt     = "n",
-                 xlab     = "",
-                 ylab     = bquote("Anomalies [%]")
-            )
+    lag   <- 1
+    dd    <- acf(dataset[[avar]], na.action = na.pass, plot = FALSE)
+    N_eff <- sum(!is.na(dataset[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
+    se_sq <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
+    sa_sq <- se_sq / sum((dataset[[avar]] - mean(dataset[[avar]], na.rm = T))^2, na.rm = T)
+    t_eff     <- lm1$coefficients[[2]] / sa_sq
+    #find two-tailed t critical values
+    t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
 
-            ## plot fit line lm
-            abline(lm1, lwd = 2)
+    conf      <- confint(lm1)
+    conf_2.5  <- conf[2,1]
+    conf_97.5 <- conf[2,2]
 
+    ## get daily climatology
+    dclima <- dataset[, max(get(gsub("_des", "_seas", avar))), by = doy]
 
-            if (DRAFT == TRUE) {
-                ## Running mean
-                first <- head(which(!is.na(dataset[[avar]])),1)
-                last  <- tail(which(!is.na(dataset[[avar]])),1)
-
-                rm <- frollmean(dataset[[avar]][first:last],
-                                round(running_mean_window_days),
-                                na.rm = TRUE,
-                                algo  = "exact",
-                                align = "center")
-
-                # points(dataset$Date, rm, col = "red", cex = 0.5)
-                lines(dataset$Date[first:last], rm, col = "red", lwd = 1.5)
-
-                ## LOESS curve
-                vec <- !is.na(dataset[[avar]])
-                FTSE.lo3 <- loess.as(dataset$Date[vec], dataset[[avar]][vec],
-                                     degree = 1,
-                                     criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
-                FTSE.lo.predict3 <- predict(FTSE.lo3, dataset$Date)
-                lines(dataset$Date, FTSE.lo.predict3, col = "cyan", lwd = 2.5)
-            }
+    ## capture lm for table
+    gather <- rbind(gather,
+                    data.frame(
+                      linear_fit_stats(lm1, confidence_interval = Daily_confidence_limit),
+                      cor_test_stats(cor1),
+                      DATA       = DBn,
+                      var        = avar,
+                      N          = sum(!is.na(dataset[[avar]])),
+                      N_eff      = N_eff,
+                      t_eff      = t_eff,
+                      t_eff_cri  = t_eff_cri,
+                      conf_2.5   = conf_2.5,
+                      conf_97.5  = conf_97.5,
+                      mean_clima = mean(dclima$V1, na.rm = T),
+                      Tres
+                    )
+    )
 
 
-            ## display trend on graph
-            fit <- lm1[[1]]
-            legend("top", lty = 1, bty = "n", lwd = 2, cex = 1,
-                   paste("Trend: ",
-                         if (fit[2] > 0) "+" else "-",
-                         signif(abs(fit[2]) * Days_of_year, 2),
-                         "±", signif(2 * Tres[2], 2) ,"%/y" )
-            )
+    ## plot data
+    plot(dataset$Date, dataset[[avar]],
+         pch      = ".",
+         col      = acol,
+         cex      = 2,
+         # main     = paste(translate(DBn), translate(avar)),
+         cex.main = 0.8,
+         yaxt     = "n",
+         xlab     = "",
+         ylab     = bquote("Anomalies [%]")
+    )
+
+    ## plot fit line lm
+    abline(lm1, lwd = 2)
+
+
+    if (DRAFT == TRUE) {
+      ## Running mean
+      first <- head(which(!is.na(dataset[[avar]])),1)
+      last  <- tail(which(!is.na(dataset[[avar]])),1)
+
+      rm <- frollmean(dataset[[avar]][first:last],
+                      round(running_mean_window_days),
+                      na.rm = TRUE,
+                      algo  = "exact",
+                      align = "center")
+
+      # points(dataset$Date, rm, col = "red", cex = 0.5)
+      lines(dataset$Date[first:last], rm, col = "red", lwd = 1.5)
+
+      ## LOESS curve
+      vec <- !is.na(dataset[[avar]])
+      FTSE.lo3 <- loess.as(dataset$Date[vec], dataset[[avar]][vec],
+                           degree = 1,
+                           criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+      FTSE.lo.predict3 <- predict(FTSE.lo3, dataset$Date)
+      lines(dataset$Date, FTSE.lo.predict3, col = "cyan", lwd = 2.5)
     }
+
+
+    ## display trend on graph
+    fit <- lm1[[1]]
+    legend("top", lty = 1, bty = "n", lwd = 2, cex = 1,
+           paste("Trend: ",
+                 if (fit[2] > 0) "+" else "-",
+                 signif(abs(fit[2]) * Days_of_year, 2),
+                 "±", signif(2 * Tres[2], 2) ,"%/y" )
+    )
+  }
 }
 #+ echo=F, include=F
 
@@ -214,122 +204,122 @@ for (DBn in dbs) {
 vars <- c("GLB_att_des", "DIR_att_des", "tsi1au_att", "wattGLB", "near_tcc_att", "near_tcc_att_des")
 
 dbs         <- c(  "ALL_1_daily_DESEAS",
-                 "CLEAR_1_daily_DESEAS",
-                 "CLOUD_1_daily_DESEAS")
+                   "CLEAR_1_daily_DESEAS",
+                   "CLOUD_1_daily_DESEAS")
 ##  Gather daily trends  -------------------------------------------------------
 gather <- data.frame()
 
 for (DBn in dbs) {
-    DB <- get(DBn)
-    cat("\n\\newpage\n")
-    cat("\n#### Trends on", translate(DBn), "data with running mean\n\n" )
+  DB <- get(DBn)
+  cat("\n\\newpage\n")
+  cat("\n#### Trends on", translate(DBn), "data with running mean\n\n" )
 
-        for (avar in vars) {
-            dataset <- DB
+  for (avar in vars) {
+    dataset <- DB
 
-            if (all(is.na(dataset[[avar]]))) next()
+    if (all(is.na(dataset[[avar]]))) next()
 
-            ## linear model by day step
-            lm1  <- lm(dataset[[avar]] ~ dataset$Date)
-            ## correlation test
-            cor1 <- cor.test(x = dataset[[avar]], y = as.numeric(dataset$Date), method = 'pearson')
-
-
-            ## _ auto reggression arima Tourpali -------------------------------
-            ## create a time variable (with lag of 1 day ?)
-            dataset[, ts := (year(Date) - min(year(Date))) + ( doy - 1 ) / Hmisc::yearDays(Date) ]
-            tmodelo <- arima(x = dataset[[avar]], order = c(1,0,0), xreg = dataset$ts, method = "ML")
-
-            ## trend per year with auto correlation
-            Tres <- data.frame(t(lmtest::coeftest(tmodelo)[3,]))
-            names(Tres) <- paste0("Tmod_", names(Tres))
-
-            lag   <- 1
-            dd    <- acf(dataset[[avar]], na.action = na.pass, plot = FALSE)
-            N_eff <- sum(!is.na(dataset[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
-            se_sq <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
-            sa_sq <- se_sq / sum((dataset[[avar]] - mean(dataset[[avar]], na.rm = T))^2, na.rm = T)
-            t_eff     <- lm1$coefficients[[2]] / sa_sq
-            #find two-tailed t critical values
-            t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
-
-            conf      <- confint(lm1)
-            conf_2.5  <- conf[2,1]
-            conf_97.5 <- conf[2,2]
-
-            ## get daily climatology
-            dclima <- dataset[, max(get(gsub("_des", "_seas", avar))), by = doy]
-
-            ## capture stats for table
-            gather <- rbind(gather,
-                            data.frame(
-                                linear_fit_stats(lm1, confidence_interval = Daily_confidence_limit),
-                                cor_test_stats(cor1),
-                                DATA      = DBn,
-                                var       = avar,
-                                N         = sum(!is.na(dataset[[avar]])),
-                                Obs       = sum(dataset[[sub("_des","_N", avar)]], na.rm = TRUE),
-                                N_eff     = N_eff,
-                                t_eff     = t_eff,
-                                t_eff_cri = t_eff_cri,
-                                conf_2.5  = conf_2.5,
-                                conf_97.5 = conf_97.5,
-                                mean_clima = mean(dclima$V1, na.rm = T),
-                                Tres
-                            )
-            )
-
-            par("mar" = c(3, 4, 2, 1))
-
-            if (grepl("wattGLB", avar)) {
-                acol <- "green"
-            } else if (grepl("near_tcc", avar)) {
-                acol <- "cyan"
-            }
-            else {
-                acol <- get(paste0(c("col", unlist(strsplit(avar, split = "_"))[1:2]),
-                                   collapse = "_"))
-            }
+    ## linear model by day step
+    lm1  <- lm(dataset[[avar]] ~ dataset$Date)
+    ## correlation test
+    cor1 <- cor.test(x = dataset[[avar]], y = as.numeric(dataset$Date), method = 'pearson')
 
 
-            ## plot data
-            plot(dataset$Date, dataset[[avar]],
-                 pch      = ".",
-                 col      = acol,
-                 cex      = 2,
-                 main     = paste(translate(DBn), translate(avar)),
-                 cex.main = 0.8,
-                 yaxt     = "n",
-                 xlab     = "",
-                 ylab     = bquote("Anomalies [%]")
-            )
-            axis(2, pretty(dataset[[avar]]), las = 2 )
+    ## _ auto reggression arima Tourpali -------------------------------
+    ## create a time variable (with lag of 1 day ?)
+    dataset[, ts := (year(Date) - min(year(Date))) + ( doy - 1 ) / Hmisc::yearDays(Date) ]
+    tmodelo <- arima(x = dataset[[avar]], order = c(1,0,0), xreg = dataset$ts, method = "ML")
 
-            # ylab = bquote("Deseas." ~ .(translate(avar)) ~ "[" ~ Watt/m^2 ~ "]" ) )
+    ## trend per year with auto correlation
+    Tres <- data.frame(t(lmtest::coeftest(tmodelo)[3,]))
+    names(Tres) <- paste0("Tmod_", names(Tres))
 
-            ## plot fit line
-            abline(lm1, lwd = 2)
+    lag   <- 1
+    dd    <- acf(dataset[[avar]], na.action = na.pass, plot = FALSE)
+    N_eff <- sum(!is.na(dataset[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
+    se_sq <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
+    sa_sq <- se_sq / sum((dataset[[avar]] - mean(dataset[[avar]], na.rm = T))^2, na.rm = T)
+    t_eff     <- lm1$coefficients[[2]] / sa_sq
+    #find two-tailed t critical values
+    t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
 
-            ## Running mean
-            first <- head(which(!is.na(dataset[[avar]])),1)
-            last  <- tail(which(!is.na(dataset[[avar]])),1)
+    conf      <- confint(lm1)
+    conf_2.5  <- conf[2,1]
+    conf_97.5 <- conf[2,2]
 
-            rm <- frollmean(dataset[[avar]][first:last],
-                            round(running_mean_window_days),
-                            na.rm = TRUE,
-                            algo  = "exact",
-                            align = "center")
+    ## get daily climatology
+    dclima <- dataset[, max(get(gsub("_des", "_seas", avar))), by = doy]
 
-            # points(dataset$Date, rm, col = "red", cex = 0.5)
-            lines(dataset$Date[first:last], rm, col = "red", lwd = 1.5)
+    ## capture stats for table
+    gather <- rbind(gather,
+                    data.frame(
+                      linear_fit_stats(lm1, confidence_interval = Daily_confidence_limit),
+                      cor_test_stats(cor1),
+                      DATA      = DBn,
+                      var       = avar,
+                      N         = sum(!is.na(dataset[[avar]])),
+                      Obs       = sum(dataset[[sub("_des","_N", avar)]], na.rm = TRUE),
+                      N_eff     = N_eff,
+                      t_eff     = t_eff,
+                      t_eff_cri = t_eff_cri,
+                      conf_2.5  = conf_2.5,
+                      conf_97.5 = conf_97.5,
+                      mean_clima = mean(dclima$V1, na.rm = T),
+                      Tres
+                    )
+    )
 
-            ## LOESS curve
-            vec <- !is.na(dataset[[avar]])
-            FTSE.lo3 <- loess.as(dataset$Date[vec], dataset[[avar]][vec],
-                                 degree = 1,
-                                 criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
-            FTSE.lo.predict3 <- predict(FTSE.lo3, dataset$Date)
-            lines(dataset$Date, FTSE.lo.predict3, col = "cyan", lwd = 2.5)
+    par("mar" = c(3, 4, 2, 1))
+
+    if (grepl("wattGLB", avar)) {
+      acol <- "green"
+    } else if (grepl("near_tcc", avar)) {
+      acol <- "cyan"
+    }
+    else {
+      acol <- get(paste0(c("col", unlist(strsplit(avar, split = "_"))[1:2]),
+                         collapse = "_"))
+    }
+
+
+    ## plot data
+    plot(dataset$Date, dataset[[avar]],
+         pch      = ".",
+         col      = acol,
+         cex      = 2,
+         main     = paste(translate(DBn), translate(avar)),
+         cex.main = 0.8,
+         yaxt     = "n",
+         xlab     = "",
+         ylab     = bquote("Anomalies [%]")
+    )
+    axis(2, pretty(dataset[[avar]]), las = 2 )
+
+    # ylab = bquote("Deseas." ~ .(translate(avar)) ~ "[" ~ Watt/m^2 ~ "]" ) )
+
+    ## plot fit line
+    abline(lm1, lwd = 2)
+
+    ## Running mean
+    first <- head(which(!is.na(dataset[[avar]])),1)
+    last  <- tail(which(!is.na(dataset[[avar]])),1)
+
+    rm <- frollmean(dataset[[avar]][first:last],
+                    round(running_mean_window_days),
+                    na.rm = TRUE,
+                    algo  = "exact",
+                    align = "center")
+
+    # points(dataset$Date, rm, col = "red", cex = 0.5)
+    lines(dataset$Date[first:last], rm, col = "red", lwd = 1.5)
+
+    ## LOESS curve
+    vec <- !is.na(dataset[[avar]])
+    FTSE.lo3 <- loess.as(dataset$Date[vec], dataset[[avar]][vec],
+                         degree = 1,
+                         criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
+    FTSE.lo.predict3 <- predict(FTSE.lo3, dataset$Date)
+    lines(dataset$Date, FTSE.lo.predict3, col = "cyan", lwd = 2.5)
 
 
             ## decorations

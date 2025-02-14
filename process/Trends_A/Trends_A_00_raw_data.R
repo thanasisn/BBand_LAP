@@ -28,7 +28,7 @@
 #'     toc:              yes
 #'     toc_depth:        4
 #'     fig_width:        8
-#'     fig_height:       5
+#'     fig_height:       4
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  9
@@ -39,6 +39,8 @@
 #' ---
 #+ include=F
 
+#'
+#' # Prepare raw data
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -86,14 +88,13 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
-#+ include=T, echo=F, results="asis"
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
 LAP  <- tbl(con, "LAP")
 META <- tbl(con, "META")
 
-
+#+ include=T, echo=T, results="asis"
 ##  Range of data ready to use  ------------------------------------------------
 LAP <- LAP |>
   filter(Date > FIRST_DAY) |>
@@ -102,7 +103,6 @@ LAP <- LAP |>
 
 ##  Keep daylight only  --------------------------------------------------------
 LAP <- LAP |> filter(Elevat >= 0)
-
 
 
 ##  Only days with good data  --------------------------------------------------
@@ -123,10 +123,13 @@ LAP <- LAP |> filter(
 
 
 ##  Remove days with partial observations  -------------------------------------
-#
-#  Remove days with too few data, as they can not be representative of a
-#  normal day.
-#
+#'
+#' ## Filter days
+#'
+#' Remove days with too few data, as they can not be representative of a
+#' normal day.
+#'
+#+ include=T, echo=T, results="asis"
 
 daylengths <- META |> select(Day, Daylength)
 
@@ -173,6 +176,11 @@ LAP <- LAP |> mutate(
 
 
 ##  Move measurements to mean earth distance  ----------------------------------
+#'
+#' ## Remove Sun distance variation
+#'
+#+ include=T, echo=T, results="asis"
+
 LAP <- LAP |>
   mutate(
     DIR_trnd_A  := DIR_strict  * (Sun_Dist_Astropy ^ 2),

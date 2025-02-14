@@ -40,11 +40,10 @@
 #+ include=F
 
 #'
+#' # Analyse daily values
+#'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' Trends from daily values
-#'
-
 
 #+ include=F
 ## __ Document options  --------------------------------------------------------
@@ -100,29 +99,26 @@ if (Sys.info()["nodename"] == Main.Host) {
 ## list of daily tables
 dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
-##  All data points  -----------------------------------------------------------
-vars <- c(
-  "DIR_trnd_A",
-  "HOR_trnd_A",
-  "GLB_trnd_A",
-  "DIFF_trnd_A"
-)
-
-##  Plot daily mean values
+##  Daily mean values  -----------------------------------------------------------
 #'
 #' ## Daily mean values
 #'
-#+ daily-mean-trends, include=T, echo=F, results="asis"
+#+ daily-mean-trends, include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
-  DATA |> colnames()
+  vars <- DATA |> select(ends_with("_mean")) |> colnames()
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
-    avar <- paste0(avar, "_mean")
+
+    cat("\n\\FloatBarrier\n\n")
+    cat(paste("\n####", var_name(avar), "\n\n"))
+
+
+
 
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
@@ -134,16 +130,18 @@ for (DBn in dbs) {
            subtitle = paste(var_name(DBn), var_name(avar))) +
       theme_bw()
     show(p)
+
+    stop()
   }
 }
-
+stop()
 
 
 ##  Plot daily anomaly values
 #'
 #' ## Daily departure from the climatology
 #'
-#+ daily-anomaly-trends, include=T, echo=F, results="asis"
+#+ daily-anomaly-trends, include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
@@ -172,5 +170,6 @@ for (DBn in dbs) {
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
+#' \FloatBarrier
 #+ results="asis", echo=FALSE
 goodbye()

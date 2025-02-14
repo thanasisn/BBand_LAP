@@ -28,7 +28,7 @@
 #'     toc:              yes
 #'     toc_depth:        4
 #'     fig_width:        8
-#'     fig_height:       5
+#'     fig_height:       4
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  9
@@ -40,12 +40,13 @@
 #+ include=F
 
 #'
+#' # Analysis of raw data
+#'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
 #' Trends from all one minute data, except some days with
 #' too few valid points.
 #'
-
 
 #+ include=F
 ## __ Document options  --------------------------------------------------------
@@ -90,7 +91,7 @@ library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggpubr,     warn.conflicts = FALSE, quietly = TRUE)
 
 
-#+ include=T, echo=F, results="asis"
+#+ include=T, echo=F, results="asis". warning=F
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
@@ -124,19 +125,16 @@ dbs <- c(
   "CLEAR"
 )
 
+#' ## Trends from raw data
+#+ include=T, echo=F, results="asis". warning=F
 for (DBn in dbs) {
   DATA <- get(DBn)
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n##", var_name(DBn), "\n\n"))
+  cat(paste("\n###", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
     pp <- DATA
-    # ## test
-    # pp <- DATA |>
-    #   filter(!is.na(!!sym(avar))) |>
-    #   collect() |>
-    #   sample_n(10000)
 
     p <- pp |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
@@ -154,5 +152,6 @@ for (DBn in dbs) {
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
+#' \FloatBarrier
 #+ results="asis", echo=FALSE
 goodbye()
