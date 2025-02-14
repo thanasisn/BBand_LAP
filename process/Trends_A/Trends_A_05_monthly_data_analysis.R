@@ -42,9 +42,8 @@
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
-#' Trends from daily values
+#' Trends from montnly values
 #'
-
 
 #+ include=F
 ## __ Document options  --------------------------------------------------------
@@ -93,32 +92,27 @@ library(ggpubr,     warn.conflicts = FALSE, quietly = TRUE)
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
-## list of daily tables
+## list of monthly tables
 dbs <- sort(grep("_MONTHLY_", dbListTables(con), value = TRUE))
-stop()
-##  All data points  -----------------------------------------------------------
-vars <- c(
-  "DIR_trnd_A",
-  "HOR_trnd_A",
-  "GLB_trnd_A",
-  "DIFF_trnd_A"
-)
 
-##  Plot daily mean values
+##  Monthly points  -----------------------------------------------------------
+##  Plot monthly mean values
 #'
-#' ## Daily mean values
+#' ## Monthly mean values
 #'
-#+ daily-mean-trends, include=T, echo=F, results="asis"
+#+ monthly-mean-trends, include=T, echo=F, results="asis"
+
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
-  DATA |> colnames()
+  vars <- DATA |> select(ends_with("_mean_mean")) |> colnames()
+
+  stop()
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
-    avar <- paste0(avar, "_mean")
 
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
@@ -135,11 +129,11 @@ for (DBn in dbs) {
 
 
 
-##  Plot daily anomaly values
+##  Plot monthly anomaly values
 #'
-#' ## Daily departure from the climatology
+#' ## monthly departure from the climatology
 #'
-#+ daily-anomaly-trends, include=T, echo=F, results="asis"
+#+ monthly-anomaly-trends, include=T, echo=F, results="asis"
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 

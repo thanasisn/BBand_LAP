@@ -104,22 +104,16 @@ dbs <- grep("Trend_A_DAILY", dbListTables(con), value = TRUE)
 #'
 #' will compute mean of daily means, not anomaly
 #'
-
-vars <- c(
-  "DIR_trnd_A_mean",
-  "HOR_trnd_A_mean",
-  "GLB_trnd_A_mean",
-  "DIFF_trnd_A_mean",
-  "GLB_strict_mean",
-  "DIR_strict_mean"
-)
+#+ include=T, echo=T, results="asis", warnings=FALSE
 
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   type <- sub(".*_", "", DBn)
+  ## variables to aggregate
+  vars <- DATA |> select(ends_with("_mean")) |> colnames()
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Monthly means", var_name(DBn), "\n\n"))
+  cat(paste("\n## Monthly means", type, "\n\n"))
 
   ## Create monthly values and stats
   MONTHLY <- DATA   |>
@@ -139,8 +133,9 @@ for (DBn in dbs) {
       Month_N = n(),
       .groups = "drop"
     ) |> collect() |> data.table()
+  ## create proper dates
   MONTHLY$Day <- as.Date(strptime(paste(MONTHLY$Year, MONTHLY$Month, "01"), "%Y %m %d"))
-
+  MONTHLY[, Decimal_date := decimal_date(Day)]
 
   ## inspect fill ratios of valid observations
   hist(MONTHLY[!is.na(GLB_trnd_A_mean_mean), GLB_trnd_A_mean_N], breaks = 100,
@@ -166,11 +161,11 @@ for (DBn in dbs) {
 ##  Monthly data representation  -------------------------------------------------
 dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 
-
 #'
 #' We choose to use monthly values only if `r Monthly_aggegation_N_lim` days
 #' with data exist for each month.
 #'
+#+ include=T, echo=T, results="asis", warnings=FALSE
 
 for (DBn in dbs) {
   DATA <- tbl(con, DBn) |> collect() |> data.table()
@@ -199,7 +194,6 @@ for (DBn in dbs) {
 
 
 
-
 ##  Monthly deseasonal values  -------------------------------------------------
 dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 
@@ -207,6 +201,8 @@ dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 #'
 #' Compute monthly anomaly `_mean_anom` from `_mean_mean` - `_mean_seas`
 #'
+#+ include=T, echo=T, results="asis", warnings=FALSE
+
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   type <- sub(".*_", "", DBn)
@@ -277,7 +273,6 @@ for (DBn in dbs) {
     res <- update_table(con, DATA, DBn, "Day")
     cat("\nTable", DBn, "updated\n\n")
   }
-
 }
 
 
