@@ -1824,15 +1824,3 @@ wecare        <- grep("intercept", names(gather_seas), value = T, invert = T)
 gather_seas   <- data.table(gather_seas)
 ## some wired data where inserted
 gather_seas   <- gather_seas[DATA != "TRUE",]
-pprint        <- gather_seas[, ..wecare]
-
-pprint[, DATA := translate(DATA)]
-pprint[, var  := translate(var) ]
-
-pprint[, slope.stat_sig     := 100 * (1 - slope.p)]
-pprint[, slope.t            := NULL]
-pprint[, Rsqrd              := NULL]
-pprint[, RsqrdAdj           := NULL]
-pprint[, slope.ConfInt_0.99 := NULL]
-pprint[, slope.ConfInt_0.95 := NULL]
-

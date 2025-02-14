@@ -28,7 +28,7 @@
 #'     toc:              yes
 #'     toc_depth:        4
 #'     fig_width:        8
-#'     fig_height:       5
+#'     fig_height:       4
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  9
@@ -91,7 +91,11 @@ library(ggpubr,     warn.conflicts = FALSE, quietly = TRUE)
 
 #+ include=T, echo=F, results="asis"
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
+if (Sys.info()["nodename"] == Main.Host) {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD))
+} else {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
+}
 
 ## list of daily tables
 dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))

@@ -28,7 +28,7 @@
 #'     toc:              yes
 #'     toc_depth:        4
 #'     fig_width:        8
-#'     fig_height:       5
+#'     fig_height:       4
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  9
@@ -40,9 +40,9 @@
 #+ include=F
 
 #'
-#' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
+#' # Trends of monthly values
 #'
-#' Trends from montnly values
+#' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
 
 #+ include=F
@@ -90,24 +90,26 @@ library(ggpubr,     warn.conflicts = FALSE, quietly = TRUE)
 
 #+ include=T, echo=F, results="asis"
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
+if (Sys.info()["nodename"] == Main.Host) {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD))
+} else {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
+}
 
 ## list of monthly tables
 dbs <- sort(grep("_MONTHLY_", dbListTables(con), value = TRUE))
 
 ##  Monthly points  -----------------------------------------------------------
-##  Plot monthly mean values
 #'
-#' ## Monthly mean values
+#' ## Monthly mean values of variables
 #'
-#+ monthly-mean-trends, include=T, echo=F, results="asis"
+#+ monthly-mean-trends, include=T, echo=F, results="asis", warning=F
 
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
-
+  type <- sub(".*_", "", DBn)
+  ## variables to plot
   vars <- DATA |> select(ends_with("_mean_mean")) |> colnames()
-
-  stop()
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n"))
@@ -129,20 +131,23 @@ for (DBn in dbs) {
 
 
 
+
 ##  Plot monthly anomaly values
 #'
-#' ## monthly departure from the climatology
+#' ## Monthly departure from the climatology
 #'
-#+ monthly-anomaly-trends, include=T, echo=F, results="asis"
+#+ monthly-anomaly-trends, include=T, echo=F, results="asis", warning=F
+
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
+  type <- sub(".*_", "", DBn)
+  ## variables to plot
+  vars <- DATA |> select(ends_with("_mean_anom")) |> colnames()
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
-    avar <- paste0(avar, "_mean_anom")
-
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
@@ -162,5 +167,6 @@ for (DBn in dbs) {
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
+#' \FloatBarrier
 #+ results="asis", echo=FALSE
 goodbye()
