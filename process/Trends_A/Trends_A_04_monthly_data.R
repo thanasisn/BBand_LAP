@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends"
+#' title:         "Trends A"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -28,7 +28,7 @@
 #'     toc:              yes
 #'     toc_depth:        4
 #'     fig_width:        8
-#'     fig_height:       5
+#'     fig_height:       4
 #'   html_document:
 #'     toc:        true
 #'     fig_width:  9
@@ -50,6 +50,7 @@
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(message   = FALSE   )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.cap   = " empty caption ")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
@@ -81,7 +82,7 @@ library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
-require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
+library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
@@ -104,7 +105,7 @@ dbs <- grep("Trend_A_DAILY", dbListTables(con), value = TRUE)
 #'
 #' will compute mean of daily means, not anomaly
 #'
-#+ include=T, echo=T, results="asis", warnings=FALSE
+#+ include=T, echo=T, results="asis", warning=FALSE
 
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
@@ -149,12 +150,12 @@ for (DBn in dbs) {
   ## Store monthly values as is
   tbl_name <- paste0("Trend_A_MONTHLY_", type)
   if (dbExistsTable(con , tbl_name)) {
-    cat("\n Remove table", tbl_name, "\n\n")
+    # cat("\n Remove table", tbl_name, "\n\n")
     dbRemoveTable(con, tbl_name)
   }
   dbCreateTable(conn = con, name = tbl_name, MONTHLY)
-  res <- insert_table(con, MONTHLY, tbl_name, "Day")
-  cat("\n Created", tbl_name, "\n\n")
+  res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
+  # cat("\n Created", tbl_name, "\n\n")
 }
 
 
@@ -165,7 +166,7 @@ dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 #' We choose to use monthly values only if `r Monthly_aggegation_N_lim` days
 #' with data exist for each month.
 #'
-#+ include=T, echo=T, results="asis", warnings=FALSE
+#+ include=T, echo=T, results="asis", warning=FALSE
 
 for (DBn in dbs) {
   DATA <- tbl(con, DBn) |> collect() |> data.table()
@@ -183,8 +184,8 @@ for (DBn in dbs) {
   ## store data to db
   dbRemoveTable(con, DBn)
   dbCreateTable(conn = con, name = DBn, DATA)
-  res <- insert_table(con, DATA, DBn, "Day")
-  cat("\n Re-created filtered:", DBn, "table\n\n")
+  res <- insert_table(con, DATA, DBn, "Day", quiet = TRUE)
+  # cat("\n Re-created filtered:", DBn, "table\n\n")
 
   hist(DATA[!is.na(av), get(tv)], breaks = 100,
        ylab = "Valid data days")
@@ -201,7 +202,7 @@ dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 #'
 #' Compute monthly anomaly `_mean_anom` from `_mean_mean` - `_mean_seas`
 #'
-#+ include=T, echo=T, results="asis", warnings=FALSE
+#+ include=T, echo=T, results="asis", warning=FALSE
 
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
@@ -270,8 +271,8 @@ for (DBn in dbs) {
 
   ## Store anomaly data in duckdb
   if (Sys.info()["nodename"] == Main.Host) {
-    res <- update_table(con, DATA, DBn, "Day")
-    cat("\nTable", DBn, "updated\n\n")
+    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
+    # cat("\nTable", DBn, "updated\n\n")
   }
 }
 
@@ -281,5 +282,6 @@ for (DBn in dbs) {
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
 
+#' \FloatBarrier
 #+ results="asis", echo=FALSE
 goodbye()

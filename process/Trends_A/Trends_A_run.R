@@ -35,4 +35,6 @@ render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_04_monthly_data.R"
        output_format = output_format,
        output_dir    = output_dir)
 
-source("~/BBand_LAP/process/Trends_A/Trends_A_05_monthly_data_analysis.R")
+render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_05_monthly_data_analysis.R",
+       output_format = output_format,
+       output_dir    = output_dir)

@@ -69,13 +69,21 @@ Cloud_daily_ratio_lim     <- 0.6
 var_name <- function(type) {
   switch(type,
          DIR_trnd_A            = "DNI",
+         DIR_trnd_A_mean_mean  = "DNI",
          DIR_trnd_A_mean_anom  = "DNI Anomaly",
+         DIR_trnd_A_mean_mean_anom  = "DNI Anomaly",
          HOR_trnd_A            = "Dir. Irrad. horizontal plane",
+         HOR_trnd_A_mean_mean  = "Dir. Irrad. horizontal plane",
          HOR_trnd_A_mean_anom  = "Dir. Irrad. horizontal plane Anomaly",
+         HOR_trnd_A_mean_mean_anom  = "Dir. Irrad. horizontal plane Anomaly",
          DIFF_trnd_A           = "Diffuse. Irrad.",
+         DIFF_trnd_A_mean_mean = "Diffuse. Irrad.",
          DIFF_trnd_A_mean_anom = "Diffuse. Irrad. Anomaly",
+         DIFF_trnd_A_mean_mean_anom = "Diffuse. Irrad. Anomaly",
          GLB_trnd_A            = "GHI",
+         GLB_trnd_A_mean_anom  = "GHI",
          GLB_trnd_A_mean_anom  = "GHI Anomaly",
+         GLB_trnd_A_mean_mean_anom  = "GHI Anomaly",
          tsi1au_att            = "TSI at 1au",
          near_tcc_des          = "TCCn deseasonalized",
          near_tcc_att          = "TCC nearest",
@@ -92,15 +100,20 @@ var_name <- function(type) {
          Trend_A_DAILY_ALL     = "All sky cond. daily",
          Trend_A_DAILY_CLEAR   = "Clear sky cond. daily",
          Trend_A_DAILY_CLOUD   = "Cloudy sky cond. daily",
+         Trend_A_MONTHLY_ALL   = "All sky cond. monthly",
+         Trend_A_MONTHLY_CLEAR = "Clear sky cond. monthly",
+         Trend_A_MONTHLY_CLOUD = "Cloudy sky cond. monthly",
          type)
 }
 
 
 coldict <- list(
   DIR_trnd   = "#2166ac",
+  DIR_strict = "blue",
   HOR_trnd   = "#4244ac",
   DIFF_trnd  = "#9970ab",
-  GLB_trnd   = "#1a9850"
+  GLB_trnd   = "#1a9850",
+  GLB_strict = "green"
 )
 
 var_col <- function(x) {
