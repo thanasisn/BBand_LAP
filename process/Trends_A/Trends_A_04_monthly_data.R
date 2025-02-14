@@ -216,10 +216,9 @@ for (DBn in dbs) {
 
   vars <- DATA |> select(contains("_mean_mean")) |> colnames()
 
-  stop()
-  ##  Compute seasonal daily values --------------------------------------------
+  ##  Compute seasonal monthly values --------------------------------------------
   SEAS <- DATA |>
-    group_by(DOY = yday(Day)) |>
+    group_by(Month) |>
     summarise(
       Seas_N = n(),
       across(
@@ -238,25 +237,22 @@ for (DBn in dbs) {
       )
     ) |> collect() |> data.table()
 
-
   ## Plot seasonal values
-  p <- SEAS |> select(DOY,
-                      GLB_strict_mean_seas,
-                      ends_with(c("trnd_A_mean_seas"))) |>
-    melt(id.vars = 'DOY', variable.name = 'Radiation') |>
-    ggplot(aes(x = DOY, y = value)) +
+  p <- SEAS |> select(Month,
+                      ends_with(c("_mean_mean_seas"))) |>
+    melt(id.vars = 'Month', variable.name = 'Radiation') |>
+    ggplot(aes(x = Month, y = value)) +
     geom_point(aes(colour = Radiation)) +
-    labs(subtitle = paste("Daily climatology for ", var_name(DBn)),
+    labs(subtitle = paste("Monthly climatology for ", type),
          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
     theme_bw()
   show(p)
 
-
   ## Create deseasonal anomaly
   DATA <- left_join(
-    DATA |> mutate(DOY = yday(Day)),
+    DATA,
     SEAS,
-    by = "DOY",
+    by = "Month",
     copy = TRUE
   ) |> collect() |> data.table()
 
@@ -276,7 +272,7 @@ for (DBn in dbs) {
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
-  ## Store anomaly data
+  ## Store anomaly data in duckdb
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, DATA, DBn, "Day")
     cat("\nTable", DBn, "updated\n\n")
