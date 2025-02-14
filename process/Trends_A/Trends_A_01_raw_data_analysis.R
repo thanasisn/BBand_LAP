@@ -91,7 +91,7 @@ library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggpubr,     warn.conflicts = FALSE, quietly = TRUE)
 
 
-#+ include=T, echo=F, results="asis". warning=F
+#+ include=T, echo=F, results="asis", warning=F
 ##  Open dataset  --------------------------------------------------------------
 con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 

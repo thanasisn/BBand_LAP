@@ -157,10 +157,8 @@ for (DBn in dbs) {
       theme_bw()
     show(p)
 
-    stop()
   }
 }
-stop()
 
 
 ##  Plot daily anomaly values
