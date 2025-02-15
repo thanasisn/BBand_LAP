@@ -105,7 +105,7 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 #'
 #' ## Daily mean values
 #'
-#+ daily-mean-trends, include=T, echo=F, results="asis", warning=F
+#+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
   ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> collect() |> data.table()
@@ -117,7 +117,7 @@ for (DBn in dbs) {
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n####", var_name(avar), "\n\n"))
+    cat(paste("\n####", var_name(avar), "\n\n\n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
@@ -144,16 +144,16 @@ for (DBn in dbs) {
 
 
     ## _ Time series analysis ----------------------------------------
-    dd <- read.zoo(DATA, index.column = "Day")
-    dd <- as.ts(dd)
+    dd        <- read.zoo(DATA, index.column = "Day")
+    dd        <- as.ts(dd)
 
-    lag   <- 1
-    dd    <- acf(DATA[[avar]], na.action = na.pass, plot = FALSE)
-    N_eff <- sum(!is.na(DATA[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
-    se_sq <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
-    sa_sq <- se_sq / sum((DATA[[avar]] - mean(DATA[[avar]], na.rm = T))^2, na.rm = T)
+    lag       <- 1
+    dd        <- acf(DATA[[avar]], na.action = na.pass, plot = FALSE)
+    N_eff     <- sum(!is.na(DATA[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
+    se_sq     <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
+    sa_sq     <- se_sq / sum((DATA[[avar]] - mean(DATA[[avar]], na.rm = T))^2, na.rm = T)
     t_eff     <- lm1$coefficients[[2]] / sa_sq
-    #find two-tailed t critical values
+    # find two-tailed t critical values
     t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
 
     conf      <- confint(lm1)
@@ -165,7 +165,7 @@ for (DBn in dbs) {
       geom_point(col = var_col(avar), size = 0.6)    +
       geom_ma(n = running_mean_window_days) +
       geom_smooth(method = "loess", formula = y ~ x, colour = "orange") +
-      geom_smooth(method = "lm", formula = y ~ x, colour = "red", fill = "red", se = F) +
+      geom_smooth(method = "lm",    formula = y ~ x, colour = "red", fill = "red", se = F) +
       stat_regline_equation(label.y.npc = 1) +
       labs(x = element_blank(),
            y = bquote(.(var_name(avar)) ~ ~ group("[", W/m^2, "]")),
@@ -181,17 +181,19 @@ for (DBn in dbs) {
 #'
 #' ## Daily departure from the climatology
 #'
-#+ daily-anomaly-trends, include=T, echo=F, results="asis", warning=F
+#+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
   ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> collect() |> data.table()
   vars <- sort(DATA |> select(ends_with("_mean_anom")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n###", var_name(DBn), "\n\n"))
+  cat(paste("\n###", var_name(DBn), "\n\n\n"))
 
   for (avar in vars) {
 
+    cat("\n\\FloatBarrier\n\n")
+    cat(paste("\n####", var_name(avar), "\n\n\n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
@@ -218,16 +220,16 @@ for (DBn in dbs) {
 
 
     ## _ Time series analysis ----------------------------------------
-    dd <- read.zoo(DATA, index.column = "Day")
-    dd <- as.ts(dd)
+    dd        <- read.zoo(DATA, index.column = "Day")
+    dd        <- as.ts(dd)
 
-    lag   <- 1
-    dd    <- acf(DATA[[avar]], na.action = na.pass, plot = FALSE)
-    N_eff <- sum(!is.na(DATA[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
-    se_sq <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
-    sa_sq <- se_sq / sum((DATA[[avar]] - mean(DATA[[avar]], na.rm = T))^2, na.rm = T)
+    lag       <- 1
+    dd        <- acf(DATA[[avar]], na.action = na.pass, plot = FALSE)
+    N_eff     <- sum(!is.na(DATA[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
+    se_sq     <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
+    sa_sq     <- se_sq / sum((DATA[[avar]] - mean(DATA[[avar]], na.rm = T))^2, na.rm = T)
     t_eff     <- lm1$coefficients[[2]] / sa_sq
-    #find two-tailed t critical values
+    # find two-tailed t critical values
     t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
 
     conf      <- confint(lm1)
@@ -235,13 +237,12 @@ for (DBn in dbs) {
     conf_97.5 <- conf[2,2]
 
 
-
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
       geom_ma(n = running_mean_window_days) +
       geom_smooth(method = "loess", formula = y ~ x, colour = "orange") +
-      geom_smooth(method = "lm", formula = y ~ x, colour = "red", fill = "red", se = F) +
+      geom_smooth(method = "lm",    formula = y ~ x, colour = "red", fill = "red", se = F) +
       stat_regline_equation(label.y.npc = 1) +
       labs(x = element_blank(),
            y = bquote(.(var_name(avar)) ~ ~ group("[","%","]")),
