@@ -179,6 +179,8 @@ for (DBn in dbs) {
 
 ##  Plot daily anomaly values
 #'
+#' \newpage
+#'
 #' ## Daily departure from the climatology
 #'
 #+ include=T, echo=F, results="asis", warning=F

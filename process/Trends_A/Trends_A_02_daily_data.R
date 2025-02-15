@@ -119,7 +119,9 @@ dbs <- sort(c( "ALL", "CLOUD", "CLEAR"))
 
 ##  Create daily values  -------------------------------------------------------
 #'
-#' ## Crate daily means for each data set
+#' \newpage
+#'
+#' ## Create daily means for each data set
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
 for (DBn in dbs) {
@@ -186,6 +188,8 @@ for (DBn in dbs) {
 warning("This breaks other variables for Clear and Cloud!! This is only for GHI")
 
 #'
+#' \newpage
+#'
 #' ## Apply some filtering on the data to use
 #'
 #' We choose to use a ratio of `r Cloud_daily_ratio_lim` to set the
@@ -233,6 +237,8 @@ hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
 dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
 ##  Create daily values  -------------------------------------------------------
+#'
+#' \newpage
 #'
 #' ## Create seasonal data and anomaly
 #'
@@ -316,6 +322,14 @@ for (DBn in dbs) {
 
 ##  Daily deseasonal values by season  -----------------------------------------
 dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
+
+#'
+#' \newpage
+#'
+#' ## Create seasonal data and anomaly by season
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
+
 
 
 
