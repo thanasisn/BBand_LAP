@@ -134,6 +134,8 @@ for (DBn in dbs) {
 
 ##  Plot monthly anomaly values
 #'
+#' \newpage
+#'
 #' ## Monthly departure from the climatology
 #'
 #+ monthly-anomaly-trends, include=T, echo=F, results="asis", warning=F
