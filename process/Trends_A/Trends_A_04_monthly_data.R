@@ -247,7 +247,7 @@ for (DBn in dbs) {
     ggplot(aes(x = Month, y = value)) +
     geom_point( aes(colour = Radiation)) +
     geom_smooth(aes(colour = Radiation)) +
-    labs(subtitle = paste("Monthly climatology for ", var_name(DB)),
+    labs(subtitle = paste("Monthly climatology for ", var_name(DBn)),
          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
     theme_bw()
   show(p)

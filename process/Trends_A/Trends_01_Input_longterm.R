@@ -103,7 +103,6 @@ CLOUD_1_daily_mean <-
 
 
 
-## _ Seasonal monthly daily values ---------------------------------------------
 
 
 
