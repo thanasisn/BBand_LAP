@@ -85,6 +85,7 @@ library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
+library(zoo,        warn.conflicts = FALSE, quietly = TRUE)
 
 #+ include=T, echo=F, results="asis", warning=F
 ##  Open dataset  --------------------------------------------------------------
