@@ -40,11 +40,9 @@
 #+ include=F
 
 #'
-#' # Create monthly values from daily
+#' # Create monthly meaans from daily and deseasonal anomaly
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
-#'
-#' Create daily data and deseasonalize data
 #'
 
 #+ include=F
@@ -241,13 +239,15 @@ for (DBn in dbs) {
       )
     ) |> collect() |> data.table()
 
+
   ## Plot seasonal values
   p <- SEAS |> select(Month,
                       ends_with(c("_mean_mean_seas"))) |>
     melt(id.vars = 'Month', variable.name = 'Radiation') |>
     ggplot(aes(x = Month, y = value)) +
-    geom_point(aes(colour = Radiation)) +
-    labs(subtitle = paste("Monthly climatology for ", type),
+    geom_point( aes(colour = Radiation)) +
+    geom_smooth(aes(colour = Radiation)) +
+    labs(subtitle = paste("Monthly climatology for ", var_name(DB)),
          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
     theme_bw()
   show(p)
@@ -276,13 +276,12 @@ for (DBn in dbs) {
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
-  ## Store anomaly data in duckdb
+  ## Store anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
     # cat("\nTable", DBn, "updated\n\n")
   }
 }
-
 
 
 
