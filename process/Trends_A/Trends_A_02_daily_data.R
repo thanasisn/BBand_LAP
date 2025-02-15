@@ -129,7 +129,7 @@ for (DBn in dbs) {
 
   vars <- sort(DATA |> select(ends_with(c("_trnd_A", "_strict"))) |> colnames())
 
-  ## Create daily values and statistics
+  ## __ Create daily values and statistics  ------------------------------------
   DAILY <- DATA   |>
     group_by(Day) |>
     summarise(
@@ -152,6 +152,14 @@ for (DBn in dbs) {
     DAILY, META, by = "Day"
   ) |> collect() |> data.table()
 
+  ## __ Flag daily data with season  -------------------------------------------
+  ## create continuous seasonal variable
+  DAILY[, season_Yqrt := as.yearqtr(as.yearmon(paste(year(Day), month(Day), sep = "-")) + 1/12)]
+  ## Flag seasons using quarters
+  DAILY[season_Yqrt %% 1 == 0   , Season := "Winter"]
+  DAILY[season_Yqrt %% 1 == 0.25, Season := "Spring"]
+  DAILY[season_Yqrt %% 1 == 0.50, Season := "Summer"]
+  DAILY[season_Yqrt %% 1 == 0.75, Season := "Autumn"]
 
   ## inspect fill ratios for observations
   hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
@@ -162,11 +170,10 @@ for (DBn in dbs) {
        main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
        ylab = "Valid data ratio")
 
+  ## Store daily values as is
   if (Sys.info()["nodename"] == Main.Host) {
-    ## Store daily values as is
     tbl_name <- paste0("Trend_A_DAILY_", DBn)
     if (dbExistsTable(con , tbl_name)) {
-      # cat("\n Remove table", tbl_name, "\n\n")
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, DAILY)
@@ -232,7 +239,6 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 #' We compute daily anomaly `_anom` as 100 (`_mean` - `_seas`) / `_seas`
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-#+
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
@@ -305,6 +311,14 @@ for (DBn in dbs) {
     # cat("\nTable", DBn, "updated\n\n")
   }
 }
+
+
+
+##  Daily deseasonal values by season  -----------------------------------------
+dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
+
+
+
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)

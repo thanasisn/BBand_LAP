@@ -55,11 +55,11 @@ $(TARGET): Makefile Readme.md
 	  --metadata-file   .index.yaml   \
 	  --mathjax                       \
 	  --lua-filter      .columns.lua  \
-	  --template        .easy-pandoc-templates-master/html/uikit.html \
 	  --from            markdown      \
 	  --to              html          \
 	  --out             '$@'          \
 	  Readme.md
 
+	  # --template        .easy-pandoc-templates-master/html/uikit.html \
 	  # --toc                           \
 

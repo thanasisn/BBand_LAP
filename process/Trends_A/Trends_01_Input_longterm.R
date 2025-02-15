@@ -105,28 +105,7 @@ CLOUD_1_daily_mean <-
 
 
 
-
-
 ## Season of year daily aggregation --------------------------------------------
-
-## Quarter of year with one month shift to include December in the next years winter
-ALL_1_daily_mean[, season_Yqrt := as.yearqtr(as.yearmon(paste(year(Date), month(Date), sep = "-")) + 1/12)]
-CLEAR_1_daily_mean[, season_Yqrt := as.yearqtr(as.yearmon(paste(year(Date), month(Date), sep = "-")) + 1/12)]
-CLOUD_1_daily_mean[, season_Yqrt := as.yearqtr(as.yearmon(paste(year(Date), month(Date), sep = "-")) + 1/12)]
-
-## Flag seasons using quarters
-ALL_1_daily_mean[season_Yqrt %% 1 == 0   , Season := "Winter"]
-ALL_1_daily_mean[season_Yqrt %% 1 == 0.25, Season := "Spring"]
-ALL_1_daily_mean[season_Yqrt %% 1 == 0.50, Season := "Summer"]
-ALL_1_daily_mean[season_Yqrt %% 1 == 0.75, Season := "Autumn"]
-CLEAR_1_daily_mean[season_Yqrt %% 1 == 0   , Season := "Winter"]
-CLEAR_1_daily_mean[season_Yqrt %% 1 == 0.25, Season := "Spring"]
-CLEAR_1_daily_mean[season_Yqrt %% 1 == 0.50, Season := "Summer"]
-CLEAR_1_daily_mean[season_Yqrt %% 1 == 0.75, Season := "Autumn"]
-CLOUD_1_daily_mean[season_Yqrt %% 1 == 0   , Season := "Winter"]
-CLOUD_1_daily_mean[season_Yqrt %% 1 == 0.25, Season := "Spring"]
-CLOUD_1_daily_mean[season_Yqrt %% 1 == 0.50, Season := "Summer"]
-CLOUD_1_daily_mean[season_Yqrt %% 1 == 0.75, Season := "Autumn"]
 
 
 ## _ Create variables by season from daily means -------------------------------
