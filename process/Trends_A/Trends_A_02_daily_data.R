@@ -86,7 +86,7 @@ library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
-#+ include=T, echo=F, results="asis"
+#+ include=T, echo=F, results="asis", warning=F
 ##  Open dataset  --------------------------------------------------------------
 if (Sys.info()["nodename"] == Main.Host) {
   con <- dbConnect(duckdb(dbdir = DB_BROAD))
@@ -305,8 +305,6 @@ for (DBn in dbs) {
     # cat("\nTable", DBn, "updated\n\n")
   }
 }
-
-
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
