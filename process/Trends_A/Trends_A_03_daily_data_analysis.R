@@ -86,6 +86,7 @@ library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggpubr,     warn.conflicts = FALSE, quietly = TRUE)
+library(zoo,        warn.conflicts = FALSE, quietly = TRUE)
 
 
 #+ include=T, echo=F, results="asis"
@@ -141,10 +142,27 @@ for (DBn in dbs) {
     cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4) ), "\n\n")
 
 
-    ## _ Time series ----------------------------------------
+    ## _ Time series analysis ----------------------------------------
 
 
+    ## create times series
+    dd <- read.zoo(DATA, index.column = "Day")
+    dd <- as.ts(dd)
 
+    lag   <- 1
+    dd    <- acf(DATA[[avar]], na.action = na.pass, plot = FALSE)
+    N_eff <- sum(!is.na(DATA[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
+    se_sq <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
+    sa_sq <- se_sq / sum((DATA[[avar]] - mean(DATA[[avar]], na.rm = T))^2, na.rm = T)
+    t_eff     <- lm1$coefficients[[2]] / sa_sq
+    #find two-tailed t critical values
+    t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
+
+    conf      <- confint(lm1)
+    conf_2.5  <- conf[2,1]
+    conf_97.5 <- conf[2,2]
+
+stop()
 
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
