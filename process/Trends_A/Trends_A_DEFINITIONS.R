@@ -2,6 +2,7 @@
 #' Variables for long term trends of Broad Band project
 #'
 
+##  DATA SELECTION  ------------------------------------------------------------
 DB_BROAD  <- "~/DATA/Broad_Band/Broad_Band_LAP.duckdb"
 Main.Host <- "sagan"        ## This is the main host used to build the DB
 
@@ -13,7 +14,6 @@ FIBais_Az_2               <- 120
 FIBais_Elev               <-  12
 MIN_ELEVA                 <-   5  ##  global low elevation limit
 All_daily_ratio_lim       <- 0.5  ##  ration of daily valid data
-
 Monthly_aggegation_N_lim  <-  20  ##  Number of days per month for valid monthly value
 
 ## Ratio of characterizations to set as daily characterization
@@ -21,7 +21,16 @@ Clear_daily_ratio_lim     <- 0.6  ## keep both the same!!
 Cloud_daily_ratio_lim     <- 0.6
 
 
+##  DATA ANALYSIS  -------------------------------------------------------------
+running_mean_window_days   <- 120
+running_mean_window_months <-   4
+running_mean_window_years  <-   3
 
+
+
+
+
+##  DATA DISPLAY AND PLOT  -----------------------------------------------------
 var_name <- function(type) {
   switch(type,
          DIR_trnd_A                 = "DNI",

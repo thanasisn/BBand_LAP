@@ -87,6 +87,7 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggpubr,     warn.conflicts = FALSE, quietly = TRUE)
 library(zoo,        warn.conflicts = FALSE, quietly = TRUE)
+library(tidyquant,  warn.conflicts = FALSE, quietly = TRUE)
 
 
 #+ include=T, echo=F, results="asis"
@@ -106,9 +107,9 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 #'
 #+ daily-mean-trends, include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
+  ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> collect() |> data.table()
-
-  vars <- DATA |> select(ends_with("_mean")) |> colnames()
+  vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n"))
@@ -143,9 +144,6 @@ for (DBn in dbs) {
 
 
     ## _ Time series analysis ----------------------------------------
-
-
-    ## create times series
     dd <- read.zoo(DATA, index.column = "Day")
     dd <- as.ts(dd)
 
@@ -162,12 +160,12 @@ for (DBn in dbs) {
     conf_2.5  <- conf[2,1]
     conf_97.5 <- conf[2,2]
 
-stop()
-
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
-      geom_smooth(method = 'lm', formula = y ~ x, colour = "red", fill = "red") +
+      geom_ma(n = running_mean_window_days) +
+      geom_smooth(method = "loess", formula = y ~ x, colour = "orange") +
+      geom_smooth(method = "lm", formula = y ~ x, colour = "red", fill = "red", se = F) +
       stat_regline_equation(label.y.npc = 1) +
       labs(x = element_blank(),
            y = bquote(.(var_name(avar)) ~ ~ group("[", W/m^2, "]")),
@@ -185,25 +183,72 @@ stop()
 #'
 #+ daily-anomaly-trends, include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
-  DATA <- tbl(con, DBn)
+  ## get data and variables to analyse
+  DATA <- tbl(con, DBn) |> collect() |> data.table()
+  vars <- sort(DATA |> select(ends_with("_mean_anom")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n"))
 
-  vars <- DATA |> select(ends_with("_mean_anom")) |> colnames()
-
   for (avar in vars) {
+
+
+    ## data date range
+    cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
+
+    ## _ Linear trend by year  -------------------------------------------------
+    lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
+    d   <- summary(lm1)$coefficients
+    cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2,2], 4), "p=", round(d[2,4], 4), "\n\n")
+
+    ## _ Correlation test
+    cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = 'pearson')
+
+    ## _ Arima auto regression Tourpali ----------------------------------------
+    ## create a time variable (with lag of 1 day ?)
+    DATA[, ts := (year(Day) - min(year(Day))) + ( yday(Day) - 1 ) / Hmisc::yearDays(Day) ]
+    tmodel <- arima(x = DATA[[avar]], order = c(1,0,0), xreg = DATA$ts, method = "ML")
+
+    ## trend per year with auto correlation
+    ## estimates, associated standard errors, test statistics and p values
+    Tres <- data.frame(t(lmtest::coeftest(tmodel)[3,]))
+    Tint <- data.frame(t(lmtest::coeftest(tmodel)[2,]))
+    names(Tres) <- paste0("Tmod_", names(Tres))
+    cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4) ), "\n\n")
+
+
+    ## _ Time series analysis ----------------------------------------
+    dd <- read.zoo(DATA, index.column = "Day")
+    dd <- as.ts(dd)
+
+    lag   <- 1
+    dd    <- acf(DATA[[avar]], na.action = na.pass, plot = FALSE)
+    N_eff <- sum(!is.na(DATA[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
+    se_sq <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
+    sa_sq <- se_sq / sum((DATA[[avar]] - mean(DATA[[avar]], na.rm = T))^2, na.rm = T)
+    t_eff     <- lm1$coefficients[[2]] / sa_sq
+    #find two-tailed t critical values
+    t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
+
+    conf      <- confint(lm1)
+    conf_2.5  <- conf[2,1]
+    conf_97.5 <- conf[2,2]
+
+
 
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
-      geom_smooth(method = 'lm', formula = y ~ x, colour = "red", fill = "red") +
+      geom_ma(n = running_mean_window_days) +
+      geom_smooth(method = "loess", formula = y ~ x, colour = "orange") +
+      geom_smooth(method = "lm", formula = y ~ x, colour = "red", fill = "red", se = F) +
       stat_regline_equation(label.y.npc = 1) +
       labs(x = element_blank(),
            y = bquote(.(var_name(avar)) ~ ~ group("[","%","]")),
            subtitle = paste(var_name(DBn), var_name(avar))) +
       theme_bw()
     show(p)
+
   }
 }
 

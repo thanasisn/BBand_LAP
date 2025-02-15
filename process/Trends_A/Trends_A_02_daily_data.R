@@ -50,6 +50,7 @@
 knitr::opts_chunk$set(comment   = ""      )
 knitr::opts_chunk$set(dev       = "png"   )
 knitr::opts_chunk$set(out.width = "100%"  )
+knitr::opts_chunk$set(message   = FALSE   )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.cap   = " empty caption ")
 knitr::opts_chunk$set(fig.pos   = '!h'    )
@@ -81,13 +82,17 @@ library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
 library(dplyr,      warn.conflicts = FALSE, quietly = TRUE)
 library(lubridate,  warn.conflicts = FALSE, quietly = TRUE)
 library(tools,      warn.conflicts = FALSE, quietly = TRUE)
-require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
+library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 
 #+ include=T, echo=F, results="asis"
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_BROAD))
+if (Sys.info()["nodename"] == Main.Host) {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD))
+} else {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
+}
 
 LAP  <- tbl(con, "LAP")
 META <- tbl(con, "META") |> select(Day, Daylength)
@@ -110,23 +115,7 @@ ALL   <- LAP |>                           select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
-vars <- c(
-  "DIR_trnd_A",
-  "HOR_trnd_A",
-  "GLB_trnd_A",
-  "DIFF_trnd_A"
-)
-
-vars_obs <- c(
-  "GLB_strict",
-  "DIR_strict"
-)
-
-dbs <- c(
-  "ALL",
-  "CLOUD",
-  "CLEAR"
-)
+dbs <- sort(c( "ALL", "CLOUD", "CLEAR"))
 
 ##  Create daily values  -------------------------------------------------------
 #'
@@ -138,15 +127,18 @@ for (DBn in dbs) {
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily means", var_name(DBn), "\n\n"))
 
-  ## Create daily values and stats
+  vars <- sort(DATA |> select(ends_with(c("_trnd_A", "_strict"))) |> colnames())
+
+  ## Create daily values and statistics
   DAILY <- DATA   |>
     group_by(Day) |>
     summarise(
       ## stats on every variable
       across(
-        .cols = all_of(c(vars, vars_obs)),
+        .cols = all_of(vars),
         .fns  = list(
           mean = ~ mean(.x, na.rm = TRUE),
+          sd   = ~ sd  (.x, na.rm = TRUE),
           NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
           N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
         )
@@ -231,19 +223,7 @@ hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
 
 
 ##  Daily deseasonal values  ---------------------------------------------------
-dbs <- c(
-  "Trend_A_DAILY_ALL",
-  "Trend_A_DAILY_CLOUD",
-  "Trend_A_DAILY_CLEAR"
-)
-
-vars <- c(
-  "DIR_trnd_A_mean",
-  "HOR_trnd_A_mean",
-  "GLB_trnd_A_mean",
-  "DIFF_trnd_A_mean",
-  "GLB_strict_mean"
-)
+dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
 ##  Create daily values  -------------------------------------------------------
 #'
@@ -255,6 +235,7 @@ vars <- c(
 #+
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
+  vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
@@ -287,12 +268,12 @@ for (DBn in dbs) {
                       ends_with(c("trnd_A_mean_seas"))) |>
     melt(id.vars = 'DOY', variable.name = 'Radiation') |>
     ggplot(aes(x = DOY, y = value)) +
-    geom_point(aes(colour = Radiation)) +
+    geom_point( aes(colour = Radiation)) +
+    geom_smooth(aes(colour = Radiation)) +
     labs(subtitle = paste("Daily climatology for ", var_name(DBn)),
          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
     theme_bw()
   show(p)
-
 
   ## Create deseasonal anomaly
   DATA <- left_join(
@@ -323,7 +304,6 @@ for (DBn in dbs) {
     res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
     # cat("\nTable", DBn, "updated\n\n")
   }
-
 }
 
 
