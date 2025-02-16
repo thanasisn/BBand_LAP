@@ -184,7 +184,14 @@ cat(" \n \n")
 
 
 DATA <- readRDS("~/BBand_LAP/SIDE_DATA/Source_code_stats.Rds")
+for (ss in unique(DATA$source)) {
+  pp <- DATA[source == ss]
 
+  pp <- melt(pp, id.vars = c("Date", "language"), measure.vars = c("loc", "blank_lines", "comment_lines"))
+
+  ggplot(data = pp, aes(x = Date, y = value, colour = language, group = interaction(language, variable))) +
+    geom_point() + geom_line()
+}
 
 
 
