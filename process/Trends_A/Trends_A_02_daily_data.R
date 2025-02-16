@@ -298,11 +298,15 @@ for (DBn in dbs) {
     theme_bw()
   show(p)
 
+  DATA |> colnames()
+  SEAS |> colnames()
+
+
   ## Create deseasonal anomaly
   DATA <- left_join(
     DATA |> mutate(DOY = yday(Day)),
     SEAS,
-    by = "DOY",
+    by   = "DOY",
     copy = TRUE
   ) |> collect() |> data.table()
 
@@ -312,6 +316,7 @@ for (DBn in dbs) {
     seasvar <- paste0(av, "_seas")
     anomvar <- paste0(av, "_anom")
 
+    DATA |> colnames()
     DATA <- DATA |> mutate(
       !!anomvar := 100 * (get(av) - get(seasvar)) / get(seasvar),
       Decimal_date := decimal_date(Day)
