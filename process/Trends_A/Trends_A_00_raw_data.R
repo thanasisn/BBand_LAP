@@ -190,8 +190,6 @@ LAP <- LAP |> mutate(
 #'
 #' ## Remove Sun distance variation
 #'
-#' And create a TSI to compare with observations
-#'
 #+ include=T, echo=T, results="asis"
 
 LAP <- LAP |>
@@ -199,9 +197,7 @@ LAP <- LAP |>
     DIR_trnd_A     := DIR_strict  * (Sun_Dist_Astropy ^ 2),
     GLB_trnd_A     := GLB_strict  * (Sun_Dist_Astropy ^ 2),
     HOR_trnd_A     := HOR_strict  * (Sun_Dist_Astropy ^ 2),
-    DIFF_trnd_A    := DIFF_strict * (Sun_Dist_Astropy ^ 2),
-    TSI_GLB_trnd_A := case_when(!is.na(GLB_strict) ~ TSI, .default = NA),
-    TSI_DIR_trnd_A := case_when(!is.na(DIR_strict) ~ TSI, .default = NA)
+    DIFF_trnd_A    := DIFF_strict * (Sun_Dist_Astropy ^ 2)
   )
 
 ##  Set flag for sky conditions  -----------------------------------------------
@@ -226,7 +222,7 @@ ADD <- LAP |>
     SKY
   ) |> collect()  ## have to load data before removing LAP column
 
-## make sure we update all data
+## make sure we do not have stale data
 remove_column(con, "LAP", "DIR_trnd_A"    )
 remove_column(con, "LAP", "GLB_trnd_A"    )
 remove_column(con, "LAP", "HOR_trnd_A"    )
