@@ -199,7 +199,7 @@ LAP <- LAP |>
     HOR_trnd_A  := HOR_strict  * (Sun_Dist_Astropy ^ 2),
     DIFF_trnd_A := DIFF_strict * (Sun_Dist_Astropy ^ 2)
   )
-
+stop()
 
 ##  Set flag for sky conditions  -----------------------------------------------
 #'
