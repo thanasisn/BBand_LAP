@@ -79,6 +79,7 @@ if (!interactive()) {
 
 ## __ Load libraries  ----------------------------------------------------------
 source("~/BBand_LAP/DEFINITIONS.R")
+source("~/BBand_LAP/functions/Functions_duckdb_LAP.R")
 
 library(data.table, warn.conflicts = FALSE, quietly = TRUE)
 library(dbplyr,     warn.conflicts = FALSE, quietly = TRUE)
@@ -88,6 +89,9 @@ library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(cloc,       warn.conflicts = FALSE, quietly = TRUE)
 # install.packages("hrbrmstr/cloc")
+# remotes::install_github("hrbrmstr/cloc")
+# renv::install("hrbrmstr/cloc")
+
 
 
 overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size_duckdb.Rds"
