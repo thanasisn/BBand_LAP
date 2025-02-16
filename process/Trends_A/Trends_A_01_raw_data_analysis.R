@@ -45,7 +45,7 @@
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
 #' Trends from all one minute data, except some days with
-#' too few valid points.
+#' too few valid points, that have been removed.
 #'
 
 #+ include=F
@@ -112,12 +112,7 @@ CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
 ##  All data points  -----------------------------------------------------------
-vars <- c(
-  "DIR_trnd_A",
-  "HOR_trnd_A",
-  "GLB_trnd_A",
-  "DIFF_trnd_A"
-)
+vars <- LAP |> select(ends_with("_trnd_A")) |> colnames()
 
 dbs <- c(
   "ALL",
@@ -125,7 +120,9 @@ dbs <- c(
   "CLEAR"
 )
 
+#'
 #' ## Trends from raw data
+#'
 #+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
   DATA <- get(DBn)
