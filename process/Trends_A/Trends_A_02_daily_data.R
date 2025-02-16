@@ -111,6 +111,16 @@ LAP <- LAP |>
     SKY
   )
 
+
+##  Create TSI data for comparison with observations  --------------------------
+## No point to store these in the DB
+LAP <- LAP |>
+  mutate(
+    TSI_GLB_trnd_A := case_when(!is.na(GLB_strict) ~ TSI, .default = NA),
+    TSI_DIR_trnd_A := case_when(!is.na(DIR_strict) ~ TSI, .default = NA)
+  )
+
+
 ##  Create data sets  ----------------------------------------------------------
 ALL   <- LAP |>                           select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
