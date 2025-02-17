@@ -191,7 +191,6 @@ for (DBn in dbs) {
     }
     dbCreateTable(conn = con, name = tbl_name, DAILY)
     res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
-    # cat("\n Created", tbl_name, "\n\n")
   }
 }
 

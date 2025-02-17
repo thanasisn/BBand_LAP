@@ -101,6 +101,9 @@ META <- tbl(con, "META") |> select(Day, Daylength)
 ##  Create monthly data sets  ---------------------------------------------------
 dbs <- grep("Trend_A_DAILY", dbListTables(con), value = TRUE)
 
+##  Create monthly values  -----------------------------
+#'
+#' \newpage
 #'
 #' ## Create monthly values
 #'
@@ -108,7 +111,6 @@ dbs <- grep("Trend_A_DAILY", dbListTables(con), value = TRUE)
 #' will compute mean of daily means, not anomaly
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   type <- sub(".*_", "", DBn)
@@ -118,7 +120,7 @@ for (DBn in dbs) {
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Monthly means", var_name(DBn), "\n\n"))
 
-  ## Create monthly values and stats
+  ## __ Create monthly values and statistics  ----------------------------------
   MONTHLY <- DATA   |>
     group_by(Year = year(Day), Month =  month(Day)) |>
     summarise(
@@ -140,7 +142,16 @@ for (DBn in dbs) {
   MONTHLY$Day <- as.Date(strptime(paste(MONTHLY$Year, MONTHLY$Month, "01"), "%Y %m %d"))
   MONTHLY[, Decimal_date := decimal_date(Day)]
 
-  ## inspect fill ratios of valid observations
+  ## __ Flag monthly data with season  -----------------------------------------
+  ## create continuous seasonal variable
+  MONTHLY[, season_Yqrt := as.yearqtr(as.yearmon(paste(year(Day), month(Day), sep = "-")) + 1/12)]
+  ## Flag seasons using quarters
+  MONTHLY[season_Yqrt %% 1 == 0   , Season := "Winter"]
+  MONTHLY[season_Yqrt %% 1 == 0.25, Season := "Spring"]
+  MONTHLY[season_Yqrt %% 1 == 0.50, Season := "Summer"]
+  MONTHLY[season_Yqrt %% 1 == 0.75, Season := "Autumn"]
+
+  ## inspect fill ratios of observations
   hist(MONTHLY[!is.na(GLB_trnd_A_mean_mean), GLB_trnd_A_mean_N], breaks = 100,
        main = paste("Occurance of days with data", var_name("GLB_trnd_A_mean_N")),
        ylab = "Occurances")
@@ -149,15 +160,15 @@ for (DBn in dbs) {
        main = paste("Occurance of days with data", var_name("DIR_trnd_A_mean_N")),
        ylab = "Occurances")
 
-  ## Store monthly values as is
-  tbl_name <- paste0("Trend_A_MONTHLY_", type)
-  if (dbExistsTable(con , tbl_name)) {
-    # cat("\n Remove table", tbl_name, "\n\n")
-    dbRemoveTable(con, tbl_name)
+  ##  Store monthly values as is
+  if (Sys.info()["nodename"] == Main.Host) {
+    tbl_name <- paste0("Trend_A_MONTHLY_", type)
+    if (dbExistsTable(con , tbl_name)) {
+      dbRemoveTable(con, tbl_name)
+    }
+    dbCreateTable(conn = con, name = tbl_name, MONTHLY)
+    res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
   }
-  dbCreateTable(conn = con, name = tbl_name, MONTHLY)
-  res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
-  # cat("\n Created", tbl_name, "\n\n")
 }
 
 
@@ -174,26 +185,32 @@ dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 
 for (DBn in dbs) {
   DATA <- tbl(con, DBn) |> collect() |> data.table()
-  type <- sub(".*_", "", DBn)
 
-  varstochech <- DATA |> select(contains("_mean_mean")) |> colnames()
+  varstochech <- DATA |> select(ends_with("_mean_mean")) |> colnames()
 
+  ## FIXME???
   ## set means on days with less than n days to NA
   for (av in varstochech) {
     paste(av)
     tv <- paste0(sub("_mean$", "", av), "_N")
-    DATA[get(tv) < Monthly_aggegation_N_lim, eval(av) := NA ]
+
+    hist(DATA[!is.na(av), get(tv)], breaks = 100,
+         ylab = "All days data")
+
+    DATA[get(tv) <  Monthly_aggegation_N_lim, eval(av) := NA ]
+    cat("Days", DATA[get(tv) >= Monthly_aggegation_N_lim, .N ], "days droped for", av, "\n")
+
+    hist(DATA[!is.na(av), get(tv)], breaks = 100,
+         ylab = "Valid data days")
+
   }
 
   ## store data to db
-  dbRemoveTable(con, DBn)
-  dbCreateTable(conn = con, name = DBn, DATA)
-  res <- insert_table(con, DATA, DBn, "Day", quiet = TRUE)
-  # cat("\n Re-created filtered:", DBn, "table\n\n")
-
-  hist(DATA[!is.na(av), get(tv)], breaks = 100,
-       ylab = "Valid data days")
-
+  if (Sys.info()["nodename"] == Main.Host) {
+    dbRemoveTable(con, DBn)
+    dbCreateTable(conn = con, name = DBn, DATA)
+    res <- insert_table(con, DATA, DBn, "Day", quiet = TRUE)
+  }
 }
 
 
@@ -206,7 +223,7 @@ dbs <- grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE)
 #'
 #' ## Departure from monthly climatology
 #'
-#' Compute monthly anomaly `_mean_anom` from `_mean_mean` - `_mean_seas`
+#' Compute monthly anomaly `_mean_anom` from `_mean_mean` - `_mean_clima`
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
 
@@ -219,31 +236,31 @@ for (DBn in dbs) {
 
   vars <- DATA |> select(contains("_mean_mean")) |> colnames()
 
-  ##  Compute seasonal monthly values --------------------------------------------
-  SEAS <- DATA |>
+  ##  Compute monthly climatology ------------------------------------------
+  CLIMA <- DATA |>
     group_by(Month) |>
     summarise(
-      Seas_N = n(),
+      Clima_N = n(),
       across(
         .cols = ends_with(c("_NAs", "_N")),
         .fns  = list(
-          total = ~ sum(.x, na.rm = TRUE)
+          clima_total = ~ sum(.x, na.rm = TRUE)
         )
       ),
       across(
         .cols = ends_with("_mean"),
         .fns  = list(
-          seas = ~ mean(.x, na.rm = TRUE),
-          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+          clima     = ~ mean(.x, na.rm = TRUE),
+          clima_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
+          clima_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
         )
       )
     ) |> collect() |> data.table()
 
 
   ## Plot seasonal values
-  p <- SEAS |> select(Month,
-                      ends_with(c("_mean_mean_seas"))) |>
+  p <- CLIMA |> select(Month,
+                      ends_with(c("_mean_mean_clima"))) |>
     melt(id.vars = 'Month', variable.name = 'Radiation') |>
     ggplot(aes(x = Month, y = value)) +
     geom_point( aes(colour = Radiation)) +
@@ -256,7 +273,7 @@ for (DBn in dbs) {
   ## Create deseasonal anomaly
   DATA <- left_join(
     DATA,
-    SEAS,
+    CLIMA,
     by = "Month",
     copy = TRUE
   ) |> collect() |> data.table()
@@ -264,11 +281,11 @@ for (DBn in dbs) {
   for (av in vars) {
     cat("Compute anomaly for ", av, "\n")
 
-    seasvar <- paste0(av, "_seas")
-    anomvar <- paste0(av, "_anom")
+    climavar <- paste0(av, "_clima")
+    anomvar  <- paste0(av, "_anom" )
 
     DATA <- DATA |> mutate(
-      !!anomvar := 100 * (get(av) - get(seasvar)) / get(seasvar),
+      !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
       Decimal_date := decimal_date(Day)
     ) |> collect()
 
