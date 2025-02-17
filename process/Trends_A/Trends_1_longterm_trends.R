@@ -19,8 +19,6 @@ source("./DHI_GHI_0_variables.R")
 source("./var_translation.R")
 
 
-## choose loess criterion for span
-LOESS_CRITERIO <-  c("aicc", "gcv")[1]
 
 
 
@@ -44,78 +42,7 @@ LOESS_CRITERIO <-  c("aicc", "gcv")[1]
 
 
 ## __ Plot data trends  --------------------------------------------------------
-#'
-#' ### Trends from daily means
-#'
 
-
-
-
-#+ LongtermSeasonal, echo=F, include=T, results="asis"
-# vars <- c("HOR_att","DIR_transp", "DIR_att", "GLB_att", "tsi1au_att")
-vars <- c("DIR_att_seas", "GLB_att_seas", "wattGLB_seas")
-
-dbs         <- c(  "ALL_1_daily_DESEAS",
-                   "CLEAR_1_daily_DESEAS",
-                   "CLOUD_1_daily_DESEAS")
-rmw_days <- 15
-
-for (DBn in dbs) {
-    DB <- get(DBn)
-    cat("\n\\newpage\n")
-    cat("\n#### Climatology on", translate(DBn), "data with", rmw_days, "d running mean\n\n" )
-
-    for (avar in vars) {
-        dataset <- DB
-        dataset <- unique(dataset[, .( doy, get(avar))])
-        setorder(dataset, doy)
-
-        if (all(is.na(dataset$V2))) next()
-
-        par("mar" = c(3, 4, 2, 1))
-
-        if (grepl("wattGLB", yvar)) {
-            acol <- "green"
-        } else {
-            acol <- get(paste0(c("col", unlist(strsplit(yvar, split = "_"))[1:2]),
-                              collapse = "_"))
-        }
-
-        ## plot data
-        plot(dataset$doy, dataset$V2,
-             pch      = ".",
-             col      = acol,
-             cex      = 2,
-             main     = paste("Climatology", translate(DBn), translate(avar)),
-             cex.main = 0.8,
-             yaxt     = "n",
-             xlab     = "",
-             ylab     = bquote("SDR")
-        )
-        axis(2, pretty(dataset$V2), las = 2 )
-
-
-        ## Running mean
-        rm <- frollmean(dataset$V2,
-                        15,
-                        na.rm = TRUE,
-                        algo  = "exact",
-                        align = "center")
-
-        # points(dataset$Date, rm, col = "red", cex = 0.5)
-        lines(dataset$doy, rm, col = "red", lwd = 1.5)
-
-        ## LOESS curve
-        vec <- !is.na(dataset$V2)
-        FTSE.lo3 <- loess.as(dataset$doy[vec], dataset$V2[vec],
-                             degree = 1,
-                             criterion = LOESS_CRITERIO, user.span = NULL, plot = F)
-        FTSE.lo.predict3 <- predict(FTSE.lo3, dataset$doy)
-        lines(dataset$doy, FTSE.lo.predict3, col = "cyan", lwd = 2.5)
-
-    }
-}
-#+ echo=F, include=F
 
 
 
@@ -824,101 +751,6 @@ for (avar in vars) {
 
 
 
-## __ Calculate trends for each season  ----------------------------------------
-vars        <- c("DIR_att_des", "GLB_att_des")
-
-## vars are  set above
-gather_seas <- data.frame()
-for (DBn in dbs) {
-    DB <- get(DBn)
-
-    for (ase in Seasons) {
-        for (avar in vars) {
-            dataset <- DB[ Season == ase, ]
-
-            if (sum(!is.na(dataset[[avar]])) <= 1) next()
-
-            ## linear model counting years
-            lm2 <- lm(dataset[[avar]] ~ dataset$Year)
-            ## correlation test
-            cor1 <- cor.test(x = dataset[[avar]], y = as.numeric(dataset$Year), method = 'pearson')
-
-            lag   <- 1
-            dd    <- acf(dataset[[avar]], na.action = na.pass, plot = FALSE)
-            N_eff <- sum(!is.na(dataset[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
-            se_sq <- sum((lm1$residuals)^2, na.rm = T) / (N_eff - 2)
-            sa_sq <- se_sq / sum((dataset[[avar]] - mean(dataset[[avar]], na.rm = T))^2, na.rm = T)
-            t_eff     <- lm1$coefficients[[2]] / sa_sq
-            #find two-tailed t critical values
-            t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
-
-            conf      <- confint(lm1)
-            conf_2.5  <- conf[2,1]
-            conf_97.5 <- conf[2,2]
-
-            ## gather stats
-            gather_seas <- rbind(gather_seas,
-                                 data.frame(
-                                     linear_fit_stats(lm2,
-                                                      confidence_interval = Daily_confidence_limit),
-                                     cor_test_stats(cor1),
-                                     DATA      = DBn,
-                                     Season    = ase,
-                                     var       = avar,
-                                     N         = sum(!is.na(dataset[[avar]])),
-                                     N_eff     = N_eff,
-                                     t_eff     = t_eff,
-                                     t_eff_cri = t_eff_cri,
-                                     conf_2.5  = conf_2.5,
-                                     conf_97.5 = conf_97.5
-                                 ))
-        }
-    }
-}
-
-## __ Display data table  ------------------------------------------------------
-#'
-#' \newpage
-#' \FloatBarrier
-#'
-#' #### Table of trends by season.
-#'
-#+ echo=F, include=T
-
-wecare           <- grep("intercept", names(gather_seas), value = T, invert = T)
-gather_seas      <- data.table(gather_seas)
-gather_seas$DATA <- sub("_.*", "", gather_seas$DATA)
-
-
-pprint           <- gather_seas[ , ..wecare]
-
-pprint$cor.data_name        <- NULL
-pprint[, slope.stat_sig     := 100 * (1 - slope.p)]
-pprint[, slope.t            := NULL               ]
-# pprint[, Rsqrd              := NULL               ]
-# pprint[, RsqrdAdj           := NULL               ]
-pprint[, N                  := NULL               ]
-pprint[, slope.ConfInt_0.99 := NULL               ]
-pprint[, slope.ConfInt_0.95 := NULL               ]
-pprint[, DATA               := translate(DATA)    ]
-pprint[, var                := translate(var)     ]
-
-pprint$cor.data_name   <- NULL
-pprint$cor.null_value  <- NULL
-pprint$cor.method      <- NULL
-pprint$cor.alternative <- NULL
-pprint$cor.p           <- NULL
-
-setorder(pprint, DATA, var)
-
-#+ echo=F, include=T
-pander(pprint,
-       cap = "Slope is in %/year")
-#+ echo=F, include=F
-
-
-
-
 
 
 
@@ -1429,13 +1261,6 @@ for (DBn in dbs) {
             lm2 <- lm(dataset[[avar]] ~ dataset$Year)
             ## correlation test
 
-            # if (sum(!is.na(dataset[[avar]])) > 2) {
-            #     cor1    <- cor.test(x = dataset[[avar]], y = as.numeric(dataset$Date), method = 'pearson')
-            #     tempcor <- cor_test_stats(cor1)
-            # } else {
-            #     tempcor <- NA
-            # }
-
             ## gather stats
             temp <- data.frame(
                 linear_fit_stats(lm2,
@@ -1452,17 +1277,3 @@ for (DBn in dbs) {
     }
 }
 
-
-
-## __ Display table with trends and stats  -------------------------------------
-#'
-#' \FloatBarrier
-#'
-#' #### Table of trends by month.
-#'
-#+ echo=F, include=T
-
-wecare        <- grep("intercept", names(gather_seas), value = T, invert = T)
-gather_seas   <- data.table(gather_seas)
-## some wired data where inserted
-gather_seas   <- gather_seas[DATA != "TRUE",]
