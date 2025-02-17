@@ -244,69 +244,66 @@ hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
      ylab = "Valid data ratio")
 
 
-##  Daily deseasonal values  ---------------------------------------------------
+##  Daily deseasonalized values  -----------------------------------------------
 dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
-##  Create daily values  -------------------------------------------------------
 #'
 #' \newpage
 #'
-#' ## Create seasonal data and anomaly
+#' ## Create daily climatology data and anomaly
 #'
-#' We compute daily anomaly `_anom` as 100 (`_mean` - `_seas`) / `_seas`
+#' We compute daily anomaly `_anom` as 100 (`_mean` - `_clima`) / `_clima`
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
-  DATA <- DATA |> select(-contains("_seas"))
+  DATA <- DATA |> select(-contains("_clima"))
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
 
-  ##  Compute seasonal daily values --------------------------------------------
-  SEAS <- DATA |>
+  ##  Compute daily climatology values -----------------------------------------
+  CLIMA <- DATA |>
     group_by(DOY = yday(Day)) |>
     summarise(
-      Seas_N = n(),
+      Clima_N = n(),
+      ## get the totals of data in each mean
       across(
         .cols = ends_with(c("_NAs", "_N")),
         .fns  = list(
-          total = ~ sum(.x, na.rm = TRUE)
+          clima_total = ~ sum(.x, na.rm = TRUE)
         )
       ),
+      ## create climatology for each mean
       across(
         .cols = ends_with("_mean"),
         .fns  = list(
-          seas     = ~ mean(.x, na.rm = TRUE),
-          seas_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          seas_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+          clima     = ~ mean(.x, na.rm = TRUE),
+          clima_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
+          clima_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
         )
       )
     ) |> collect() |> data.table()
 
 
-  ## Plot seasonal values
-  p <- SEAS |> select(DOY,
-                      GLB_strict_mean_seas,
-                      ends_with(c("trnd_A_mean_seas"))) |>
+  ## Plot climatology values
+  p <- CLIMA |> select(DOY,
+                      ends_with(c("trnd_A_mean_clima"))) |>
     melt(id.vars = 'DOY', variable.name = 'Radiation') |>
     ggplot(aes(x = DOY, y = value)) +
     geom_point( aes(colour = Radiation)) +
-    geom_smooth(aes(colour = Radiation)) +
+    geom_smooth(aes(colour = Radiation), using method = 'loess', ) +
     labs(subtitle = paste("Daily climatology for ", var_name(DBn)),
          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
     theme_bw()
   show(p)
 
-  DATA |> colnames()
-  SEAS |> colnames()
-
 
   ## Create deseasonal anomaly
   DATA <- left_join(
     DATA |> mutate(DOY = yday(Day)),
-    SEAS,
+    CLIMA,
     by   = "DOY",
     copy = TRUE
   ) |> collect() |> data.table()
@@ -314,12 +311,12 @@ for (DBn in dbs) {
   for (av in vars) {
     cat("Compute anomaly for ", av, "\n")
 
-    seasvar <- paste0(av, "_seas")
-    anomvar <- paste0(av, "_anom")
+    climavar <- paste0(av, "_clima")
+    anomvar  <- paste0(av, "_anom" )
 
     DATA |> colnames()
     DATA <- DATA |> mutate(
-      !!anomvar := 100 * (get(av) - get(seasvar)) / get(seasvar),
+      !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
       Decimal_date := decimal_date(Day)
     ) |> collect()
 
@@ -337,16 +334,51 @@ for (DBn in dbs) {
 
 
 
-##  Daily deseasonal values by season  -----------------------------------------
+
+##  Daily deseasonalized values by season of year  -----------------------------
 dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
 #'
 #' \newpage
 #'
-#' ## Create seasonal data and anomaly by season
+#' ## Create climatology data and anomaly by season of year
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
+for (DBn in dbs) {
+  DATA <- tbl(con, DBn)
+  DATA <- DATA |> select(-contains("_seas"))
+  vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Season of year daily deseasonal", var_name(DBn), "\n\n"))
+
+  ##  Compute daily climatology by season  -------------------------------------
+  SEAS <- DATA |>
+    group_by(Season) |>
+    summarise(
+      Seas_N = n(),
+      ## get the totals of data in each mean
+      across(
+        .cols = ends_with(c("_NAs", "_N")),
+        .fns  = list(
+          seas_total = ~ sum(.x, na.rm = TRUE)
+        )
+      ),
+      ## create climatology for each mean
+      across(
+        .cols = ends_with("_mean"),
+        .fns  = list(
+          seas     = ~ mean(.x, na.rm = TRUE),
+          seas_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
+          seas_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+        )
+      )
+    ) |> collect() |> data.table()
+
+
+
+
+}
 
 
 

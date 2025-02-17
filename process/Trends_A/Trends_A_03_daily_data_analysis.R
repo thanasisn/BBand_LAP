@@ -108,7 +108,7 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 #+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
   ## get data and variables to analyse
-  DATA <- tbl(con, DBn) |> collect() |> data.table()
+  DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
@@ -163,7 +163,7 @@ for (DBn in dbs) {
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
-      geom_ma(n = running_mean_window_days) +
+      geom_ma(n = running_mean_window_days, ma_fun = SMA, colour = "cyan") +
       geom_smooth(method = "loess", formula = y ~ x, colour = "orange") +
       geom_smooth(method = "lm",    formula = y ~ x, colour = "red", fill = "red", se = F) +
       stat_regline_equation(label.y.npc = 1) +
@@ -186,9 +186,9 @@ for (DBn in dbs) {
 #+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
   ## get data and variables to analyse
-  DATA <- tbl(con, DBn) |> collect() |> data.table()
+  DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
   vars <- sort(DATA |> select(ends_with("_mean_anom")) |> colnames())
-
+stop()
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n\n"))
 
@@ -242,7 +242,7 @@ for (DBn in dbs) {
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
-      geom_ma(n = running_mean_window_days) +
+      geom_ma(n = running_mean_window_days, ma_fun = SMA, colour = "cyan") +
       geom_smooth(method = "loess", formula = y ~ x, colour = "orange") +
       geom_smooth(method = "lm",    formula = y ~ x, colour = "red", fill = "red", se = F) +
       stat_regline_equation(label.y.npc = 1) +
