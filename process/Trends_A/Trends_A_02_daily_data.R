@@ -258,6 +258,7 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 #+ include=T, echo=T, results="asis", warning=FALSE
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
+  DATA <- DATA |> select(-contains("_seas"))
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
@@ -277,9 +278,9 @@ for (DBn in dbs) {
       across(
         .cols = ends_with("_mean"),
         .fns  = list(
-          seas = ~ mean(.x, na.rm = TRUE),
-          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+          seas     = ~ mean(.x, na.rm = TRUE),
+          seas_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
+          seas_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
         )
       )
     ) |> collect() |> data.table()
