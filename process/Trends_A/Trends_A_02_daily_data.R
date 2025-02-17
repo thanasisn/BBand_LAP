@@ -121,7 +121,7 @@ LAP <- LAP |>
   )
 
 
-##  Create data sets  ----------------------------------------------------------
+##  Create sky data sets  ------------------------------------------------------
 ALL   <- LAP |>                           select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
@@ -263,7 +263,7 @@ for (DBn in dbs) {
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
 
-  ##  Compute daily climatology values -----------------------------------------
+  ## __ Compute daily climatology values ----------------------------------------
   CLIMA <- DATA |>
     group_by(DOY = yday(Day)) |>
     summarise(
@@ -293,14 +293,14 @@ for (DBn in dbs) {
     melt(id.vars = 'DOY', variable.name = 'Radiation') |>
     ggplot(aes(x = DOY, y = value)) +
     geom_point( aes(colour = Radiation)) +
-    geom_smooth(aes(colour = Radiation), using method = 'loess', ) +
+    geom_smooth(aes(colour = Radiation), method = 'loess', formula = 'y ~ x') +
     labs(subtitle = paste("Daily climatology for ", var_name(DBn)),
          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
     theme_bw()
   show(p)
 
 
-  ## Create deseasonal anomaly
+  ## __ Create deseasonal anomaly  ---------------------------------------------
   DATA <- left_join(
     DATA |> mutate(DOY = yday(Day)),
     CLIMA,
@@ -309,7 +309,7 @@ for (DBn in dbs) {
   ) |> collect() |> data.table()
 
   for (av in vars) {
-    cat("Compute anomaly for ", av, "\n")
+    cat("Compute anomaly by DOY for ", av, "\n")
 
     climavar <- paste0(av, "_clima")
     anomvar  <- paste0(av, "_anom" )
@@ -325,10 +325,9 @@ for (DBn in dbs) {
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
-  ## Store anomaly data
+  ## Store daily anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
-    # cat("\nTable", DBn, "updated\n\n")
   }
 }
 
@@ -352,7 +351,7 @@ for (DBn in dbs) {
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Season of year daily deseasonal", var_name(DBn), "\n\n"))
 
-  ##  Compute daily climatology by season  -------------------------------------
+  ## __ Compute daily climatology by season  -----------------------------------
   SEAS <- DATA |>
     group_by(Season) |>
     summarise(
@@ -376,15 +375,54 @@ for (DBn in dbs) {
     ) |> collect() |> data.table()
 
 
+  ## Plot seasonal values
+  p <- SEAS |> select(Season, ends_with(c("trnd_A_mean_seas"))) |>
+    arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
+    melt(id.vars = 'Season', variable.name = 'Radiation')  |>
+    ggplot(aes(x = Season, y = value)) +
+    geom_point(aes(colour = Radiation)) +
+    geom_line( aes(colour = Radiation, group = Radiation) ) +
+    geom_smooth(aes(colour = Radiation), method = 'loess', formula = 'y ~ x') +
+    labs(subtitle = paste("Season climatology for ", var_name(DBn)),
+         y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
+    theme_bw()
+  show(p)
 
+  ## __ Create deseasonal anomaly  ---------------------------------------------
+  DATA <- left_join(
+    DATA,
+    SEAS,
+    by   = "Season",
+    copy = TRUE
+  ) |> collect() |> data.table()
 
+  for (av in vars) {
+    cat("Compute anomaly by season for ", av, "\n")
+
+    climavar <- paste0(av, "_seas")
+    anomvar  <- paste0(av, "_seasanom" )
+
+    DATA |> colnames()
+    DATA <- DATA |> mutate(
+      !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
+      Decimal_date := decimal_date(Day)
+    ) |> collect()
+
+    ## protect database numeric type
+    DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
+    DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
+  }
+
+  ## Store daily anomaly data
+  if (Sys.info()["nodename"] == Main.Host) {
+    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
+  }
 }
 
 
 
-
 #+ Clean_exit, echo=FALSE
-dbDisconnect(con, shutdown = TRUE); rm(con)
+if (!interactive()) { dbDisconnect(con, shutdown = TRUE); rm(con) }
 
 #' \FloatBarrier
 #+ results="asis", echo=FALSE
