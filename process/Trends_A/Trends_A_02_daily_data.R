@@ -129,7 +129,8 @@ CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 dbs <- sort(c( "ALL", "CLOUD", "CLEAR"))
 
 ##  Create daily values  -------------------------------------------------------
-#'
+
+#' \FloatBarrier
 #' \newpage
 #'
 #' ## Create daily means for each data set
@@ -174,7 +175,7 @@ for (DBn in dbs) {
   DAILY[season_Yqrt %% 1 == 0.50, Season := "Summer"]
   DAILY[season_Yqrt %% 1 == 0.75, Season := "Autumn"]
 
-  ## inspect fill ratios for observations
+  ## inspect fill ratios of observations
   hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
        main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
        ylab = "Valid data ratio")
@@ -200,7 +201,7 @@ for (DBn in dbs) {
 ##  Daily data representation  -------------------------------------------------
 warning("This breaks other variables for Clear and Cloud!! This is only for GHI")
 
-#'
+#' \FloatBarrier
 #' \newpage
 #'
 #' ## Apply some filtering on the data to use
@@ -249,7 +250,7 @@ hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
 ##  Daily deseasonalized values  -----------------------------------------------
 dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
-#'
+#' \FloatBarrier
 #' \newpage
 #'
 #' ## Create daily climatology data and anomaly
@@ -291,8 +292,9 @@ for (DBn in dbs) {
 
   ## Plot climatology values
   p <- CLIMA |> select(DOY,
-                      ends_with(c("trnd_A_mean_clima"))) |>
-    melt(id.vars = 'DOY', variable.name = 'Radiation') |>
+                       !starts_with("TSI") &
+                       ends_with(c("trnd_A_mean_clima"))) |>
+    melt(id.vars = 'DOY', variable.name = 'Radiation')   |>
     ggplot(aes(x = DOY, y = value)) +
     geom_point( aes(colour = Radiation)) +
     geom_smooth(aes(colour = Radiation), method = 'loess', formula = 'y ~ x') +
@@ -300,7 +302,6 @@ for (DBn in dbs) {
          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
     theme_bw()
   show(p)
-
 
   ## __ Create deseasonal anomaly  ---------------------------------------------
   DATA <- left_join(
@@ -311,12 +312,11 @@ for (DBn in dbs) {
   ) |> collect() |> data.table()
 
   for (av in vars) {
-    cat("Compute anomaly by DOY for ", av, "\n")
+    cat("Compute anomaly by DOY for ", av, "\n\n")
 
     climavar <- paste0(av, "_clima")
     anomvar  <- paste0(av, "_anom" )
 
-    DATA |> colnames()
     DATA <- DATA |> mutate(
       !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
       Decimal_date := decimal_date(Day)
@@ -339,7 +339,7 @@ for (DBn in dbs) {
 ##  Daily deseasonalized values by season of year  -----------------------------
 dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
-#'
+#' \FloatBarrier
 #' \newpage
 #'
 #' ## Create climatology data and anomaly by season of year
@@ -377,8 +377,10 @@ for (DBn in dbs) {
     ) |> collect() |> data.table()
 
 
-  ## Plot seasonal values
-  p <- SEAS |> select(Season, ends_with(c("trnd_A_mean_seas"))) |>
+  ## Plot seasonal climatology values
+  p <- SEAS |> select(Season,
+                      !starts_with("TSI") &
+                      ends_with(c("trnd_A_mean_seas"))) |>
     arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
     melt(id.vars = 'Season', variable.name = 'Radiation')  |>
     ggplot(aes(x = Season, y = value)) +
@@ -399,12 +401,11 @@ for (DBn in dbs) {
   ) |> collect() |> data.table()
 
   for (av in vars) {
-    cat("Compute anomaly by season for ", av, "\n")
+    cat("Compute anomaly by season for ", av, "\n\n")
 
     climavar <- paste0(av, "_seas")
     anomvar  <- paste0(av, "_seasanom" )
 
-    DATA |> colnames()
     DATA <- DATA |> mutate(
       !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
       Decimal_date := decimal_date(Day)
