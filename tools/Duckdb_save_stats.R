@@ -198,11 +198,11 @@ rm(overview_data)
 
 
 ##  Source code statistics  ----------------------------------------------------
-## override previous file
+## override previous data file
 overview_data <- "~/BBand_LAP/SIDE_DATA/Source_code_stats.Rds"
 codemetrics   <- data.frame()
 
-dir_list <- list.dirs("~/BBand_LAP", recursive = FALSE)
+dir_list <- c(list.dirs("~/BBand_LAP", recursive = FALSE), path.expand("~/BBand_LAP"))
 dir_list <- grep(".Rproj.user|.git|REPORTS|RESOURCES|PARAMS|renv|SIDE_DATA", dir_list, invert = T, value = T)
 
 for (adir in dir_list) {
@@ -226,8 +226,7 @@ if (!file.exists(overview_data)) {
 }
 rm(overview_data)
 
-
-
+list.files("~/BBand_LAP", recursive = FALSE, full.names = T, include.dirs = T)
 
 
 
