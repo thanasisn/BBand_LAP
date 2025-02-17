@@ -85,8 +85,9 @@ library(tools,      warn.conflicts = FALSE, quietly = TRUE)
 library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
+library(zoo,        warn.conflicts = FALSE, quietly = TRUE)
 
-#+ include=T, echo=F, results="asis"
+#+ include=T, echo=F, results="asis", warning=F
 ##  Open dataset  --------------------------------------------------------------
 if (Sys.info()["nodename"] == Main.Host) {
   con <- dbConnect(duckdb(dbdir = DB_BROAD))
@@ -115,7 +116,7 @@ for (DBn in dbs) {
   vars <- DATA |> select(ends_with("_mean")) |> colnames()
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Monthly means", type, "\n\n"))
+  cat(paste("\n## Monthly means", var_name(DBn), "\n\n"))
 
   ## Create monthly values and stats
   MONTHLY <- DATA   |>
@@ -279,14 +280,13 @@ for (DBn in dbs) {
   ## Store anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
     res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
-    # cat("\nTable", DBn, "updated\n\n")
   }
 }
 
 
 
 #+ Clean_exit, echo=FALSE
-dbDisconnect(con, shutdown = TRUE); rm(con)
+if (!interactive()) { dbDisconnect(con, shutdown = TRUE); rm(con) }
 
 #' \FloatBarrier
 #+ results="asis", echo=FALSE
