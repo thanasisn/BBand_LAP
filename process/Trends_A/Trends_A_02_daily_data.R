@@ -178,10 +178,13 @@ for (DBn in dbs) {
   hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
        main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
        ylab = "Valid data ratio")
+  abline(v = Cloud_daily_ratio_lim, col = "red")
 
   hist(DAILY[!is.na(DIR_trnd_A_mean), DIR_trnd_A_N/Daylength], breaks = 100,
        main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
        ylab = "Valid data ratio")
+  abline(v = Cloud_daily_ratio_lim, col = "red")
+
 
   ## Store daily values as is
   if (Sys.info()["nodename"] == Main.Host) {

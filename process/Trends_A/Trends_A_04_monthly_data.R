@@ -196,6 +196,15 @@ for (DBn in dbs) {
 
     hist(DATA[!is.na(av), get(tv)], breaks = 100,
          ylab = "All days data")
+    abline(v = Monthly_aggegation_N_lim, col = "red")
+
+    test <- DATA |> mutate(
+      !!av := case_when(
+        !!tv <  Monthly_aggegation_N_lim ~ NA,
+        !!tv >= Monthly_aggegation_N_lim ~ av
+        )
+    )
+
 
     DATA[get(tv) <  Monthly_aggegation_N_lim, eval(av) := NA ]
     cat("Days", DATA[get(tv) >= Monthly_aggegation_N_lim, .N ], "days droped for", av, "\n")
@@ -204,7 +213,7 @@ for (DBn in dbs) {
          ylab = "Valid data days")
 
   }
-
+stop()
   ## store data to db
   if (Sys.info()["nodename"] == Main.Host) {
     dbRemoveTable(con, DBn)
