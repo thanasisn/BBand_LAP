@@ -86,6 +86,8 @@ library(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 library(ggpubr,     warn.conflicts = FALSE, quietly = TRUE)
+library(zoo,        warn.conflicts = FALSE, quietly = TRUE)
+library(tidyquant,  warn.conflicts = FALSE, quietly = TRUE)
 
 
 #+ include=T, echo=F, results="asis"
@@ -99,67 +101,158 @@ if (Sys.info()["nodename"] == Main.Host) {
 ## list of monthly tables
 dbs <- sort(grep("_MONTHLY_", dbListTables(con), value = TRUE))
 
-##  Monthly points  -----------------------------------------------------------
+##  Monthly mean values  -------------------------------------------------------
 #'
 #' ## Monthly mean values of variables
 #'
-#+ monthly-mean-trends, include=T, echo=F, results="asis", warning=F
-
+#+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
-  DATA <- tbl(con, DBn)
-  type <- sub(".*_", "", DBn)
-  ## variables to plot
-  vars <- DATA |> select(ends_with("_mean_mean")) |> colnames()
+  ## get data and variables to analyse
+  DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
+  vars <- sort(DATA |> select(ends_with("_mean_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
 
+    cat("\n\\FloatBarrier\n\n")
+    cat(paste("\n####", var_name(avar), avar, "\n\n\n"))
+
+    ## data date range
+    cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
+
+    ## _ Linear trend by year  -------------------------------------------------
+    lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
+    d   <- summary(lm1)$coefficients
+    cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2, 2], 4), "p=", round(d[2, 4], 4), "\n\n")
+
+    ## _ Correlation test
+    cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
+
+    ## _ Arima auto regression Tourpali ----------------------------------------
+    ## create a time variable (with lag of 1 day ?)
+    DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
+    tmodel <- arima(x = DATA[[avar]], order = c(1, 0, 0), xreg = DATA$ts, method = "ML")
+
+    ## trend per year with auto correlation
+    ## estimates, associated standard errors, test statistics and p values
+    Tres <- data.frame(t(lmtest::coeftest(tmodel)[3, ]))
+    Tint <- data.frame(t(lmtest::coeftest(tmodel)[2, ]))
+    names(Tres) <- paste0("Tmod_", names(Tres))
+    cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
+
+
+    ## _ Time series analysis --------------------------------------------------
+    dd        <- read.zoo(DATA, index.column = "Day")
+    dd        <- as.ts(dd)
+
+    lag       <- 1
+    dd        <- acf(DATA[[avar]], na.action = na.pass, plot = FALSE)
+    N_eff     <- sum(!is.na(DATA[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
+    se_sq     <- sum((lm1$residuals)^2, na.rm = TRUE) / (N_eff - 2)
+    sa_sq     <- se_sq / sum((DATA[[avar]] - mean(DATA[[avar]], na.rm = TRUE))^2, na.rm = TRUE)
+    t_eff     <- lm1$coefficients[[2]] / sa_sq
+    # find two-tailed t critical values
+    t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
+
+    conf      <- confint(lm1)
+    conf_2.5  <- conf[2,1]
+    conf_97.5 <- conf[2,2]
+
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
-      geom_smooth(method = 'lm', formula = y ~ x, colour = "red", fill = "red") +
+      geom_ma(n = (running_mean_window_days/30), ma_fun = SMA, colour = "cyan") +
+      geom_smooth(method = "loess", formula = y ~ x, colour = "orange") +
+      geom_smooth(method = "lm",    formula = y ~ x, colour = "red", fill = "red", se = FALSE) +
       stat_regline_equation(label.y.npc = 1) +
       labs(x = element_blank(),
            y = bquote(.(var_name(avar)) ~ ~ group("[", W/m^2, "]")),
            subtitle = paste(var_name(DBn), var_name(avar))) +
       theme_bw()
     show(p)
+
   }
 }
 
 
-
-
-##  Plot monthly anomaly values
+##  Plot monthly anomaly values  -----------------------------------------------
 #'
+#' \FloatBarrier
 #' \newpage
 #'
 #' ## Monthly departure from the climatology
 #'
-#+ monthly-anomaly-trends, include=T, echo=F, results="asis", warning=F
-
+#+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
-  DATA <- tbl(con, DBn)
-  type <- sub(".*_", "", DBn)
-  ## variables to plot
-  vars <- DATA |> select(ends_with("_mean_anom")) |> colnames()
+  ## get data and variables to analyse
+  DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
+  vars <- sort(DATA |> select(ends_with("_mean_anom")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n###", var_name(DBn), "\n\n"))
+  cat(paste("\n###", var_name(DBn), "\n\n\n"))
 
   for (avar in vars) {
+
+    cat("\n\\FloatBarrier\n\n")
+    cat(paste("\n####", var_name(avar), avar, "\n\n\n"))
+
+    ## data date range
+    cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
+
+    ## _ Linear trend by year  -------------------------------------------------
+    lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
+    d   <- summary(lm1)$coefficients
+    cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2, 2], 4), "p=", round(d[2, 4], 4), "\n\n")
+
+    ## _ Correlation test
+    cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
+
+    ## _ Arima auto regression Tourpali ----------------------------------------
+    ## create a time variable (with lag of 1 day ?)
+    DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
+    tmodel <- arima(x = DATA[[avar]], order = c(1,0,0), xreg = DATA$ts, method = "ML")
+
+    ## trend per year with auto correlation
+    ## estimates, associated standard errors, test statistics and p values
+    Tres <- data.frame(t(lmtest::coeftest(tmodel)[3, ]))
+    Tint <- data.frame(t(lmtest::coeftest(tmodel)[2, ]))
+    names(Tres) <- paste0("Tmod_", names(Tres))
+    cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
+
+
+    ## _ Time series analysis --------------------------------------------------
+    dd        <- read.zoo(DATA, index.column = "Day")
+    dd        <- as.ts(dd)
+
+    lag       <- 1
+    dd        <- acf(DATA[[avar]], na.action = na.pass, plot = FALSE)
+    N_eff     <- sum(!is.na(DATA[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
+    se_sq     <- sum((lm1$residuals)^2, na.rm = TRUE) / (N_eff - 2)
+    sa_sq     <- se_sq / sum((DATA[[avar]] - mean(DATA[[avar]], na.rm = TRUE))^2, na.rm = TRUE)
+    t_eff     <- lm1$coefficients[[2]] / sa_sq
+    # find two-tailed t critical values
+    t_eff_cri <- qt(p = .05 / 2, df = N_eff, lower.tail = FALSE)
+
+    conf      <- confint(lm1)
+    conf_2.5  <- conf[2, 1]
+    conf_97.5 <- conf[2, 2]
+
+
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
-      geom_smooth(method = 'lm', formula = y ~ x, colour = "red", fill = "red") +
+      geom_ma(n = running_mean_window_days, ma_fun = SMA, colour = "cyan") +
+      geom_smooth(method = "loess", formula = y ~ x, colour = "orange") +
+      geom_smooth(method = "lm",    formula = y ~ x, colour = "red", fill = "red", se = FALSE) +
       stat_regline_equation(label.y.npc = 1) +
       labs(x = element_blank(),
            y = bquote(.(var_name(avar)) ~ ~ group("[","%","]")),
            subtitle = paste(var_name(DBn), var_name(avar))) +
       theme_bw()
     show(p)
+
   }
 }
 
@@ -167,7 +260,7 @@ for (DBn in dbs) {
 
 
 #+ Clean_exit, echo=FALSE
-dbDisconnect(con, shutdown = TRUE); rm(con)
+if (!interactive()) { dbDisconnect(con, shutdown = TRUE); rm(con) }
 
 #' \FloatBarrier
 #+ results="asis", echo=FALSE

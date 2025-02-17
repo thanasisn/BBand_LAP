@@ -91,19 +91,21 @@ create_missing_columns <- function(con, new_data, table, quiet = TRUE) {
       }
 
       ## info
-      cat("\nNEW VAR:", paste(new_vars[i, ]), "->", ctype, "\n")
+      if (!quiet) {
+        cat("\nNEW VAR:", paste(new_vars[i, ]), "->", ctype, "\n")
+      }
 
       ## create new columns with a query
       qq <- paste0("ALTER TABLE  ",  table,
                    "  ADD COLUMN  ", new_vars$names[i],
                    "  ",             ctype,
                    "  DEFAULT null")
-      cat(qq, "\n\n")
+
+      if (!quiet) { cat(qq, "\n\n") }
       res <- dbSendQuery(con, qq)
     }
   }
 }
-
 
 
 
@@ -319,7 +321,7 @@ insert_table <- function(con, new_data, table, matchvar, quiet = FALSE) {
 #' @return         A tibble and an in place mutation of the data base
 #' @export
 #'
-upsert_table <- function(con, new_data, table, matchvar, quiet = FALSE) {
+upsert_table <- function(con, new_data, table, matchvar, quiet = TRUE) {
 
   create_missing_columns(con      = con,
                          new_data = new_data,

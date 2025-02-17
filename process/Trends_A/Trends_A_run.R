@@ -17,24 +17,30 @@ library(rmarkdown)
 
 render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_00_raw_data.R",
        output_format = output_format,
+       clean         = TRUE,
        output_dir    = output_dir)
 
 render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_01_raw_data_analysis.R",
        output_format = output_format,
+       clean         = TRUE,
        output_dir    = output_dir)
 
 render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_02_daily_data.R",
        output_format = output_format,
+       clean         = TRUE,
        output_dir    = output_dir)
 
 render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_03_daily_data_analysis.R",
        output_format = output_format,
+       clean         = TRUE,
        output_dir    = output_dir)
 
 render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_04_monthly_data.R",
        output_format = output_format,
+       clean         = TRUE,
        output_dir    = output_dir)
 
 render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_05_monthly_data_analysis.R",
        output_format = output_format,
+       clean         = TRUE,
        output_dir    = output_dir)
