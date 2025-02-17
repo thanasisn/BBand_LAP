@@ -190,6 +190,11 @@ for (adb in databases) {
   gather <- gather[!res]
 }
 
+## Save data
+saveRDS(gather, overview_data)
+rm(overview_data)
+
+
 
 
 ##  Source code statistics  ----------------------------------------------------
@@ -219,13 +224,13 @@ if (!file.exists(overview_data)) {
     distinct()
   saveRDS(DATA, overview_data)
 }
+rm(overview_data)
 
 
 
 
 
-## Save data
-saveRDS(gather, overview_data)
+
 
 #+ results="asis", echo=FALSE
 goodbye()
