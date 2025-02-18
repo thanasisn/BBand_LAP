@@ -67,7 +67,7 @@ knitr::opts_chunk$set(tidy = TRUE,
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_07_SZA_data.R"
+Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_01_daily_data.R"
 
 if (!interactive()) {
   pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -95,10 +95,9 @@ if (Sys.info()["nodename"] == Main.Host) {
   con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 }
 
-##
-## Load and prepare dataset with the same process as first script
-##
 LAP  <- tbl(con, "LAP")
+META <- tbl(con, "META") |> select(Day, Daylength)
+
 
 LAP <- LAP |>
   filter(SKY %in% c("Cloud", "Clear")) |>  ## only data for trends
@@ -108,11 +107,10 @@ LAP <- LAP |>
     ends_with("_strict"),
     Decimal_date,
     TSI,
-    preNoon,
-    SZA,
     Day,
     SKY
   )
+
 
 ##  Create TSI data for comparison with observations  --------------------------
 ## No point to store these in the DB
@@ -130,25 +128,24 @@ CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
 dbs <- sort(c( "ALL", "CLOUD", "CLEAR"))
 
-##  Create SZA values  ---------------------------------------------------------
+##  Create daily values  -------------------------------------------------------
 
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Create daily SZA means for each data set
+#' ## Create daily means for each data set
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
 for (DBn in dbs) {
   DATA <- get(DBn)
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Daily SZA means", var_name(DBn), "\n\n"))
+  cat(paste("\n## Daily means", var_name(DBn), "\n\n"))
 
   vars <- sort(DATA |> select(ends_with(c("_trnd_A", "_strict"))) |> colnames())
+
   ## __ Create daily values and statistics  ------------------------------------
   DAILY <- DATA   |>
-    group_by(Day,
-             preNoon,
-             SZA = (SZA - SZA_BIN / 2 ) %/% SZA_BIN) |>
+    group_by(Day) |>
     summarise(
       ## stats on every variable
       across(
@@ -162,9 +159,12 @@ for (DBn in dbs) {
       ),
       ## Stats on every group
       Day_N = n()
-    ) |>
-    collect() |>
-    data.table()
+    )
+
+  ## Add daylength and load all data
+  DAILY <- left_join(
+    DAILY, META, by = "Day"
+  ) |> collect() |> data.table()
 
   ## __ Flag daily data with season  -------------------------------------------
   ## create continuous seasonal variable
@@ -175,21 +175,21 @@ for (DBn in dbs) {
   DAILY[season_Yqrt %% 1 == 0.50, Season := "Summer"]
   DAILY[season_Yqrt %% 1 == 0.75, Season := "Autumn"]
 
-
-  ## inspect bin counts
-  hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N], breaks = 100,
+  ## inspect fill ratios of observations
+  hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
        main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
-       ylab = "Valid data count")
-  abline(v = SZA_aggregation_N_lim, col = "red")
+       ylab = "Valid data ratio")
+  abline(v = Cloud_daily_ratio_lim, col = "red")
 
-  hist(DAILY[!is.na(DIR_trnd_A_mean), DIR_trnd_A_N], breaks = 100,
+  hist(DAILY[!is.na(DIR_trnd_A_mean), DIR_trnd_A_N/Daylength], breaks = 100,
        main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
-       ylab = "Valid data count")
-  abline(v = SZA_aggregation_N_lim, col = "red")
+       ylab = "Valid data ratio")
+  abline(v = Cloud_daily_ratio_lim, col = "red")
+
 
   ## Store daily values as is
   if (Sys.info()["nodename"] == Main.Host) {
-    tbl_name <- paste0("Trend_A_SZA_", DBn)
+    tbl_name <- paste0("Trend_A_DAILY_", DBn)
     if (dbExistsTable(con , tbl_name)) {
       dbRemoveTable(con, tbl_name)
     }
@@ -198,9 +198,8 @@ for (DBn in dbs) {
   }
 }
 
-
-stop()
 ##  Daily data representation  -------------------------------------------------
+warning("This breaks other variables for Clear and Cloud!! This is only for GHI")
 
 #' \FloatBarrier
 #' \newpage
