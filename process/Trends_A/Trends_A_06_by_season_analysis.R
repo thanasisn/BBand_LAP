@@ -98,7 +98,7 @@ if (Sys.info()["nodename"] == Main.Host) {
   con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 }
 
-Seasons     <- c("Winter", "Spring", "Summer", "Autumn")
+Seasons <- c("Winter", "Spring", "Summer", "Autumn")
 
 
 ##  By Season from daily  ------------------------------------------------------
