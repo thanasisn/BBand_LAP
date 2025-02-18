@@ -44,3 +44,8 @@ render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_05_monthly_data_an
        output_format = output_format,
        clean         = TRUE,
        output_dir    = output_dir)
+
+render(input         = "~/BBand_LAP/process/Trends_A/Trends_A_06_by_season_analysis.R",
+       output_format = output_format,
+       clean         = TRUE,
+       output_dir    = output_dir)

@@ -226,8 +226,6 @@ if (!file.exists(overview_data)) {
 }
 rm(overview_data)
 
-list.files("~/BBand_LAP", recursive = FALSE, full.names = T, include.dirs = T)
-
 
 
 
