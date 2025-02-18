@@ -1,14 +1,11 @@
 
-03
-
+02
 
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/CODE/FUNCTIONS/R/data.R")
-source("./DHI_GHI_0_variables.R")
 Script.Name <- "DHI_GHI_02_Input_szatrends.R"
 
 ##  Prepare raw data if needed  ------------------------------------------------
-## check previous steps
 if (
     file.exists(raw_input_data) == FALSE |
     file.mtime(raw_input_data) < file.mtime("./DHI_GHI_0_variables.R") |
@@ -18,71 +15,11 @@ if (
     dummy <- gc()
 }
 
-## check current steps
-if (
-    file.exists(I2_szatrend) == FALSE |
-    file.mtime(I2_szatrend) < file.mtime("./DHI_GHI_02_Input_szatrends.R")
-) {
-    cat(paste("\n Have to create SZA trends proccessed data\n\n"))
-} else {
-    cat(paste("\n SZA trends proccessed data are ready\n\n"))
-    cond = structure(list(message = "SZA trends proccessed data are ready"),
-                     class = c("exit", "condition"))
-    signalCondition(cond)
-    stop("Normal to exit here ")
-}
-
-
 
 
 ##  Daily SZA means ------------------------------------------------------------
 
 ## _ daily means  --------------------------------------------------------------
-ALL_2_daily_mean <-
-    DATA_all[, .(DIR_att       = mean(DIR_att,    na.rm = T),
-                 HOR_att       = mean(HOR_att,    na.rm = T),
-                 GLB_att       = mean(GLB_att,    na.rm = T),
-                 DIR_att_sd    = sd(  DIR_att,    na.rm = T),
-                 HOR_att_sd    = sd(  HOR_att,    na.rm = T),
-                 GLB_att_sd    = sd(  GLB_att,    na.rm = T),
-                 doy           = yday(Date),
-                 GLB_att_N     = sum(!is.na(GLB_att)),
-                 HOR_att_N     = sum(!is.na(HOR_att)),
-                 DIR_att_N     = sum(!is.na(DIR_att))  ),
-             by = .(SZA     = (SZA - SZA_BIN / 2 ) %/% SZA_BIN,
-                    Date    = Day,
-                    preNoon = preNoon ) ]
-
-CLEAR_2_daily_mean <-
-    DATA_Clear[, .(DIR_att       = mean(DIR_att,    na.rm = T),
-                   HOR_att       = mean(HOR_att,    na.rm = T),
-                   GLB_att       = mean(GLB_att,    na.rm = T),
-                   DIR_att_sd    = sd(  DIR_att,    na.rm = T),
-                   HOR_att_sd    = sd(  HOR_att,    na.rm = T),
-                   GLB_att_sd    = sd(  GLB_att,    na.rm = T),
-                   doy           = yday(Date),
-                   GLB_att_N     = sum(!is.na(GLB_att)),
-                   HOR_att_N     = sum(!is.na(HOR_att)),
-                   DIR_att_N     = sum(!is.na(DIR_att))  ),
-               by = .(SZA     = (SZA - SZA_BIN / 2 ) %/% SZA_BIN,
-                      Date    = Day,
-                      preNoon = preNoon ) ]
-
-CLOUD_2_daily_mean <-
-    DATA_Cloud[, .(DIR_att       = mean(DIR_att,    na.rm = T),
-                   HOR_att       = mean(HOR_att,    na.rm = T),
-                   GLB_att       = mean(GLB_att,    na.rm = T),
-                   DIR_att_sd    = sd(  DIR_att,    na.rm = T),
-                   HOR_att_sd    = sd(  HOR_att,    na.rm = T),
-                   GLB_att_sd    = sd(  GLB_att,    na.rm = T),
-                   doy           = yday(Date),
-                   GLB_att_N     = sum(!is.na(GLB_att)),
-                   HOR_att_N     = sum(!is.na(HOR_att)),
-                   DIR_att_N     = sum(!is.na(DIR_att))  ),
-               by = .(SZA     = (SZA - SZA_BIN / 2 ) %/% SZA_BIN,
-                      Date    = Day,
-                      preNoon = preNoon ) ]
-
 
 ## _ Aggregation limit with SZA_aggregation_N_lim data points ------------------
 ALL_2_daily_mean[   DIR_att_N <= SZA_aggregation_N_lim, DIR_att       := NA ]
@@ -494,22 +431,6 @@ gc()
 
 
 
-## _ Margin of error calculation for confidence interval -----------------------
-# conf_param  <- 1 - ( 1 - SZA_confidence_limit ) / 2
-# suppressWarnings({
-#     ALL_2_daily_mean[,   DIR_att_EM   := qt(conf_param,df=DIR_att_N -1) * DIR_att_sd    / sqrt(DIR_att_N)]
-#     ALL_2_daily_mean[,   HOR_att_EM   := qt(conf_param,df=HOR_att_N -1) * HOR_att_sd    / sqrt(HOR_att_N)]
-#     ALL_2_daily_mean[,   GLB_att_EM   := qt(conf_param,df=GLB_att_N -1) * GLB_att_sd    / sqrt(GLB_att_N)]
-#     # ALL_2_daily_mean[,   DIR_transp_EM:= qt(conf_param,df=DIR_att_N -1) * DIR_transp_sd / sqrt(DIR_att_N)]
-#     CLEAR_2_daily_mean[, DIR_att_EM   := qt(conf_param,df=DIR_att_N -1) * DIR_att_sd    / sqrt(DIR_att_N)]
-#     CLEAR_2_daily_mean[, HOR_att_EM   := qt(conf_param,df=HOR_att_N -1) * HOR_att_sd    / sqrt(HOR_att_N)]
-#     CLEAR_2_daily_mean[, GLB_att_EM   := qt(conf_param,df=GLB_att_N -1) * GLB_att_sd    / sqrt(GLB_att_N)]
-#     # CLEAR_2_daily_mean[, DIR_transp_EM:= qt(conf_param,df=DIR_att_N -1) * DIR_transp_sd / sqrt(DIR_att_N)]
-#     CLOUD_2_daily_mean[, DIR_att_EM   := qt(conf_param,df=DIR_att_N -1) * DIR_att_sd    / sqrt(DIR_att_N)]
-#     CLOUD_2_daily_mean[, HOR_att_EM   := qt(conf_param,df=HOR_att_N -1) * HOR_att_sd    / sqrt(HOR_att_N)]
-#     CLOUD_2_daily_mean[, GLB_att_EM   := qt(conf_param,df=GLB_att_N -1) * GLB_att_sd    / sqrt(GLB_att_N)]
-#     # CLOUD_2_daily_mean[, DIR_transp_EM:= qt(conf_param,df=DIR_att_N -1) * DIR_transp_sd / sqrt(DIR_att_N)]
-# })
 
 
 
@@ -754,18 +675,6 @@ CLOUD_2_bySeason_monthly_mean[Yqrt %% 1 == 0.25, Season := "Spring"]
 CLOUD_2_bySeason_monthly_mean[Yqrt %% 1 == 0.50, Season := "Summer"]
 CLOUD_2_bySeason_monthly_mean[Yqrt %% 1 == 0.75, Season := "Autumn"]
 
-#   ALL_2_bySeason_yearly_mean[Yqrt %% 1 == 0   , Season := "Winter"]
-#   ALL_2_bySeason_yearly_mean[Yqrt %% 1 == 0.25, Season := "Spring"]
-#   ALL_2_bySeason_yearly_mean[Yqrt %% 1 == 0.50, Season := "Summer"]
-#   ALL_2_bySeason_yearly_mean[Yqrt %% 1 == 0.75, Season := "Autumn"]
-# CLEAR_2_bySeason_yearly_mean[Yqrt %% 1 == 0   , Season := "Winter"]
-# CLEAR_2_bySeason_yearly_mean[Yqrt %% 1 == 0.25, Season := "Spring"]
-# CLEAR_2_bySeason_yearly_mean[Yqrt %% 1 == 0.50, Season := "Summer"]
-# CLEAR_2_bySeason_yearly_mean[Yqrt %% 1 == 0.75, Season := "Autumn"]
-# CLOUD_2_bySeason_yearly_mean[Yqrt %% 1 == 0   , Season := "Winter"]
-# CLOUD_2_bySeason_yearly_mean[Yqrt %% 1 == 0.25, Season := "Spring"]
-# CLOUD_2_bySeason_yearly_mean[Yqrt %% 1 == 0.50, Season := "Summer"]
-# CLOUD_2_bySeason_yearly_mean[Yqrt %% 1 == 0.75, Season := "Autumn"]
 
 
 
@@ -934,15 +843,6 @@ ALL_2_bySeason_monthly_DESEAS <- merge(  ALL_2_bySeason_monthly_mean,   ALL_2_by
 CLEAR_2_bySeason_monthly_DESEAS <- merge(CLEAR_2_bySeason_monthly_mean, CLEAR_2_bySeason_monthly_seas, by = c("Month", "SZA", "preNoon", "Season"), all = T)
 CLOUD_2_bySeason_monthly_DESEAS <- merge(CLOUD_2_bySeason_monthly_mean, CLOUD_2_bySeason_monthly_seas, by = c("Month", "SZA", "preNoon", "Season"), all = T)
 
-setorder(  ALL_2_bySeason_monthly_DESEAS, Date)
-setorder(CLEAR_2_bySeason_monthly_DESEAS, Date)
-setorder(CLOUD_2_bySeason_monthly_DESEAS, Date)
-
-## forget monthly data
-rm(  ALL_2_bySeason_monthly_mean,   ALL_2_bySeason_monthly_seas,
-     CLEAR_2_bySeason_monthly_mean, CLEAR_2_bySeason_monthly_seas,
-     CLOUD_2_bySeason_monthly_mean, CLOUD_2_bySeason_monthly_seas)
-
 
 ## _ Monthly relative anomaly --------------------------------------------------
 
@@ -961,10 +861,3 @@ CLOUD_2_bySeason_monthly_DESEAS[, HOR_att_des   := 100 * (HOR_att    - HOR_att_s
 CLOUD_2_bySeason_monthly_DESEAS[, GLB_att_des   := 100 * (GLB_att    - GLB_att_seas   ) / GLB_att_seas   ]
 # CLOUD_2_bySeason_monthly_DESEAS[, DIR_transp_des:= 100 * (DIR_transp - DIR_transp_seas) / DIR_transp_seas]
 
-
-# ......................................................................... ----
-##  Save data ------------------------------------------------------------------
-save(file = I2_szatrend,
-     list = ls(pattern = "^ALL_2_|^CLEAR_2_|^CLOUD_2_"),
-     compress = "xz")
-cat(paste("\n SZA trends proccessed data saved", I2_szatrend, "\n\n"))

@@ -12,14 +12,11 @@ pch_daily                 <-  19
 running_mean_window_years <-   5
 running_mean_window_days  <- running_mean_window_years * Days_of_year
 
-SZA_BIN                   <-   1
-MIN_N                     <-   4
-SEAS_MIN_N                <-   3
 
 Daily_confidence_limit    <-   0.99
 SZA_confidence_limit      <-   0.99
 Monthly_confidence_limit  <-   0.99
 
 Daily_aggregation_N_lim   <-   0        # replaced with relative daylight filter
-SZA_aggregation_N_lim     <-   4
+
 

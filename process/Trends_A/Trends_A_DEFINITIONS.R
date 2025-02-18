@@ -15,10 +15,15 @@ FIBais_Elev               <-  12
 MIN_ELEVA                 <-   5  ##  global low elevation limit
 All_daily_ratio_lim       <- 0.5  ##  ration of daily valid data
 Monthly_aggegation_N_lim  <-  20  ##  Number of days per month for valid monthly value
+SZA_aggregation_N_lim     <-   4  ##  Number of point for each SZA Bin
+SZA_BIN                   <-   1  ##  SZA aggregation bin size
 
 ## Ratio of characterizations to set as daily characterization
 Clear_daily_ratio_lim     <- 0.6  ## keep both the same!!
 Cloud_daily_ratio_lim     <- 0.6
+
+MIN_N                     <-   4
+SEAS_MIN_N                <-   3
 
 
 ##  DATA ANALYSIS  -------------------------------------------------------------
