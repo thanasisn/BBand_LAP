@@ -1,81 +1,8 @@
-# /* #!/usr/bin/env Rscript */
-# /* Copyright (C) 2022 Athanasios Natsis <natsisphysicist@gmail.com> */
-#' ---
-#' title:         "Trends of SDR in Thessaloniki "
-#' author:
-#'   - Natsis Athanasios^[Laboratory of Atmospheric Physics, AUTH, natsisphysicist@gmail.com]
-#'   - Alkiviadis Bais^[Laboratory of Atmospheric Physics, AUTH]
-#' abstract:
-#'   "Study of GHI and DNI radiation for 'clear sky' and all sly conditions."
-#'
-#' documentclass:  article
-#' classoption:    a4paper,oneside
-#' fontsize:       10pt
-#' geometry:       "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#' link-citations: yes
-#' colorlinks:     yes
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections: no
-#'     fig_caption:     no
-#'     keep_tex:        yes
-#'     latex_engine:    xelatex
-#'     toc:             yes
-#'     toc_depth:       4
-#'     fig_width:       7
-#'     fig_height:      4.5
-#'   html_document:
-#'     toc:             true
-#'     keep_md:         yes
-#'     fig_width:       7
-#'     fig_height:      4.5
-#'
-#' date: "`r format(Sys.time(), '%F')`"
-#'
-#' ---
 
-#+ echo=F, include=T
+05
 
-
-## __ Document options ---------------------------------------------------------
-
-#+ echo=F, include=F
-knitr::opts_chunk$set(comment    = ""       )
-knitr::opts_chunk$set(dev        = c("pdf", "png"))
-# knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
-knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(cache      =  FALSE   )  ## !! breaks calculations
-knitr::opts_chunk$set(fig.pos    = '!h'     )
-
-#+ include=F, echo=F
-## __ Set environment ----------------------------------------------------------
-Sys.setenv(TZ = "UTC")
 Script.Name <- "./DHI_GHI_3_trends_consistency.R"
 
-if (!interactive()) {
-    pdf( file = paste0("./runtime/",  basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(file = paste0("./runtime/",  basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
-    filelock::lock(paste0("./runtime/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
-}
-
-
-#+ echo=F, include=T
-library(data.table, quietly = TRUE, warn.conflicts = FALSE)
-library(pander,     quietly = TRUE, warn.conflicts = FALSE)
-library(lubridate,  quietly = TRUE, warn.conflicts = FALSE)
-library(ggplot2,    quietly = TRUE, warn.conflicts = FALSE)
-library(fANCOVA,    quietly = TRUE, warn.conflicts = FALSE)
-
-
-panderOptions("table.alignment.default", "right")
-panderOptions("table.split.table",        120   )
 
 ## __ Load external functions --------------------------------------------------
 ## Functions from `https://github.com/thanasisn/IStillBreakStuff/tree/main/FUNCTIONS/R`
@@ -87,14 +14,6 @@ source("~/CODE/FUNCTIONS/R/data.R")
 
 ## __ Source initial scripts ---------------------------------------------------
 source("./DHI_GHI_0_variables.R")
-
-## notification function
-options(error = function() {
-    if (interactive()) {
-        system("mplayer /usr/share/sounds/freedesktop/stereo/dialog-warning.oga", ignore.stdout = T, ignore.stderr = T)
-        system(paste("notify-send -u normal -t 30000 ", Script.Name, " 'An error occurred!'"))
-    }
-})
 
 
 if (!file.exists(I1_longterm) |
@@ -125,26 +44,6 @@ if (!file.exists(I3_trendsconsist) |
 load(I1_longterm)
 load(I3_trendsconsist)
 
-tic <- Sys.time()
-
-
-## __ Flags --------------------------------------------------------------------
-
-DRAFT <- TRUE
-DRAFT <- FALSE
-
-## override plot options
-par(pch = ".")
-
-## choose to grid some plots
-FIGURESGRID <- TRUE
-# FIGURESGRID <- FALSE
-
-## choose loess criterion for span
-LOESS_CRITERIO <-  c("aicc", "gcv")[1]
-
-## cex value for side by side
-ccex_sbs <- 1.3
 
 #+ echo=F, include=T
 #'
@@ -1639,8 +1538,3 @@ for (adb in database) {
 
 
 
-#' **END**
-#+ include=T, echo=F
-tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n", Sys.time(), Sys.info()["login"],
-            Sys.info()["nodename"], basename(Script.Name), difftime(tac,tic,units = "mins")))

@@ -1,22 +1,15 @@
 
+04
 
 ## Data input for this paper
 
 ## to force a rebuild of the dataset remove stored
 # file.remove(common_data)
 
-require(data.table)
-require(zoo)
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/CODE/FUNCTIONS/R/data.R")
 source("./DHI_GHI_0_variables.R")
 Script.Name <- "DHI_GHI_03_Input_consistency.R"
-
-if (!interactive()) {
-    pdf( file = paste0("./runtime/",  basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(file = paste0("./runtime/",  basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
-    filelock::lock(paste0("./runtime/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
-}
 
 ##  Prepare raw data if needed  ------------------------------------------------
 ## check previous steps
@@ -51,10 +44,6 @@ DATA_Cloud <- DATA_all[TYPE == "Cloud"]
 DATA_all  [, TYPE := NULL]
 DATA_Clear[, TYPE := NULL]
 DATA_Cloud[, TYPE := NULL]
-
-
-# warning("REMOVING CLOUD ENHANCEMENT")
-# DATA_Cloud <- DATA_Cloud[wattGLB < cosde(SZA) * TSIextEARTH_comb * 0.8 + 30 ]
 
 
 
@@ -325,57 +314,3 @@ CLOUD_3_monthly_DESEAS[preNoon == FALSE, preNoon := "pm"]
 
 
 
-## forget original data
-rm(DATA_all)
-rm(DATA_Clear)
-rm(DATA_Cloud)
-
-
-
-
-
-# #### run on all quarter of the hour
-# ayear$quarter <- ((as.numeric( ayear$Date ) %/% (3600/4) ) )
-#
-# selectqua  <- list(ayear$quarter)
-#
-# qDates     <- aggregate(ayear$Date,       by = selectqua, FUN = min)
-#
-# qGlobal    <- aggregate(ayear$wattGLB,    by = selectqua, FUN = mean, na.rm = TRUE )
-# qGlobalCNT <- aggregate(ayear$wattGLB,    by = selectqua, FUN = function(x) sum(!is.na(x)) )
-# qGlobalSTD <- aggregate(ayear$wattGLB,    by = selectqua, FUN = sd,   na.rm = TRUE )
-#
-# qElevaMEAN <- aggregate(ayear$Eleva,      by = selectqua, FUN = mean, na.rm = TRUE )
-#
-# qGLstd     <- aggregate(ayear$wattGLB_SD, by = selectqua, FUN = mean, na.rm = TRUE )
-# qGLstdCNT  <- aggregate(ayear$wattGLB_SD, by = selectqua, FUN = function(x) sum(!is.na(x)) )
-# qGLstdSTD  <- aggregate(ayear$wattGLB_SD, by = selectqua, FUN = sd,   na.rm = TRUE )
-#
-# #### output of quarterly data
-# ayearquarter <- data.frame( Dates      = qDates$x,
-#                             qGlobal    = qGlobal$x,
-#                             qGlobalCNT = qGlobalCNT$x,
-#                             qGlobalSTD = qGlobalSTD$x,
-#                             qElevaMEAN = qElevaMEAN$x,
-#                             qGLstd     = qGLstd$x,
-#                             qGLstdCNT  = qGLstdCNT$x,
-#                             qGLstdSTD  = qGLstdSTD$x)
-#
-# #### run on 4 quarters of every hour
-# ayearquarter$hourly <- as.numeric( ayearquarter$Dates ) %/% 3600
-# hposic              <- as.POSIXct( ayearquarter$hourly * 3600, origin = "1970-01-01" )
-#
-# selecthour <- list(ayearquarter$hourly)
-#
-# hDates     <- aggregate( ayearquarter$Dates,   by = selecthour, FUN = min )
-#
-# hGlobal    <- aggregate( ayearquarter$qGlobal, by = selecthour, FUN = mean, na.rm = FALSE )  ## na.rm must be FALSE!
-# hGlobalCNT <- aggregate( ayearquarter$qGlobal, by = selecthour, FUN = function(x) sum(!is.na(x)))
-
-
-# ......................................................................... ----
-##  Save data ------------------------------------------------------------------
-save(file = I3_trendsconsist,
-     list = ls(pattern = "^ALL_3_|^CLEAR_3_|^CLOUD_3_"),
-     compress = "xz")
-cat(paste("\n trends consistency data saved", I3_trendsconsist, "\n\n"))

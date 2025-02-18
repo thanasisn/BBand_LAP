@@ -1,56 +1,10 @@
 
 02
 
-source("~/CODE/FUNCTIONS/R/trig_deg.R")
-source("~/CODE/FUNCTIONS/R/data.R")
-Script.Name <- "DHI_GHI_02_Input_szatrends.R"
-
-##  Prepare raw data if needed  ------------------------------------------------
-if (
-    file.exists(raw_input_data) == FALSE |
-    file.mtime(raw_input_data) < file.mtime("./DHI_GHI_0_variables.R") |
-    file.mtime(raw_input_data) < file.mtime("./DHI_GHI_00_raw_data.R")
-) {
-    source("./DHI_GHI_00_raw_data.R")
-    dummy <- gc()
-}
-
-
 
 ##  Daily SZA means ------------------------------------------------------------
 
 ## _ daily means  --------------------------------------------------------------
-
-## _ Aggregation limit with SZA_aggregation_N_lim data points ------------------
-ALL_2_daily_mean[   DIR_att_N <= SZA_aggregation_N_lim, DIR_att       := NA ]
-ALL_2_daily_mean[   HOR_att_N <= SZA_aggregation_N_lim, HOR_att       := NA ]
-ALL_2_daily_mean[   GLB_att_N <= SZA_aggregation_N_lim, GLB_att       := NA ]
-ALL_2_daily_mean[   DIR_att_N <= SZA_aggregation_N_lim, DIR_att_sd    := NA ]
-ALL_2_daily_mean[   HOR_att_N <= SZA_aggregation_N_lim, HOR_att_sd    := NA ]
-ALL_2_daily_mean[   GLB_att_N <= SZA_aggregation_N_lim, GLB_att_sd    := NA ]
-ALL_2_daily_mean[   DIR_att_N <= SZA_aggregation_N_lim, DIR_att_EM    := NA ]
-ALL_2_daily_mean[   HOR_att_N <= SZA_aggregation_N_lim, HOR_att_EM    := NA ]
-ALL_2_daily_mean[   GLB_att_N <= SZA_aggregation_N_lim, GLB_att_EM    := NA ]
-
-CLEAR_2_daily_mean[ DIR_att_N <= SZA_aggregation_N_lim, DIR_att       := NA ]
-CLEAR_2_daily_mean[ HOR_att_N <= SZA_aggregation_N_lim, HOR_att       := NA ]
-CLEAR_2_daily_mean[ GLB_att_N <= SZA_aggregation_N_lim, GLB_att       := NA ]
-CLEAR_2_daily_mean[ DIR_att_N <= SZA_aggregation_N_lim, DIR_att_sd    := NA ]
-CLEAR_2_daily_mean[ HOR_att_N <= SZA_aggregation_N_lim, HOR_att_sd    := NA ]
-CLEAR_2_daily_mean[ GLB_att_N <= SZA_aggregation_N_lim, GLB_att_sd    := NA ]
-CLEAR_2_daily_mean[ DIR_att_N <= SZA_aggregation_N_lim, DIR_att_EM    := NA ]
-CLEAR_2_daily_mean[ HOR_att_N <= SZA_aggregation_N_lim, HOR_att_EM    := NA ]
-CLEAR_2_daily_mean[ GLB_att_N <= SZA_aggregation_N_lim, GLB_att_EM    := NA ]
-
-CLOUD_2_daily_mean[ DIR_att_N <= SZA_aggregation_N_lim, DIR_att       := NA ]
-CLOUD_2_daily_mean[ HOR_att_N <= SZA_aggregation_N_lim, HOR_att       := NA ]
-CLOUD_2_daily_mean[ GLB_att_N <= SZA_aggregation_N_lim, GLB_att       := NA ]
-CLOUD_2_daily_mean[ DIR_att_N <= SZA_aggregation_N_lim, DIR_att_sd    := NA ]
-CLOUD_2_daily_mean[ HOR_att_N <= SZA_aggregation_N_lim, HOR_att_sd    := NA ]
-CLOUD_2_daily_mean[ GLB_att_N <= SZA_aggregation_N_lim, GLB_att_sd    := NA ]
-CLOUD_2_daily_mean[ DIR_att_N <= SZA_aggregation_N_lim, DIR_att_EM    := NA ]
-CLOUD_2_daily_mean[ HOR_att_N <= SZA_aggregation_N_lim, HOR_att_EM    := NA ]
-CLOUD_2_daily_mean[ GLB_att_N <= SZA_aggregation_N_lim, GLB_att_EM    := NA ]
 
 
 hist(CLEAR_2_daily_mean[, GLB_att_N], breaks = 100)
@@ -119,21 +73,6 @@ CLOUD_2_daily_seas <-
                            preNoon
                        )]
 
-
-## _ Margin of error for confidence interval  ----------------------------------
-conf_param  <- 1 - (1 - Daily_confidence_limit) / 2
-suppressWarnings({
-    ALL_2_daily_seas[,DIR_att_EM_seas   :=qt(conf_param,df=DIR_att_N_seas -1)* DIR_att_sd_seas   /sqrt(DIR_att_N_seas)]
-    ALL_2_daily_seas[,HOR_att_EM_seas   :=qt(conf_param,df=HOR_att_N_seas -1)* HOR_att_sd_seas   /sqrt(HOR_att_N_seas)]
-    ALL_2_daily_seas[,GLB_att_EM_seas   :=qt(conf_param,df=GLB_att_N_seas -1)* GLB_att_sd_seas   /sqrt(GLB_att_N_seas)]
-    CLEAR_2_daily_seas[,DIR_att_EM_seas   :=qt(conf_param,df=DIR_att_N_seas -1)* DIR_att_sd_seas   /sqrt(DIR_att_N_seas)]
-    CLEAR_2_daily_seas[,HOR_att_EM_seas   :=qt(conf_param,df=HOR_att_N_seas -1)* HOR_att_sd_seas   /sqrt(HOR_att_N_seas)]
-    CLEAR_2_daily_seas[,GLB_att_EM_seas   :=qt(conf_param,df=GLB_att_N_seas -1)* GLB_att_sd_seas   /sqrt(GLB_att_N_seas)]
-    CLOUD_2_daily_seas[,DIR_att_EM_seas   :=qt(conf_param,df=DIR_att_N_seas -1)* DIR_att_sd_seas   /sqrt(DIR_att_N_seas)]
-    CLOUD_2_daily_seas[,HOR_att_EM_seas   :=qt(conf_param,df=HOR_att_N_seas -1)* HOR_att_sd_seas   /sqrt(HOR_att_N_seas)]
-    CLOUD_2_daily_seas[,GLB_att_EM_seas   :=qt(conf_param,df=GLB_att_N_seas -1)* GLB_att_sd_seas   /sqrt(GLB_att_N_seas)]
-    # CLOUD_2_daily_seas[,DIR_transp_EM_seas:=qt(conf_param,df=DIR_att_N_seas -1)* DIR_transp_sd_seas/sqrt(DIR_att_N_seas)]
-})
 
 
 ## _ Daily de-seasonal relative anomaly ----------------------------------------
@@ -249,12 +188,6 @@ CLOUD_2_monthly_mean <-
                        ) ]
 CLOUD_2_monthly_mean[, Date := as.Date(paste(Year, Month, 1), "%Y %m %d") ]
 
-rm(   ALL_2_daily_mean,
-      CLEAR_2_daily_mean,
-      CLOUD_2_daily_mean )
-gc()
-
-
 
 hist(CLOUD_2_monthly_mean[, GLB_att_N], breaks = 100)
 hist(CLEAR_2_monthly_mean[, GLB_att_N], breaks = 100)
@@ -345,17 +278,11 @@ setorder(  ALL_2_monthly_DESEAS, Date)
 setorder(CLEAR_2_monthly_DESEAS, Date)
 setorder(CLOUD_2_monthly_DESEAS, Date)
 
-## forget some daily data (want monthly_mean for yearly)
-rm(  ALL_2_monthly_seas,
-     CLEAR_2_monthly_seas,
-     CLOUD_2_monthly_seas)
-gc()
 
 ### Using the % departure from seasonal values
 ALL_2_monthly_DESEAS[, GLB_att_des   := 100 * (GLB_att - GLB_att_seas ) / GLB_att_seas ]
 CLEAR_2_monthly_DESEAS[, GLB_att_des   := 100 * (GLB_att - GLB_att_seas ) / GLB_att_seas ]
 CLOUD_2_monthly_DESEAS[, GLB_att_des   := 100 * (GLB_att - GLB_att_seas ) / GLB_att_seas ]
-
 
 
 
@@ -421,11 +348,6 @@ CLOUD_2_yearly_mean <-
 
 
 
-## forget some daily data (want monthly_mean for yearly)
-rm(  ALL_2_monthly_mean,
-     CLEAR_2_monthly_mean,
-     CLOUD_2_monthly_mean)
-gc()
 
 
 
@@ -757,15 +679,6 @@ warning("Years in by Season are shifted by a month to match seasons")
 ALL_2_bySeason_daily_DESEAS[, Year := year(Yqrt)]
 CLEAR_2_bySeason_daily_DESEAS[, Year := year(Yqrt)]
 CLOUD_2_bySeason_daily_DESEAS[, Year := year(Yqrt)]
-
-setorder(  ALL_2_bySeason_daily_DESEAS, Yqrt)
-setorder(CLEAR_2_bySeason_daily_DESEAS, Yqrt)
-setorder(CLOUD_2_bySeason_daily_DESEAS, Yqrt)
-
-rm(  ALL_2_bySeason_daily_seas,
-     CLEAR_2_bySeason_daily_seas,
-     CLOUD_2_bySeason_daily_seas)
-gc()
 
 
 
