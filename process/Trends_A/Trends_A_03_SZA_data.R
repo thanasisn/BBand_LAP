@@ -231,7 +231,7 @@ for (DBn in dbs) {
           !!sym(checkvar) <= SZA_aggregation_N_lim ~ NA,
           !!sym(checkvar) >  SZA_aggregation_N_lim ~ !!sym(avar)
         )
-      ) # |> collect() |> data.table()
+      )  |> collect() |> data.table()
   }
 
   ## store the table in the database
