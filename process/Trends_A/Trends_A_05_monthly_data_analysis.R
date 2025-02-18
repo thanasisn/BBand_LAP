@@ -117,7 +117,7 @@ for (DBn in dbs) {
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n####", var_name(avar), avar, "\n\n\n"))
+    cat(paste("\n####", var_name(avar), avar, "\n\n \n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
@@ -196,7 +196,7 @@ for (DBn in dbs) {
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n####", var_name(avar), avar, "\n\n\n"))
+    cat(paste("\n####", var_name(avar), avar, "\n\n \n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")

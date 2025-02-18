@@ -127,16 +127,19 @@ dbs <- c(
 for (DBn in dbs) {
   DATA <- get(DBn)
 
+  cat("\n\\newpage\n\n")
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
+    cat(paste("\n####", var_name(avar), avar, "\n\n\n"))
+
     pp <- DATA
 
     p <- pp |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
-      geom_smooth(method = 'lm', colour = "red", fill = "red") +
+      geom_smooth(method = 'lm', formula = "y ~ x", colour = "red", fill = "red") +
       stat_regline_equation(label.y.npc = 1) +
       labs(x = element_blank(),
            y = bquote(.(var_name(avar)) ~ ~ group("[", W/m^2, "]")),

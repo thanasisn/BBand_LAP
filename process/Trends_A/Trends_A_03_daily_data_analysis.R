@@ -101,7 +101,11 @@ if (Sys.info()["nodename"] == Main.Host) {
 ## list of daily tables
 dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
-##  Daily mean values  -----------------------------------------------------------
+
+
+
+stop()
+##  By season daily  values  ---------------------------------------------------
 #'
 #' ## Daily mean values
 #'
@@ -109,6 +113,7 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
+
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
@@ -117,7 +122,7 @@ for (DBn in dbs) {
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n####", var_name(avar), avar, "\n\n\n"))
+    cat(paste("\n####", var_name(avar), avar, "\n\n \n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
@@ -196,7 +201,7 @@ for (DBn in dbs) {
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n####", var_name(avar), avar, "\n\n\n"))
+    cat(paste("\n####", var_name(avar), avar, "\n\n \n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
