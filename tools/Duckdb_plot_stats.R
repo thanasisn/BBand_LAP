@@ -184,13 +184,41 @@ cat(" \n \n")
 
 
 DATA <- readRDS("~/BBand_LAP/SIDE_DATA/Source_code_stats.Rds")
+
+# DATA |> group_by(source, language) |>
+#   summarise(changes = sum(loc != lag(loc), na.rm = TRUE))
+#
+# vars <- c("loc", "blank_lines", "blank_lines", "file_count")
+#
+# bb <- DATA |> group_by(source, language) |>
+#   filter(loc != lag(loc))
+#
+# cc <- DATA |> group_by(source, language) |>
+#   filter(loc == lag(loc))
+#
+# ## remove unchanged?
+# DATA |> distinct(source, language, .keep_all = T)
+#
+#
+# DATA |> group_by(source, language) |> distinct(Date)
+#
+# DATA |> select(-Date) |> group_by(source, language) |> distinct(source, language, .keep_all = T)
+
+
 for (ss in unique(DATA$source)) {
   pp <- DATA[source == ss]
 
+  if (length(unique(pp$Date)) <= 1) next()
+
   pp <- melt(pp, id.vars = c("Date", "language"), measure.vars = c("loc", "blank_lines", "comment_lines"))
 
-  ggplot(data = pp, aes(x = Date, y = value, colour = language, group = interaction(language, variable))) +
-    geom_point() + geom_line()
+  p <- ggplot(data = pp, aes(x = Date, y = value, colour = interaction(language, variable, sep = " "))) +
+    geom_point() +
+    geom_line() +
+    labs(subtitle = ss )
+  show(p)
+
+  # if (interactive()) stop()
 }
 
 
