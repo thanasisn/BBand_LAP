@@ -236,7 +236,7 @@ for (DBn in dbs) {
 
   ## store the table in the database
   if (Sys.info()["nodename"] == Main.Host) {
-    res <- update_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
+    res <- update_table(con, DATA, tbl_name, "Day", quiet = TRUE)
   }
 
 }
