@@ -67,7 +67,7 @@ knitr::opts_chunk$set(tidy = TRUE,
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_05_monthly_data_analysis.R"
+Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_12_monthly_data_analysis.R"
 
 if (!interactive()) {
   pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
