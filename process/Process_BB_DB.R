@@ -19,7 +19,7 @@ dir.create(output_dir, showWarnings = F, recursive = T)
 
 ## __ Keep some stats on data bases  -------------------------------------------
 try({
-  source("~/BBand_LAP/inspect_duckdb/Duckdb_save_stats.R"         )
+  source("~/BBand_LAP/tools/Duckdb_save_stats.R")
 })
 
 try({

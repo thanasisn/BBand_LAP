@@ -102,9 +102,6 @@ if (Sys.info()["nodename"] == Main.Host) {
 dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
 
-
-
-stop()
 ##  By season daily  values  ---------------------------------------------------
 #'
 #' ## Daily mean values
@@ -182,7 +179,7 @@ for (DBn in dbs) {
 }
 
 
-##  Plot daily anomaly values
+##  Daily anomaly values  ------------------------------------------------------
 #'
 #' \FloatBarrier
 #' \newpage

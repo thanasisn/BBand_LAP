@@ -270,7 +270,11 @@ for (DBn in dbs) {
 for (DBn in dbs) {
   ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
-  vars <- sort(DATA |> select(ends_with("_mean_anom")) |> colnames())
+  vars <- sort(DATA |>
+                 select(!contains("strict") &
+                          !starts_with("TSI") &
+                          ends_with("_mean_anom")) |>
+                 colnames())
 
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n###", var_name(DBn), "\n\n\n"))
@@ -285,24 +289,24 @@ for (DBn in dbs) {
       cat("\n\\FloatBarrier\n\n")
       cat(paste("\n####", month.name[amo], var_name(avar), avar, "\n\n \n"))
 
-      DATA <- tbl(con, DBn) |>
-        filter(Month == amo) |>
+      DATA <- tbl(con, DBn)   |>
+        filter(Month == amo)  |>
         arrange(Decimal_date) |>
         collect() |> data.table()
 
-      ## _ Linear trend by year  -------------------------------------------------
-      lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
-      d   <- summary(lm1)$coefficients
-      cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2, 2], 4), "p=", round(d[2, 4], 4), "\n\n")
-
-      ## _ Correlation test
       if (sum(!is.na(DATA[[avar]])) > 2) {
+
+        ## _ Linear trend by year  -------------------------------------------------
+        lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
+        d   <- summary(lm1)$coefficients
+        cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2, 2], 4), "p=", round(d[2, 4], 4), "\n\n")
+
+        ## _ Correlation test
         cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
-      }
 
-      ## _ Arima auto regression Tourpali ----------------------------------------
-      ## create a time variable (with lag of 1 day ?)
-      if (sum(!is.na(DATA[[avar]])) > 2) {
+
+        ## _ Arima auto regression Tourpali ----------------------------------------
+        ## create a time variable (with lag of 1 day ?)
         DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
         tmodel <- arima(x = DATA[[avar]], order = c(1,0,0), xreg = DATA$ts, method = "ML")
 
