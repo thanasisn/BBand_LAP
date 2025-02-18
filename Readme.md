@@ -15,7 +15,7 @@ under the [Data display](https://thanasisn.github.io/data_display.html) section.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Mon Feb 17 06:38:45 UTC 2025 -->
+<!-- Added by: athan, at: Tue Feb 18 05:08:20 UTC 2025 -->
 
 <!--te-->
 
@@ -28,10 +28,10 @@ under the [Data display](https://thanasisn.github.io/data_display.html) section.
 | Name                  |     Rows |    Size |    Values | Vars |   Fill | Bytes/Value |
 |:----------------------|---------:|--------:|----------:|-----:|-------:|------------:|
 | Broad Band LAP duckdb | 16946350 | 4.5 GiB | 921199063 |  815 | 58.44% |        5.27 |
-| Raw files hashes      |   927137 | 4.9 MiB |   3708548 |    4 |   100% |        1.39 |
-| **Total**             | 17873487 | 4.5 GiB | 924907611 |  819 |    NA% |        5.26 |
+| Raw files hashes      |   927143 | 4.9 MiB |   3708572 |    4 |   100% |        1.39 |
+| **Total**             | 17873493 | 4.5 GiB | 924907635 |  819 |    NA% |        5.26 |
 
-Table: Datasets sizes on 2025-02-17
+Table: Datasets sizes on 2025-02-18
 
 
 
@@ -81,7 +81,7 @@ Table: Datasets sizes on 2025-02-17
   - Flags data as affected by clouds or not with the algorithm of M. J. Reno and C.
     W. Hansen (2016)
 - Investigate long-term trends (Work in progress)
-  - Process similar to A. Natsis, A. Bais and C. Meleti (2023)
+  - Process similar to [A. Natsis, A. Bais and C. Meleti (2023)](https://www.mdpi.com/2076-3417/14/1/252)
 - Creates TSI data used in analysis
 - Imports atmospheric pressure data from proxies
 - Keeps an `md5sum` of all input files to check for bit rot and other data corruption.
@@ -109,8 +109,8 @@ Table: Datasets sizes on 2025-02-17
 
 - `inspect_days_duckdb.R`  interactive plot of some data in the duckdb
 - `inspect_days_DB.R`  interactive plot of some data in the DB
-- `inspect_days_Lap.R` interactive plot of some data from source files 
-- `inspect_days_Lap_sirena.R` interactive plot of some data from source files 
+- `inspect_days_Lap.R` interactive plot of some data from source files
+- `inspect_days_Lap_sirena.R` interactive plot of some data from source files
 
 
 ## TODO
@@ -150,10 +150,16 @@ There is no centralized documentation for the project. Although you can refer to
 - Summary notes on the start of each script
 - Comments inside each script
 - Compiled reports from each script
+- Follow the sequence of the scripts in 'execution' folder
 
 
 ## Reproducibility
 
 - We use the `renv` R package to keep track of the projects dependencies.
 - Maybe will use a `nix-shell` environment as a more robust and portable method.
+
+
+## Journal
+
+Contains parts of the logbook of the instruments maintenance and other notes.
 
