@@ -37,26 +37,10 @@ dbs <- c(  "ALL_1_D_monthly_DESEAS",
 
 for (DBn in dbs) {
     DB <- get(DBn)
-    ## set seasons in each data base
-    DB[, Month := month(Date) ]
-    ## sanity check
-    stopifnot(!any(is.na(DB$Month)))
-
-    if (!FIGURESGRID) {
-        cat("\n\\newpage\n")
-        cat("\n#### ", translate(DBn), "\n\n")
-    }
 
     for (avar in vars) {
 
-        ## plot in a grid
-        if (FIGURESGRID) {
-            par(mfrow = c(6, 2))
-            cat("\n\\newpage\n")
-            cat("\n#### ", translate(DBn), translate(avar) , "\n\n")
-        }
-
-        ## common range
+      ## common range
         ylim <- range(DB[[avar]],na.rm = TRUE)
 
         for (ase in 1:12) {
