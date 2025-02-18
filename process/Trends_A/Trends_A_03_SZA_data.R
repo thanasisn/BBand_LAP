@@ -161,7 +161,7 @@ for (DBn in dbs) {
         )
       ),
       ## Stats on every group
-      Day_N = n()
+      SZA_N = n()
     ) |>
     collect() |>
     data.table()
@@ -196,232 +196,54 @@ for (DBn in dbs) {
     dbCreateTable(conn = con, name = tbl_name, DAILY)
     res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
   }
+  rm(DAILY); res <- gc()
 }
 
 
-stop()
-##  Daily data representation  -------------------------------------------------
+##  SZA data representation  -------------------------------------------------
+dbs <- sort(grep("A_SZA_", dbListTables(con), value = TRUE))
 
 #' \FloatBarrier
 #' \newpage
 #'
 #' ## Apply some filtering on the data to use
 #'
-#' We choose to use a ratio of `r Cloud_daily_ratio_lim` to set the
-#' sky type characterization for the whole day.
-#'
-#' **Daily data representation applied only on GHI!!**
-#' i.e. GLB_trnd_A_mean for CLOUD and CLEAR
+#' We choose to use only SZA bins with at least `r SZA_aggregation_N_lim` data
+#' points.
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
 
-CLOUD <- tbl(con, "Trend_A_DAILY_CLOUD")
-CLOUD <- CLOUD |>
-  mutate(
-    GLB_trnd_A_mean := case_when(
-      GLB_trnd_A_N / Daylength >  Cloud_daily_ratio_lim ~ GLB_trnd_A_mean,
-      GLB_trnd_A_N / Daylength <= Cloud_daily_ratio_lim ~ NA )
-  )
-if (Sys.info()["nodename"] == Main.Host) {
-  res <- update_table(con, CLOUD, "Trend_A_DAILY_CLOUD", "Day", quiet = TRUE)
-}
-
-CLOUD <- CLOUD |> collect() |> data.table()
-hist(CLOUD[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
-     main = paste(var_name("CLOUD"), var_name("GLB_trnd_A_N")),
-     ylab = "Valid data ratio")
-
-
-CLEAR <- tbl(con, "Trend_A_DAILY_CLEAR")
-CLEAR <- CLEAR |>
-  mutate(
-    GLB_trnd_A_mean := case_when(
-      GLB_trnd_A_N / Daylength >  Clear_daily_ratio_lim ~ GLB_trnd_A_mean,
-      GLB_trnd_A_N / Daylength <= Clear_daily_ratio_lim ~ NA )
-  )
-if (Sys.info()["nodename"] == Main.Host) {
-  res <- update_table(con, CLEAR, "Trend_A_DAILY_CLEAR", "Day", quiet = TRUE)
-}
-CLEAR <- CLEAR |> collect() |> data.table()
-hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
-     main = paste(var_name("CLEAR"), var_name("GLB_trnd_A_N")),
-     ylab = "Valid data ratio")
-
-
-##  Daily deseasonalized values  -----------------------------------------------
-dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
-
-#' \FloatBarrier
-#' \newpage
-#'
-#' ## Create daily climatology data and anomaly
-#'
-#' We compute daily anomaly `_anom` as 100 (`_mean` - `_clima`) / `_clima`
-#'
-#+ include=T, echo=T, results="asis", warning=FALSE
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
-  DATA <- DATA |> select(-contains("_clima"))
-  vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
-
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
+  cat(paste("\n## Daily SZA ", var_name(DBn), "\n\n"))
 
-  ## __ Compute daily climatology values ----------------------------------------
-  CLIMA <- DATA |>
-    group_by(DOY = yday(Day)) |>
-    summarise(
-      Clima_N = n(),
-      ## get the totals of data in each mean
-      across(
-        .cols = ends_with(c("_NAs", "_N")),
-        .fns  = list(
-          clima_total = ~ sum(.x, na.rm = TRUE)
+  ##  Variables to restrict  ---
+  vars <- DATA |> select(ends_with("_mean")) |> colnames()
+
+  ## restrict each variable
+  for (avar in vars)  {
+    checkvar <- sub("_mean", "_N", avar)
+
+    DATA <- DATA |>
+      mutate(
+        !!avar := case_when(
+          !!sym(checkvar) <= SZA_aggregation_N_lim ~ NA,
+          !!sym(checkvar) >  SZA_aggregation_N_lim ~ !!sym(avar)
         )
-      ),
-      ## create climatology for each mean
-      across(
-        .cols = ends_with("_mean"),
-        .fns  = list(
-          clima     = ~ mean(.x, na.rm = TRUE),
-          clima_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          clima_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
-        )
-      )
-    ) |> collect() |> data.table()
-
-
-  ## Plot climatology values
-  p <- CLIMA |> select(DOY,
-                       !starts_with("TSI") &
-                       ends_with(c("trnd_A_mean_clima"))) |>
-    melt(id.vars = 'DOY', variable.name = 'Radiation')   |>
-    ggplot(aes(x = DOY, y = value)) +
-    geom_point( aes(colour = Radiation)) +
-    geom_smooth(aes(colour = Radiation), method = 'loess', formula = 'y ~ x') +
-    labs(subtitle = paste("Daily climatology for ", var_name(DBn)),
-         y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
-    theme_bw()
-  show(p)
-
-  ## __ Create deseasonal anomaly  ---------------------------------------------
-  DATA <- left_join(
-    DATA |> mutate(DOY = yday(Day)),
-    CLIMA,
-    by   = "DOY",
-    copy = TRUE
-  ) |> collect() |> data.table()
-
-  for (av in vars) {
-    cat("Compute anomaly by DOY for ", av, "\n\n")
-
-    climavar <- paste0(av, "_clima")
-    anomvar  <- paste0(av, "_anom" )
-
-    DATA <- DATA |> mutate(
-      !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
-      Decimal_date := decimal_date(Day)
-    ) |> collect()
-
-    ## protect database numeric type
-    DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
-    DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
+      ) # |> collect() |> data.table()
   }
 
-  ## Store daily anomaly data
+  ## store the table in the database
   if (Sys.info()["nodename"] == Main.Host) {
-    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
+    res <- update_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
   }
+
 }
 
 
+## TODO test data was excluded
 
-
-##  Daily deseasonalized values by season of year  -----------------------------
-dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
-
-#' \FloatBarrier
-#' \newpage
-#'
-#' ## Create climatology data and anomaly by season of year
-#'
-#+ include=T, echo=T, results="asis", warning=FALSE
-for (DBn in dbs) {
-  DATA <- tbl(con, DBn)
-  DATA <- DATA |> select(-contains("_seas"))
-  vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
-
-  cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Season of year daily deseasonal", var_name(DBn), "\n\n"))
-
-  ## __ Compute daily climatology by season  -----------------------------------
-  SEAS <- DATA |>
-    group_by(Season) |>
-    summarise(
-      Seas_N = n(),
-      ## get the totals of data in each mean
-      across(
-        .cols = ends_with(c("_NAs", "_N")),
-        .fns  = list(
-          seas_total = ~ sum(.x, na.rm = TRUE)
-        )
-      ),
-      ## create climatology for each mean
-      across(
-        .cols = ends_with("_mean"),
-        .fns  = list(
-          seas     = ~ mean(.x, na.rm = TRUE),
-          seas_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          seas_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
-        )
-      )
-    ) |> collect() |> data.table()
-
-
-  ## Plot seasonal climatology values
-  p <- SEAS |> select(Season,
-                      !starts_with("TSI") &
-                      ends_with(c("trnd_A_mean_seas"))) |>
-    arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
-    melt(id.vars = 'Season', variable.name = 'Radiation')  |>
-    ggplot(aes(x = Season, y = value)) +
-    geom_point(aes(colour = Radiation)) +
-    geom_line( aes(colour = Radiation, group = Radiation) ) +
-    geom_smooth(aes(colour = Radiation), method = 'loess', formula = 'y ~ x') +
-    labs(subtitle = paste("Season climatology for ", var_name(DBn)),
-         y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
-    theme_bw()
-  show(p)
-
-  ## __ Create deseasonal anomaly  ---------------------------------------------
-  DATA <- left_join(
-    DATA,
-    SEAS,
-    by   = "Season",
-    copy = TRUE
-  ) |> collect() |> data.table()
-
-  for (av in vars) {
-    cat("Compute anomaly by season for ", av, "\n\n")
-
-    climavar <- paste0(av, "_seas")
-    anomvar  <- paste0(av, "_seasanom" )
-
-    DATA <- DATA |> mutate(
-      !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
-      Decimal_date := decimal_date(Day)
-    ) |> collect()
-
-    ## protect database numeric type
-    DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
-    DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
-  }
-
-  ## Store daily anomaly data
-  if (Sys.info()["nodename"] == Main.Host) {
-    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
-  }
-}
 
 
 
