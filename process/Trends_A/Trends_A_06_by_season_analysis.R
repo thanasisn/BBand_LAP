@@ -135,7 +135,7 @@ for (DBn in dbs) {
         arrange(Decimal_date)  |>
         collect() |> data.table()
 
-      ## _ Linear trend by year  -------------------------------------------------
+      ## _ Linear trend by year  -----------------------------------------------
       lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
       d   <- summary(lm1)$coefficients
       cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2, 2], 4), "p=", round(d[2, 4], 4), "\n\n")
@@ -143,7 +143,7 @@ for (DBn in dbs) {
       ## _ Correlation test
       cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
 
-      ## _ Arima auto regression Tourpali ----------------------------------------
+      ## _ Arima auto regression Tourpali  -------------------------------------
       ## create a time variable (with lag of 1 day ?)
       DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
       tmodel <- arima(x = DATA[[avar]], order = c(1, 0, 0), xreg = DATA$ts, method = "ML")
@@ -156,7 +156,7 @@ for (DBn in dbs) {
       cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
 
 
-      ## _ Time series analysis --------------------------------------------------
+      ## _ Time series analysis  -----------------------------------------------
       dd        <- read.zoo(DATA, index.column = "Day")
       dd        <- as.ts(dd)
 
@@ -192,7 +192,7 @@ for (DBn in dbs) {
 
 
 
-##  By Season from monthly  ------------------------------------------------------
+##  By Season from monthly  ----------------------------------------------------
 
 ## list of monthly tables
 dbs <- sort(grep("_MONTHLY_", dbListTables(con), value = TRUE))
@@ -210,7 +210,9 @@ dbs <- sort(grep("_MONTHLY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
-  vars <- sort(DATA |> select(ends_with("_mean_seasanom")) |> colnames())
+  vars <- sort(DATA |>
+                 select(!starts_with("TSI") &
+                          ends_with("_mean_seasanom")) |> colnames())
 
   cat("\n\\newpage\n\n")
   cat("\n\\FloatBarrier\n\n")
@@ -228,43 +230,48 @@ for (DBn in dbs) {
         arrange(Decimal_date)  |>
         collect() |> data.table()
 
-      ## _ Linear trend by year  -------------------------------------------------
-      lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
-      d   <- summary(lm1)$coefficients
-      cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2, 2], 4), "p=", round(d[2, 4], 4), "\n\n")
 
-      ## _ Correlation test
-      cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
+      if (sum(!is.na(DATA[[avar]])) > 2) {
 
-      ## _ Arima auto regression Tourpali ----------------------------------------
-      ## create a time variable (with lag of 1 day ?)
-      DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
-      tmodel <- arima(x = DATA[[avar]], order = c(1, 0, 0), xreg = DATA$ts, method = "ML")
+        ## _ Linear trend by year  -----------------------------------------------
+        lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
+        d   <- summary(lm1)$coefficients
+        cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2, 2], 4), "p=", round(d[2, 4], 4), "\n\n")
 
-      ## trend per year with auto correlation
-      ## estimates, associated standard errors, test statistics and p values
-      Tres <- data.frame(t(lmtest::coeftest(tmodel)[3, ]))
-      Tint <- data.frame(t(lmtest::coeftest(tmodel)[2, ]))
-      names(Tres) <- paste0("Tmod_", names(Tres))
-      cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
+        ## _ Correlation test
+        cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
+
+        ## _ Arima auto regression Tourpali  -------------------------------------
+        ## create a time variable (with lag of 1 day ?)
+        DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
+        tmodel <- arima(x = DATA[[avar]], order = c(1, 0, 0), xreg = DATA$ts, method = "ML")
+
+        ## trend per year with auto correlation
+        ## estimates, associated standard errors, test statistics and p values
+        Tres <- data.frame(t(lmtest::coeftest(tmodel)[3, ]))
+        Tint <- data.frame(t(lmtest::coeftest(tmodel)[2, ]))
+        names(Tres) <- paste0("Tmod_", names(Tres))
+        cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
 
 
-      ## _ Time series analysis --------------------------------------------------
-      dd        <- read.zoo(DATA, index.column = "Day")
-      dd        <- as.ts(dd)
+        ## _ Time series analysis  -----------------------------------------------
+        dd        <- read.zoo(DATA, index.column = "Day")
+        dd        <- as.ts(dd)
 
-      lag       <- 1
-      dd        <- acf(DATA[[avar]], na.action = na.pass, plot = FALSE)
-      N_eff     <- sum(!is.na(DATA[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
-      se_sq     <- sum((lm1$residuals)^2, na.rm = TRUE) / (N_eff - 2)
-      sa_sq     <- se_sq / sum((DATA[[avar]] - mean(DATA[[avar]], na.rm = TRUE))^2, na.rm = TRUE)
-      t_eff     <- lm1$coefficients[[2]] / sa_sq
-      # find two-tailed t critical values
-      t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
+        lag       <- 1
+        dd        <- acf(DATA[[avar]], na.action = na.pass, plot = FALSE)
+        N_eff     <- sum(!is.na(DATA[[avar]])) * (1 - dd[lag][[1]]) / (1 + dd[lag][[1]])
+        se_sq     <- sum((lm1$residuals)^2, na.rm = TRUE) / (N_eff - 2)
+        sa_sq     <- se_sq / sum((DATA[[avar]] - mean(DATA[[avar]], na.rm = TRUE))^2, na.rm = TRUE)
+        t_eff     <- lm1$coefficients[[2]] / sa_sq
+        # find two-tailed t critical values
+        t_eff_cri <- qt(p = .05/2, df = N_eff, lower.tail = FALSE)
 
-      conf      <- confint(lm1)
-      conf_2.5  <- conf[2,1]
-      conf_97.5 <- conf[2,2]
+        conf      <- confint(lm1)
+        conf_2.5  <- conf[2,1]
+        conf_97.5 <- conf[2,2]
+
+      }
 
       p <- DATA |>
         ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
