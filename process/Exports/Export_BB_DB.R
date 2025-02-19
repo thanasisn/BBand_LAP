@@ -2,6 +2,7 @@
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 
 ## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 renv::load("~/BBand_LAP")

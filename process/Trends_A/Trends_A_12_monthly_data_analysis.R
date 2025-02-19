@@ -64,6 +64,7 @@ knitr::opts_chunk$set(tidy = TRUE,
 )
 
 ## __ Set environment  ---------------------------------------------------------
+closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_12_monthly_data_analysis.R"
