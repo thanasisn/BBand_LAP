@@ -71,7 +71,6 @@ knitr::opts_chunk$set(tidy = TRUE,
 )
 
 ## __ Set environment  ---------------------------------------------------------
-closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name  <- "~/BBand_LAP/process/QCRad_ThanasisN/QCRad_ThanasisN_T08_v10.R"
@@ -345,7 +344,7 @@ for (ad in sort(unique(test$Day))) {
 
 
 ## clean exit
-dbDisconnect(con, shutdown = TRUE); rm("con"); closeAllConnections()
+dbDisconnect(con, shutdown = TRUE); rm("con")
 
 #+ include=T, echo=F, results="asis"
 tac <- Sys.time()
