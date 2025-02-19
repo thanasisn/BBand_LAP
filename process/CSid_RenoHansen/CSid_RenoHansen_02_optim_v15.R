@@ -68,7 +68,6 @@ knitr::opts_chunk$set(tidy = TRUE,
                       )
 
 ## __ Set environment  ---------------------------------------------------------
-closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name  <- "~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_02_optim_v15.R"

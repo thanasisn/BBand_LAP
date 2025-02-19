@@ -1,4 +1,4 @@
-source("renv/activate.R")
+# source("renv/activate.R")
 
 ## Set default to compile packages for performance
 R_COMPILE_PKGS <- 3
