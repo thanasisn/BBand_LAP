@@ -64,7 +64,7 @@ knitr::opts_chunk$set(tidy = TRUE,
 )
 
 ## __ Set environment  ---------------------------------------------------------
-closeAllConnections()
+# closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_03_SZA_data.R"
@@ -255,8 +255,16 @@ for (DBn in dbs) {
 
 
 ## TODO test data was excluded
+for (DBn in dbs) {
+  DATA <- tbl(con, DBn)
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Daily SZA ", var_name(DBn), "\n\n"))
 
+  DATA |> colnames()
 
+  hist(DATA |> filter(!is.na(GLB_trnd_A_mean)) |> select(GLB_trnd_A_N) |> pull())
+
+}
 
 
 #+ Clean_exit, echo=FALSE
