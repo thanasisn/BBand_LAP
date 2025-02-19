@@ -3,7 +3,7 @@
 # Read all nc files from ERA5 and get data for specific locations.
 #
 
-
+closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 Script.Name = c("nc_ERA_export_locations.R")
