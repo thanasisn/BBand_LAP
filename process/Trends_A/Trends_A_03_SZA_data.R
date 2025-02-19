@@ -228,13 +228,12 @@ for (DBn in dbs) {
   for (avar in vars)  {
     checkvar <- sub("_mean", "_N", avar)
 
-    # years <- tbl(con, DBn) |> select(Year) |> distinct() |> arrange(Year) |> pull()
+    years <- tbl(con, DBn) |> select(Year) |> distinct() |> arrange(Year) |> pull()
 
-    # for (yyyy in years) {
-      # cat(DBn, "-", avar, "-", yyyy, "\n")
-      cat(DBn, "-", avar, "\n")
+    for (yyyy in years) {
+      cat(DBn, "-", avar, "-", yyyy, "\n")
       PART <- tbl(con, DBn)  |>
-        # filter(Year == yyyy) |>
+        filter(Year == yyyy) |>
         select(Day, !!avar, !!checkvar)
 
       ## apply
@@ -250,7 +249,7 @@ for (DBn in dbs) {
       if (Sys.info()["nodename"] == Main.Host) {
         res <- update_table(con, PART, tbl_name, "Day", quiet = TRUE)
       }
-    # }
+    }
   }
 }
 
