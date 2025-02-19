@@ -126,8 +126,7 @@ LAP <- LAP |>
 ALL   <- LAP |>                           select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
-
-dbs <- sort(c( "ALL", "CLOUD", "CLEAR"))
+dbs   <- sort(c( "ALL", "CLOUD", "CLEAR"))
 
 ##  Create SZA values  ---------------------------------------------------------
 
@@ -164,6 +163,7 @@ for (DBn in dbs) {
     ) |>
     collect() |>
     data.table()
+  DAILY[, Year := year(Day)]
 
   ## __ Flag daily data with season  -------------------------------------------
   ## create continuous seasonal variable
@@ -199,6 +199,9 @@ for (DBn in dbs) {
 }
 
 
+
+
+
 ##  SZA data representation  -------------------------------------------------
 dbs <- sort(grep("A_SZA_", dbListTables(con), value = TRUE))
 
@@ -224,20 +227,29 @@ for (DBn in dbs) {
   for (avar in vars)  {
     checkvar <- sub("_mean", "_N", avar)
 
-    DATA <- DATA |>
-      mutate(
-        !!avar := case_when(
-          !!sym(checkvar) <= SZA_aggregation_N_lim ~ NA,
-          !!sym(checkvar) >  SZA_aggregation_N_lim ~ !!sym(avar)
-        )
-      )  |> collect() |> data.table()
-  }
+    years <- tbl(con, DBn) |> select(Year) |> distinct() |> arrange(Year) |> pull()
 
-  ## store the table in the database
-  if (Sys.info()["nodename"] == Main.Host) {
-    res <- update_table(con, DATA, tbl_name, "Day", quiet = TRUE)
-  }
+    for (yyyy in years) {
+      cat(" -", yyyy)
+      PART <- tbl(con, DBn)  |>
+        filter(Year == yyyy) |>
+        select(Day, !!avar, !!checkvar)
 
+      ## apply
+      PART <- PART |>
+        mutate(
+          !!avar := case_when(
+            !!sym(checkvar) <= SZA_aggregation_N_lim ~ NA,
+            !!sym(checkvar) >  SZA_aggregation_N_lim ~ !!sym(avar)
+          )
+        )  #|> collect() |> data.table()
+
+      ## store the table in the database
+      if (Sys.info()["nodename"] == Main.Host) {
+        res <- update_table(con, PART, tbl_name, "Day", quiet = FALSE)
+      }
+    }
+  }
 }
 
 
