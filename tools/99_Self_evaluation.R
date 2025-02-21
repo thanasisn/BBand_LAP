@@ -1,4 +1,4 @@
-#!/opt/R/4.2.3/bin/Rscript
+# /* #!/opt/R/4.2.3/bin/Rscript */
 # /* Copyright (C) 2022-2023 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
 #' title:         "Project performance monitoring"
@@ -19,6 +19,12 @@
 #' - \captionsetup{font=small}
 #'
 #' output:
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  7.5
+#'     fig_height: 5
+#'     keep_tex:         no
+#'     keep_md:          no
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
@@ -28,12 +34,7 @@
 #'     toc_depth:        4
 #'     fig_width:        8
 #'     fig_height:       5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  7.5
-#'     fig_height: 5
-#'     keep_tex:         no
-#'     keep_md:          no
+
 #'
 #' date: "`r format(Sys.time(), '%F')`"
 #'
@@ -41,7 +42,6 @@
 
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
-#'
 #'
 #'
 #+ echo=F, include=T

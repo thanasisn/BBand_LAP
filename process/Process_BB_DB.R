@@ -12,10 +12,7 @@ output_dir <- "~/BBand_LAP/REPORTS/REPORTS/"
 dir.create(output_dir, showWarnings = F, recursive = T)
 
 
-
-
 ## This should be the last things to run on the BBand_LAP
-
 
 ## __ Keep some stats on data bases  -------------------------------------------
 try({
@@ -26,6 +23,7 @@ try({
   render(input         = "~/BBand_LAP/tools/Duckdb_plot_stats.R",
          output_dir    = output_dir)
 })
+
 
 try({
   render(input         = "~/BBand_LAP/tools/99_Self_evaluation.R",
