@@ -1,10 +1,9 @@
-# source("renv/activate.R")
 
 ## Set default to compile packages for performance
 R_COMPILE_PKGS <- 3
 
 ## Print more digits of dates
-options("digits.secs" = 1 )
+options("digits.secs" = 1)
 
 ## Renv options
 options(renv.config.auto.snapshot    = TRUE)
@@ -20,10 +19,10 @@ require(colorout, quietly = TRUE, warn.conflicts = FALSE )
 
 ## Don't ask to save workspace on R console exit
 utils::assignInNamespace(
-    "q",
-    function(save = "no", status = 0, runLast = TRUE) {
-        .Internal(quit(save, status, runLast)) },
-    "base"
+  "q",
+  function(save = "no", status = 0, runLast = TRUE) {
+      .Internal(quit(save, status, runLast)) },
+  "base"
 )
 
 ## Set tags to detect in rstudio

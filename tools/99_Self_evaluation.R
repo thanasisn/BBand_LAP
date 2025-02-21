@@ -19,12 +19,6 @@
 #' - \captionsetup{font=small}
 #'
 #' output:
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  7.5
-#'     fig_height: 5
-#'     keep_tex:         no
-#'     keep_md:          no
 #'   bookdown::pdf_document2:
 #'     number_sections:  no
 #'     fig_caption:      no
@@ -34,6 +28,12 @@
 #'     toc_depth:        4
 #'     fig_width:        8
 #'     fig_height:       5
+#'   html_document:
+#'     toc:        true
+#'     fig_width:  7.5
+#'     fig_height: 5
+#'     keep_tex:         no
+#'     keep_md:          no
 #'
 #' date: "`r format(Sys.time(), '%F')`"
 #'
