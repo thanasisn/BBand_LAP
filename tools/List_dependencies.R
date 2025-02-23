@@ -22,8 +22,9 @@ folders <- c(
 )
 
 for (af in folders) {
+  env_info <- paste0(af, "/Dependencies.md")
   listDependencies(af,
-                   output = paste0(af, "/Dependencies.md"),
+                   output = env_info,
                    output_overwrite = TRUE)
 
 }
