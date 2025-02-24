@@ -69,19 +69,20 @@ let
       };
     })
 
-    (pkgs.rPackages.buildRPackage {
+  (pkgs.rPackages.buildRPackage {
       name = "duckdb";
-      version = "1.1.3-1";
+      version = "1.2.0";
       src = pkgs.fetchgit {
         url = "https://github.com/duckdb/duckdb-r/";
-        rev = "c043baa69d202263750bd19a14eb04f6e735c5b6";
-        sha256 = "sha256-MFX2tGp+qz6b0EH9iuU5484e3tUACFxDrJ6IAA2GNrk=";
+        rev = "d7b7108c2e526fa125669439cabc179021585d43";
+        sha256 = "sha256-ksk9QBiiZlleWxdidO41ppu3juREGCeEcE6Q2SlQM50=";
       };
       propagatedBuildInputs = builtins.attrValues {
         inherit (pkgs.rPackages)
           DBI;
       };
     })
+
 
    ];
 
