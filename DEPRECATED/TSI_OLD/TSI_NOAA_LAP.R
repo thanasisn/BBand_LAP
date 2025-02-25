@@ -34,7 +34,7 @@ knitr::opts_chunk$set(dev        = c("pdf", "png"))
 knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
 knitr::opts_chunk$set(cache      =  FALSE   )  ## !! breaks calculations
-knitr::opts_chunk$set(fig.pos    = '!h'     )
+knitr::opts_chunk$set(fig.pos    = "!ht"    )
 
 
 ## __ Set environment  ---------------------------------------------------------
