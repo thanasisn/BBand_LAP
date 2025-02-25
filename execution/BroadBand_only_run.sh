@@ -33,27 +33,27 @@ info "##  End build_duckdb STATUS:$?  ##"
 
 
 info "##  Start QCRad LongShi  ##"
-"$HOME/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_run.R"
+"$HOME/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_run.R" FORCERUN
 info "##  End QCRad LongShi STATUS:$?  ##"
 
 
 info "##  Start QCRad ThanasisN  ##"
-"$HOME/BBand_LAP/process/QCRad_ThanasisN/QCRad_ThanasisN_run.R"
+"$HOME/BBand_LAP/process/QCRad_ThanasisN/QCRad_ThanasisN_run.R" FORCERUN
 info "##  End QCRad ThanaisN STATUS:$?  ##"
 
 
 info "##  Start inspect_duckdb  ##"
-"$HOME/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R"
+"$HOME/BBand_LAP/inspect_duckdb/Inspect_BB_DB.R" FORCERUN
 info "##  End Inspect_BB_DB.R STATUS:$?  ##"
 
 
 info "##  Start CSid_RenoHansen_run.R  ##"
-"$HOME/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_run.R"
+"$HOME/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_run.R" FORCERUN
 info "##  End CSid_RenoHansen_run.R STATUS:$?  ##"
 
 
 info "##  Start Trends_A  ##"
-"$HOME/BBand_LAP/process/Trends_A/Trends_A_run.R"
+"$HOME/BBand_LAP/process/Trends_A/Trends_A_run.R" FORCERUN
 info "##  End Trends_A STATUS:$?  ##"
 
 

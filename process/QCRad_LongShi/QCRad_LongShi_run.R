@@ -16,6 +16,17 @@ library(rmarkdown)
 ## Run every nth day
 run_days <- 10
 
+## Get shell arguments
+args <- commandArgs( trailingOnly = TRUE )
+## Override run condition from shell
+FORCE <- FALSE
+if (length(args) > 0) {
+  if (any(args == "FORCERUN")) {
+    FORCE <- TRUE
+    cat("\n * * * FORCED TO RUN NOW * * *\n\n")
+  }
+}
+
 ##  Run tests  -----------------------------------------------------------------
 # source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T01_v10.R")
 # source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R")
@@ -25,8 +36,8 @@ run_days <- 10
 # source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T06_v10.R")
 
 
-if (as.numeric(Sys.Date()) %% run_days == 0)
-{
+if (FORCE || as.numeric(Sys.Date()) %% run_days == 0) {
+
   try({
     render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T01_v10.R",
            params      = list(CLEAN = TRUE),
