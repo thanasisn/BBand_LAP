@@ -7,7 +7,6 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/Build_TSI.R"
-renv::load("~/BBand_LAP", quiet = TRUE)
 
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Parameters_TSI/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)

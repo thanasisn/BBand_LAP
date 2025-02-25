@@ -13,8 +13,6 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 
-renv::load("~/BBand_LAP", quiet = TRUE)
-
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Inspect/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 output_format <- bookdown::pdf_document2()

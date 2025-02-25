@@ -5,7 +5,6 @@
 closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
-renv::load("~/BBand_LAP")
 
 
 library(rmarkdown)

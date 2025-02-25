@@ -7,7 +7,6 @@ rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/weather/Build_weather.R"
-renv::load("~/BBand_LAP", quiet = TRUE)
 
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/Parameters_weather/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)

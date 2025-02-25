@@ -6,7 +6,6 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 Script.Name <- "~/BBand_LAP/process/QCRad_ThanasisN/QCRad_ThanasisN_run.R"
-# renv::load("~/BBand_LAP")
 
 
 ##  Run tests  -----------------------------------------------------------------

@@ -6,7 +6,6 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 Script.Name <- "~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_run.R"
-# renv::load("~/BBand_LAP")
 
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/CSid_RenoHansen/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)

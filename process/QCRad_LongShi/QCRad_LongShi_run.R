@@ -6,7 +6,6 @@ closeAllConnections()
 rm(list = (ls()[ls() != ""]))
 Sys.setenv(TZ = "UTC")
 Script.Name <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_run.R"
-# renv::load("~/BBand_LAP", quiet = TRUE)
 
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/QCRad_LongShi/"
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
