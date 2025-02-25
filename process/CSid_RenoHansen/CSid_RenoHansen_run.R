@@ -15,7 +15,19 @@ library(rmarkdown)
 ## Run every nth day
 run_days <- 10
 
-if (as.numeric(Sys.Date()) %% run_days == 0)
+## Get shell arguments
+args <- commandArgs( trailingOnly = TRUE )
+## Override run condition from shell
+FORCE <- FALSE
+if (length(args) > 0) {
+  if (any(args == "FORCERUN")) {
+    FORCE <- TRUE
+    cat("\n * * * FORCED TO RUN NOW * * *\n\n")
+  }
+}
+
+
+if (FORCE | as.numeric(Sys.Date()) %% run_days == 0)
 {
   try({
     render(input      = "~/BBand_LAP/process/CSid_RenoHansen/Clear_sky_id_Reno-Hansen_apply_v14.2_legacy.R",
@@ -36,7 +48,6 @@ if (as.numeric(Sys.Date()) %% run_days == 0)
   # source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R")
   # try({
   #   rmarkdown::render(input       = "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R",
-  #                     params      = list(CLEAN = TRUE),
   #                     output_file = "QCRad_LongShi_T02_v10_B",
   #                     output_dir  = "~/BBand_LAP/REPORTS/REPORTS")
   # })
