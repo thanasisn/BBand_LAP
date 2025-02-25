@@ -90,9 +90,6 @@ require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(cloc,       warn.conflicts = FALSE, quietly = TRUE)
 # install.packages("hrbrmstr/cloc")
 # remotes::install_github("hrbrmstr/cloc")
-# renv::install("hrbrmstr/cloc")
-
-
 
 overview_data <- "~/BBand_LAP/SIDE_DATA/Data_size_duckdb.Rds"
 
@@ -203,7 +200,7 @@ overview_data <- "~/BBand_LAP/SIDE_DATA/Source_code_stats.Rds"
 codemetrics   <- data.frame()
 
 dir_list <- c(list.dirs("~/BBand_LAP", recursive = FALSE), path.expand("~/BBand_LAP"))
-dir_list <- grep(".Rproj.user|.git|REPORTS|RESOURCES|PARAMS|renv|SIDE_DATA", dir_list, invert = T, value = T)
+dir_list <- grep(".Rproj.user|.git|REPORTS|RESOURCES|PARAMS|renv|SIDE_DATA", dir_list, invert = TRUE, value = TRUE)
 
 for (adir in dir_list) {
   codestats   <- data.table(cloc(adir))
@@ -220,7 +217,7 @@ if (!file.exists(overview_data)) {
 
   DATA <- rows_upsert(DATA,
                       codemetrics,
-                      by = c("Date", "source","language")) |>
+                      by = c("Date", "source", "language")) |>
     distinct()
   saveRDS(DATA, overview_data)
 }

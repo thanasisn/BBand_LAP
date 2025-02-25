@@ -53,7 +53,7 @@ knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(message   = FALSE   )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.cap   = " empty caption ")
-knitr::opts_chunk$set(fig.pos   = '!h'    )
+knitr::opts_chunk$set(fig.pos   = "!ht"   )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
                         indent       = 4,
@@ -129,7 +129,7 @@ CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 dbs   <- sort(c( "ALL", "CLOUD", "CLEAR"))
 
-##  Create SZA values  ---------------------------------------------------------
+##  Create daily SZA values  ---------------------------------------------------
 
 #' \FloatBarrier
 #' \newpage
@@ -189,7 +189,7 @@ for (DBn in dbs) {
 
   ## Store daily values as is
   if (Sys.info()["nodename"] == Main.Host) {
-    tbl_name <- paste0("Trend_A_SZA_", DBn)
+    tbl_name <- paste0("Trend_A_SZA_DAILY", DBn)
     if (dbExistsTable(con , tbl_name)) {
       dbRemoveTable(con, tbl_name)
     }
@@ -201,10 +201,8 @@ for (DBn in dbs) {
 
 
 
-
-
 ##  SZA data representation  -------------------------------------------------
-dbs <- sort(grep("A_SZA_", dbListTables(con), value = TRUE))
+dbs <- sort(grep("A_SZA_DAILY", dbListTables(con), value = TRUE))
 
 #' \FloatBarrier
 #' \newpage
@@ -216,6 +214,7 @@ dbs <- sort(grep("A_SZA_", dbListTables(con), value = TRUE))
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
 
+## this is slow!!
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   cat("\n\\FloatBarrier\n\n")
@@ -265,6 +264,40 @@ for (DBn in dbs) {
   hist(DATA |> filter(!is.na(GLB_trnd_A_mean)) |> select(GLB_trnd_A_N) |> pull())
 
 }
+
+
+
+
+##  Daily deseasonalized SZA values  -------------------------------------------
+dbs <- sort(grep("A_SZA_DAILY", dbListTables(con), value = TRUE))
+
+#' \FloatBarrier
+#' \newpage
+#'
+#' ## Create daily climatology data and anomaly
+#'
+#' We compute daily anomaly `_anom` as 100 (`_mean` - `_clima`) / `_clima`
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #+ Clean_exit, echo=FALSE

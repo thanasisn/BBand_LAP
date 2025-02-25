@@ -128,14 +128,14 @@ if (Sys.info()["nodename"] == Main.Host &
 # ##  Export sunsets sunrises for legacy use
 # if (!file.exists(paste0(sunsets_fl, ".Rds")) |
 #     file.mtime(paste0(sunsets_fl, ".Rds")) < Sys.time() - 30 * 3600) {
-# 
+#
 #   write_RDS(Sunsets, paste0(sunsets_fl, ".Rds"), notes = Script.Name)
 #   write.csv(Sunsets, paste0(sunsets_fl, ".csv"), quote = F)
 # }
 
 
 ##  Compute daylength  ---------------------------------------------------------
-cat("## Find sunsets and sunrises \n\n")
+cat("## Find daylengths \n\n")
 
 Daylengths <- Sunsets[, .(Daylength = diff(as.numeric(range(Date))) / 60),
                       by = Day]
@@ -151,7 +151,7 @@ if (Sys.info()["nodename"] == Main.Host &
 # ##  Export daylength for legacy use
 # if (!file.exists(paste0(daylength_fl, ".Rds")) |
 #     file.mtime(paste0(daylength_fl, ".Rds")) < Sys.time() - 30 * 3600) {
-# 
+#
 #   write_RDS(Daylengths, paste0(daylength_fl, ".Rds"), notes = Script.Name)
 #   write.csv(Daylengths, paste0(daylength_fl, ".csv"), quote = F)
 # }
@@ -183,7 +183,7 @@ if (!file.exists(pysolar_file) |
 # ## __ Export Astropy for old and forgotten processes  --------------------------
 # if (!file.exists(astropy_file) |
 #     file.mtime(pysolar_file) < Sys.time() - 30 * 3600) {
-# 
+#
 #   astropy <- tbl(sun, "params") |>
 #     filter(!is.na(AsPy_Azimuth))                          |>
 #     filter(!is.na(AsPy_Elevation))                        |>
@@ -195,7 +195,7 @@ if (!file.exists(pysolar_file) |
 #     collect()                                             |>
 #     arrange(Date)                                         |>
 #     data.table()
-# 
+#
 #   write_RDS(astropy, astropy_file, notes = Script.Name)
 #   rm(astropy); gc()
 # }

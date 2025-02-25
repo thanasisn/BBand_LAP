@@ -19,6 +19,10 @@ try({
 })
 
 try({
+  source("~/BBand_LAP/tools/List_dependencies.R")
+})
+
+try({
   render(input         = "~/BBand_LAP/tools/Duckdb_plot_stats.R",
          output_dir    = output_dir)
 })

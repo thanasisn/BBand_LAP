@@ -59,7 +59,6 @@ knitr::opts_chunk$set(echo      = FALSE   )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/inspect_db/60_Inspect_CM21_sig.R"
-renv::load("~/BBand_LAP")
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
