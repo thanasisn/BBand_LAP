@@ -13,12 +13,12 @@ knitr::opts_chunk$set(fig.pos   = "!ht"   )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R"
+Script.Name  <- "~/BBand_LAP/process/QCRad_LongShi/test.R"
 Script.ID    <- "Q1"
 parameter_fl <- "~/BBand_LAP/SIDE_DATA/QCRad_LongShi_v10_duck_parameters.Rds"
 
 if (!interactive()) {
-    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
+    pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",  basename(sub("\\.R$", ".pdf", Script.Name))))
 }
 
 ## __ Load libraries  ----------------------------------------------------------
@@ -53,7 +53,11 @@ flagname_GLB <- "QCv10_02_glb_flag"
 
 con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = T))
 
-
+grep("_MONTHLY_", dbListTables(con), value = TRUE)
+dbRemoveTable(con)
+stop()
+dbDisconnect(con, shutdown = TRUE)
+stop()
 
 DD <- tbl(con, "LAP")
 
@@ -74,12 +78,6 @@ categories <- c("empty",
                 "pass",
                 "Extremely rare limits min (3)",
                 "Extremely rare limits max (4)")
-
-
-
-
-
-
 
 
 make_categorical_column(flagname_DIR, categories, con, "test")

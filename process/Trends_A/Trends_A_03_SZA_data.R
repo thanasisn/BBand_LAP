@@ -129,7 +129,7 @@ CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 dbs   <- sort(c( "ALL", "CLOUD", "CLEAR"))
 
-##  Create SZA values  ---------------------------------------------------------
+##  Create daily SZA values  ---------------------------------------------------------
 
 #' \FloatBarrier
 #' \newpage
@@ -175,7 +175,6 @@ for (DBn in dbs) {
   DAILY[season_Yqrt %% 1 == 0.50, Season := "Summer"]
   DAILY[season_Yqrt %% 1 == 0.75, Season := "Autumn"]
 
-
   ## inspect bin counts
   hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N], breaks = 100,
        main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
@@ -189,7 +188,7 @@ for (DBn in dbs) {
 
   ## Store daily values as is
   if (Sys.info()["nodename"] == Main.Host) {
-    tbl_name <- paste0("Trend_A_SZA_", DBn)
+    tbl_name <- paste0("Trend_A_SZA_DAILY_", DBn)
     if (dbExistsTable(con , tbl_name)) {
       dbRemoveTable(con, tbl_name)
     }
@@ -201,15 +200,13 @@ for (DBn in dbs) {
 
 
 
-
-
-##  SZA data representation  -------------------------------------------------
-dbs <- sort(grep("A_SZA_", dbListTables(con), value = TRUE))
+##  SZA daily data representation  ---------------------------------------------
+dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
 
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Apply some filtering on the data to use
+#' ## Apply some filtering on the daily data before use
 #'
 #' We choose to use only SZA bins with at least `r SZA_aggregation_N_lim` data
 #' points.
@@ -265,6 +262,8 @@ for (DBn in dbs) {
   hist(DATA |> filter(!is.na(GLB_trnd_A_mean)) |> select(GLB_trnd_A_N) |> pull())
 
 }
+
+
 
 
 #+ Clean_exit, echo=FALSE

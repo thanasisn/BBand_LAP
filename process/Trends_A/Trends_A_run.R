@@ -13,9 +13,6 @@ output_format <- bookdown::pdf_document2()
 
 library(rmarkdown)
 
-## Run every nth day
-run_days <- 10
-
 ## Get shell arguments
 args <- commandArgs( trailingOnly = TRUE )
 ## Override run condition from shell
@@ -27,8 +24,8 @@ if (length(args) > 0) {
   }
 }
 
-
-if (FORCE | as.numeric(Sys.Date()) %% run_days == 0)
+## run on the first of each month to include all of the previous
+if (FORCE || as.numeric(strftime(Sys.Date(), "%d")) == 1)
 {
   render(
     input         = "~/BBand_LAP/process/Trends_A/Trends_A_00_raw_data.R",

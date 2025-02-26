@@ -26,7 +26,7 @@
 #'     keep_md:          no
 #'     latex_engine:     xelatex
 #'     toc:              yes
-#'     toc_depth:        4
+#'     toc_depth:        5
 #'     fig_width:        8
 #'     fig_height:       4
 #'   html_document:
@@ -109,7 +109,7 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 #'
 #' \FloatBarrier
 #'
-#' ## Trends for season of the year from daily means
+#' ## Daily trends for season of the year
 #'
 #' We calculated Seasonal means from the daily means
 #'
@@ -201,7 +201,7 @@ dbs <- sort(grep("_MONTHLY_", dbListTables(con), value = TRUE))
 #' \newpage
 #' \FloatBarrier
 #'
-#' ## Trends for season of the year from monthly means
+#' ## Monthly trends for season of the year
 #'
 #' We calculated Seasonal means from the monthly means of daily means
 #'

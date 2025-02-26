@@ -27,7 +27,7 @@ if (length(args) > 0) {
 }
 
 
-if (FORCE | as.numeric(Sys.Date()) %% run_days == 0)
+if (FORCE || as.numeric(Sys.Date()) %% run_days == 0)
 {
   try({
     render(input      = "~/BBand_LAP/process/CSid_RenoHansen/Clear_sky_id_Reno-Hansen_apply_v14.2_legacy.R",

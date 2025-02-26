@@ -34,7 +34,7 @@ if (length(args) > 0) {
 }
 
 
-if (FORCE | as.numeric(Sys.Date()) %% run_days == 0)
+if (FORCE || as.numeric(Sys.Date()) %% run_days == 0)
 {
 
   ## __ Check inputs  ------------------------------------------------------------

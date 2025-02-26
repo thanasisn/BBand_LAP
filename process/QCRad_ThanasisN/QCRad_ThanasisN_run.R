@@ -31,7 +31,7 @@ if (length(args) > 0) {
 ##  Run tests  -----------------------------------------------------------------
 
 
-if (FORCE | as.numeric(Sys.Date()) %% run_days == 0)
+if (FORCE || as.numeric(Sys.Date()) %% run_days == 0)
 {
 
   # source("~/BBand_LAP/process/QCRad_ThanasisN/QCRad_ThanasisN_T07_v10.R")
