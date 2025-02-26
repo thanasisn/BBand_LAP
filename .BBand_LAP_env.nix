@@ -18,6 +18,7 @@ let
       formatR
       knitr
       rmarkdown
+      tinytex
       ## for data analysis
       RNetCDF
       arrow

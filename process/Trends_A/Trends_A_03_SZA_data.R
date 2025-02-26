@@ -64,7 +64,7 @@ knitr::opts_chunk$set(tidy = TRUE,
 )
 
 ## __ Set environment  ---------------------------------------------------------
-# closeAllConnections()
+closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name  <- "~/BBand_LAP/process/Trends_A/Trends_A_03_SZA_data.R"
@@ -270,10 +270,93 @@ for (DBn in dbs) {
 
 }
 
-
+if (FALSE) {
 ##  Daily deseasonalized anomaly SZA -------------------------------------------
 
+#' \FloatBarrier
+#' \newpage
+#'
+#' ## Create daily climatology data and anomaly
+#'
+#' We compute daily anomaly `_anom` as 100 (`_mean` - `_clima`) / `_clima`
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
+for (DBn in dbs) {
+  DATA <- tbl(con, DBn)
+  DATA <- DATA |> select(-contains("_clima"))
+  vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
+
+  ## __ Compute daily climatology values ----------------------------------------
+  CLIMA <- DATA |>
+    group_by(DOY = yday(Day)) |>
+    summarise(
+      Clima_N = n(),
+      ## get the totals of data in each mean
+      across(
+        .cols = ends_with(c("_NAs", "_N")),
+        .fns  = list(
+          clima_total = ~ sum(.x, na.rm = TRUE)
+        )
+      ),
+      ## create climatology for each mean
+      across(
+        .cols = ends_with("_mean"),
+        .fns  = list(
+          clima     = ~ mean(.x, na.rm = TRUE),
+          clima_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
+          clima_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+        )
+      )
+    ) |> collect() |> data.table()
+
+
+  ## Plot climatology values
+  p <- CLIMA |> select(DOY,
+                       !starts_with("TSI") &
+                         ends_with(c("trnd_A_mean_clima"))) |>
+    melt(id.vars = 'DOY', variable.name = 'Radiation')   |>
+    ggplot(aes(x = DOY, y = value)) +
+    geom_point( aes(colour = Radiation)) +
+    geom_smooth(aes(colour = Radiation), method = 'loess', formula = 'y ~ x') +
+    labs(subtitle = paste("Daily climatology for ", var_name(DBn)),
+         y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
+    theme_bw()
+  show(p)
+
+  ## __ Create deseasonal anomaly  ---------------------------------------------
+  DATA <- left_join(
+    DATA |> mutate(DOY = yday(Day)),
+    CLIMA,
+    by   = "DOY",
+    copy = TRUE
+  ) |> collect() |> data.table()
+
+  for (av in vars) {
+    cat("Compute anomaly by DOY for ", av, "\n\n")
+
+    climavar <- paste0(av, "_clima")
+    anomvar  <- paste0(av, "_anom" )
+
+    DATA <- DATA |> mutate(
+      !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
+      Decimal_date := decimal_date(Day)
+    ) |> collect()
+
+    ## protect database numeric type
+    DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
+    DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
+  }
+
+  ## Store daily anomaly data
+  if (Sys.info()["nodename"] == Main.Host) {
+    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
+  }
+}
+
+}
 
 ##  Daily deseasonalized anomaly by season of year  ----------------------------
 
