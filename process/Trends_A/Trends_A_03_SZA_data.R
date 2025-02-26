@@ -149,7 +149,7 @@ for (DBn in dbs) {
   DAILY <- DATA   |>
     group_by(Day,
              preNoon,
-             SZA = (SZA - SZA_BIN / 2 ) %/% SZA_BIN) |>
+             SZA = (SZA - SZA_BIN / 2) %/% SZA_BIN) |>
     summarise(
       ## stats on every variable
       across(
