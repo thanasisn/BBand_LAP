@@ -270,27 +270,29 @@ for (DBn in dbs) {
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily SZA ", var_name(DBn), "\n\n"))
 
-  DATA |> select(contains("GLB")) |> colnames()
+  ##  Variables to restrict  ---
+  vars <- DATA |> select(ends_with("_mean")) |> colnames()
 
-  hist(DATA |>
-         filter(!is.na(GLB_trnd_A_mean)) |>
-         select(GLB_trnd_A_N) |>
-         pull(),
-       breaks = 50)
-  abline(v = SZA_aggregation_N_lim, col = "red")
+  ## restrict each variable
+  for (avar in vars)  {
+    checkvar <- sub("_mean", "_N", avar)
 
+    hist(DATA |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
+         breaks = 50)
+    abline(v = SZA_aggregation_N_lim, col = "red")
+  }
 }
 
-  ##  Daily deseasonalized anomaly SZA -------------------------------------------
+##  Daily deseasonalized anomaly SZA -------------------------------------------
 
-  #' \FloatBarrier
-  #' \newpage
-  #'
-  #' ## Create daily climatology data and anomaly
-  #'
-  #' We compute daily anomaly `_anom` as 100 (`_mean` - `_clima`) / `_clima`
-  #'
-  #+ include=T, echo=T, results="asis", warning=FALSE
+#' \FloatBarrier
+#' \newpage
+#'
+#' ## Create daily climatology data and anomaly
+#'
+#' We compute daily anomaly `_anom` as 100 (`_mean` - `_clima`) / `_clima`
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
 if (FALSE) {
   for (DBn in dbs) {
     DATA <- tbl(con, DBn)

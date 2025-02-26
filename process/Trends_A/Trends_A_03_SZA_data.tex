@@ -1,0 +1,6312 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  10pt,
+  a4paper,oneside]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Trends A},
+  pdfauthor={Natsis Athanasios},
+  colorlinks=true,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[left=0.5in,right=0.5in,top=0.5in,bottom=0.5in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{caption}
+\usepackage{placeins}
+\captionsetup{font=small}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Trends A}
+\author{Natsis Athanasios}
+\date{2025-02-26}
+
+\begin{document}
+\maketitle
+
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{4}
+\tableofcontents
+}
+\hypertarget{create-daily-means-and-deseasonal-anomaly}{%
+\section{Create daily means, and deseasonal anomaly}\label{create-daily-means-and-deseasonal-anomaly}}
+
+\textbf{Details and source code: \href{https://github.com/thanasisn/BBand_LAP}{\texttt{github.com/thanasisn/BBand\_LAP}}}
+
+\FloatBarrier
+\newpage
+
+\hypertarget{create-daily-sza-means-for-each-data-set}{%
+\subsection{Create daily SZA means for each data set}\label{create-daily-sza-means-for-each-data-set}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (DBn }\ControlFlowTok{in}\NormalTok{ dbs) \{}
+\NormalTok{    DATA }\OtherTok{\textless{}{-}} \FunctionTok{get}\NormalTok{(DBn)}
+    \FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n\textbackslash{}\textbackslash{}}\StringTok{FloatBarrier}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+    \FunctionTok{cat}\NormalTok{(}
+        \FunctionTok{paste}\NormalTok{(}
+            \StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{\#\# Daily SZA means"}\NormalTok{, }\FunctionTok{var\_name}\NormalTok{(DBn),}
+            \StringTok{"}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}
+\NormalTok{        )}
+\NormalTok{    )}
+    \FunctionTok{status\_msg}\NormalTok{(}\AttributeTok{ScriptName =}\NormalTok{ Script.Name, }\AttributeTok{msg =} \FunctionTok{c}\NormalTok{(DBn, }\StringTok{"Daily SZA means"}\NormalTok{))}
+\NormalTok{    vars }\OtherTok{\textless{}{-}} \FunctionTok{sort}\NormalTok{(}
+\NormalTok{        DATA }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{select}\NormalTok{(}\FunctionTok{ends\_with}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"\_trnd\_A"}\NormalTok{, }\StringTok{"\_strict"}\NormalTok{))) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{colnames}\NormalTok{()}
+\NormalTok{    )}
+\NormalTok{    DAILY }\OtherTok{\textless{}{-}}\NormalTok{ DATA }\SpecialCharTok{|\textgreater{}}
+        \FunctionTok{group\_by}\NormalTok{(Day, preNoon, }\AttributeTok{SZA =}\NormalTok{ (SZA }\SpecialCharTok{{-}}\NormalTok{ SZA\_BIN}\SpecialCharTok{/}\DecValTok{2}\NormalTok{)}\SpecialCharTok{\%/\%}\NormalTok{SZA\_BIN) }\SpecialCharTok{|\textgreater{}}
+        \FunctionTok{summarise}\NormalTok{(}
+            \FunctionTok{across}\NormalTok{(}
+                \AttributeTok{.cols =} \FunctionTok{all\_of}\NormalTok{(vars),}
+                \AttributeTok{.fns =} \FunctionTok{list}\NormalTok{(}
+                  \AttributeTok{mean =} \SpecialCharTok{\textasciitilde{}}\FunctionTok{mean}\NormalTok{(.x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+                  \AttributeTok{sd =} \SpecialCharTok{\textasciitilde{}}\FunctionTok{sd}\NormalTok{(.x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+                  \AttributeTok{NAs =} \SpecialCharTok{\textasciitilde{}}\FunctionTok{sum}\NormalTok{(}
+                    \FunctionTok{case\_match}\NormalTok{(}
+                      \FunctionTok{is.na}\NormalTok{(.x),}
+                      \ConstantTok{TRUE} \SpecialCharTok{\textasciitilde{}}\NormalTok{ 1L, }\ConstantTok{FALSE} \SpecialCharTok{\textasciitilde{}}\NormalTok{ 0L}
+\NormalTok{                  ),}
+                    \AttributeTok{na.rm =} \ConstantTok{TRUE}
+\NormalTok{                ),}
+                  \AttributeTok{N =} \SpecialCharTok{\textasciitilde{}}\FunctionTok{sum}\NormalTok{(}
+                    \FunctionTok{case\_match}\NormalTok{(}
+                      \SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(.x),}
+                      \ConstantTok{TRUE} \SpecialCharTok{\textasciitilde{}}\NormalTok{ 1L, }\ConstantTok{FALSE} \SpecialCharTok{\textasciitilde{}}\NormalTok{ 0L}
+\NormalTok{                  ),}
+                    \AttributeTok{na.rm =} \ConstantTok{TRUE}
+\NormalTok{                )}
+\NormalTok{              )}
+\NormalTok{            ),}
+            \AttributeTok{SZA\_N =} \FunctionTok{n}\NormalTok{()}
+\NormalTok{        ) }\SpecialCharTok{|\textgreater{}}
+        \FunctionTok{collect}\NormalTok{() }\SpecialCharTok{|\textgreater{}}
+        \FunctionTok{data.table}\NormalTok{()}
+\NormalTok{    DAILY[, Year }\SpecialCharTok{:}\ErrorTok{=} \FunctionTok{year}\NormalTok{(Day)]}
+\NormalTok{    DAILY[, season\_Yqrt }\SpecialCharTok{:}\ErrorTok{=} \FunctionTok{as.yearqtr}\NormalTok{(}
+        \FunctionTok{as.yearmon}\NormalTok{(}
+            \FunctionTok{paste}\NormalTok{(}
+                \FunctionTok{year}\NormalTok{(Day),}
+                \FunctionTok{month}\NormalTok{(Day),}
+                \AttributeTok{sep =} \StringTok{"{-}"}
+\NormalTok{            )}
+\NormalTok{        ) }\SpecialCharTok{+}
+            \DecValTok{1}\SpecialCharTok{/}\DecValTok{12}
+\NormalTok{    )]}
+\NormalTok{    DAILY[season\_Yqrt}\SpecialCharTok{\%\%}\DecValTok{1} \SpecialCharTok{==} \DecValTok{0}\NormalTok{, Season }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Winter"}\NormalTok{]}
+\NormalTok{    DAILY[season\_Yqrt}\SpecialCharTok{\%\%}\DecValTok{1} \SpecialCharTok{==} \FloatTok{0.25}\NormalTok{, Season }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Spring"}\NormalTok{]}
+\NormalTok{    DAILY[season\_Yqrt}\SpecialCharTok{\%\%}\DecValTok{1} \SpecialCharTok{==} \FloatTok{0.5}\NormalTok{, Season }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Summer"}\NormalTok{]}
+\NormalTok{    DAILY[season\_Yqrt}\SpecialCharTok{\%\%}\DecValTok{1} \SpecialCharTok{==} \FloatTok{0.75}\NormalTok{, Season }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Autumn"}\NormalTok{]}
+    \FunctionTok{hist}\NormalTok{(}
+\NormalTok{        DAILY[}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(GLB\_trnd\_A\_mean),}
+\NormalTok{            GLB\_trnd\_A\_N], }\AttributeTok{breaks =} \DecValTok{100}\NormalTok{, }\AttributeTok{main =} \FunctionTok{paste}\NormalTok{(}
+            \FunctionTok{var\_name}\NormalTok{(DBn),}
+            \FunctionTok{var\_name}\NormalTok{(}\StringTok{"GLB\_trnd\_A\_N"}\NormalTok{)}
+\NormalTok{        ),}
+        \AttributeTok{ylab =} \StringTok{"Valid data count"}
+\NormalTok{    )}
+    \FunctionTok{abline}\NormalTok{(}\AttributeTok{v =}\NormalTok{ SZA\_aggregation\_N\_lim, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+    \FunctionTok{hist}\NormalTok{(}
+\NormalTok{        DAILY[}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(DIR\_trnd\_A\_mean),}
+\NormalTok{            DIR\_trnd\_A\_N], }\AttributeTok{breaks =} \DecValTok{100}\NormalTok{, }\AttributeTok{main =} \FunctionTok{paste}\NormalTok{(}
+            \FunctionTok{var\_name}\NormalTok{(DBn),}
+            \FunctionTok{var\_name}\NormalTok{(}\StringTok{"GLB\_trnd\_A\_N"}\NormalTok{)}
+\NormalTok{        ),}
+        \AttributeTok{ylab =} \StringTok{"Valid data count"}
+\NormalTok{    )}
+    \FunctionTok{abline}\NormalTok{(}\AttributeTok{v =}\NormalTok{ SZA\_aggregation\_N\_lim, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+    \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{Sys.info}\NormalTok{()[}\StringTok{"nodename"}\NormalTok{] }\SpecialCharTok{==}\NormalTok{ Main.Host) \{}
+\NormalTok{        tbl\_name }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(}\StringTok{"Trend\_A\_SZA\_DAILY\_"}\NormalTok{, DBn)}
+        \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{dbExistsTable}\NormalTok{(con, tbl\_name)) \{}
+            \FunctionTok{dbRemoveTable}\NormalTok{(con, tbl\_name)}
+\NormalTok{        \}}
+        \FunctionTok{dbCreateTable}\NormalTok{(}\AttributeTok{conn =}\NormalTok{ con, }\AttributeTok{name =}\NormalTok{ tbl\_name, DAILY)}
+\NormalTok{        res }\OtherTok{\textless{}{-}} \FunctionTok{insert\_table}\NormalTok{(con, DAILY, tbl\_name, }\StringTok{"Day"}\NormalTok{, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{    \}}
+    \FunctionTok{rm}\NormalTok{(DAILY)}
+\NormalTok{    res }\OtherTok{\textless{}{-}} \FunctionTok{gc}\NormalTok{()}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\FloatBarrier
+
+\hypertarget{daily-sza-means-all-sky-cond.}{%
+\subsection{Daily SZA means All sky cond.}\label{daily-sza-means-all-sky-cond.}}
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-4-1} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-4-1}
+\end{figure}
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-4-2} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-4-2}
+\end{figure}
+
+\FloatBarrier
+
+\hypertarget{daily-sza-means-clear-sky-cond.}{%
+\subsection{Daily SZA means Clear sky cond.}\label{daily-sza-means-clear-sky-cond.}}
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-4-3} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-4-3}
+\end{figure}
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-4-4} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-4-4}
+\end{figure}
+
+\FloatBarrier
+
+\hypertarget{daily-sza-means-cloudy-sky-cond.}{%
+\subsection{Daily SZA means Cloudy sky cond.}\label{daily-sza-means-cloudy-sky-cond.}}
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-4-5} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-4-5}
+\end{figure}
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-4-6} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-4-6}
+\end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dbs }\OtherTok{\textless{}{-}} \FunctionTok{sort}\NormalTok{(}
+    \FunctionTok{grep}\NormalTok{(}
+        \StringTok{"A\_SZA\_DAILY\_"}\NormalTok{, }\FunctionTok{dbListTables}\NormalTok{(con),}
+        \AttributeTok{value =} \ConstantTok{TRUE}
+\NormalTok{    )}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\FloatBarrier
+\newpage
+
+\hypertarget{apply-some-filtering-on-the-daily-data-before-use}{%
+\subsection{Apply some filtering on the daily data before use}\label{apply-some-filtering-on-the-daily-data-before-use}}
+
+In order to preserve the representation of the data,
+we choose to use only SZA bins with at least 4 data
+points.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (DBn }\ControlFlowTok{in}\NormalTok{ dbs) \{}
+\NormalTok{    DATA }\OtherTok{\textless{}{-}} \FunctionTok{tbl}\NormalTok{(con, DBn)}
+    \FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n\textbackslash{}\textbackslash{}}\StringTok{FloatBarrier}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+    \FunctionTok{cat}\NormalTok{(}
+        \FunctionTok{paste}\NormalTok{(}
+            \StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{\#\# Filter daily SZA "}\NormalTok{, }\FunctionTok{var\_name}\NormalTok{(DBn),}
+            \StringTok{"}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}
+\NormalTok{        )}
+\NormalTok{    )}
+    \FunctionTok{status\_msg}\NormalTok{(}\AttributeTok{ScriptName =}\NormalTok{ Script.Name, }\AttributeTok{msg =} \FunctionTok{c}\NormalTok{(DBn, }\StringTok{"Filter daily SZA means"}\NormalTok{))}
+\NormalTok{    vars }\OtherTok{\textless{}{-}}\NormalTok{ DATA }\SpecialCharTok{|\textgreater{}}
+        \FunctionTok{select}\NormalTok{(}\FunctionTok{ends\_with}\NormalTok{(}\StringTok{"\_mean"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+        \FunctionTok{colnames}\NormalTok{()}
+    \ControlFlowTok{for}\NormalTok{ (avar }\ControlFlowTok{in}\NormalTok{ vars) \{}
+\NormalTok{        checkvar }\OtherTok{\textless{}{-}} \FunctionTok{sub}\NormalTok{(}\StringTok{"\_mean"}\NormalTok{, }\StringTok{"\_N"}\NormalTok{, avar)}
+\NormalTok{        years }\OtherTok{\textless{}{-}} \FunctionTok{tbl}\NormalTok{(con, DBn) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{select}\NormalTok{(Year) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{distinct}\NormalTok{() }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{arrange}\NormalTok{(Year) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{pull}\NormalTok{()}
+        \ControlFlowTok{for}\NormalTok{ (yyyy }\ControlFlowTok{in}\NormalTok{ years) \{}
+            \FunctionTok{cat}\NormalTok{(DBn, }\StringTok{"{-}"}\NormalTok{, avar, }\StringTok{"{-}"}\NormalTok{, yyyy, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+            \FunctionTok{status\_msg}\NormalTok{(}\AttributeTok{ScriptName =}\NormalTok{ Script.Name, }\AttributeTok{msg =} \FunctionTok{c}\NormalTok{(DBn, avar, yyyy))}
+\NormalTok{            PART }\OtherTok{\textless{}{-}} \FunctionTok{tbl}\NormalTok{(con, DBn) }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{filter}\NormalTok{(Year }\SpecialCharTok{==}\NormalTok{ yyyy) }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{select}\NormalTok{(Day, }\SpecialCharTok{!!}\NormalTok{avar, }\SpecialCharTok{!!}\NormalTok{checkvar)}
+            \ControlFlowTok{if}\NormalTok{ (PART }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(}\SpecialCharTok{!!}\FunctionTok{sym}\NormalTok{(avar))) }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{tally}\NormalTok{() }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{pull}\NormalTok{() }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) \{}
+\NormalTok{                (}\ControlFlowTok{next}\NormalTok{)()}
+\NormalTok{            \}}
+\NormalTok{            PART }\OtherTok{\textless{}{-}}\NormalTok{ PART }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{mutate}\NormalTok{(}
+                  \SpecialCharTok{!!}\AttributeTok{avar :=} \FunctionTok{case\_when}\NormalTok{(}
+                    \SpecialCharTok{!!}\FunctionTok{sym}\NormalTok{(checkvar) }\SpecialCharTok{\textless{}=}
+\NormalTok{                      SZA\_aggregation\_N\_lim }\SpecialCharTok{\textasciitilde{}} \ConstantTok{NA}\NormalTok{, }\SpecialCharTok{!!}\FunctionTok{sym}\NormalTok{(checkvar) }\SpecialCharTok{\textgreater{}}
+\NormalTok{                      SZA\_aggregation\_N\_lim }\SpecialCharTok{\textasciitilde{}} \SpecialCharTok{!!}\FunctionTok{sym}\NormalTok{(avar)}
+\NormalTok{                )}
+\NormalTok{              ) }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{collect}\NormalTok{() }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{data.table}\NormalTok{()}
+            \FunctionTok{hist}\NormalTok{(}
+\NormalTok{                PART }\SpecialCharTok{|\textgreater{}}
+                  \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(}\SpecialCharTok{!!}\FunctionTok{sym}\NormalTok{(avar))) }\SpecialCharTok{|\textgreater{}}
+                  \FunctionTok{select}\NormalTok{(}\SpecialCharTok{!!}\NormalTok{checkvar) }\SpecialCharTok{|\textgreater{}}
+                  \FunctionTok{pull}\NormalTok{(), }\AttributeTok{breaks =} \DecValTok{50}
+\NormalTok{            )}
+            \FunctionTok{abline}\NormalTok{(}\AttributeTok{v =}\NormalTok{ SZA\_aggregation\_N\_lim, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+            \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{Sys.info}\NormalTok{()[}\StringTok{"nodename"}\NormalTok{] }\SpecialCharTok{==}\NormalTok{ Main.Host) \{}
+\NormalTok{                res }\OtherTok{\textless{}{-}} \FunctionTok{update\_table}\NormalTok{(con, PART, tbl\_name, }\StringTok{"Day"}\NormalTok{, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{            \}}
+\NormalTok{        \}}
+\NormalTok{    \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\FloatBarrier
+
+\hypertarget{filter-daily-sza-trend_a_sza_daily_all}{%
+\subsection{Filter daily SZA Trend\_A\_SZA\_DAILY\_ALL}\label{filter-daily-sza-trend_a_sza_daily_all}}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 1993
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 1994
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 1995
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 1996
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 1997
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 1998
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 1999
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2000
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2001
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2002
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2003
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2004
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2005
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2006
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2007
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2008
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2009
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2010
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2011
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2012
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2013
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2014
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2015
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-1} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-1}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-2} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-2}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-3} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-3}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-4} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-4}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-5} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-5}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-6} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-6}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-7} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-7}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-8} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-8}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-9} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-9}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-10} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-10}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-11} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-11}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-12} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-12}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-13} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-13}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-14} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-14}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-15} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-15}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-16} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-16}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-17} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-17}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIFF\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-18} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-18}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 1993
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 1994
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 1995
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 1996
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 1997
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 1998
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 1999
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2000
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2001
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2002
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2003
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2004
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2005
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2006
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2007
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2008
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2009
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2010
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2011
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2012
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2013
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2014
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2015
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-19} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-19}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-20} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-20}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-21} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-21}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-22} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-22}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-23} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-23}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-24} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-24}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-25} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-25}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-26} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-26}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-27} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-27}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-28} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-28}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-29} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-29}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-30} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-30}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-31} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-31}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-32} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-32}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-33} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-33}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-34} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-34}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-35} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-35}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - DIR\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-36} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-36}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 1993
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-37} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-37}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 1994
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-38} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-38}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 1995
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-39} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-39}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 1996
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-40} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-40}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 1997
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-41} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-41}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 1998
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-42} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-42}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 1999
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-43} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-43}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2000
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-44} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-44}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2001
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-45} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-45}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2002
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-46} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-46}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2003
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-47} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-47}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2004
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-48} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-48}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2005
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-49} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-49}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2006
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-50} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-50}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2007
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-51} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-51}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2008
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-52} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-52}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2009
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-53} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-53}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2010
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-54} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-54}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2011
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-55} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-55}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2012
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-56} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-56}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2013
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-57} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-57}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2014
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-58} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-58}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2015
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-59} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-59}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-60} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-60}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-61} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-61}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-62} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-62}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-63} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-63}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-64} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-64}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-65} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-65}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-66} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-66}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-67} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-67}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-68} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-68}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 1993
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-69} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-69}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 1994
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-70} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-70}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 1995
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-71} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-71}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 1996
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-72} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-72}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 1997
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-73} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-73}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 1998
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-74} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-74}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 1999
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-75} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-75}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2000
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-76} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-76}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2001
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-77} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-77}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2002
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-78} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-78}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2003
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-79} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-79}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2004
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-80} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-80}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2005
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-81} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-81}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2006
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-82} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-82}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2007
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-83} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-83}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2008
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-84} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-84}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2009
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-85} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-85}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2010
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-86} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-86}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2011
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-87} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-87}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2012
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-88} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-88}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2013
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-89} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-89}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2014
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-90} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-90}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2015
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-91} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-91}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-92} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-92}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-93} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-93}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-94} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-94}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-95} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-95}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-96} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-96}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-97} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-97}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-98} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-98}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-99} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-99}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - GLB\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-100} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-100}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 1993
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 1994
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 1995
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 1996
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 1997
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 1998
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 1999
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2000
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2001
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2002
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2003
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2004
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2005
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2006
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2007
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2008
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2009
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2010
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2011
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2012
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2013
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2014
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2015
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-101} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-101}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-102} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-102}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-103} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-103}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-104} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-104}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-105} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-105}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-106} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-106}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-107} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-107}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-108} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-108}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-109} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-109}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-110} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-110}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-111} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-111}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-112} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-112}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-113} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-113}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-114} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-114}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-115} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-115}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-116} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-116}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-117} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-117}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - HOR\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-118} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-118}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-119} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-119}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-120} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-120}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-121} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-121}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-122} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-122}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-123} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-123}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-124} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-124}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-125} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-125}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-126} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-126}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_DIR\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-127} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-127}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 1993
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-128} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-128}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 1994
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-129} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-129}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 1995
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-130} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-130}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 1996
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-131} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-131}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 1997
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-132} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-132}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 1998
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-133} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-133}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 1999
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-134} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-134}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2000
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-135} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-135}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2001
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-136} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-136}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2002
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-137} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-137}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2003
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-138} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-138}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2004
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-139} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-139}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2005
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-140} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-140}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2006
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-141} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-141}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2007
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-142} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-142}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2008
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-143} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-143}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2009
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-144} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-144}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2010
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-145} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-145}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2011
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-146} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-146}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2012
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-147} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-147}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2013
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-148} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-148}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2014
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-149} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-149}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2015
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-150} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-150}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-151} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-151}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-152} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-152}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-153} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-153}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-154} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-154}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-155} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-155}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-156} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-156}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-157} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-157}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-158} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-158}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_ALL - TSI\_GLB\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-159} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-159}
+\end{figure}
+
+\FloatBarrier
+
+\hypertarget{filter-daily-sza-trend_a_sza_daily_clear}{%
+\subsection{Filter daily SZA Trend\_A\_SZA\_DAILY\_CLEAR}\label{filter-daily-sza-trend_a_sza_daily_clear}}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-160} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-160}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-161} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-161}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-162} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-162}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-163} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-163}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-164} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-164}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-165} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-165}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-166} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-166}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-167} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-167}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-168} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-168}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-169} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-169}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-170} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-170}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-171} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-171}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-172} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-172}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-173} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-173}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-174} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-174}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-175} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-175}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-176} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-176}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIFF\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-177} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-177}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-178} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-178}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-179} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-179}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-180} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-180}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-181} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-181}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-182} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-182}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-183} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-183}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-184} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-184}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-185} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-185}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-186} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-186}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-187} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-187}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-188} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-188}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-189} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-189}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-190} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-190}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-191} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-191}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-192} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-192}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-193} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-193}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-194} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-194}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - DIR\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-195} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-195}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 1993
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-196} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-196}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 1994
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-197} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-197}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 1995
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-198} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-198}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 1996
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-199} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-199}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 1997
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-200} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-200}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 1998
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-201} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-201}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 1999
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-202} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-202}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2000
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-203} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-203}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2001
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-204} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-204}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2002
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-205} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-205}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2003
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-206} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-206}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2004
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-207} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-207}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2005
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-208} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-208}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2006
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-209} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-209}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2007
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-210} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-210}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2008
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-211} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-211}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2009
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-212} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-212}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2010
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-213} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-213}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2011
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-214} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-214}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2012
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-215} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-215}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2013
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-216} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-216}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2014
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-217} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-217}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2015
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-218} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-218}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-219} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-219}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-220} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-220}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-221} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-221}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-222} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-222}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-223} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-223}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-224} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-224}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-225} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-225}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-226} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-226}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-227} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-227}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 1993
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-228} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-228}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 1994
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-229} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-229}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 1995
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-230} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-230}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 1996
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-231} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-231}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 1997
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-232} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-232}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 1998
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-233} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-233}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 1999
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-234} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-234}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2000
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-235} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-235}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2001
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-236} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-236}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2002
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-237} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-237}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2003
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-238} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-238}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2004
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-239} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-239}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2005
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-240} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-240}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2006
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-241} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-241}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2007
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-242} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-242}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2008
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-243} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-243}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2009
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-244} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-244}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2010
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-245} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-245}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2011
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-246} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-246}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2012
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-247} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-247}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2013
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-248} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-248}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2014
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-249} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-249}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2015
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-250} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-250}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-251} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-251}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-252} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-252}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-253} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-253}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-254} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-254}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-255} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-255}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-256} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-256}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-257} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-257}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-258} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-258}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - GLB\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-259} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-259}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-260} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-260}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-261} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-261}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-262} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-262}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-263} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-263}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-264} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-264}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-265} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-265}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-266} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-266}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-267} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-267}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-268} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-268}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-269} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-269}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-270} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-270}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-271} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-271}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-272} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-272}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-273} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-273}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-274} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-274}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-275} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-275}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-276} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-276}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - HOR\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-277} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-277}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-278} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-278}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-279} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-279}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-280} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-280}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-281} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-281}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-282} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-282}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-283} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-283}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-284} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-284}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-285} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-285}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_DIR\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-286} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-286}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 1993
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-287} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-287}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 1994
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-288} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-288}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 1995
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-289} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-289}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 1996
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-290} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-290}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 1997
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-291} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-291}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 1998
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-292} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-292}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 1999
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-293} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-293}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2000
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-294} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-294}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2001
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-295} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-295}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2002
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-296} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-296}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2003
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-297} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-297}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2004
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-298} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-298}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2005
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-299} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-299}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2006
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-300} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-300}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2007
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-301} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-301}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2008
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-302} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-302}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2009
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-303} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-303}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2010
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-304} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-304}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2011
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-305} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-305}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2012
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-306} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-306}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2013
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-307} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-307}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2014
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-308} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-308}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2015
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-309} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-309}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-310} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-310}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-311} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-311}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-312} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-312}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-313} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-313}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-314} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-314}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-315} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-315}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-316} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-316}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-317} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-317}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLEAR - TSI\_GLB\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-318} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-318}
+\end{figure}
+
+\FloatBarrier
+
+\hypertarget{filter-daily-sza-trend_a_sza_daily_cloud}{%
+\subsection{Filter daily SZA Trend\_A\_SZA\_DAILY\_CLOUD}\label{filter-daily-sza-trend_a_sza_daily_cloud}}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-319} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-319}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-320} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-320}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-321} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-321}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-322} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-322}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-323} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-323}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-324} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-324}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-325} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-325}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-326} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-326}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-327} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-327}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-328} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-328}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-329} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-329}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-330} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-330}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-331} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-331}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-332} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-332}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-333} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-333}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-334} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-334}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-335} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-335}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIFF\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-336} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-336}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-337} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-337}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-338} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-338}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-339} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-339}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-340} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-340}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-341} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-341}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-342} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-342}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-343} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-343}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-344} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-344}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-345} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-345}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-346} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-346}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-347} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-347}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-348} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-348}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-349} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-349}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-350} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-350}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-351} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-351}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-352} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-352}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-353} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-353}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - DIR\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-354} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-354}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 1993
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-355} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-355}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 1994
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-356} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-356}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 1995
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-357} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-357}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 1996
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-358} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-358}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 1997
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-359} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-359}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 1998
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-360} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-360}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 1999
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-361} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-361}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2000
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-362} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-362}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2001
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-363} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-363}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2002
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-364} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-364}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2003
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-365} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-365}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2004
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-366} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-366}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2005
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-367} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-367}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2006
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-368} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-368}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2007
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-369} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-369}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2008
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-370} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-370}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2009
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-371} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-371}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2010
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-372} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-372}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2011
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-373} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-373}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2012
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-374} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-374}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2013
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-375} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-375}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2014
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-376} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-376}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2015
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-377} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-377}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-378} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-378}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-379} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-379}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-380} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-380}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-381} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-381}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-382} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-382}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-383} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-383}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-384} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-384}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-385} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-385}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-386} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-386}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 1993
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-387} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-387}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 1994
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-388} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-388}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 1995
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-389} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-389}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 1996
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-390} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-390}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 1997
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-391} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-391}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 1998
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-392} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-392}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 1999
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-393} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-393}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2000
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-394} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-394}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2001
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-395} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-395}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2002
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-396} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-396}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2003
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-397} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-397}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2004
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-398} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-398}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2005
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-399} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-399}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2006
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-400} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-400}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2007
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-401} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-401}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2008
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-402} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-402}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2009
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-403} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-403}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2010
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-404} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-404}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2011
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-405} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-405}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2012
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-406} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-406}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2013
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-407} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-407}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2014
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-408} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-408}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2015
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-409} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-409}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-410} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-410}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-411} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-411}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-412} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-412}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-413} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-413}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-414} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-414}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-415} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-415}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-416} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-416}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-417} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-417}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - GLB\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-418} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-418}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-419} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-419}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-420} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-420}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-421} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-421}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-422} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-422}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-423} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-423}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-424} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-424}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-425} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-425}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-426} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-426}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_strict\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-427} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-427}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-428} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-428}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-429} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-429}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-430} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-430}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-431} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-431}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-432} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-432}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-433} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-433}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-434} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-434}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-435} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-435}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - HOR\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-436} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-436}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 1993
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 1994
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 1995
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 1996
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 1997
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 1998
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 1999
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2000
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2001
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2002
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2003
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2004
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2005
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2006
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2007
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2008
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2009
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2010
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2011
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2012
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2013
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2014
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2015
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-437} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-437}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-438} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-438}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-439} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-439}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-440} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-440}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-441} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-441}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-442} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-442}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-443} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-443}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-444} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-444}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_DIR\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-445} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-445}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 1993
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-446} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-446}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 1994
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-447} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-447}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 1995
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-448} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-448}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 1996
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-449} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-449}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 1997
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-450} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-450}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 1998
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-451} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-451}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 1999
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-452} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-452}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2000
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-453} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-453}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2001
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-454} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-454}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2002
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-455} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-455}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2003
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-456} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-456}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2004
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-457} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-457}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2005
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-458} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-458}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2006
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-459} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-459}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2007
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-460} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-460}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2008
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-461} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-461}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2009
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-462} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-462}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2010
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-463} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-463}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2011
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-464} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-464}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2012
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-465} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-465}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2013
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-466} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-466}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2014
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-467} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-467}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2015
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-468} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-468}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2016
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-469} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-469}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2017
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-470} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-470}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2018
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-471} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-471}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2019
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-472} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-472}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2020
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-473} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-473}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2021
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-474} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-474}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2022
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-475} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-475}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2023
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-476} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-476}
+\end{figure}
+
+Trend\_A\_SZA\_DAILY\_CLOUD - TSI\_GLB\_trnd\_A\_mean - 2024
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-477} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-477}
+\end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (DBn }\ControlFlowTok{in}\NormalTok{ dbs) \{}
+\NormalTok{    DATA }\OtherTok{\textless{}{-}} \FunctionTok{tbl}\NormalTok{(con, DBn)}
+    \FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n\textbackslash{}\textbackslash{}}\StringTok{FloatBarrier}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+    \FunctionTok{cat}\NormalTok{(}
+        \FunctionTok{paste}\NormalTok{(}
+            \StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{\#\# Daily SZA "}\NormalTok{, }\FunctionTok{var\_name}\NormalTok{(DBn),}
+            \StringTok{"}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}
+\NormalTok{        )}
+\NormalTok{    )}
+\NormalTok{    DATA }\SpecialCharTok{|\textgreater{}}
+        \FunctionTok{select}\NormalTok{(}\FunctionTok{contains}\NormalTok{(}\StringTok{"GLB"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+        \FunctionTok{colnames}\NormalTok{()}
+    \FunctionTok{hist}\NormalTok{(}
+\NormalTok{        DATA }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{filter}\NormalTok{(}\SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(GLB\_trnd\_A\_mean)) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{select}\NormalTok{(GLB\_trnd\_A\_N) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{pull}\NormalTok{(), }\AttributeTok{breaks =} \DecValTok{50}
+\NormalTok{    )}
+    \FunctionTok{abline}\NormalTok{(}\AttributeTok{v =}\NormalTok{ SZA\_aggregation\_N\_lim, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\FloatBarrier
+
+\hypertarget{daily-sza-trend_a_sza_daily_all}{%
+\subsection{Daily SZA Trend\_A\_SZA\_DAILY\_ALL}\label{daily-sza-trend_a_sza_daily_all}}
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-478} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-478}
+\end{figure}
+
+\FloatBarrier
+
+\hypertarget{daily-sza-trend_a_sza_daily_clear}{%
+\subsection{Daily SZA Trend\_A\_SZA\_DAILY\_CLEAR}\label{daily-sza-trend_a_sza_daily_clear}}
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-479} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-479}
+\end{figure}
+
+\FloatBarrier
+
+\hypertarget{daily-sza-trend_a_sza_daily_cloud}{%
+\subsection{Daily SZA Trend\_A\_SZA\_DAILY\_CLOUD}\label{daily-sza-trend_a_sza_daily_cloud}}
+
+\begin{figure}[!ht]
+
+{\centering \includegraphics[width=1\linewidth]{Trends_A_03_SZA_data_files/figure-latex/unnamed-chunk-5-480} 
+
+}
+
+\caption{ empty caption }\label{fig:unnamed-chunk-5-480}
+\end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{ (}\ConstantTok{FALSE}\NormalTok{) \{}
+    \ControlFlowTok{for}\NormalTok{ (DBn }\ControlFlowTok{in}\NormalTok{ dbs) \{}
+\NormalTok{        DATA }\OtherTok{\textless{}{-}} \FunctionTok{tbl}\NormalTok{(con, DBn)}
+\NormalTok{        DATA }\OtherTok{\textless{}{-}}\NormalTok{ DATA }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\FunctionTok{contains}\NormalTok{(}\StringTok{"\_clima"}\NormalTok{))}
+\NormalTok{        vars }\OtherTok{\textless{}{-}} \FunctionTok{sort}\NormalTok{(}
+\NormalTok{            DATA }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{select}\NormalTok{(}\FunctionTok{ends\_with}\NormalTok{(}\StringTok{"\_mean"}\NormalTok{)) }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{colnames}\NormalTok{()}
+\NormalTok{        )}
+        \FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n\textbackslash{}\textbackslash{}}\StringTok{FloatBarrier}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+        \FunctionTok{cat}\NormalTok{(}
+            \FunctionTok{paste}\NormalTok{(}
+                \StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{\#\# Daily deseasonal"}\NormalTok{, }\FunctionTok{var\_name}\NormalTok{(DBn),}
+                \StringTok{"}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}
+\NormalTok{            )}
+\NormalTok{        )}
+\NormalTok{        CLIMA }\OtherTok{\textless{}{-}}\NormalTok{ DATA }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{group\_by}\NormalTok{(}\AttributeTok{DOY =} \FunctionTok{yday}\NormalTok{(Day)) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{summarise}\NormalTok{(}
+                \AttributeTok{Clima\_N =} \FunctionTok{n}\NormalTok{(), }\FunctionTok{across}\NormalTok{(}
+                  \AttributeTok{.cols =} \FunctionTok{ends\_with}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"\_NAs"}\NormalTok{, }\StringTok{"\_N"}\NormalTok{)),}
+                  \AttributeTok{.fns =} \FunctionTok{list}\NormalTok{(}\AttributeTok{clima\_total =} \SpecialCharTok{\textasciitilde{}}\FunctionTok{sum}\NormalTok{(.x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{))}
+\NormalTok{              ),}
+                \FunctionTok{across}\NormalTok{(}
+                  \AttributeTok{.cols =} \FunctionTok{ends\_with}\NormalTok{(}\StringTok{"\_mean"}\NormalTok{),}
+                  \AttributeTok{.fns =} \FunctionTok{list}\NormalTok{(}
+                    \AttributeTok{clima =} \SpecialCharTok{\textasciitilde{}}\FunctionTok{mean}\NormalTok{(.x, }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{),}
+                    \AttributeTok{clima\_NAs =} \SpecialCharTok{\textasciitilde{}}\FunctionTok{sum}\NormalTok{(}
+                      \FunctionTok{case\_match}\NormalTok{(}
+                        \FunctionTok{is.na}\NormalTok{(.x),}
+                        \ConstantTok{TRUE} \SpecialCharTok{\textasciitilde{}}\NormalTok{ 1L, }\ConstantTok{FALSE} \SpecialCharTok{\textasciitilde{}}\NormalTok{ 0L}
+\NormalTok{                    ),}
+                      \AttributeTok{na.rm =} \ConstantTok{TRUE}
+\NormalTok{                  ),}
+                    \AttributeTok{clima\_N =} \SpecialCharTok{\textasciitilde{}}\FunctionTok{sum}\NormalTok{(}
+                      \FunctionTok{case\_match}\NormalTok{(}
+                        \SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(.x),}
+                        \ConstantTok{TRUE} \SpecialCharTok{\textasciitilde{}}\NormalTok{ 1L, }\ConstantTok{FALSE} \SpecialCharTok{\textasciitilde{}}\NormalTok{ 0L}
+\NormalTok{                    ),}
+                      \AttributeTok{na.rm =} \ConstantTok{TRUE}
+\NormalTok{                  )}
+\NormalTok{                )}
+\NormalTok{              )}
+\NormalTok{            ) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{collect}\NormalTok{() }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{data.table}\NormalTok{()}
+\NormalTok{        p }\OtherTok{\textless{}{-}}\NormalTok{ CLIMA }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{select}\NormalTok{(}
+\NormalTok{                DOY, }\SpecialCharTok{!}\FunctionTok{starts\_with}\NormalTok{(}\StringTok{"TSI"}\NormalTok{) }\SpecialCharTok{\&}
+                  \FunctionTok{ends\_with}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"trnd\_A\_mean\_clima"}\NormalTok{))}
+\NormalTok{            ) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{melt}\NormalTok{(}\AttributeTok{id.vars =} \StringTok{"DOY"}\NormalTok{, }\AttributeTok{variable.name =} \StringTok{"Radiation"}\NormalTok{) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ DOY, }\AttributeTok{y =}\NormalTok{ value)) }\SpecialCharTok{+}
+            \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{colour =}\NormalTok{ Radiation)) }\SpecialCharTok{+}
+            \FunctionTok{geom\_smooth}\NormalTok{(}
+                \FunctionTok{aes}\NormalTok{(}\AttributeTok{colour =}\NormalTok{ Radiation),}
+                \AttributeTok{method =} \StringTok{"loess"}\NormalTok{, }\AttributeTok{formula =} \StringTok{"y \textasciitilde{} x"}
+\NormalTok{            ) }\SpecialCharTok{+}
+            \FunctionTok{labs}\NormalTok{(}
+                \AttributeTok{subtitle =} \FunctionTok{paste}\NormalTok{(}\StringTok{"Daily climatology for "}\NormalTok{, }\FunctionTok{var\_name}\NormalTok{(DBn)),}
+                \AttributeTok{y =} \FunctionTok{bquote}\NormalTok{(}
+\NormalTok{                  .(}\StringTok{"Irradiance"}\NormalTok{) }\SpecialCharTok{\textasciitilde{}}
+                    \ErrorTok{\textasciitilde{}}\FunctionTok{group}\NormalTok{(}\StringTok{"["}\NormalTok{, W}\SpecialCharTok{/}\NormalTok{m}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{, }\StringTok{"]"}\NormalTok{)}
+\NormalTok{              )}
+\NormalTok{            ) }\SpecialCharTok{+}
+            \FunctionTok{theme\_bw}\NormalTok{()}
+        \FunctionTok{show}\NormalTok{(p)}
+\NormalTok{        DATA }\OtherTok{\textless{}{-}} \FunctionTok{left\_join}\NormalTok{(}
+\NormalTok{            DATA }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{mutate}\NormalTok{(}\AttributeTok{DOY =} \FunctionTok{yday}\NormalTok{(Day)),}
+\NormalTok{            CLIMA, }\AttributeTok{by =} \StringTok{"DOY"}\NormalTok{, }\AttributeTok{copy =} \ConstantTok{TRUE}
+\NormalTok{        ) }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{collect}\NormalTok{() }\SpecialCharTok{|\textgreater{}}
+            \FunctionTok{data.table}\NormalTok{()}
+        \ControlFlowTok{for}\NormalTok{ (av }\ControlFlowTok{in}\NormalTok{ vars) \{}
+            \FunctionTok{cat}\NormalTok{(}\StringTok{"Compute anomaly by DOY for "}\NormalTok{, av, }\StringTok{"}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\NormalTok{            climavar }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(av, }\StringTok{"\_clima"}\NormalTok{)}
+\NormalTok{            anomvar }\OtherTok{\textless{}{-}} \FunctionTok{paste0}\NormalTok{(av, }\StringTok{"\_anom"}\NormalTok{)}
+\NormalTok{            DATA }\OtherTok{\textless{}{-}}\NormalTok{ DATA }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{mutate}\NormalTok{(}
+                  \SpecialCharTok{!!}\AttributeTok{anomvar :=} \DecValTok{100} \SpecialCharTok{*}\NormalTok{ (}\FunctionTok{get}\NormalTok{(av) }\SpecialCharTok{{-}}
+                    \FunctionTok{get}\NormalTok{(climavar))}\SpecialCharTok{/}\FunctionTok{get}\NormalTok{(climavar),}
+                  \AttributeTok{Decimal\_date :=} \FunctionTok{decimal\_date}\NormalTok{(Day)}
+\NormalTok{              ) }\SpecialCharTok{|\textgreater{}}
+                \FunctionTok{collect}\NormalTok{()}
+\NormalTok{            DATA[}\FunctionTok{get}\NormalTok{(anomvar) }\SpecialCharTok{\textgreater{}}
+                \DecValTok{9999}\NormalTok{, }\FunctionTok{eval}\NormalTok{(anomvar) }\SpecialCharTok{:}\ErrorTok{=}
+                \DecValTok{9999}\NormalTok{]}
+\NormalTok{            DATA[}\FunctionTok{get}\NormalTok{(anomvar) }\SpecialCharTok{\textless{}}
+                \SpecialCharTok{{-}}\DecValTok{9999}\NormalTok{, }\FunctionTok{eval}\NormalTok{(anomvar) }\SpecialCharTok{:}\ErrorTok{=}
+                \SpecialCharTok{{-}}\DecValTok{9999}\NormalTok{]}
+\NormalTok{        \}}
+        \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{Sys.info}\NormalTok{()[}\StringTok{"nodename"}\NormalTok{] }\SpecialCharTok{==}\NormalTok{ Main.Host) \{}
+\NormalTok{            res }\OtherTok{\textless{}{-}} \FunctionTok{update\_table}\NormalTok{(con, DATA, DBn, }\StringTok{"Day"}\NormalTok{, }\AttributeTok{quiet =} \ConstantTok{TRUE}\NormalTok{)}
+\NormalTok{        \}}
+\NormalTok{    \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\FloatBarrier
+\newpage
+
+\hypertarget{create-monthly-sza-means-for-each-data-set}{%
+\subsection{Create monthly SZA means for each data set}\label{create-monthly-sza-means-for-each-data-set}}
+
+\FloatBarrier
+
+\textbf{END} 2025-02-26 18:12:35.4 \href{mailto:athan@sagan}{\nolinkurl{athan@sagan}} \textasciitilde/BBand\_LAP/process/Trends\_A/Trends\_A\_03\_SZA\_data.R 6.164803 mins
+
+\end{document}
