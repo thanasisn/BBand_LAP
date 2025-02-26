@@ -200,7 +200,7 @@ for (DBn in dbs) {
 
 
 
-##  SZA daily data representation  ---------------------------------------------
+##  Filter daily SZA values  ---------------------------------------------------
 dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
 
 #' \FloatBarrier
@@ -208,7 +208,8 @@ dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
 #'
 #' ## Apply some filtering on the daily data before use
 #'
-#' We choose to use only SZA bins with at least `r SZA_aggregation_N_lim` data
+#' In order to preserve the representation of the data,
+#' we choose to use only SZA bins with at least `r SZA_aggregation_N_lim` data
 #' points.
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
@@ -264,6 +265,24 @@ for (DBn in dbs) {
 }
 
 
+##  Daily deseasonalized anomaly SZA -------------------------------------------
+
+
+
+##  Daily deseasonalized anomaly by season of year  ----------------------------
+
+
+
+
+
+##  Create monthly SZA values  -------------------------------------------------
+
+#' \FloatBarrier
+#' \newpage
+#'
+#' ## Create monthly SZA means for each data set
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
 
 
 #+ Clean_exit, echo=FALSE
