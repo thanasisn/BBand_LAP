@@ -47,13 +47,12 @@ PLOT_FIRST <- as_date("1993-01-01")
 PLOT_LAST  <- as_date("2024-01-01")
 
 
-
 flagname_DIR <- "QCv10_02_dir_flag"
 flagname_GLB <- "QCv10_02_glb_flag"
 
-con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = T))
+con <- dbConnect(duckdb(dbdir = DB_BROAD))
 
-grep("_MONTHLY_", dbListTables(con), value = TRUE)
+grep("_SZA_", dbListTables(con), value = TRUE)
 dbRemoveTable(con)
 stop()
 dbDisconnect(con, shutdown = TRUE)
