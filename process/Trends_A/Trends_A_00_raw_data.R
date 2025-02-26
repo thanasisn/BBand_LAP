@@ -222,16 +222,19 @@ ADD <- LAP |>
     SKY
   ) |> collect()  ## have to load data before removing LAP column
 
-## make sure we do not have stale data
-remove_column(con, "LAP", "DIR_trnd_A"    )
-remove_column(con, "LAP", "GLB_trnd_A"    )
-remove_column(con, "LAP", "HOR_trnd_A"    )
-remove_column(con, "LAP", "DIFF_trnd_A"   )
-remove_column(con, "LAP", "TSI_GLB_trnd_A")
-remove_column(con, "LAP", "TSI_DIR_trnd_A")
-remove_column(con, "LAP", "SKY"           )
+if (Sys.info()["nodename"] == Main.Host) {
+  con <- dbConnect(duckdb(dbdir = DB_BROAD))
+  ## make sure we do not have stale data
+  remove_column(con, "LAP", "DIR_trnd_A"    )
+  remove_column(con, "LAP", "GLB_trnd_A"    )
+  remove_column(con, "LAP", "HOR_trnd_A"    )
+  remove_column(con, "LAP", "DIFF_trnd_A"   )
+  remove_column(con, "LAP", "TSI_GLB_trnd_A")
+  remove_column(con, "LAP", "TSI_DIR_trnd_A")
+  remove_column(con, "LAP", "SKY"           )
 
-res <- update_table(con, ADD, "LAP", "Date", quiet = TRUE)
+  res <- update_table(con, ADD, "LAP", "Date", quiet = TRUE)
+}
 
 # for (ad in sample(unique(test$Day), 10)) {
 #   pp <- test[Day == ad]
