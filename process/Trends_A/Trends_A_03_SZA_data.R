@@ -141,6 +141,8 @@ for (DBn in dbs) {
   DATA <- get(DBn)
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily SZA means", var_name(DBn), "\n\n"))
+  status_msg(ScriptName = Script.Name,
+             msg        = c(DBn, "Daily SZA means"))
 
   vars <- sort(DATA |> select(ends_with(c("_trnd_A", "_strict"))) |> colnames())
   ## __ Create daily values and statistics  ------------------------------------
@@ -217,7 +219,9 @@ dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Daily SZA ", var_name(DBn), "\n\n"))
+  cat(paste("\n## Filter daily SZA ", var_name(DBn), "\n\n"))
+  status_msg(ScriptName = Script.Name,
+             msg        = c(DBn, "Filter daily SZA means"))
 
   ##  Variables to restrict  ---
   vars <- DATA |> select(ends_with("_mean")) |> colnames()
@@ -230,6 +234,8 @@ for (DBn in dbs) {
 
     for (yyyy in years) {
       cat(DBn, "-", avar, "-", yyyy, "\n")
+      status_msg(ScriptName = Script.Name,
+                 msg        = c(DBn, avar, yyyy))
       PART <- tbl(con, DBn)  |>
         filter(Year == yyyy) |>
         select(Day, !!avar, !!checkvar)
