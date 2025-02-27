@@ -313,8 +313,7 @@ for (DBn in dbs) {
 #+ include=T, echo=T, results="asis", warning=FALSE
 dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
-  DATA <- tbl(con, DBn)
-  DATA <- DATA |> select(-contains("_clima"))
+  DATA <- tbl(con, DBn) |> select(-contains("_clima"))
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
@@ -381,11 +380,21 @@ for (DBn in dbs) {
     climavar <- paste0(av, "_clima")
     anomvar  <- paste0(av, "_anom" )
 
-    ## merge relevant data
+    ## get only relevant data and re-apply restrictions
+    DATA <- tbl(con, DBn) |>
+      select(-contains("_clima")) |>
+      mutate(DOY = yday(Day)) |>
+      mutate(
+        !!avar := case_when(
+          !!sym(checkvar) <= SZA_aggregation_N_lim ~ NA,
+          !!sym(checkvar) >  SZA_aggregation_N_lim ~ !!sym(avar)
+        )
+      ) |>
+      select(DOY, SZA, preNoon, !!av, Day)
+
+    ## merge relevant data with climatology
     DATA <- left_join(
-      DATA |>
-        mutate(DOY = yday(Day)) |>
-        select(DOY, SZA, preNoon, !!av, Day),
+      DATA,
       CLIMA |>
         select(DOY, SZA, preNoon, !!climavar),
       by   = c("DOY", "preNoon", "SZA"),
