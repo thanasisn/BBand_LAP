@@ -98,15 +98,12 @@ if (Sys.info()["nodename"] == Main.Host) {
   con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 }
 
-## list of daily tables
-dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
-
-
-##  By season daily  values  ---------------------------------------------------
+##  By season daily values  ----------------------------------------------------
 #'
 #' # Daily mean values
 #'
 #+ include=T, echo=F, results="asis", warning=F
+dbs <- sort(grep("Trend_A_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
@@ -132,7 +129,7 @@ for (DBn in dbs) {
     ## _ Correlation test
     cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
 
-    ## _ Arima auto regression Tourpali ----------------------------------------
+    ## _ Arima auto regression Tourpali  ---------------------------------------
     ## create a time variable (with lag of 1 day ?)
     DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
     tmodel <- arima(x = DATA[[avar]], order = c(1, 0, 0), xreg = DATA$ts, method = "ML")
@@ -144,8 +141,7 @@ for (DBn in dbs) {
     names(Tres) <- paste0("Tmod_", names(Tres))
     cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
 
-
-    ## _ Time series analysis ----------------------------------------
+    ## _ Time series analysis  -------------------------------------------------
     dd        <- read.zoo(DATA, index.column = "Day")
     dd        <- as.ts(dd)
 
@@ -174,7 +170,6 @@ for (DBn in dbs) {
            subtitle = paste(var_name(DBn), var_name(avar))) +
       theme_bw()
     show(p)
-
   }
 }
 
@@ -187,6 +182,7 @@ for (DBn in dbs) {
 #' # Daily departure from the climatology
 #'
 #+ include=T, echo=F, results="asis", warning=F
+dbs <- sort(grep("Trend_A_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
@@ -211,7 +207,7 @@ for (DBn in dbs) {
     ## _ Correlation test
     cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
 
-    ## _ Arima auto regression Tourpali ----------------------------------------
+    ## _ Arima auto regression Tourpali  ---------------------------------------
     ## create a time variable (with lag of 1 day ?)
     DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
     tmodel <- arima(x = DATA[[avar]], order = c(1,0,0), xreg = DATA$ts, method = "ML")
@@ -223,8 +219,7 @@ for (DBn in dbs) {
     names(Tres) <- paste0("Tmod_", names(Tres))
     cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
 
-
-    ## _ Time series analysis ----------------------------------------
+    ## _ Time series analysis  ---------------------------------------
     dd        <- read.zoo(DATA, index.column = "Day")
     dd        <- as.ts(dd)
 
@@ -241,7 +236,6 @@ for (DBn in dbs) {
     conf_2.5  <- conf[2, 1]
     conf_97.5 <- conf[2, 2]
 
-
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
@@ -254,7 +248,6 @@ for (DBn in dbs) {
            subtitle = paste(var_name(DBn), var_name(avar))) +
       theme_bw()
     show(p)
-
   }
 }
 

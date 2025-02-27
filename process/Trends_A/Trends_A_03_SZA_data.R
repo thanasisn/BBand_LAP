@@ -60,7 +60,8 @@ knitr::opts_chunk$set(tidy = TRUE,
                         blank        = FALSE,
                         comment      = FALSE,
                         args.newline = TRUE,
-                        arrow        = TRUE)
+                        arrow        = TRUE
+                      )
 )
 
 ## __ Set environment  ---------------------------------------------------------
@@ -128,7 +129,7 @@ ALL   <- LAP |>                           select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
-##  Create daily SZA values  ---------------------------------------------------------
+##  Create daily SZA values  ---------------------------------------------------
 
 #' \FloatBarrier
 #' \newpage
@@ -157,8 +158,8 @@ for (DBn in dbs) {
         .fns  = list(
           mean = ~ mean(.x, na.rm = TRUE),
           sd   = ~ sd  (.x, na.rm = TRUE),
-          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE),
+          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE)
         )
       ),
       ## Stats on every group
@@ -300,7 +301,7 @@ for (DBn in dbs) {
   }
 }
 
-##  Daily deseasonalized anomaly SZA -------------------------------------------
+##  Daily deseasonalized anomaly SZA  ------------------------------------------
 
 #' \FloatBarrier
 #' \newpage
@@ -318,7 +319,7 @@ for (DBn in dbs) {
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
 
-  ## __ Compute daily climatology values ----------------------------------------
+  ## __ Compute daily climatology values  --------------------------------------
   CLIMA <- DATA |>
     group_by(DOY     = yday(Day),
              preNoon,
@@ -337,14 +338,14 @@ for (DBn in dbs) {
         .cols = ends_with("_mean"),
         .fns  = list(
           clima     = ~ mean(.x, na.rm = TRUE),
-          clima_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          clima_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+          clima_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE),
+          clima_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE)
         )
       ),
       .groups = "keep"
     ) |> collect() |> data.table()
 
-  ## not prcactica to plot
+  ## not practical to plot all
   # pvars <- CLIMA |> select(!starts_with("TSI") & ends_with(c("trnd_A_mean_clima"))) |> colnames()
   # for (apv in pvars) {
   #   CLIMA |>

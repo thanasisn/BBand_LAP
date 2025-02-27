@@ -98,26 +98,25 @@ if (Sys.info()["nodename"] == Main.Host) {
   con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 }
 
-## list of monthly tables
-dbs <- sort(grep("_MONTHLY_", dbListTables(con), value = TRUE))
 
 ##  Monthly mean values  -------------------------------------------------------
 #'
-#' ## Monthly mean values of variables
+#' # Monthly mean values of variables
 #'
 #+ include=T, echo=F, results="asis", warning=F
+dbs <- sort(grep("Trend_A_MONTHLY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
   vars <- sort(DATA |> select(ends_with("_mean_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n###", var_name(DBn), "\n\n"))
+  cat(paste("\n##", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n####", var_name(avar), avar, "\n\n \n"))
+    cat(paste("\n###", var_name(avar), avar, "\n\n \n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
@@ -130,7 +129,7 @@ for (DBn in dbs) {
     ## _ Correlation test
     cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
 
-    ## _ Arima auto regression Tourpali ----------------------------------------
+    ## _ Arima auto regression Tourpali  ---------------------------------------
     ## create a time variable (with lag of 1 day ?)
     DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
     tmodel <- arima(x = DATA[[avar]], order = c(1, 0, 0), xreg = DATA$ts, method = "ML")
@@ -143,7 +142,7 @@ for (DBn in dbs) {
     cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
 
 
-    ## _ Time series analysis --------------------------------------------------
+    ## _ Time series analysis  -------------------------------------------------
     dd        <- read.zoo(DATA, index.column = "Day")
     dd        <- as.ts(dd)
 
@@ -172,7 +171,6 @@ for (DBn in dbs) {
            subtitle = paste(var_name(DBn), var_name(avar))) +
       theme_bw()
     show(p)
-
   }
 }
 
@@ -182,21 +180,22 @@ for (DBn in dbs) {
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Monthly departure from the climatology
+#' # Monthly departure from the climatology
 #'
 #+ include=T, echo=F, results="asis", warning=F
+dbs <- sort(grep("Trend_A_MONTHLY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
   vars <- sort(DATA |> select(ends_with("_mean_anom")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n###", var_name(DBn), "\n\n\n"))
+  cat(paste("\n##", var_name(DBn), "\n\n\n"))
 
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n####", var_name(avar), avar, "\n\n \n"))
+    cat(paste("\n###", var_name(avar), avar, "\n\n \n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
@@ -209,7 +208,7 @@ for (DBn in dbs) {
     ## _ Correlation test
     cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
 
-    ## _ Arima auto regression Tourpali ----------------------------------------
+    ## _ Arima auto regression Tourpali  ---------------------------------------
     ## create a time variable (with lag of 1 day ?)
     DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
     tmodel <- arima(x = DATA[[avar]], order = c(1,0,0), xreg = DATA$ts, method = "ML")
@@ -221,8 +220,7 @@ for (DBn in dbs) {
     names(Tres) <- paste0("Tmod_", names(Tres))
     cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
 
-
-    ## _ Time series analysis --------------------------------------------------
+    ## _ Time series analysis  -------------------------------------------------
     dd        <- read.zoo(DATA, index.column = "Day")
     dd        <- as.ts(dd)
 
@@ -239,7 +237,6 @@ for (DBn in dbs) {
     conf_2.5  <- conf[2, 1]
     conf_97.5 <- conf[2, 2]
 
-
     p <- DATA |>
       ggplot(aes(x = Decimal_date, y = !!sym(avar))) +
       geom_point(col = var_col(avar), size = 0.6)    +
@@ -252,7 +249,6 @@ for (DBn in dbs) {
            subtitle = paste(var_name(DBn), var_name(avar))) +
       theme_bw()
     show(p)
-
   }
 }
 
@@ -296,7 +292,7 @@ for (DBn in dbs) {
 
       if (sum(!is.na(DATA[[avar]])) > 2) {
 
-        ## _ Linear trend by year  -------------------------------------------------
+        ## _ Linear trend by year  ---------------------------------------------
         lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
         d   <- summary(lm1)$coefficients
         cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2, 2], 4), "p=", round(d[2, 4], 4), "\n\n")
@@ -304,12 +300,10 @@ for (DBn in dbs) {
         ## _ Correlation test
         cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
 
-
-        ## _ Arima auto regression Tourpali ----------------------------------------
+        ## _ Arima auto regression Tourpali  -----------------------------------
         ## create a time variable (with lag of 1 day ?)
         DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
         tmodel <- arima(x = DATA[[avar]], order = c(1,0,0), xreg = DATA$ts, method = "ML")
-
 
         ## trend per year with auto correlation
         ## estimates, associated standard errors, test statistics and p values
@@ -318,8 +312,7 @@ for (DBn in dbs) {
         names(Tres) <- paste0("Tmod_", names(Tres))
         cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
 
-
-        ## _ Time series analysis --------------------------------------------------
+        ## _ Time series analysis  ---------------------------------------------
         dd        <- read.zoo(DATA, index.column = "Day")
         dd        <- as.ts(dd)
 
@@ -354,10 +347,6 @@ for (DBn in dbs) {
     }
   }
 }
-
-
-
-
 
 
 #+ Clean_exit, echo=FALSE
