@@ -316,6 +316,7 @@ for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   DATA <- DATA |> select(-contains("_clima"))
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
+
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
 

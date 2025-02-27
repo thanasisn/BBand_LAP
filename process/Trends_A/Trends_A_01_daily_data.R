@@ -126,7 +126,6 @@ ALL   <- LAP |>                           select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
-dbs <- sort(c( "ALL", "CLOUD", "CLEAR"))
 
 ##  Create daily values  -------------------------------------------------------
 
@@ -136,6 +135,7 @@ dbs <- sort(c( "ALL", "CLOUD", "CLEAR"))
 #' ## Create daily means for each data set
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(c("ALL", "CLOUD", "CLEAR"))
 for (DBn in dbs) {
   DATA <- get(DBn)
   cat("\n\\FloatBarrier\n\n")
@@ -186,7 +186,6 @@ for (DBn in dbs) {
        ylab = "Valid data ratio")
   abline(v = Cloud_daily_ratio_lim, col = "red")
 
-
   ## Store daily values as is
   if (Sys.info()["nodename"] == Main.Host) {
     tbl_name <- paste0("Trend_A_DAILY_", DBn)
@@ -224,7 +223,6 @@ CLOUD <- CLOUD |>
 if (Sys.info()["nodename"] == Main.Host) {
   res <- update_table(con, CLOUD, "Trend_A_DAILY_CLOUD", "Day", quiet = TRUE)
 }
-
 CLOUD <- CLOUD |> collect() |> data.table()
 hist(CLOUD[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
      main = paste(var_name("CLOUD"), var_name("GLB_trnd_A_N")),
@@ -248,7 +246,6 @@ hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
 
 
 ##  Daily deseasonalized values  -----------------------------------------------
-dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
 #' \FloatBarrier
 #' \newpage
@@ -258,6 +255,7 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 #' We compute daily anomaly `_anom` as 100 (`_mean` - `_clima`) / `_clima`
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(grep("Trends_A_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   DATA <- DATA |> select(-contains("_clima"))
@@ -294,10 +292,10 @@ for (DBn in dbs) {
   p <- CLIMA |> select(DOY,
                        !starts_with("TSI") &
                        ends_with(c("trnd_A_mean_clima"))) |>
-    melt(id.vars = 'DOY', variable.name = 'Radiation')   |>
+    melt(id.vars = "DOY", variable.name = "Radiation")   |>
     ggplot(aes(x = DOY, y = value)) +
     geom_point( aes(colour = Radiation)) +
-    geom_smooth(aes(colour = Radiation), method = 'loess', formula = 'y ~ x') +
+    geom_smooth(aes(colour = Radiation), method = "loess", formula = "y ~ x") +
     labs(subtitle = paste("Daily climatology for ", var_name(DBn)),
          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
     theme_bw()
@@ -337,7 +335,6 @@ for (DBn in dbs) {
 
 
 ##  Daily deseasonalized values by season of year  -----------------------------
-dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
 #' \FloatBarrier
 #' \newpage
@@ -345,6 +342,7 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 #' ## Create climatology data and anomaly by season of year
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(grep("Trends_A_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   DATA <- DATA |> select(-contains("_seas"))
@@ -370,23 +368,22 @@ for (DBn in dbs) {
         .cols = ends_with("_mean"),
         .fns  = list(
           seas     = ~ mean(.x, na.rm = TRUE),
-          seas_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          seas_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+          seas_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE),
+          seas_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE)
         )
       )
     ) |> collect() |> data.table()
-
 
   ## Plot seasonal climatology values
   p <- SEAS |> select(Season,
                       !starts_with("TSI") &
                       ends_with(c("trnd_A_mean_seas"))) |>
     arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
-    melt(id.vars = 'Season', variable.name = 'Radiation')  |>
+    melt(id.vars = "Season", variable.name = "Radiation")  |>
     ggplot(aes(x = Season, y = value)) +
-    geom_point(aes(colour = Radiation)) +
-    geom_line( aes(colour = Radiation, group = Radiation) ) +
-    geom_smooth(aes(colour = Radiation), method = 'loess', formula = 'y ~ x') +
+    geom_point( aes(colour = Radiation)) +
+    geom_line(  aes(colour = Radiation, group = Radiation)) +
+    geom_smooth(aes(colour = Radiation), method = "loess", formula = "y ~ x") +
     labs(subtitle = paste("Season climatology for ", var_name(DBn)),
          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
     theme_bw()
@@ -404,7 +401,7 @@ for (DBn in dbs) {
     cat("Compute anomaly by season for ", av, "\n\n")
 
     climavar <- paste0(av, "_seas")
-    anomvar  <- paste0(av, "_seasanom" )
+    anomvar  <- paste0(av, "_seasanom")
 
     DATA <- DATA |> mutate(
       !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
@@ -421,7 +418,6 @@ for (DBn in dbs) {
     res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
   }
 }
-
 
 
 #+ Clean_exit, echo=FALSE
