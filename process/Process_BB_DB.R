@@ -8,7 +8,7 @@ Sys.setenv(TZ = "UTC")
 library(rmarkdown)
 
 output_dir <- "~/BBand_LAP/REPORTS/REPORTS/"
-dir.create(output_dir, showWarnings = F, recursive = T)
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 
 ## This should be the last things to run on the BBand_LAP
@@ -24,12 +24,11 @@ try({
 
 try({
   render(input         = "~/BBand_LAP/tools/Duckdb_plot_stats.R",
-         output_dir    = output_dir)
+         output_dir    = "~/BBand_LAP/REPORTS/REPORTS/")
 })
-
 
 try({
   render(input         = "~/BBand_LAP/tools/99_Self_evaluation.R",
-         output_dir    = output_dir)
+         output_dir    = "~/BBand_LAP/REPORTS/REPORTS/")
 })
 
