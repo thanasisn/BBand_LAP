@@ -111,8 +111,8 @@ pkgs.mkShell {
     export QT_XCB_GL_INTEGRATION=none
     alias rstudio='setsid rstudio &'
     ## check for dependencies
-    Rscript -e "renv::update(check=TRUE)"
-    echo "Show recomendation"
+    # Rscript -e "renv::update(check=TRUE)"
+    # echo "Show recomendation"
   '';
 
 }

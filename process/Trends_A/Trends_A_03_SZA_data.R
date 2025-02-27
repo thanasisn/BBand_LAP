@@ -127,16 +127,16 @@ LAP <- LAP |>
 ALL   <- LAP |>                           select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
-dbs   <- sort(c( "ALL", "CLOUD", "CLEAR"))
 
 ##  Create daily SZA values  ---------------------------------------------------------
 
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Create daily SZA means for each data set
+#' # Create daily SZA means for each data set
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
+dbs   <- sort(c( "ALL", "CLOUD", "CLEAR"))
 for (DBn in dbs) {
   DATA <- get(DBn)
   cat("\n\\FloatBarrier\n\n")
@@ -203,19 +203,18 @@ for (DBn in dbs) {
 
 
 ##  Filter daily SZA values  ---------------------------------------------------
-dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
 
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Apply some filtering on the daily data before use
+#' # Apply some filtering on the daily data before use
 #'
 #' In order to preserve the representation of the data,
 #' we choose to use only SZA bins with at least `r SZA_aggregation_N_lim` data
 #' points.
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-
+dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   cat("\n\\FloatBarrier\n\n")
@@ -251,9 +250,10 @@ for (DBn in dbs) {
           )
         ) |> collect() |> data.table()
 
-      hist(PART |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
-           breaks = 50)
-      abline(v = SZA_aggregation_N_lim, col = "red")
+      # ## test
+      # hist(PART |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
+      #      breaks = 50)
+      # abline(v = SZA_aggregation_N_lim, col = "red")
 
       ## store the table in the database
       if (Sys.info()["nodename"] == Main.Host) {
@@ -264,7 +264,19 @@ for (DBn in dbs) {
 }
 
 
+#' \FloatBarrier
+#' \newpage
+#'
+#' # Test exclusions was done correctly
+#'
+#' In order to preserve the representation of the data,
+#' we choose to use only SZA bins with at least `r SZA_aggregation_N_lim` data
+#' points.
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
+
 ## TODO test data was excluded
+dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   cat("\n\\FloatBarrier\n\n")
@@ -278,7 +290,9 @@ for (DBn in dbs) {
     checkvar <- sub("_mean", "_N", avar)
 
     hist(DATA |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
-         breaks = 50)
+         breaks = 50,
+        main = paste(avar, checkvar))
+
     abline(v = SZA_aggregation_N_lim, col = "red")
   }
 }
@@ -294,6 +308,7 @@ for (DBn in dbs) {
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
 if (FALSE) {
+  dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
   for (DBn in dbs) {
     DATA <- tbl(con, DBn)
     DATA <- DATA |> select(-contains("_clima"))
@@ -371,20 +386,20 @@ if (FALSE) {
 
 }
 
-##  Daily deseasonalized anomaly by season of year  ----------------------------
-
-
-
-
-
-##  Create monthly SZA values  -------------------------------------------------
-
-#' \FloatBarrier
-#' \newpage
-#'
-#' ## Create monthly SZA means for each data set
-#'
-#+ include=T, echo=T, results="asis", warning=FALSE
+#;;; ##  Daily deseasonalized anomaly by season of year  ----------------------------
+#;;;
+#;;;
+#;;;
+#;;;
+#;;;
+#;;; ##  Create monthly SZA values  -------------------------------------------------
+#;;;
+#;;; #' \FloatBarrier
+#;;; #' \newpage
+#;;; #'
+#;;; #' ## Create monthly SZA means for each data set
+#;;; #'
+#;;; #+ include=T, echo=T, results="asis", warning=FALSE
 
 
 #+ Clean_exit, echo=FALSE
