@@ -104,7 +104,7 @@ dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
 
 ##  By season daily  values  ---------------------------------------------------
 #'
-#' ## Daily mean values
+#' # Daily mean values
 #'
 #+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
@@ -114,12 +114,12 @@ for (DBn in dbs) {
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n###", var_name(DBn), "\n\n"))
+  cat(paste("\n##", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n####", var_name(avar), avar, "\n\n \n"))
+    cat(paste("\n###", var_name(avar), avar, "\n\n \n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
@@ -184,7 +184,7 @@ for (DBn in dbs) {
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Daily departure from the climatology
+#' # Daily departure from the climatology
 #'
 #+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
@@ -193,12 +193,12 @@ for (DBn in dbs) {
   vars <- sort(DATA |> select(ends_with("_mean_anom")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n###", var_name(DBn), "\n\n\n"))
+  cat(paste("\n##", var_name(DBn), "\n\n\n"))
 
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n####", var_name(avar), avar, "\n\n \n"))
+    cat(paste("\n###", var_name(avar), avar, "\n\n \n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
