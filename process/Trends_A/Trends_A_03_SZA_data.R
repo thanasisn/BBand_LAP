@@ -266,40 +266,35 @@ for (DBn in dbs) {
 }
 
 
-#' \FloatBarrier
-#' \newpage
-#'
-#' # Test exclusions was done correctly
-#'
-#' In order to preserve the representation of the data,
-#' we choose to use only SZA bins with at least `r SZA_aggregation_N_lim` data
-#' points.
-#'
-#+ include=T, echo=T, results="asis", warning=FALSE
+## #' \FloatBarrier
+## #' \newpage
+## #'
+## #' # Test exclusions was done correctly
+## #'
+## #+ include=T, echo=T, results="asis", warning=FALSE
+##
+## ## TODO test data was excluded
+## dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
+## for (DBn in dbs) {
+##   DATA <- tbl(con, DBn)
+##   cat("\n\\FloatBarrier\n\n")
+##   cat(paste("\n## Daily SZA ", var_name(DBn), "\n\n"))
+##   status_msg(ScriptName = Script.Name,
+##              msg        = c(DBn, "Test plot SZA hist"))
+##
+##   vars <- DATA |> select(ends_with("_mean")) |> colnames()
+##
+##   for (avar in vars)  {
+##     checkvar <- sub("_mean", "_N", avar)
+##
+##     hist(DATA |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
+##          breaks = 50,
+##         main = paste(avar, checkvar))
+##
+##     abline(v = SZA_aggregation_N_lim, col = "red")
+##   }
+## }
 
-## TODO test data was excluded
-dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
-for (DBn in dbs) {
-  DATA <- tbl(con, DBn)
-  cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Daily SZA ", var_name(DBn), "\n\n"))
-  status_msg(ScriptName = Script.Name,
-             msg        = c(DBn, "Test plot SZA hist"))
-
-  ##  Variables to restrict  ---
-  vars <- DATA |> select(ends_with("_mean")) |> colnames()
-
-  ## restrict each variable
-  for (avar in vars)  {
-    checkvar <- sub("_mean", "_N", avar)
-
-    hist(DATA |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
-         breaks = 50,
-        main = paste(avar, checkvar))
-
-    abline(v = SZA_aggregation_N_lim, col = "red")
-  }
-}
 
 ##  Daily deseasonalized anomaly SZA  ------------------------------------------
 
@@ -346,28 +341,21 @@ for (DBn in dbs) {
     ) |> collect() |> data.table()
 
   ## not practical to plot all
-  # pvars <- CLIMA |> select(!starts_with("TSI") & ends_with(c("trnd_A_mean_clima"))) |> colnames()
-  # for (apv in pvars) {
-  #   CLIMA |>
-  #     select(DOY,
-  #            SZA,
-  #            preNoon, !!apv)
-  # }
-  #
-  # ## Plot climatology values
-  # p <- CLIMA |> select(DOY,
-  #                      SZA,
-  #                      preNoon,
-  #                      !starts_with("TSI") &
-  #                        ends_with(c("trnd_A_mean_clima"))) |>
-  #   melt(id.vars = 'DOY', variable.name = 'Radiation')   |>
-  #   ggplot(aes(x = DOY, y = value)) +
-  #   geom_point( aes(colour = Radiation)) +
-  #   geom_smooth(aes(colour = Radiation), method = 'loess', formula = 'y ~ x') +
-  #   labs(subtitle = paste("Daily climatology for ", var_name(DBn)),
-  #        y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
-  #   theme_bw()d
-  # show(p)
+  pvars <- CLIMA |> select(!starts_with("TSI") & ends_with(c("trnd_A_mean_clima"))) |> colnames()
+  for (apv in pvars) {
+    pp <- CLIMA |>
+      filter(SZA == 55) |>
+      select(DOY,
+             SZA,
+             preNoon, !!apv)
+    p <- ggplot(pp, aes(x = DOY, y = !!sym(apv))) +
+      geom_point(aes(colour = preNoon)) +
+      geom_smooth(aes(colour = preNoon), method = 'loess', formula = 'y ~ x') +
+      labs(subtitle = paste("Daily SZA 55 climatology for ", var_name(DBn)),
+           y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
+     theme_bw()
+    show(p)
+  }
 
 
   ## __ Create deseasonal anomaly  ---------------------------------------------
@@ -391,6 +379,12 @@ for (DBn in dbs) {
         )
       ) |>
       select(DOY, SZA, preNoon, !!av, Day)
+
+    ## plot to check data input
+    hist(DATA |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
+         breaks = 50,
+        main = paste(avar, checkvar))
+
 
     ## merge relevant data with climatology
     DATA <- left_join(
