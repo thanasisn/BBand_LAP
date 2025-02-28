@@ -166,8 +166,7 @@ for (DBn in dbs) {
       SZA_N = n(),
       .groups = "keep"
     ) |>
-    collect() |>
-    data.table()
+    collect() |> data.table()
   DAILY[, Year := year(Day)]
 
   ## __ Flag daily data with season  -------------------------------------------
@@ -197,7 +196,7 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, DAILY)
-    # res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
+    res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
   }
   rm(DAILY); res <- gc()
 }
@@ -261,7 +260,7 @@ for (DBn in dbs) {
       ## store the table in the database
       if (Sys.info()["nodename"] == Main.Host) {
         res <- update_table(con, PART, tbl_name,
-                            matchvar = c("Day", "preNoon", "SZA"), quiet = TRUE)
+                            matchvar = c("Day", "preNoon", "SZA"), quiet = FALSE)
       }
     }
   }
