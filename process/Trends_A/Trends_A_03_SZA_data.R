@@ -382,6 +382,7 @@ for (DBn in dbs) {
     ## protect database numeric type
     DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
+    DATA <- DATA |> mutate_if(is.numeric, ~ ifelse(is.nan(.), NA, .))
 
     ## Store daily anomaly data
     if (Sys.info()["nodename"] == Main.Host) {
