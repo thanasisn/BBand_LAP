@@ -469,20 +469,23 @@ for (DBn in dbs) {
   hist(MONTHLY[!is.na(GLB_trnd_A_mean_mean), GLB_trnd_A_mean_N], breaks = 100,
        main = paste("Occurance of days with data", var_name("GLB_trnd_A_mean_N")),
        ylab = "Occurances")
+  abline(v = SZA_Monthly_aggregation_N_lim, col = "red")
 
   hist(MONTHLY[!is.na(DIR_trnd_A_mean_mean), DIR_trnd_A_mean_N], breaks = 100,
        main = paste("Occurance of days with data", var_name("DIR_trnd_A_mean_N")),
        ylab = "Occurances")
+  abline(v = SZA_Monthly_aggregation_N_lim, col = "red")
 
-  # ##  Store monthly values as is
-  # if (Sys.info()["nodename"] == Main.Host) {
-  #   tbl_name <- paste0("Trend_A_MONTHLY_", type)
-  #   if (dbExistsTable(con , tbl_name)) {
-  #     dbRemoveTable(con, tbl_name)
-  #   }
-  #   dbCreateTable(conn = con, name = tbl_name, MONTHLY)
-  #   res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
-  # }
+
+  ##  Store monthly values as is
+  if (Sys.info()["nodename"] == Main.Host) {
+    tbl_name <- sub("DAILY", "MONTHLY", DBn)
+    if (dbExistsTable(con , tbl_name)) {
+      dbRemoveTable(con, tbl_name)
+    }
+    dbCreateTable(conn = con, name = tbl_name, MONTHLY)
+    res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
+  }
 }
 
 

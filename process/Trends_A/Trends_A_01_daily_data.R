@@ -165,7 +165,8 @@ for (DBn in dbs) {
   DAILY <- left_join(
     DAILY, META, by = "Day"
   ) |> collect() |> data.table()
-
+  
+  DAILY[, Decimal_date := decimal_date(Day)]
   ## __ Flag daily data with season  -------------------------------------------
   ## create continuous seasonal variable
   DAILY[, season_Yqrt := as.yearqtr(as.yearmon(paste(year(Day), month(Day), sep = "-")) + 1/12)]
