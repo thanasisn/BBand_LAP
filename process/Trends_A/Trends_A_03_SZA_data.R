@@ -324,10 +324,10 @@ for (DBn in dbs) {
              preNoon, !!apv)
     p <- ggplot(pp, aes(x = DOY, y = !!sym(apv))) +
       geom_point(aes(colour = preNoon)) +
-      geom_smooth(aes(colour = preNoon), method = "loess", formula = "y ~ x") +
+      geom_smooth(aes(colour = preNoon), method = 'loess', formula = 'y ~ x') +
       labs(subtitle = paste("Daily SZA 55 climatology for ", var_name(DBn)),
            y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
-      theme_bw()
+     theme_bw()
     show(p)
   }
 
@@ -355,12 +355,6 @@ for (DBn in dbs) {
       ) |>
       select(DOY, SZA, preNoon, Day, !!av, !!checkvar)
 
-    ## plot to check data input
-    hist(DATA |> filter(!is.na(!!sym(av))) |> select(!!checkvar) |> pull(),
-         breaks = 50,
-         main = paste(av, checkvar))
-    abline(v = SZA_aggregation_N_lim, col = "red")
-
 
     ## merge relevant data with climatology
     DATA <- left_join(
@@ -371,6 +365,12 @@ for (DBn in dbs) {
       copy = TRUE
     ) |> collect() |> data.table()
 
+    ## plot to check data input
+    hist(DATA[!is.na(get(av)), get(checkvar)],
+         breaks = 50,
+         main = paste(av, checkvar))
+    abline(v = SZA_aggregation_N_lim, col = "red")
+
     ## create anomaly
     DATA <- DATA |> mutate(
       !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
@@ -380,10 +380,11 @@ for (DBn in dbs) {
     ## protect database numeric type
     DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
-  }
-  ## Store daily anomaly data
-  if (Sys.info()["nodename"] == Main.Host) {
-    res <- update_table(con, DATA, DBn, c("preNoon", "SZA", "Day"), quiet = TRUE)
+
+    ## Store daily anomaly data
+    if (Sys.info()["nodename"] == Main.Host) {
+      res <- update_table(con, DATA, DBn, c("preNoon", "SZA", "Day"), quiet = TRUE)
+    }
   }
 }
 
