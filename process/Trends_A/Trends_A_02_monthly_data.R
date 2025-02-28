@@ -96,20 +96,19 @@ if (Sys.info()["nodename"] == Main.Host) {
 }
 
 
-##  Create monthly data sets  ---------------------------------------------------
-dbs <- sort(grep("Trend_A_DAILY", dbListTables(con), value = TRUE))
 
-##  Create monthly values  -----------------------------
+##  Create monthly values  -----------------------------------------------------
 
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Create monthly values
+#' # Create monthly values
 #'
 #' Use daily data to create monthly values
 #' will compute mean of daily means, not anomaly
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(grep("Trend_A_DAILY", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   type <- sub(".*_", "", DBn)
@@ -177,7 +176,7 @@ dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Filter monthly values
+#' # Filter monthly values
 #'
 #' We choose to use monthly values only if `r Monthly_aggegation_N_lim` days
 #' with data exist for each month.
@@ -190,7 +189,7 @@ for (DBn in dbs) {
   varstochech <- sort(DATA |> select(ends_with("_mean_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n### Means selection for", var_name(DBn), "\n\n"))
+  cat(paste("\n## Means selection for", var_name(DBn), "\n\n"))
 
   ## set means on days with less than n days to NA
   for (av in varstochech) {
@@ -231,7 +230,7 @@ dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Departure from monthly climatology
+#' # Departure from monthly climatology
 #'
 #' Compute monthly anomaly `_mean_anom` from `_mean_mean` - `_mean_clima`
 #'
@@ -321,7 +320,7 @@ dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Create climatology data and anomaly by season of year
+#' # Create climatology data and anomaly by season of year
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
 for (DBn in dbs) {

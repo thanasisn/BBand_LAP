@@ -117,7 +117,6 @@ for (adb in databases) {
 
   for (il in 1:length(chosen)) {
     ll <- chosen[il][[1]]
-
     tt <- ll$db_stats
     tt <- tt[, .(Rows = unique(N)), by = Table]
     tt[, Date := ll$date ]
@@ -129,6 +128,9 @@ for (adb in databases) {
                                 Data = adb))
   }
 }
+
+rowstat <- rowstat[!Table %in% c("Trend_A_SZA_DAILYALL", "Trend_A_SZA_DAILYCLEAR", "Trend_A_SZA_DAILYCLOUD"), ]
+varstat <- varstat[!Table %in% c("Trend_A_SZA_DAILYALL", "Trend_A_SZA_DAILYCLEAR", "Trend_A_SZA_DAILYCLOUD"), ]
 
 colstat <- varstat[, .N ,by = .(Data, Date, Table)]
 

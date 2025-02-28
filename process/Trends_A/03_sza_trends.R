@@ -14,20 +14,6 @@ source("~/CODE/FUNCTIONS/R/data.R")
 LOESS_CRITERIO <-  c("aicc", "gcv")[1]
 
 
-#+ echo=F, include=T
-#'
-#' ## 2. Long term by SZA
-#'
-#' ### Data info
-#'
-#' Time data span `r range(ALL_2_daily_DESEAS$Date)`
-#'
-#' ### Process
-#'
-#+ echo=F, include=F
-
-
-
 ##  Daily SZA trends for all year  ---------------------------------------------
 
 #'

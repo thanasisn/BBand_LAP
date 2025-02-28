@@ -341,7 +341,7 @@ for (DBn in dbs) {
     ) |> collect() |> data.table()
 
   ## not practical to plot all
-  pvars <- CLIMA |> select(!starts_with("TSI") & ends_with(c("trnd_A_mean_clima"))) |> colnames()
+  pvars <- CLIMA |> select(ends_with(c("trnd_A_mean_clima"))) |> colnames()
   for (apv in pvars) {
     pp <- CLIMA |>
       filter(SZA == 55) |>
@@ -367,6 +367,7 @@ for (DBn in dbs) {
 
     climavar <- paste0(av, "_clima")
     anomvar  <- paste0(av, "_anom" )
+    checkvar <- sub("_mean", "_N", av)
 
     ## get only relevant data and re-apply restrictions
     DATA <- tbl(con, DBn) |>
@@ -378,12 +379,13 @@ for (DBn in dbs) {
           !!sym(checkvar) >  SZA_aggregation_N_lim ~ !!sym(av)
         )
       ) |>
-      select(DOY, SZA, preNoon, !!av, Day)
+      select(DOY, SZA, preNoon, Day, !!av, !!checkvar)
 
     ## plot to check data input
     hist(DATA |> filter(!is.na(!!sym(av))) |> select(!!checkvar) |> pull(),
          breaks = 50,
          main = paste(av, checkvar))
+    abline(v = SZA_aggregation_N_lim, col = "red")
 
 
     ## merge relevant data with climatology
@@ -412,20 +414,76 @@ for (DBn in dbs) {
 }
 
 
-#;;; ##  Daily deseasonalized anomaly by season of year  ----------------------------
-#;;;
-#;;;
-#;;;
-#;;;
-#;;;
-#;;; ##  Create monthly SZA values  -------------------------------------------------
-#;;;
-#;;; #' \FloatBarrier
-#;;; #' \newpage
-#;;; #'
-#;;; #' ## Create monthly SZA means for each data set
-#;;; #'
-#;;; #+ include=T, echo=T, results="asis", warning=FALSE
+
+##  Create monthly SZA values  -------------------------------------------------
+
+#' \FloatBarrier
+#' \newpage
+#'
+#' # Create monthly SZA means for each data set from daily
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
+for (DBn in dbs) {
+  DATA <- tbl(con, DBn) |> select(-contains("_clima"))
+  vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
+
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Monthly SZA", var_name(DBn), "\n\n"))
+
+  ## __ Create monthly values and statistics  ----------------------------------
+  MONTHLY <- DATA   |>
+    group_by(Year  = year(Day),
+             Month = month(Day),
+             preNoon,
+             SZA) |>
+    summarise(
+      ## stats on every variable
+      across(
+        .cols = all_of(vars),
+        .fns  = list(
+          mean = ~ mean(.x, na.rm = TRUE),
+          sd   = ~ sd  (.x, na.rm = TRUE),
+          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
+          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+        )
+      ),
+      ## Stats on every group
+      Month_N = n(),
+      .groups = "drop"
+    ) |> collect() |> data.table()
+  ## create proper dates
+  MONTHLY$Day <- as.Date(strptime(paste(MONTHLY$Year, MONTHLY$Month, "01"), "%Y %m %d"))
+  MONTHLY[, Decimal_date := decimal_date(Day)]
+
+  ## __ Flag monthly data with season  -----------------------------------------
+  ## create continuous seasonal variable
+  MONTHLY[, season_Yqrt := as.yearqtr(as.yearmon(paste(year(Day), month(Day), sep = "-")) + 1/12)]
+  ## Flag seasons using quarters
+  MONTHLY[season_Yqrt %% 1 == 0   , Season := "Winter"]
+  MONTHLY[season_Yqrt %% 1 == 0.25, Season := "Spring"]
+  MONTHLY[season_Yqrt %% 1 == 0.50, Season := "Summer"]
+  MONTHLY[season_Yqrt %% 1 == 0.75, Season := "Autumn"]
+
+  ## inspect fill ratios of observations
+  hist(MONTHLY[!is.na(GLB_trnd_A_mean_mean), GLB_trnd_A_mean_N], breaks = 100,
+       main = paste("Occurance of days with data", var_name("GLB_trnd_A_mean_N")),
+       ylab = "Occurances")
+
+  hist(MONTHLY[!is.na(DIR_trnd_A_mean_mean), DIR_trnd_A_mean_N], breaks = 100,
+       main = paste("Occurance of days with data", var_name("DIR_trnd_A_mean_N")),
+       ylab = "Occurances")
+
+  # ##  Store monthly values as is
+  # if (Sys.info()["nodename"] == Main.Host) {
+  #   tbl_name <- paste0("Trend_A_MONTHLY_", type)
+  #   if (dbExistsTable(con , tbl_name)) {
+  #     dbRemoveTable(con, tbl_name)
+  #   }
+  #   dbCreateTable(conn = con, name = tbl_name, MONTHLY)
+  #   res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
+  # }
+}
 
 
 #+ Clean_exit, echo=FALSE

@@ -9,14 +9,15 @@ Main.Host <- "sagan"        ## This is the main host used to build the DB
 LAST_DAY  <- as.POSIXct("2025-01-01 00:00:00")
 FIRST_DAY <- as.POSIXct("1900-01-01 00:00:00")
 
-FIBais_Az_1               <-  58
-FIBais_Az_2               <- 120
-FIBais_Elev               <-  12
-MIN_ELEVA                 <-   5  ##  global low elevation limit
-All_daily_ratio_lim       <- 0.5  ##  ration of daily valid data
-Monthly_aggegation_N_lim  <-  20  ##  Number of days per month for valid monthly value
-SZA_aggregation_N_lim     <-   4  ##  Number of point for each SZA Bin
-SZA_BIN                   <-   1  ##  SZA aggregation bin size
+FIBais_Az_1                   <-  58
+FIBais_Az_2                   <- 120
+FIBais_Elev                   <-  12
+MIN_ELEVA                     <-   5  ##  global low elevation limit
+All_daily_ratio_lim           <- 0.5  ##  ration of daily valid data
+Monthly_aggegation_N_lim      <-  20  ##  Number of days per month for valid monthly value
+SZA_aggregation_N_lim         <-   4  ##  Number of point for each SZA Bin
+SZA_Monthly_aggregation_N_lim <-   3  ##  Number of days per month for valid SZA monthly value
+SZA_BIN                       <-   1  ##  SZA aggregation bin size
 
 ## Ratio of characterizations to set as daily characterization
 Clear_daily_ratio_lim     <- 0.6  ## keep both the same!!
