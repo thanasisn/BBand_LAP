@@ -373,17 +373,17 @@ for (DBn in dbs) {
       select(-contains("_clima")) |>
       mutate(DOY = yday(Day)) |>
       mutate(
-        !!avar := case_when(
+        !!av := case_when(
           !!sym(checkvar) <= SZA_aggregation_N_lim ~ NA,
-          !!sym(checkvar) >  SZA_aggregation_N_lim ~ !!sym(avar)
+          !!sym(checkvar) >  SZA_aggregation_N_lim ~ !!sym(av)
         )
       ) |>
       select(DOY, SZA, preNoon, !!av, Day)
 
     ## plot to check data input
-    hist(DATA |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
+    hist(DATA |> filter(!is.na(!!sym(av))) |> select(!!checkvar) |> pull(),
          breaks = 50,
-        main = paste(avar, checkvar))
+         main = paste(av, checkvar))
 
 
     ## merge relevant data with climatology

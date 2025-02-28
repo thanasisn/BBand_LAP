@@ -179,13 +179,31 @@ for (adb in databases) {
   dt[, day := as.Date(date)]
   dt[, base_name := adb]
   setorder(dt, date)
-  ## chose to remove
+  ## choose to remove
+
+  sapply(gather, "[[", "base_name")
+  sapply(gather, "[", "db_stats")
+
+    gather |> mutate( dd = sapply(gather, "[[", "base_name"))
+
+
+  if (adb == "Broad_Band_LAP.duckdb") stop()
+
   dt  <- dt[duplicated(dt$day, fromLast = TRUE)]
   res <- sapply(gather, "[[", "base_name") == adb &
     sapply(gather, "[[", "date") %in% dt$date
   ## drop data
   gather <- gather[!res]
 }
+
+
+sapply(
+  gather[
+    sapply(
+      gather,
+      "[[", "base_name") == "Broad_Band_LAP.duckdb"],
+  "[", "db_stats"
+)
 
 ## Save data
 saveRDS(gather, overview_data)
