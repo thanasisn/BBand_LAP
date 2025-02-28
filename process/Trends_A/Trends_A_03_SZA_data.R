@@ -88,6 +88,9 @@ library(pander,     warn.conflicts = FALSE, quietly = TRUE)
 library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 library(zoo,        warn.conflicts = FALSE, quietly = TRUE)
 
+# TEST
+Main.Host <- "tyler "
+
 #+ include=T, echo=F, results="asis", warning=F
 ##  Open dataset  --------------------------------------------------------------
 if (Sys.info()["nodename"] == Main.Host) {
@@ -260,7 +263,7 @@ for (DBn in dbs) {
       ## store the table in the database
       if (Sys.info()["nodename"] == Main.Host) {
         res <- update_table(con, PART, tbl_name,
-                            matchvar = c("Day", "preNoon", "SZA"), quiet = FALSE)
+                            matchvar = c("Day", "preNoon", "SZA"), quiet = TRUE)
       }
     }
   }
