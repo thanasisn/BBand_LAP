@@ -5,48 +5,6 @@
 
 ##  Monthly SZA means ----------------------------------------------------------
 
-## _ monthly means -------------------------------------------------------------
-
-
-CLOUD_2_monthly_mean <-
-    CLOUD_2_daily_mean[,
-                       .(
-                           DIR_att       = mean(DIR_att,    na.rm = T),
-                           HOR_att       = mean(HOR_att,    na.rm = T),
-                           GLB_att       = mean(GLB_att,    na.rm = T),
-                           # DIR_transp    = mean(DIR_transp, na.rm = T),
-                           DIR_att_sd    = sd(  DIR_att,    na.rm = T),
-                           HOR_att_sd    = sd(  HOR_att,    na.rm = T),
-                           GLB_att_sd    = sd(  GLB_att,    na.rm = T),
-                           # DIR_transp_sd = sd(  DIR_transp, na.rm = T),
-                           GLB_att_N     = sum(!is.na(GLB_att)),
-                           HOR_att_N     = sum(!is.na(HOR_att)),
-                           DIR_att_N     = sum(!is.na(DIR_att))
-                       ),
-                       by = .(
-                           # SZA     = (SZA - SZA_BIN / 2 ) %/% SZA_BIN,
-                           SZA     = SZA,
-                           Year    = year(Date),
-                           Month   = month(Date),
-                           preNoon = preNoon
-                       ) ]
-CLOUD_2_monthly_mean[, Date := as.Date(paste(Year, Month, 1), "%Y %m %d") ]
-
-
-hist(CLOUD_2_monthly_mean[, GLB_att_N], breaks = 100)
-hist(CLEAR_2_monthly_mean[, GLB_att_N], breaks = 100)
-hist(  ALL_2_monthly_mean[, GLB_att_N], breaks = 100)
-
-table(CLOUD_2_monthly_mean[, GLB_att_N])
-table(CLEAR_2_monthly_mean[, GLB_att_N])
-
-
-## _ Aggregation Representation limits?? ---------------------------------------
-CLOUD_2_monthly_mean[ GLB_att_N <=2, GLB_att := NA ]
-CLEAR_2_monthly_mean[ GLB_att_N <=2, GLB_att := NA ]
-ALL_2_monthly_mean[ GLB_att_N <=2, GLB_att := NA ]
-
-
 ## _ Seasonal monthly ----------------------------------------------------------
 ALL_2_monthly_seas <-
     ALL_2_monthly_mean[,
@@ -189,9 +147,6 @@ CLOUD_2_yearly_mean <-
                              Year    = year(Date),
                              preNoon = preNoon
                          ) ]
-
-
-
 
 
 

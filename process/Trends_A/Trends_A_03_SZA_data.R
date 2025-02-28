@@ -137,7 +137,7 @@ CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 #' # Create daily SZA means for each data set
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-dbs   <- sort(c( "ALL", "CLOUD", "CLEAR"))
+dbs   <- sort(c("ALL", "CLOUD", "CLEAR"))
 for (DBn in dbs) {
   DATA <- get(DBn)
   cat("\n\\FloatBarrier\n\n")
@@ -197,7 +197,7 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, DAILY)
-    res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
+    # res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
   }
   rm(DAILY); res <- gc()
 }
@@ -237,9 +237,10 @@ for (DBn in dbs) {
       cat(DBn, "-", avar, "-", yyyy, "\n")
       status_msg(ScriptName = Script.Name,
                  msg        = c(DBn, avar, yyyy))
+
       PART <- tbl(con, DBn)  |>
         filter(Year == yyyy) |>
-        select(Day, !!avar, !!checkvar)
+        select(Day, preNoon, SZA, !!avar, !!checkvar)
 
       if (PART |> filter(!is.na(!!sym(avar))) |> tally() |> pull() == 0) { next() }
 
@@ -259,41 +260,14 @@ for (DBn in dbs) {
 
       ## store the table in the database
       if (Sys.info()["nodename"] == Main.Host) {
-        res <- update_table(con, PART, tbl_name, "Day", quiet = TRUE)
+        res <- update_table(con, PART, tbl_name,
+                            matchvar = c("Day", "preNoon", "SZA"), quiet = TRUE)
       }
     }
   }
 }
 
 
-## #' \FloatBarrier
-## #' \newpage
-## #'
-## #' # Test exclusions was done correctly
-## #'
-## #+ include=T, echo=T, results="asis", warning=FALSE
-##
-## ## TODO test data was excluded
-## dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
-## for (DBn in dbs) {
-##   DATA <- tbl(con, DBn)
-##   cat("\n\\FloatBarrier\n\n")
-##   cat(paste("\n## Daily SZA ", var_name(DBn), "\n\n"))
-##   status_msg(ScriptName = Script.Name,
-##              msg        = c(DBn, "Test plot SZA hist"))
-##
-##   vars <- DATA |> select(ends_with("_mean")) |> colnames()
-##
-##   for (avar in vars)  {
-##     checkvar <- sub("_mean", "_N", avar)
-##
-##     hist(DATA |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
-##          breaks = 50,
-##         main = paste(avar, checkvar))
-##
-##     abline(v = SZA_aggregation_N_lim, col = "red")
-##   }
-## }
 
 
 ##  Daily deseasonalized anomaly SZA  ------------------------------------------
@@ -350,10 +324,10 @@ for (DBn in dbs) {
              preNoon, !!apv)
     p <- ggplot(pp, aes(x = DOY, y = !!sym(apv))) +
       geom_point(aes(colour = preNoon)) +
-      geom_smooth(aes(colour = preNoon), method = 'loess', formula = 'y ~ x') +
+      geom_smooth(aes(colour = preNoon), method = "loess", formula = "y ~ x") +
       labs(subtitle = paste("Daily SZA 55 climatology for ", var_name(DBn)),
            y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
-     theme_bw()
+      theme_bw()
     show(p)
   }
 
@@ -444,8 +418,8 @@ for (DBn in dbs) {
         .fns  = list(
           mean = ~ mean(.x, na.rm = TRUE),
           sd   = ~ sd  (.x, na.rm = TRUE),
-          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE),
-          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~0L), na.rm = TRUE)
+          NAs  = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE),
+          N    = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE)
         )
       ),
       ## Stats on every group
@@ -484,8 +458,9 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, MONTHLY)
-    res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
+    # res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
   }
+  rm(MONTHLY); res <- gc()
 }
 
 
@@ -507,24 +482,22 @@ dbs <- sort(grep("A_SZA_MONTHLY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Filter daily SZA ", var_name(DBn), "\n\n"))
-  status_msg(ScriptName = Script.Name,
-             msg        = c(DBn, "Filter daily SZA means"))
+  cat(paste("\n## Restrict daily SZA ", var_name(DBn), "\n\n"))
 
-  ##  Variables to restrict  ---
+  ##  Variables to restrict
   vars <- DATA |> select(ends_with("_mean_mean")) |> colnames()
 
   ## restrict each variable
   for (avar in vars)  {
     checkvar <- sub("_mean$", "_N", avar)
 
-    DATA |> select(starts_with("DIFF")) |> colnames()
+    # DATA |> select(starts_with("DIFF")) |> colnames()
 
     status_msg(ScriptName = Script.Name,
-               msg        = c(DBn, avar))
+               msg        = c(DBn, avar, "Filter daily SZA means"))
 
     PART <- tbl(con, DBn)  |>
-      select(Day, !!avar, !!checkvar)
+      select(Year, Month, preNoon, SZA, !!avar, !!checkvar)
 
     ## apply
     PART <- PART |>
@@ -543,7 +516,8 @@ for (DBn in dbs) {
 
     ## store the table in the database
     if (Sys.info()["nodename"] == Main.Host) {
-      res <- update_table(con, PART, tbl_name, "Day", quiet = TRUE)
+      res <- update_table(con, PART, tbl_name,
+                          matchvar = c("Year", "Month", "preNoon", "SZA"), quiet = TRUE)
     }
   }
 }
