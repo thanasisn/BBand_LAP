@@ -489,6 +489,72 @@ for (DBn in dbs) {
 }
 
 
+
+
+##  Filter monthly SZA values  -------------------------------------------------
+
+#' \FloatBarrier
+#' \newpage
+#'
+#' # Apply some filtering on the monthly data before use
+#'
+#' In order to preserve the representation of the data,
+#' we choose to use only SZA bins with at least `r SZA_Monthly_aggregation_N_lim` daily data
+#' points.
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(grep("A_SZA_MONTHLY_", dbListTables(con), value = TRUE))
+for (DBn in dbs) {
+  DATA <- tbl(con, DBn)
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Filter daily SZA ", var_name(DBn), "\n\n"))
+  status_msg(ScriptName = Script.Name,
+             msg        = c(DBn, "Filter daily SZA means"))
+
+  ##  Variables to restrict  ---
+  vars <- DATA |> select(ends_with("_mean_mean")) |> colnames()
+
+  ## restrict each variable
+  for (avar in vars)  {
+    checkvar <- sub("_mean$", "_N", avar)
+
+    DATA |> select(starts_with("DIFF")) |> colnames()
+
+    status_msg(ScriptName = Script.Name,
+               msg        = c(DBn, avar))
+
+    PART <- tbl(con, DBn)  |>
+      select(Day, !!avar, !!checkvar)
+
+    ## apply
+    PART <- PART |>
+      mutate(
+        !!avar := case_when(
+          !!sym(checkvar) <= SZA_Monthly_aggregation_N_lim ~ NA,
+          !!sym(checkvar) >  SZA_Monthly_aggregation_N_lim ~ !!sym(avar)
+        )
+      ) |> collect() |> data.table()
+
+    ## test plot
+    hist(PART |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
+         breaks = 50,
+         xlab = checkvar, main = avar)
+    abline(v = SZA_Monthly_aggregation_N_lim, col = "red")
+
+    ## store the table in the database
+    if (Sys.info()["nodename"] == Main.Host) {
+      res <- update_table(con, PART, tbl_name, "Day", quiet = TRUE)
+    }
+  }
+}
+
+
+
+
+
+
+
+
 #+ Clean_exit, echo=FALSE
 if (!interactive()) { dbDisconnect(con, shutdown = TRUE); rm(con) }
 
