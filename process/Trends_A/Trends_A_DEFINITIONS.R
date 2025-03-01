@@ -6,12 +6,12 @@
 DB_BROAD  <- "~/DATA/Broad_Band/Broad_Band_LAP.duckdb"
 Main.Host <- "sagan"        ## This is the main host used to build the DB
 
-LAST_DAY  <- as.POSIXct("2025-01-01 00:00:00")
+LAST_DAY  <- as.POSIXct("2025-01-01 00:00:00")  ## Move this after data QCrad procedure
 FIRST_DAY <- as.POSIXct("1900-01-01 00:00:00")
 
-FIBais_Az_1                   <-  58
-FIBais_Az_2                   <- 120
-FIBais_Elev                   <-  12
+FIBais_Az_1                   <-  58  ##  Azimuth exclusion start
+FIBais_Az_2                   <- 120  ##  Azimuth exclusion end
+FIBais_Elev                   <-  12  ##  Elevation for azimuth exclusion
 MIN_ELEVA                     <-   5  ##  global low elevation limit
 All_daily_ratio_lim           <- 0.5  ##  ration of daily valid data
 Monthly_aggegation_N_lim      <-  20  ##  Number of days per month for valid monthly value
@@ -20,17 +20,17 @@ SZA_Monthly_aggregation_N_lim <-   3  ##  Number of days per month for valid SZA
 SZA_BIN                       <-   1  ##  SZA aggregation bin size
 
 ## Ratio of characterizations to set as daily characterization
-Clear_daily_ratio_lim     <- 0.6  ## keep both the same!!
-Cloud_daily_ratio_lim     <- 0.6
+Clear_daily_ratio_lim         <- 0.6  ##  Keep both the same!!
+Cloud_daily_ratio_lim         <- 0.6
 
-MIN_N                     <-   4
-SEAS_MIN_N                <-   3
+MIN_N                         <-   4
+SEAS_MIN_N                    <-   3
 
 
 ##  DATA ANALYSIS  -------------------------------------------------------------
-running_mean_window_days   <- 120
-running_mean_window_months <-   4
-running_mean_window_years  <-   3
+running_mean_window_days      <- 120
+running_mean_window_months    <-   4
+running_mean_window_years     <-   3
 
 
 
@@ -39,12 +39,13 @@ running_mean_window_years  <-   3
 ##  DATA DISPLAY AND PLOT  -----------------------------------------------------
 var_name <- function(type) {
   switch(type,
+         DIR_strict                 = "DNI raw",
          DIR_trnd_A                 = "DNI",
-         DIR_trnd_A_mean            = "DNI",
-         DIR_trnd_A_mean_mean       = "DNI",
-         DIR_trnd_A_mean_seas       = "DNI season climat.",
-         DIR_trnd_A_mean_anom       = "DNI Anomaly",
-         DIR_trnd_A_mean_mean_anom  = "DNI Anomaly",
+         DIR_trnd_A_mean            = "DNI daily",
+         DIR_trnd_A_mean_mean       = "DNI monthly",
+         DIR_trnd_A_mean_seas       = "DNI daily climat.",
+         DIR_trnd_A_mean_anom       = "DNI daily Anomaly",
+         DIR_trnd_A_mean_mean_anom  = "DNI monthly Anomaly",
          HOR_trnd_A                 = "Dir. Irrad. horiz. plane",
          HOR_trnd_A_mean            = "Dir. Irrad. horiz. plane",
          HOR_trnd_A_mean_mean       = "Dir. Irrad. horiz. plane",
@@ -57,12 +58,13 @@ var_name <- function(type) {
          DIFF_trnd_A_mean_seas      = "Diffuse. Irrad. season climat.",
          DIFF_trnd_A_mean_anom      = "Diffuse. Irrad. Anomaly",
          DIFF_trnd_A_mean_mean_anom = "Diffuse. Irrad. Anomaly",
+         GLB_strict                 = "GHI raw",
          GLB_trnd_A                 = "GHI",
-         GLB_trnd_A_mean            = "GHI",
-         GLB_trnd_A_mean_mean       = "GHI",
-         GLB_trnd_A_mean_seas       = "GHI season climat.",
-         GLB_trnd_A_mean_anom       = "GHI Anomaly",
-         GLB_trnd_A_mean_mean_anom  = "GHI Anomaly",
+         GLB_trnd_A_mean            = "GHI daily",
+         GLB_trnd_A_mean_mean       = "GHI monthly",
+         GLB_trnd_A_mean_seas       = "GHI daily climat.",
+         GLB_trnd_A_mean_anom       = "GHI daily Anomaly",
+         GLB_trnd_A_mean_mean_anom  = "GHI monthly Anomaly",
          tsi1au_att                 = "TSI at 1au",
          near_tcc_des               = "TCCn deseasonalized",
          near_tcc_att               = "TCC nearest",

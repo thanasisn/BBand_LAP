@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends A"
+#' title:         "Trends A: Create daily monthly means, and deseasonal anomaly by SZA"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -39,8 +39,6 @@
 #' ---
 #+ include=F
 
-#'
-#' # Create daily means, and deseasonal anomaly
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -89,7 +87,7 @@ library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 library(zoo,        warn.conflicts = FALSE, quietly = TRUE)
 
 # TEST
-Main.Host <- "tyler "
+# Main.Host <- "tyler "
 
 #+ include=T, echo=F, results="asis", warning=F
 ##  Open dataset  --------------------------------------------------------------
@@ -126,14 +124,13 @@ LAP <- LAP |>
     TSI_DIR_trnd_A := case_when(!is.na(DIR_strict) ~ TSI, .default = NA)
   )
 
-
 ##  Create sky data sets  ------------------------------------------------------
 ALL   <- LAP |>                           select(-SKY)
 CLOUD <- LAP |> filter(SKY == "Cloud") |> select(-SKY)
 CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
 ##  Create daily SZA values  ---------------------------------------------------
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
@@ -207,7 +204,7 @@ for (DBn in dbs) {
 
 
 ##  Filter daily SZA values  ---------------------------------------------------
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
@@ -273,7 +270,7 @@ for (DBn in dbs) {
 
 
 ##  Daily deseasonalized anomaly SZA  ------------------------------------------
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
@@ -471,7 +468,7 @@ for (DBn in dbs) {
 
 
 ##  Filter monthly SZA values  -------------------------------------------------
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
@@ -525,10 +522,6 @@ for (DBn in dbs) {
     }
   }
 }
-
-
-
-
 
 
 

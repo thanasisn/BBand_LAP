@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends A"
+#' title:         "Trends A: Create monthly means from daily and deseasonal anomaly"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -39,8 +39,6 @@
 #' ---
 #+ include=F
 
-#'
-#' # Create monthly meaans from daily and deseasonal anomaly
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -96,9 +94,8 @@ if (Sys.info()["nodename"] == Main.Host) {
 }
 
 
-
 ##  Create monthly values  -----------------------------------------------------
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
@@ -170,26 +167,25 @@ for (DBn in dbs) {
 }
 
 
-##  Monthly data representation  -------------------------------------------------
-dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
-
+##  Monthly data representation  -----------------------------------------------
+#'
 #' \FloatBarrier
 #' \newpage
 #'
-#' # Filter monthly values
+#' # Filter acceptable monthly values
 #'
 #' We choose to use monthly values only if `r Monthly_aggegation_N_lim` days
 #' with data exist for each month.
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-
+dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA        <- tbl(con, DBn) |> collect() |> data.table()
 
   varstochech <- sort(DATA |> select(ends_with("_mean_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Means selection for", var_name(DBn), "\n\n"))
+  cat(paste("\n## Selection for", var_name(DBn), "\n\n"))
 
   ## set means on days with less than n days to NA
   for (av in varstochech) {
@@ -211,7 +207,7 @@ for (DBn in dbs) {
          ylab = "Occurrences",
          xlab = "Available days for used monthly mean",
          main = paste("Days with data for",  var_name(av))
-         )
+    )
   }
 
   ## store data to db
@@ -225,8 +221,7 @@ for (DBn in dbs) {
 
 
 ##  Monthly deseasonalized values  ---------------------------------------------
-dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
@@ -235,6 +230,7 @@ dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
 #' Compute monthly anomaly `_mean_anom` from `_mean_mean` - `_mean_clima`
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   type <- sub(".*_", "", DBn)
@@ -267,11 +263,10 @@ for (DBn in dbs) {
       )
     ) |> collect() |> data.table()
 
-
   ## Plot climatology values
   p <- CLIMA |> select(Month,
                        !starts_with("TSI") &
-                       ends_with(c("_mean_mean_clima"))) |>
+                         ends_with(c("_mean_mean_clima"))) |>
     melt(id.vars = 'Month', variable.name = 'Radiation') |>
     ggplot(aes(x = Month, y = value)) +
     geom_point( aes(colour = Radiation)) +
@@ -290,7 +285,8 @@ for (DBn in dbs) {
   ) |> collect() |> data.table()
 
   for (av in vars) {
-    cat("Compute anomaly by season of year for ", av, "\n\n")
+    status_msg(ScriptName = Script.Name,
+               msg        = c("Compute anomaly by month of year for ", DBn, av))
 
     climavar <- paste0(av, "_clima")
     anomvar  <- paste0(av, "_anom" )
@@ -313,16 +309,15 @@ for (DBn in dbs) {
 
 
 
-
-##  Monthly deseasonalized values by season of year  -----------------------------
-dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
-
+##  Monthly deseasonalized values by season of year  ---------------------------
+#'
 #' \FloatBarrier
 #' \newpage
 #'
 #' # Create climatology data and anomaly by season of year
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   DATA <- DATA |> select(-contains("_seas"))
@@ -331,7 +326,7 @@ for (DBn in dbs) {
   cat("\n\\FloatBarrier\n\n")
   cat(paste("\n## Season of year daily deseasonal", var_name(DBn), "\n\n"))
 
-  ## __ Compute monthly climatology by season  -----------------------------------
+  ## __ Compute monthly climatology by season  ---------------------------------
   SEAS <- DATA |>
     group_by(Season) |>
     summarise(
@@ -358,7 +353,7 @@ for (DBn in dbs) {
   ## Plot seasonal climatology values
   p <- SEAS |> select(Season,
                       !starts_with("TSI") &
-                      ends_with(c("mean_mean_seas"))) |>
+                        ends_with(c("mean_mean_seas"))) |>
     arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
     melt(id.vars = 'Season', variable.name = 'Radiation')  |>
     ggplot(aes(x = Season, y = value)) +
@@ -379,19 +374,21 @@ for (DBn in dbs) {
   ) |> collect() |> data.table()
 
   for (av in vars) {
-    cat("Compute anomaly by season for ", av, "\n\n")
+    status_msg(ScriptName = Script.Name,
+               msg        = c("Compute anomaly by season of year for ", DBn, av))
 
-      climavar <- paste0(av, "_seas")
-      anomvar  <- paste0(av, "_seasanom" )
 
-      DATA <- DATA |> mutate(
-        !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
-        Decimal_date := decimal_date(Day)
-      ) |> collect()
+    climavar <- paste0(av, "_seas")
+    anomvar  <- paste0(av, "_seasanom" )
 
-      ## protect database numeric type
-      DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
-      DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
+    DATA <- DATA |> mutate(
+      !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
+      Decimal_date := decimal_date(Day)
+    ) |> collect()
+
+    ## protect database numeric type
+    DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
+    DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
   }
 
   ## Store daily anomaly data
@@ -399,7 +396,6 @@ for (DBn in dbs) {
     res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
   }
 }
-
 
 
 #+ Clean_exit, echo=FALSE
