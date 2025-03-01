@@ -196,7 +196,7 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, DAILY)
-    res <- update_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
+    res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
   }
   rm(DAILY); res <- gc()
 }
@@ -459,7 +459,7 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, MONTHLY)
-    res <- update_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
+    res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
   }
   rm(MONTHLY); res <- gc()
 }

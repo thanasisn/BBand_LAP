@@ -162,7 +162,7 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, MONTHLY)
-    res <- update_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
+    res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
   }
 }
 
@@ -181,7 +181,6 @@ for (DBn in dbs) {
 dbs <- sort(grep("Trend_A_MONTHLY", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA        <- tbl(con, DBn) |> collect() |> data.table()
-
   varstochech <- sort(DATA |> select(ends_with("_mean_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
@@ -199,8 +198,8 @@ for (DBn in dbs) {
     abline(v = Monthly_aggegation_N_lim, col = "red")
 
     ## apply limit
-    DATA[get(tv) <  Monthly_aggegation_N_lim, eval(av) := NA ]
-    cat("Days", DATA[get(tv) >= Monthly_aggegation_N_lim, .N ], "days droped for", av, "\n")
+    DATA[get(tv) < Monthly_aggegation_N_lim, eval(av) := NA]
+    cat("Days", DATA[get(tv) >= Monthly_aggegation_N_lim, .N], "days droped for", av, "\n")
 
     ## plog
     hist(DATA[!is.na(get(av)), get(tv)], breaks = 33,
@@ -214,7 +213,7 @@ for (DBn in dbs) {
   if (Sys.info()["nodename"] == Main.Host) {
     dbRemoveTable(con, DBn)
     dbCreateTable(conn = con, name = DBn, DATA)
-    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
+    res <- insert_table(con, DATA, DBn, "Day", quiet = TRUE)
   }
 }
 
@@ -349,7 +348,6 @@ for (DBn in dbs) {
       )
     ) |> collect() |> data.table()
 
-
   ## Plot seasonal climatology values
   p <- SEAS |> select(Season,
                       !starts_with("TSI") &
@@ -376,7 +374,6 @@ for (DBn in dbs) {
   for (av in vars) {
     status_msg(ScriptName = Script.Name,
                msg        = c("Compute anomaly by season of year for ", DBn, av))
-
 
     climavar <- paste0(av, "_seas")
     anomvar  <- paste0(av, "_seasanom" )
