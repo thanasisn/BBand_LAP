@@ -196,7 +196,7 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, DAILY)
-    res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
+    res <- update_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
   }
   rm(DAILY); res <- gc()
 }
@@ -459,7 +459,7 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, MONTHLY)
-    res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
+    res <- update_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
   }
   rm(MONTHLY); res <- gc()
 }
@@ -483,7 +483,7 @@ dbs <- sort(grep("A_SZA_MONTHLY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n## Restrict daily SZA ", var_name(DBn), "\n\n"))
+  cat(paste("\n## Restrict monthly SZA ", var_name(DBn), "\n\n"))
 
   ##  Variables to restrict
   vars <- DATA |> select(ends_with("_mean_mean")) |> colnames()

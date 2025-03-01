@@ -162,7 +162,7 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, MONTHLY)
-    res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
+    res <- update_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
   }
 }
 
@@ -214,7 +214,7 @@ for (DBn in dbs) {
   if (Sys.info()["nodename"] == Main.Host) {
     dbRemoveTable(con, DBn)
     dbCreateTable(conn = con, name = DBn, DATA)
-    res <- insert_table(con, DATA, DBn, "Day", quiet = TRUE)
+    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
   }
 }
 

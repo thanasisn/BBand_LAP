@@ -165,7 +165,7 @@ for (DBn in dbs) {
   DAILY <- left_join(
     DAILY, META, by = "Day"
   ) |> collect() |> data.table()
-  
+
   DAILY[, Decimal_date := decimal_date(Day)]
   ## __ Flag daily data with season  -------------------------------------------
   ## create continuous seasonal variable
@@ -193,8 +193,8 @@ for (DBn in dbs) {
     if (dbExistsTable(con , tbl_name)) {
       dbRemoveTable(con, tbl_name)
     }
-    dbCreateTable(conn = con, name = tbl_name, DAILY)
-    res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
+    dbCreateTable(conn = con, name = tbl_name, DAILY$Day)
+    res <- update_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
   }
 }
 
