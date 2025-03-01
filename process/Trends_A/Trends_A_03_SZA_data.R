@@ -87,7 +87,7 @@ library(ggplot2,    warn.conflicts = FALSE, quietly = TRUE)
 library(zoo,        warn.conflicts = FALSE, quietly = TRUE)
 
 # TEST
-Main.Host <- "tyler"
+# Main.Host <- "tyler"
 
 #+ include=T, echo=F, results="asis", warning=F
 ##  Open dataset  --------------------------------------------------------------
@@ -103,7 +103,7 @@ if (Sys.info()["nodename"] == Main.Host) {
 LAP  <- tbl(con, "LAP")
 
 LAP <- LAP |>
-  filter(SKY %in% c("Cloud", "Clear")) |>  ## only data for trends
+  filter(SKY %in% c("Cloud", "Clear")) |>  ## only data for trends, same as the first script
   select(
     Date,
     ends_with("_trnd_A"),
