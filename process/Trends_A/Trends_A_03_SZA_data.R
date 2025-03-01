@@ -391,7 +391,7 @@ for (DBn in dbs) {
 
 
 ##  Create monthly SZA values  -------------------------------------------------
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
@@ -459,7 +459,7 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, MONTHLY)
-    # res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
+    res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
   }
   rm(MONTHLY); res <- gc()
 }
@@ -497,7 +497,7 @@ for (DBn in dbs) {
     status_msg(ScriptName = Script.Name,
                msg        = c(DBn, avar, "Filter daily SZA means"))
 
-    PART <- tbl(con, DBn)  |>
+    PART <- tbl(con, DBn) |>
       select(Year, Month, preNoon, SZA, !!avar, !!checkvar)
 
     ## apply
@@ -509,6 +509,7 @@ for (DBn in dbs) {
         )
       ) |> collect() |> data.table()
 
+    PART |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull()
     ## test plot
     hist(PART |> filter(!is.na(!!sym(avar))) |> select(!!checkvar) |> pull(),
          breaks = 50,
