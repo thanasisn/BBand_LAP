@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends A: Create monthly means from daily and deseasonal anomaly"
+#' title:         "Trends A 02: Create monthly means from daily and deseasonal anomaly"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -113,6 +113,7 @@ for (DBn in dbs) {
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
+  cat("\n\\newpage\n\n")
   cat(paste("\n## Monthly means", var_name(DBn), "\n\n"))
 
   ## __ Create monthly values and statistics  ----------------------------------
@@ -184,6 +185,7 @@ for (DBn in dbs) {
   varstochech <- sort(DATA |> select(ends_with("_mean_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
+  cat("\n\\newpage\n\n")
   cat(paste("\n## Selection for", var_name(DBn), "\n\n"))
 
   ## set means on days with less than n days to NA
@@ -235,6 +237,7 @@ for (DBn in dbs) {
   type <- sub(".*_", "", DBn)
 
   cat("\n\\FloatBarrier\n\n")
+  cat("\n\\newpage\n\n")
   cat(paste("\n## Monthly deseasonal", var_name(DBn), "\n\n"))
 
   vars <- sort(DATA |> select(contains("_mean_mean")) |> colnames())

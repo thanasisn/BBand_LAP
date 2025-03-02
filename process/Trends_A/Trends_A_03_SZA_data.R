@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends A: Create daily monthly means, and deseasonal anomaly by SZA"
+#' title:         "Trends A 03: Create daily monthly means, and deseasonal anomaly by SZA"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -140,7 +140,9 @@ CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 dbs   <- sort(c("ALL", "CLOUD", "CLEAR"))
 for (DBn in dbs) {
   DATA <- get(DBn)
+
   cat("\n\\FloatBarrier\n\n")
+  cat("\n\\newpage\n\n")
   cat(paste("\n## Daily SZA means", var_name(DBn), "\n\n"))
   status_msg(ScriptName = Script.Name,
              msg        = c(DBn, "Daily SZA means"))
@@ -218,7 +220,9 @@ for (DBn in dbs) {
 dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
+
   cat("\n\\FloatBarrier\n\n")
+  cat("\n\\newpage\n\n")
   cat(paste("\n## Filter daily SZA ", var_name(DBn), "\n\n"))
   status_msg(ScriptName = Script.Name,
              msg        = c(DBn, "Filter daily SZA means"))
@@ -233,7 +237,6 @@ for (DBn in dbs) {
     years <- tbl(con, DBn) |> select(Year) |> distinct() |> arrange(Year) |> pull()
 
     for (yyyy in years) {
-      cat(DBn, "-", avar, "-", yyyy, "\n")
       status_msg(ScriptName = Script.Name,
                  msg        = c(DBn, avar, yyyy))
 
@@ -285,6 +288,7 @@ for (DBn in dbs) {
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
+  cat("\n\\newpage\n\n")
   cat(paste("\n## Daily deseasonal", var_name(DBn), "\n\n"))
 
   ## __ Compute daily climatology values  --------------------------------------
@@ -404,6 +408,7 @@ for (DBn in dbs) {
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
+  cat("\n\\newpage\n\n")
   cat(paste("\n## Monthly SZA", var_name(DBn), "\n\n"))
 
   ## __ Create monthly values and statistics  ----------------------------------
@@ -442,13 +447,13 @@ for (DBn in dbs) {
 
   ## inspect fill ratios of observations
   hist(MONTHLY[!is.na(GLB_trnd_A_mean_mean), GLB_trnd_A_mean_N], breaks = 100,
-       main = paste("Occurance of days with data", var_name("GLB_trnd_A_mean_N")),
-       ylab = "Occurances")
+       main = paste("Occurrence of days with data", var_name("GLB_trnd_A_mean_N")),
+       ylab = "Occurrences")
   abline(v = SZA_Monthly_aggregation_N_lim, col = "red")
 
   hist(MONTHLY[!is.na(DIR_trnd_A_mean_mean), DIR_trnd_A_mean_N], breaks = 100,
-       main = paste("Occurance of days with data", var_name("DIR_trnd_A_mean_N")),
-       ylab = "Occurances")
+       main = paste("Occurrence of days with data", var_name("DIR_trnd_A_mean_N")),
+       ylab = "Occurrences")
   abline(v = SZA_Monthly_aggregation_N_lim, col = "red")
 
 
@@ -482,7 +487,9 @@ for (DBn in dbs) {
 dbs <- sort(grep("A_SZA_MONTHLY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
+
   cat("\n\\FloatBarrier\n\n")
+  cat("\n\\newpage\n\n")
   cat(paste("\n## Restrict monthly SZA ", var_name(DBn), "\n\n"))
 
   ##  Variables to restrict

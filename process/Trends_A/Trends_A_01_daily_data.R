@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends A"
+#' title:         "Trends A 01: Create daily means, and deseasonal anomaly"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -39,8 +39,6 @@
 #' ---
 #+ include=F
 
-#'
-#' # Create daily means, and deseasonal anomaly
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -98,7 +96,6 @@ if (Sys.info()["nodename"] == Main.Host) {
 LAP  <- tbl(con, "LAP")
 META <- tbl(con, "META") |> select(Day, Daylength)
 
-
 LAP <- LAP |>
   filter(SKY %in% c("Cloud", "Clear")) |>  ## only data for trends
   select(
@@ -128,11 +125,11 @@ CLEAR <- LAP |> filter(SKY == "Clear") |> select(-SKY)
 
 
 ##  Create daily values  -------------------------------------------------------
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Create daily means for each data set
+#' # Create daily means for each data set
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
 dbs <- sort(c("ALL", "CLOUD", "CLEAR"))
@@ -199,12 +196,11 @@ for (DBn in dbs) {
 }
 
 ##  Daily data representation  -------------------------------------------------
-warning("This breaks other variables for Clear and Cloud!! This is only for GHI")
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Apply some filtering on the data to use
+#' # Apply some filtering on the daily data
 #'
 #' We choose to use a ratio of `r Cloud_daily_ratio_lim` to set the
 #' sky type characterization for the whole day.
@@ -213,7 +209,7 @@ warning("This breaks other variables for Clear and Cloud!! This is only for GHI"
 #' i.e. GLB_trnd_A_mean for CLOUD and CLEAR
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-
+warning("This breaks other variables for Clear and Cloud!! This is only for GHI")
 CLOUD <- tbl(con, "Trend_A_DAILY_CLOUD")
 CLOUD <- CLOUD |>
   mutate(
@@ -247,11 +243,11 @@ hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
 
 
 ##  Daily deseasonalized values  -----------------------------------------------
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Create daily climatology data and anomaly
+#' # Create daily climatology data and anomaly
 #'
 #' We compute daily anomaly `_anom` as 100 (`_mean` - `_clima`) / `_clima`
 #'
@@ -336,11 +332,11 @@ for (DBn in dbs) {
 
 
 ##  Daily deseasonalized values by season of year  -----------------------------
-
+#'
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Create climatology data and anomaly by season of year
+#' # Create climatology data and anomaly by season of year
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
 dbs <- sort(grep("Trends_A_DAILY_", dbListTables(con), value = TRUE))

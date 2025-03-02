@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends A"
+#' title:         "Trends A 00: Prepare raw data"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -39,8 +39,6 @@
 #' ---
 #+ include=F
 
-#'
-#' # Prepare raw data
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -100,7 +98,11 @@ LAP  <- tbl(con, "LAP")
 META <- tbl(con, "META")
 
 #'
-#' ## Select data to use
+#' # Select data to use
+#'
+#' - Only screened data
+#' - Sun above horizon
+#' - Sun above obsructions
 #'
 #+ include=T, echo=T, results="asis"
 ##  Range of data ready to use  ------------------------------------------------
@@ -132,7 +134,7 @@ LAP <- LAP |> filter(
 
 ##  Remove days with partial observations  -------------------------------------
 #'
-#' ## Filter out some days
+#' # Filter out some days
 #'
 #' Remove days with too few data, as they can not be representative of a
 #' normal day.
@@ -188,7 +190,7 @@ LAP <- LAP |> mutate(
 
 ##  Move measurements to mean earth distance  ----------------------------------
 #'
-#' ## Remove Sun distance variation
+#' # Remove Sun distance variation
 #'
 #+ include=T, echo=T, results="asis"
 
@@ -202,7 +204,7 @@ LAP <- LAP |>
 
 ##  Set flag for sky conditions  -----------------------------------------------
 #'
-#' These flags describe all data for trend analysis
+#' # Create proper flags describing all data for trend analysis
 #'
 LAP <- LAP |>
   mutate(
