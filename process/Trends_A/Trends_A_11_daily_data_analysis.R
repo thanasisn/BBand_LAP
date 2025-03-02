@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends A"
+#' title:         "Trends A 11: Analyse daily values"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -39,8 +39,6 @@
 #' ---
 #+ include=F
 
-#'
-#' # Analyse daily values
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -111,12 +109,13 @@ for (DBn in dbs) {
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
+  cat("\n\\newpage\n\n")
   cat(paste("\n##", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n###", var_name(avar), avar, "\n\n \n"))
+    cat(paste("\n###", var_name(avar), avar, "\n \n \n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")
@@ -189,12 +188,13 @@ for (DBn in dbs) {
   vars <- sort(DATA |> select(ends_with("_mean_anom")) |> colnames())
 
   cat("\n\\FloatBarrier\n\n")
+  cat("\n\\newpage\n\n")
   cat(paste("\n##", var_name(DBn), "\n\n\n"))
 
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
-    cat(paste("\n###", var_name(avar), avar, "\n\n \n"))
+    cat(paste("\n###", var_name(avar), avar, "\n \n \n"))
 
     ## data date range
     cat("Date range:   ", paste(DATA[!is.na(get(avar)), range(Day)]), "\n\n")

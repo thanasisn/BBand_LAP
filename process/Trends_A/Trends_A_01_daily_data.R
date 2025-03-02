@@ -166,7 +166,7 @@ for (DBn in dbs) {
   DAILY[, Decimal_date := decimal_date(Day)]
   ## __ Flag daily data with season  -------------------------------------------
   ## create continuous seasonal variable
-  DAILY[, season_Yqrt := as.yearqtr(as.yearmon(paste(year(Day), month(Day), sep = "-")) + 1/12)]
+  DAILY[, season_Yqrt := as.yearqtr(as.yearmon(paste(year(Day), month(Day), sep = "-")) + 1 / 12)]
   ## Flag seasons using quarters
   DAILY[season_Yqrt %% 1 == 0   , Season := "Winter"]
   DAILY[season_Yqrt %% 1 == 0.25, Season := "Spring"]
@@ -174,12 +174,12 @@ for (DBn in dbs) {
   DAILY[season_Yqrt %% 1 == 0.75, Season := "Autumn"]
 
   ## inspect fill ratios of observations
-  hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
+  hist(DAILY[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N / Daylength], breaks = 100,
        main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
        ylab = "Valid data ratio")
   abline(v = Cloud_daily_ratio_lim, col = "red")
 
-  hist(DAILY[!is.na(DIR_trnd_A_mean), DIR_trnd_A_N/Daylength], breaks = 100,
+  hist(DAILY[!is.na(DIR_trnd_A_mean), DIR_trnd_A_N / Daylength], breaks = 100,
        main = paste(var_name(DBn), var_name("GLB_trnd_A_N")),
        ylab = "Valid data ratio")
   abline(v = Cloud_daily_ratio_lim, col = "red")
@@ -187,7 +187,7 @@ for (DBn in dbs) {
   ## Store daily values as is
   if (Sys.info()["nodename"] == Main.Host) {
     tbl_name <- paste0("Trend_A_DAILY_", DBn)
-    if (dbExistsTable(con , tbl_name)) {
+    if (dbExistsTable(con, tbl_name)) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, DAILY)
@@ -252,7 +252,7 @@ hist(CLEAR[!is.na(GLB_trnd_A_mean), GLB_trnd_A_N/Daylength], breaks = 100,
 #' We compute daily anomaly `_anom` as 100 (`_mean` - `_clima`) / `_clima`
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-dbs <- sort(grep("Trends_A_DAILY_", dbListTables(con), value = TRUE))
+dbs <- sort(grep("Trend_A_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   DATA <- DATA |> select(-contains("_clima"))
@@ -339,7 +339,7 @@ for (DBn in dbs) {
 #' # Create climatology data and anomaly by season of year
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-dbs <- sort(grep("Trends_A_DAILY_", dbListTables(con), value = TRUE))
+dbs <- sort(grep("Trend_A_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
   DATA <- DATA |> select(-contains("_seas"))

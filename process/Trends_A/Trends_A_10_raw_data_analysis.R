@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends A"
+#' title:         "Trends A 10: Analysis of raw data"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -39,8 +39,6 @@
 #' ---
 #+ include=F
 
-#'
-#' # Analysis of raw data
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -121,7 +119,7 @@ dbs <- c(
 )
 
 #'
-#' ## Trends from raw data
+#' # Trends from raw data
 #'
 #+ include=T, echo=F, results="asis", warning=F
 for (DBn in dbs) {
@@ -129,10 +127,10 @@ for (DBn in dbs) {
 
   cat("\n\\newpage\n\n")
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n###", var_name(DBn), "\n\n"))
+  cat(paste("\n##", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
-    cat(paste("\n####", var_name(avar), avar, "\n\n\n"))
+    cat(paste("\n###", var_name(avar), avar, "\n\n\n"))
 
     pp <- DATA
 

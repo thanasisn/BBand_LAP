@@ -217,7 +217,7 @@ for (DBn in dbs) {
 #' points.
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
+dbs <- sort(grep("Trend_A_SZA_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
@@ -282,7 +282,7 @@ for (DBn in dbs) {
 #' We compute daily anomaly `_anom` as 100 (`_mean` - `_clima`) / `_clima`
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
+dbs <- sort(grep("Trend_A_SZA_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn) |> select(-contains("_clima"))
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
@@ -402,7 +402,7 @@ for (DBn in dbs) {
 #' # Create monthly SZA means for each data set from daily
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-dbs <- sort(grep("A_SZA_DAILY_", dbListTables(con), value = TRUE))
+dbs <- sort(grep("Trend_A_SZA_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn) |> select(-contains("_clima"))
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
@@ -484,7 +484,7 @@ for (DBn in dbs) {
 #' points.
 #'
 #+ include=T, echo=T, results="asis", warning=FALSE
-dbs <- sort(grep("A_SZA_MONTHLY_", dbListTables(con), value = TRUE))
+dbs <- sort(grep("Trend_A_SZA_MONTHLY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
