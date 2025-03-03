@@ -99,10 +99,63 @@ if (Sys.info()["nodename"] == Main.Host) {
 Seasons <- c("Winter", "Spring", "Summer", "Autumn")
 
 
-##  By Season from daily  ------------------------------------------------------
+
+##  Daily data -----------------------------------------------
+#'
+#' \FloatBarrier
+#' \newpage
+#'
+#' # Daily data
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(grep("Trend_A_DAILY_", dbListTables(con), value = TRUE))
+for (DBn in dbs) {
+  DATA <- tbl(con, DBn)
+
+  vars <- sort(DATA |> select(ends_with("_anom")) |> colnames())
+
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Daily anomaly", var_name(DBn), "\n\n"))
+
+  for (av in vars) {
+    cat("Daily anomaly for ", av, "\n\n")
+
+    ## prepare cusum
+    pp <- DATA |> select(Decimal_date, !!av) |> collect() |> data.table()
+    setorder(pp, Decimal_date)
+    pp[is.na(get(av)), eval(av) := 0 ]
+    pp[, cusum := cumsum(get(av))]
+
+    ## plot simple cusum
+    p <- ggplot(pp, aes(x = Decimal_date, y = cusum)) +
+      geom_line(col = var_col(av)) +
+      labs(x = element_blank(),
+           y = bquote("CUSUM" ~ .(var_name(av)) ~ ~ group("[", "%", "]")),
+           subtitle = paste(var_name(DBn), var_name(av))) +
+      theme_bw()
+    print(p)
+
+    merge(
+      pp[get(av) > 0, .(posSum = sum(get(av))), by = .(year = Decimal_date %/% 1) ],
+      pp[get(av) < 0, .(negSum = sum(get(av))), by = .(year = Decimal_date %/% 1) ],
+      by = "year", all = TRUE
+    )
+
+    testdb <- pp[, .(sum = sum(get(av))), by = .(year = Decimal_date %/% 1) ]
 
 
+    ggplot(testdb, aes(x = year, y = sum)) +
+      geom_col(data = testdb[sum <= 0], fill = "red") +
+      geom_col(data = testdb[sum >= 0], fill = "blue")
 
+
+    pp$Decimal_date %/% 1
+
+  }
+
+
+  stop()
+}
 
 
 
