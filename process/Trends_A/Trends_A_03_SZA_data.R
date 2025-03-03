@@ -198,7 +198,11 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, DAILY)
-    res <- insert_table(con, DAILY, tbl_name, "Day", quiet = TRUE)
+    res <- insert_table(con,
+                        DAILY,
+                        tbl_name,
+                        matchvar = c("Day", "preNoon", "SZA"),
+                        quiet = TRUE)
   }
   rm(DAILY); res <- gc()
 }
@@ -261,8 +265,11 @@ for (DBn in dbs) {
 
       ## store the table in the database
       if (Sys.info()["nodename"] == Main.Host) {
-        res <- update_table(con, PART, tbl_name,
-                            matchvar = c("Day", "preNoon", "SZA"), quiet = TRUE)
+        res <- update_table(con,
+                            PART,
+                            tbl_name,
+                            matchvar = c("Day", "preNoon", "SZA"),
+                            quiet = TRUE)
       }
     }
   }
@@ -333,7 +340,6 @@ for (DBn in dbs) {
     show(p)
   }
 
-
   ## __ Create deseasonal anomaly  ---------------------------------------------
   for (av in vars) {
 
@@ -356,7 +362,6 @@ for (DBn in dbs) {
         )
       ) |>
       select(DOY, SZA, preNoon, Day, !!av, !!checkvar)
-
 
     ## merge relevant data with climatology
     DATA <- left_join(
@@ -386,7 +391,11 @@ for (DBn in dbs) {
 
     ## Store daily anomaly data
     if (Sys.info()["nodename"] == Main.Host) {
-      res <- update_table(con, DATA, DBn, c("preNoon", "SZA", "Day"), quiet = TRUE)
+      res <- update_table(con,
+                          DATA,
+                          DBn,
+                          matchvar = c("Day", "preNoon", "SZA"),
+                          quiet = TRUE)
     }
   }
 }
@@ -463,7 +472,11 @@ for (DBn in dbs) {
       dbRemoveTable(con, tbl_name)
     }
     dbCreateTable(conn = con, name = tbl_name, MONTHLY)
-    res <- insert_table(con, MONTHLY, tbl_name, "Day", quiet = TRUE)
+    res <- insert_table(con,
+                        MONTHLY,
+                        tbl_name,
+                        matchvar = c("Year", "Month", "preNoon", "SZA"),
+                        quiet = TRUE)
   }
   rm(MONTHLY); res <- gc()
 }
@@ -521,8 +534,11 @@ for (DBn in dbs) {
 
     ## store the table in the database
     if (Sys.info()["nodename"] == Main.Host) {
-      res <- update_table(con, PART, tbl_name,
-                          matchvar = c("Year", "Month", "preNoon", "SZA"), quiet = TRUE)
+      res <- update_table(con,
+                          PART,
+                          tbl_name,
+                          matchvar = c("Year", "Month", "preNoon", "SZA"),
+                          quiet = TRUE)
     }
   }
 }
@@ -616,11 +632,16 @@ for (DBn in dbs) {
     ## protect database numeric type
     DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
+    DATA <- DATA |> mutate_if(is.numeric, ~ ifelse(is.nan(.), NA, .))
   }
 
   ## Store daily anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
-    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
+    res <- update_table(con,
+                        DATA,
+                        DBn,
+                        matchvar = c("Day", "SZA", "preNoon"),
+                        quiet = TRUE)
   }
 }
 
@@ -672,20 +693,20 @@ for (DBn in dbs) {
       )
     ) |> collect() |> data.table()
 
-#   ## Plot seasonal climatology values
-#   p <- SEAS |> select(Season,
-#                       !starts_with("TSI") &
-#                         ends_with(c("trnd_A_mean_seas"))) |>
-#     arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
-#     melt(id.vars = "Season", variable.name = "Radiation")  |>
-#     ggplot(aes(x = Season, y = value)) +
-#     geom_point( aes(colour = Radiation)) +
-#     geom_line(  aes(colour = Radiation, group = Radiation)) +
-#     geom_smooth(aes(colour = Radiation), method = "loess", formula = "y ~ x") +
-#     labs(subtitle = paste("Season climatology for ", var_name(DBn)),
-#          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
-#     theme_bw()
-#   show(p)
+  #   ## Plot seasonal climatology values
+  #   p <- SEAS |> select(Season,
+  #                       !starts_with("TSI") &
+  #                         ends_with(c("trnd_A_mean_seas"))) |>
+  #     arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
+  #     melt(id.vars = "Season", variable.name = "Radiation")  |>
+  #     ggplot(aes(x = Season, y = value)) +
+  #     geom_point( aes(colour = Radiation)) +
+  #     geom_line(  aes(colour = Radiation, group = Radiation)) +
+  #     geom_smooth(aes(colour = Radiation), method = "loess", formula = "y ~ x") +
+  #     labs(subtitle = paste("Season climatology for ", var_name(DBn)),
+  #          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
+  #     theme_bw()
+  #   show(p)
 
   ## __ Create deseasonal anomaly  ---------------------------------------------
   DATA <- left_join(
@@ -714,11 +735,16 @@ for (DBn in dbs) {
     ## protect database numeric type
     DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
-   }
+    DATA <- DATA |> mutate_if(is.numeric, ~ ifelse(is.nan(.), NA, .))
+  }
 
   ## Store daily anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
-    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
+    res <- update_table(con,
+                        DATA,
+                        DBn,
+                        matchvar = c("Year", "Month", "preNoon", "SZA"),
+                        quiet = TRUE)
   }
 }
 
