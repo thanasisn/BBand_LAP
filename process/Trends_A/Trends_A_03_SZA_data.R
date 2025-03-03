@@ -51,7 +51,7 @@ knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(message   = FALSE   )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.cap   = " empty caption ")
-knitr::opts_chunk$set(fig.pos   = "!ht"   )
+knitr::opts_chunk$set(fig.pos   = "!h"    )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
                         indent       = 4,
@@ -222,12 +222,11 @@ for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
   cat("\n\\FloatBarrier\n\n")
-  cat("\n\\newpage\n\n")
   cat(paste("\n## Filter daily SZA ", var_name(DBn), "\n\n"))
   status_msg(ScriptName = Script.Name,
              msg        = c(DBn, "Filter daily SZA means"))
 
-  ##  Variables to restrict  ---
+  ##  Variables to restrict
   vars <- DATA |> select(ends_with("_mean")) |> colnames()
 
   ## restrict each variable
@@ -489,7 +488,6 @@ for (DBn in dbs) {
   DATA <- tbl(con, DBn)
 
   cat("\n\\FloatBarrier\n\n")
-  cat("\n\\newpage\n\n")
   cat(paste("\n## Restrict monthly SZA ", var_name(DBn), "\n\n"))
 
   ##  Variables to restrict
@@ -498,8 +496,6 @@ for (DBn in dbs) {
   ## restrict each variable
   for (avar in vars)  {
     checkvar <- sub("_mean$", "_N", avar)
-
-    # DATA |> select(starts_with("DIFF")) |> colnames()
 
     status_msg(ScriptName = Script.Name,
                msg        = c(DBn, avar, "Filter daily SZA means"))

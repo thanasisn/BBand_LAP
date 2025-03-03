@@ -51,7 +51,7 @@ knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(message   = FALSE   )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.cap   = " empty caption ")
-knitr::opts_chunk$set(fig.pos   = "!ht"   )
+knitr::opts_chunk$set(fig.pos   = "!h"    )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
                         indent       = 4,
@@ -108,13 +108,12 @@ for (DBn in dbs) {
 
   vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
 
-  cat("\n\\FloatBarrier\n\n")
-  cat("\n\\newpage\n\n")
   cat(paste("\n##", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
+    cat("\n\\newpage\n\n")
     cat(paste("\n###", var_name(avar), avar, "\n \n \n"))
 
     ## data date range
@@ -187,13 +186,12 @@ for (DBn in dbs) {
   DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
   vars <- sort(DATA |> select(ends_with("_mean_anom")) |> colnames())
 
-  cat("\n\\FloatBarrier\n\n")
-  cat("\n\\newpage\n\n")
   cat(paste("\n##", var_name(DBn), "\n\n\n"))
 
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
+    cat("\n\\newpage\n\n")
     cat(paste("\n###", var_name(avar), avar, "\n \n \n"))
 
     ## data date range

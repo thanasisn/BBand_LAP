@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends A"
+#' title:         "Trends A 12: Trends of monthly values"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -40,8 +40,6 @@
 #+ include=F
 
 #'
-#' # Trends of monthly values
-#'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
 
@@ -53,7 +51,7 @@ knitr::opts_chunk$set(out.width = "100%"  )
 knitr::opts_chunk$set(message   = FALSE   )
 knitr::opts_chunk$set(fig.align = "center")
 knitr::opts_chunk$set(fig.cap   = " empty caption ")
-knitr::opts_chunk$set(fig.pos   = "!ht"   )
+knitr::opts_chunk$set(fig.pos   = "!h"    )
 knitr::opts_chunk$set(tidy = TRUE,
                       tidy.opts = list(
                         indent       = 4,
@@ -110,12 +108,12 @@ for (DBn in dbs) {
   DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
   vars <- sort(DATA |> select(ends_with("_mean_mean")) |> colnames())
 
-  cat("\n\\FloatBarrier\n\n")
   cat(paste("\n##", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
+    cat("\n\\newpage\n\n")
     cat(paste("\n###", var_name(avar), avar, "\n\n \n"))
 
     ## data date range
@@ -195,6 +193,7 @@ for (DBn in dbs) {
   for (avar in vars) {
 
     cat("\n\\FloatBarrier\n\n")
+    cat("\n\\newpage\n\n")
     cat(paste("\n###", var_name(avar), avar, "\n\n \n"))
 
     ## data date range
@@ -254,12 +253,11 @@ for (DBn in dbs) {
 
 
 ##  Trend by month  ------------------------------------------------------------
-
 #'
 #' \FloatBarrier
 #' \newpage
 #'
-#' ## Trend of departure from the climatology by each month
+#' # Trend of departure from the climatology by each month
 #'
 #+ include=T, echo=F, results="asis", warning=F
 
@@ -273,7 +271,7 @@ for (DBn in dbs) {
                  colnames())
 
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n###", var_name(DBn), "\n\n\n"))
+  cat(paste("\n##", var_name(DBn), "\n\n\n"))
 
   for (avar in vars) {
 
@@ -283,7 +281,8 @@ for (DBn in dbs) {
     for (amo in 1:12) {
 
       cat("\n\\FloatBarrier\n\n")
-      cat(paste("\n####", month.name[amo], var_name(avar), avar, "\n\n \n"))
+      cat("\n\\newpage\n\n")
+      cat(paste("\n###", month.name[amo], var_name(avar), avar, "\n\n \n"))
 
       DATA <- tbl(con, DBn)   |>
         filter(Month == amo)  |>
