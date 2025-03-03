@@ -135,26 +135,36 @@ for (DBn in dbs) {
       theme_bw()
     print(p)
 
-    merge(
-      pp[get(av) > 0, .(posSum = sum(get(av))), by = .(year = Decimal_date %/% 1) ],
-      pp[get(av) < 0, .(negSum = sum(get(av))), by = .(year = Decimal_date %/% 1) ],
-      by = "year", all = TRUE
-    )
+    ## prepare some more data to plot
+    # merge(
+    #   pp[get(av) > 0, .(posSum = cumsum(get(av))), by = .(year = Decimal_date %/% 1) ],
+    #   pp[get(av) > 0, .(posSum = cumsum(get(av))), by = .(year = Decimal_date %/% 1) ],
+    #   by = "year", all = TRUE
+    # )
+    pp[get(av) > 0, posSum := cumsum(tidyr::replace_na(get(av), 0)) ]
+    pp[get(av) < 0, negSum := cumsum(tidyr::replace_na(get(av), 0)) ]
 
+    p <- ggplot(pp, aes(x = Decimal_date)) +
+      geom_line(aes(y =   posSum), col = "blue") +
+      geom_line(aes(y = - negSum), col = "red") +
+      theme_bw()
+    print(p)
+
+    ## plot yearly sums
     testdb <- pp[, .(sum = sum(get(av))), by = .(year = Decimal_date %/% 1) ]
-
-
-    ggplot(testdb, aes(x = year, y = sum)) +
+    p <- ggplot(testdb, aes(x = year, y = sum)) +
       geom_col(data = testdb[sum <= 0], fill = "red") +
-      geom_col(data = testdb[sum >= 0], fill = "blue")
+      geom_col(data = testdb[sum >= 0], fill = "blue") +
+      ggtitle(paste("Sum of all year values", var_name(DBn), var_name(av))) +
+      xlab("Year")     +
+      ylab("Year Sum") +
+      theme_bw()
+    print(p)
 
-
-    pp$Decimal_date %/% 1
 
   }
 
 
-  stop()
 }
 
 

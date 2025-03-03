@@ -84,6 +84,14 @@ if (FORCE || as.numeric(strftime(Sys.Date(), "%d")) == 1) {
          output_dir    = output_dir
   )
 
+  render(
+         input         = "~/BBand_LAP/process/Trends_A/Trends_A_14_consistency.R",
+         output_format = output_format,
+         clean         = TRUE,
+         output_dir    = output_dir
+  )
+
+
 } else {
   cat("\nIt's not time to run", Script.Name, "\n\n")
 }
