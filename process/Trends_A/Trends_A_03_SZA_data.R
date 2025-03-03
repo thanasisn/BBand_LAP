@@ -511,7 +511,7 @@ for (DBn in dbs) {
     checkvar <- sub("_mean$", "_N", avar)
 
     status_msg(ScriptName = Script.Name,
-               msg        = c(DBn, avar, "Filter daily SZA means"))
+               msg        = c("Filter daily SZA means",DBn, avar))
 
     PART <- tbl(con, DBn) |>
       select(Year, Month, preNoon, SZA, !!avar, !!checkvar)
