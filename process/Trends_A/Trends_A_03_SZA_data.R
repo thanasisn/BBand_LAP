@@ -570,23 +570,24 @@ for (DBn in dbs) {
           seas_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE),
           seas_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE)
         )
-      )
+      ),
+      .groups = "keep"
     ) |> collect() |> data.table()
 
-#   ## Plot seasonal climatology values
-#   p <- SEAS |> select(Season,
-#                       !starts_with("TSI") &
-#                         ends_with(c("trnd_A_mean_seas"))) |>
-#     arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
-#     melt(id.vars = "Season", variable.name = "Radiation")  |>
-#     ggplot(aes(x = Season, y = value)) +
-#     geom_point( aes(colour = Radiation)) +
-#     geom_line(  aes(colour = Radiation, group = Radiation)) +
-#     geom_smooth(aes(colour = Radiation), method = "loess", formula = "y ~ x") +
-#     labs(subtitle = paste("Season climatology for ", var_name(DBn)),
-#          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
-#     theme_bw()
-#   show(p)
+  #   ## Plot seasonal climatology values
+  #   p <- SEAS |> select(Season,
+  #                       !starts_with("TSI") &
+  #                         ends_with(c("trnd_A_mean_seas"))) |>
+  #     arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
+  #     melt(id.vars = "Season", variable.name = "Radiation")  |>
+  #     ggplot(aes(x = Season, y = value)) +
+  #     geom_point( aes(colour = Radiation)) +
+  #     geom_line(  aes(colour = Radiation, group = Radiation)) +
+  #     geom_smooth(aes(colour = Radiation), method = "loess", formula = "y ~ x") +
+  #     labs(subtitle = paste("Season climatology for ", var_name(DBn)),
+  #          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
+  #     theme_bw()
+  #   show(p)
 
   ## __ Create deseasonal anomaly  ---------------------------------------------
   DATA <- left_join(
@@ -615,7 +616,7 @@ for (DBn in dbs) {
     ## protect database numeric type
     DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
     DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
-   }
+  }
 
   ## Store daily anomaly data
   if (Sys.info()["nodename"] == Main.Host) {
