@@ -1,18 +1,8 @@
 
 03
 
-
 source("~/CODE/FUNCTIONS/R/sumNA.R")
-source("~/CODE/FUNCTIONS/R/linear_fit_stats.R")
-source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/CODE/FUNCTIONS/R/data.R")
-
-
-
-## __ Flags --------------------------------------------------------------------
-
-LOESS_CRITERIO <-  c("aicc", "gcv")[1]
-
 
 ##  Daily SZA trends for all year  ---------------------------------------------
 
@@ -1676,15 +1666,6 @@ for (ase in seasons) {
 
 
             if (i %in% c(7)) {
-                # legend("top",
-                #        legend = c("Morning low stat. sig.", "Evening low stat. sig.",
-                #                   "Morning",                "Evening"),
-                #        col    = c(2, 3),
-                #        pt.cex = 1,
-                #        cex    = 0.8,
-                #        pch    = c(1, 2, 16, 17),
-                #        ncol   = 2,
-                #        bty = "n")
                 legend("topleft",
                        legend = c("Morning",                "Evening",
                                   "Morning low stat. sig.", "Evening low stat. sig."),

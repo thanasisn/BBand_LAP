@@ -1,7 +1,7 @@
 # /* #!/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #' ---
-#' title:         "Trends A"
+#' title:         "Trends A 13: Analysis by season of year"
 #' author:        "Natsis Athanasios"
 #' institute:     "AUTH"
 #' affiliation:   "Laboratory of Atmospheric Physics"
@@ -39,8 +39,6 @@
 #' ---
 #+ include=F
 
-#'
-#' # Trends of monthly values
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'
@@ -103,17 +101,15 @@ Seasons <- c("Winter", "Spring", "Summer", "Autumn")
 
 ##  By Season from daily  ------------------------------------------------------
 
-## list of monthly tables
-dbs <- sort(grep("_DAILY_", dbListTables(con), value = TRUE))
-
 #'
 #' \FloatBarrier
 #'
-#' ## Daily trends for season of the year
+#' # Daily trends for season of the year
 #'
 #' We calculated Seasonal means from the daily means
 #'
 #+ include=T, echo=F, results="asis", warning=F
+dbs <- sort(grep("Trend_A_DAILY_", dbListTables(con), value = TRUE))
 for (DBn in dbs) {
   ## get data and variables to analyse
   DATA <- tbl(con, DBn) |> arrange(Decimal_date) |> collect() |> data.table()
@@ -121,14 +117,14 @@ for (DBn in dbs) {
 
   cat("\n\\newpage\n\n")
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n###", var_name(DBn), "\n\n"))
+  cat(paste("\n##", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
 
     for (ases in Seasons) {
 
       cat("\n\\FloatBarrier\n\n")
-      cat(paste("\n####", ases, var_name(avar), avar, "\n\n \n"))
+      cat(paste("\n###", ases, var_name(avar), avar, "\n\n \n"))
 
       DATA <- tbl(con, DBn)    |>
         filter(Season == ases) |>
@@ -154,7 +150,6 @@ for (DBn in dbs) {
       Tint <- data.frame(t(lmtest::coeftest(tmodel)[2, ]))
       names(Tres) <- paste0("Tmod_", names(Tres))
       cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
-
 
       ## _ Time series analysis  -----------------------------------------------
       dd        <- read.zoo(DATA, index.column = "Day")
@@ -195,13 +190,13 @@ for (DBn in dbs) {
 ##  By Season from monthly  ----------------------------------------------------
 
 ## list of monthly tables
-dbs <- sort(grep("_MONTHLY_", dbListTables(con), value = TRUE))
+dbs <- sort(grep("Trend_A_MONTHLY_", dbListTables(con), value = TRUE))
 
 #'
 #' \newpage
 #' \FloatBarrier
 #'
-#' ## Monthly trends for season of the year
+#' # Monthly trends for season of the year
 #'
 #' We calculated Seasonal means from the monthly means of daily means
 #'
@@ -216,24 +211,23 @@ for (DBn in dbs) {
 
   cat("\n\\newpage\n\n")
   cat("\n\\FloatBarrier\n\n")
-  cat(paste("\n###", var_name(DBn), "\n\n"))
+  cat(paste("\n##", var_name(DBn), "\n\n"))
 
   for (avar in vars) {
 
     for (ases in Seasons) {
 
       cat("\n\\FloatBarrier\n\n")
-      cat(paste("\n####", ases, var_name(avar), avar, "\n\n \n"))
+      cat(paste("\n###", ases, var_name(avar), avar, "\n\n \n"))
 
       DATA <- tbl(con, DBn)    |>
         filter(Season == ases) |>
         arrange(Decimal_date)  |>
         collect() |> data.table()
 
-
       if (sum(!is.na(DATA[[avar]])) > 2) {
 
-        ## _ Linear trend by year  -----------------------------------------------
+        ## _ Linear trend by year  ---------------------------------------------
         lm1 <- lm(DATA[[avar]] ~ DATA$Decimal_date)
         d   <- summary(lm1)$coefficients
         cat("Linear trend: ", round(lm1$coefficients[2], 4), "+/-", round(d[2, 2], 4), "p=", round(d[2, 4], 4), "\n\n")
@@ -241,7 +235,7 @@ for (DBn in dbs) {
         ## _ Correlation test
         cor1 <- cor.test(x = DATA[[avar]], y = DATA$Decimal_date, method = "pearson")
 
-        ## _ Arima auto regression Tourpali  -------------------------------------
+        ## _ Arima auto regression Tourpali  -----------------------------------
         ## create a time variable (with lag of 1 day ?)
         DATA[, ts := (year(Day) - min(year(Day))) + (yday(Day) - 1) / Hmisc::yearDays(Day)]
         tmodel <- arima(x = DATA[[avar]], order = c(1, 0, 0), xreg = DATA$ts, method = "ML")
@@ -253,8 +247,7 @@ for (DBn in dbs) {
         names(Tres) <- paste0("Tmod_", names(Tres))
         cat("ARIMA:        ", paste(round(Tres[1], 4), "+/-", round(Tres[2], 4), "p=", round(Tres[4], 4)), "\n\n")
 
-
-        ## _ Time series analysis  -----------------------------------------------
+        ## _ Time series analysis  ---------------------------------------------
         dd        <- read.zoo(DATA, index.column = "Day")
         dd        <- as.ts(dd)
 

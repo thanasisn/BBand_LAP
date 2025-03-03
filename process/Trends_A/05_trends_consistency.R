@@ -1,48 +1,6 @@
 
 05
 
-Script.Name <- "./DHI_GHI_3_trends_consistency.R"
-
-
-## __ Load external functions --------------------------------------------------
-## Functions from `https://github.com/thanasisn/IStillBreakStuff/tree/main/FUNCTIONS/R`
-source("~/CODE/FUNCTIONS/R/sumNA.R")
-source("~/CODE/FUNCTIONS/R/linear_fit_stats.R")
-source("~/CODE/FUNCTIONS/R/trig_deg.R")
-source("~/CODE/FUNCTIONS/R/data.R")
-
-
-## __ Source initial scripts ---------------------------------------------------
-source("./DHI_GHI_0_variables.R")
-
-
-if (!file.exists(I1_longterm) |
-    file.mtime(I1_longterm) < file.mtime("./DHI_GHI_0_variables.R") |
-    file.mtime(I1_longterm) < file.mtime("./DHI_GHI_00_raw_data.R") |
-    file.mtime(I1_longterm) < file.mtime("./DHI_GHI_01_Input_longterm.R"))
-{
-    # source("./DHI_GHI_01_Input_longterm.R")
-    tryCatch(source("./DHI_GHI_01_Input_longterm.R"), exit = function(cond) {
-        message( conditionMessage(cond) )
-    })
-    dummy <- gc()
-}
-
-if (!file.exists(I3_trendsconsist) |
-    file.mtime(I3_trendsconsist) < file.mtime("./DHI_GHI_0_variables.R") |
-    file.mtime(I3_trendsconsist) < file.mtime("./DHI_GHI_00_raw_data.R") |
-    file.mtime(I3_trendsconsist) < file.mtime("./DHI_GHI_03_Input_consistency.R"))
-{
-    # source("./DHI_GHI_01_Input_longterm.R")
-    tryCatch(source("./DHI_GHI_03_Input_consistency.R"), exit = function(cond) {
-        message( conditionMessage(cond) )
-    })
-    dummy <- gc()
-}
-
-## load data
-load(I1_longterm)
-load(I3_trendsconsist)
 
 
 #+ echo=F, include=T
@@ -1534,7 +1492,4 @@ for (adb in database) {
 }
 #'
 #+ echo=F, include=T
-
-
-
 

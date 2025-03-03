@@ -1,55 +1,6 @@
 
 04
 
-## Data input for this paper
-
-## to force a rebuild of the dataset remove stored
-# file.remove(common_data)
-
-source("~/CODE/FUNCTIONS/R/trig_deg.R")
-source("~/CODE/FUNCTIONS/R/data.R")
-source("./DHI_GHI_0_variables.R")
-Script.Name <- "DHI_GHI_03_Input_consistency.R"
-
-##  Prepare raw data if needed  ------------------------------------------------
-## check previous steps
-if (
-    file.exists(raw_input_data) == FALSE |
-    file.mtime(raw_input_data) < file.mtime("./DHI_GHI_0_variables.R") |
-    file.mtime(raw_input_data) < file.mtime("./DHI_GHI_00_raw_data.R")
-) {
-    source("./DHI_GHI_00_raw_data.R")
-    dummy <- gc()
-}
-
-## check current steps
-if (
-    file.exists(I3_trendsconsist) == FALSE |
-    file.mtime(I3_trendsconsist) < file.mtime("./DHI_GHI_03_Input_consistency.R")
-) {
-    cat(paste("\n Have to create trends consistency data\n\n"))
-} else {
-    cat(paste("\n trends consistency data are ready\n\n"))
-    cond = structure(list(message = "trends consistency data are ready"),
-                     class = c("exit", "condition"))
-    signalCondition(cond)
-    stop("Normal to exit here ")
-}
-
-##  Load raw data  -------------------------------------------------------------
-DATA_all   <- readRDS(raw_input_data)
-DATA_Clear <- DATA_all[TYPE == "Clear"]
-DATA_Cloud <- DATA_all[TYPE == "Cloud"]
-
-DATA_all  [, TYPE := NULL]
-DATA_Clear[, TYPE := NULL]
-DATA_Cloud[, TYPE := NULL]
-
-
-
-
-# ......................................................................... ----
-####  3. Consistency of trends  ################################################
 
 ## _ Monthly means by SZA prenoon month  ---------------------------------------
 
@@ -174,22 +125,6 @@ CLOUD_3_monthly_mean <- data.table(rbind(data.frame(CLOUD_3_monthly_meanB),
 rm(CLOUD_3_monthly_meanA, CLOUD_3_monthly_meanB)
 CLOUD_3_monthly_mean[, Date := as.Date(paste(Year, Month, 1), "%Y %m %d") ]
 
-## _ Margin of error calculation  ----------------------------------------------
-conf_param  <- 1 - ( 1 - Monthly_confidence_limit ) / 2
-suppressWarnings({
-    ALL_3_monthly_mean[,  DIR_att_EM   :=qt(conf_param,df=DIR_att_N -1)* DIR_att_sd   /sqrt(DIR_att_N)]
-    ALL_3_monthly_mean[,  HOR_att_EM   :=qt(conf_param,df=HOR_att_N -1)* HOR_att_sd   /sqrt(HOR_att_N)]
-    ALL_3_monthly_mean[,  GLB_att_EM   :=qt(conf_param,df=GLB_att_N -1)* GLB_att_sd   /sqrt(GLB_att_N)]
-    ALL_3_monthly_mean[,  DIR_transp_EM:=qt(conf_param,df=DIR_att_N -1)* DIR_transp_sd/sqrt(DIR_att_N)]
-    CLEAR_3_monthly_mean[,DIR_att_EM   :=qt(conf_param,df=DIR_att_N -1)* DIR_att_sd   /sqrt(DIR_att_N)]
-    CLEAR_3_monthly_mean[,HOR_att_EM   :=qt(conf_param,df=HOR_att_N -1)* HOR_att_sd   /sqrt(HOR_att_N)]
-    CLEAR_3_monthly_mean[,GLB_att_EM   :=qt(conf_param,df=GLB_att_N -1)* GLB_att_sd   /sqrt(GLB_att_N)]
-    CLEAR_3_monthly_mean[,DIR_transp_EM:=qt(conf_param,df=DIR_att_N -1)* DIR_transp_sd/sqrt(DIR_att_N)]
-    CLOUD_3_monthly_mean[,DIR_att_EM   :=qt(conf_param,df=DIR_att_N -1)* DIR_att_sd   /sqrt(DIR_att_N)]
-    CLOUD_3_monthly_mean[,HOR_att_EM   :=qt(conf_param,df=HOR_att_N -1)* HOR_att_sd   /sqrt(HOR_att_N)]
-    CLOUD_3_monthly_mean[,GLB_att_EM   :=qt(conf_param,df=GLB_att_N -1)* GLB_att_sd   /sqrt(GLB_att_N)]
-    CLOUD_3_monthly_mean[,DIR_transp_EM:=qt(conf_param,df=DIR_att_N -1)* DIR_transp_sd/sqrt(DIR_att_N)]
-})
 
 ## _ Exclude means with less than Monthly_aggegation_N_lim data points ---------
 ALL_3_monthly_mean[   DIR_att_N <= Monthly_aggegation_N_lim, DIR_att       := NA]
