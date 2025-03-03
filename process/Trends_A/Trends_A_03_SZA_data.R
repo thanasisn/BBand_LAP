@@ -528,6 +528,198 @@ for (DBn in dbs) {
 }
 
 
+##  Daily deseasonalized values by season of year  -----------------------------
+#'
+#' \FloatBarrier
+#' \newpage
+#'
+#' # Create daily climatology data and anomaly by season of year
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(grep("Trend_A_SZA_DAILY_", dbListTables(con), value = TRUE))
+for (DBn in dbs) {
+  DATA <- tbl(con, DBn)
+  DATA <- DATA |> select(-contains("_seas"))
+  vars <- sort(DATA |> select(ends_with("_mean")) |> colnames())
+
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Season of year daily deseasonal", var_name(DBn), "\n\n"))
+
+  ## __ Compute daily climatology by season  -----------------------------------
+  SEAS <- DATA |>
+    group_by(
+      Season,
+      SZA,
+      preNoon,
+      DOY
+    ) |>
+    summarise(
+      Seas_N = n(),
+      ## get the totals of data in each mean
+      across(
+        .cols = ends_with(c("_NAs", "_N")),
+        .fns  = list(
+          seas_total = ~ sum(.x, na.rm = TRUE)
+        )
+      ),
+      ## create climatology for each mean
+      across(
+        .cols = ends_with("_mean"),
+        .fns  = list(
+          seas     = ~ mean(.x, na.rm = TRUE),
+          seas_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE),
+          seas_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE)
+        )
+      )
+    ) |> collect() |> data.table()
+
+#   ## Plot seasonal climatology values
+#   p <- SEAS |> select(Season,
+#                       !starts_with("TSI") &
+#                         ends_with(c("trnd_A_mean_seas"))) |>
+#     arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
+#     melt(id.vars = "Season", variable.name = "Radiation")  |>
+#     ggplot(aes(x = Season, y = value)) +
+#     geom_point( aes(colour = Radiation)) +
+#     geom_line(  aes(colour = Radiation, group = Radiation)) +
+#     geom_smooth(aes(colour = Radiation), method = "loess", formula = "y ~ x") +
+#     labs(subtitle = paste("Season climatology for ", var_name(DBn)),
+#          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
+#     theme_bw()
+#   show(p)
+
+  ## __ Create deseasonal anomaly  ---------------------------------------------
+  DATA <- left_join(
+    DATA,
+    SEAS,
+    by = c(
+      "Season",
+      "DOY",
+      "SZA",
+      "preNoon"
+    ),
+    copy = TRUE
+  ) |> collect() |> data.table()
+
+  for (av in vars) {
+    cat("Compute anomaly by season for ", av, "\n\n")
+
+    climavar <- paste0(av, "_seas")
+    anomvar  <- paste0(av, "_seasanom")
+
+    DATA <- DATA |> mutate(
+      !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
+      Decimal_date := decimal_date(Day)
+    ) |> collect()
+
+    ## protect database numeric type
+    DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
+    DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
+   }
+
+  ## Store daily anomaly data
+  if (Sys.info()["nodename"] == Main.Host) {
+    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
+  }
+}
+
+
+
+
+##  Monthly deseasonalized values by season of year  ---------------------------
+#'
+#' \FloatBarrier
+#' \newpage
+#'
+#' # Create monthly climatology data and anomaly by season of year
+#'
+#+ include=T, echo=T, results="asis", warning=FALSE
+dbs <- sort(grep("Trend_A_SZA_MONTHLY_", dbListTables(con), value = TRUE))
+for (DBn in dbs) {
+  DATA <- tbl(con, DBn)
+  DATA <- DATA |> select(-contains("_seas"))
+  vars <- sort(DATA |> select(ends_with("_mean_mean")) |> colnames())
+
+  cat("\n\\FloatBarrier\n\n")
+  cat(paste("\n## Season of year daily deseasonal", var_name(DBn), "\n\n"))
+
+  ## __ Compute monthly climatology by season  ---------------------------------
+  SEAS <- DATA |>
+    group_by(
+      Season,
+      SZA,
+      preNoon,
+      Month
+    ) |>
+    summarise(
+      Seas_N = n(),
+      ## get the totals of data in each mean
+      across(
+        .cols = ends_with(c("_NAs", "_N")),
+        .fns  = list(
+          seas_total = ~ sum(.x, na.rm = TRUE)
+        )
+      ),
+      ## create climatology for each mean
+      across(
+        .cols = ends_with("_mean_mean"),
+        .fns  = list(
+          seas     = ~ mean(.x, na.rm = TRUE),
+          seas_NAs = ~ sum(case_match( is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE),
+          seas_N   = ~ sum(case_match(!is.na(.x), TRUE ~ 1L, FALSE ~ 0L), na.rm = TRUE)
+        )
+      )
+    ) |> collect() |> data.table()
+
+#   ## Plot seasonal climatology values
+#   p <- SEAS |> select(Season,
+#                       !starts_with("TSI") &
+#                         ends_with(c("trnd_A_mean_seas"))) |>
+#     arrange(match(Season, c("Winter", "Spring", "Summer", "Autumn"))) |>
+#     melt(id.vars = "Season", variable.name = "Radiation")  |>
+#     ggplot(aes(x = Season, y = value)) +
+#     geom_point( aes(colour = Radiation)) +
+#     geom_line(  aes(colour = Radiation, group = Radiation)) +
+#     geom_smooth(aes(colour = Radiation), method = "loess", formula = "y ~ x") +
+#     labs(subtitle = paste("Season climatology for ", var_name(DBn)),
+#          y        = bquote(.("Irradiance") ~ ~ group("[", W/m^2, "]"))) +
+#     theme_bw()
+#   show(p)
+
+  ## __ Create deseasonal anomaly  ---------------------------------------------
+  DATA <- left_join(
+    DATA,
+    SEAS,
+    by = c(
+      "Season",
+      "Month",
+      "SZA",
+      "preNoon"
+    ),
+    copy = TRUE
+  ) |> collect() |> data.table()
+
+  for (av in vars) {
+    cat("Compute anomaly by season for ", av, "\n\n")
+
+    climavar <- paste0(av, "_seas")
+    anomvar  <- paste0(av, "_seasanom")
+
+    DATA <- DATA |> mutate(
+      !!anomvar := 100 * (get(av) - get(climavar)) / get(climavar),
+      Decimal_date := decimal_date(Day)
+    ) |> collect()
+
+    ## protect database numeric type
+    DATA[get(anomvar) >  9999, eval(anomvar) :=  9999]
+    DATA[get(anomvar) < -9999, eval(anomvar) := -9999]
+   }
+
+  ## Store daily anomaly data
+  if (Sys.info()["nodename"] == Main.Host) {
+    res <- update_table(con, DATA, DBn, "Day", quiet = TRUE)
+  }
+}
 
 
 #+ Clean_exit, echo=FALSE
