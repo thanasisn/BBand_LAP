@@ -141,12 +141,20 @@ for (DBn in dbs) {
     #   pp[get(av) > 0, .(posSum = cumsum(get(av))), by = .(year = Decimal_date %/% 1) ],
     #   by = "year", all = TRUE
     # )
-    pp[get(av) > 0, posSum := cumsum(tidyr::replace_na(get(av), 0)) ]
-    pp[get(av) < 0, negSum := cumsum(tidyr::replace_na(get(av), 0)) ]
+    pp[get(av) > 0, posSum := cumsum(tidyr::replace_na(get(av), 0))]
+    pp[get(av) < 0, negSum := cumsum(tidyr::replace_na(get(av), 0))]
+
+
+    setnafill(pp, "locf", cols = c("negSum", "posSum"))
 
     p <- ggplot(pp, aes(x = Decimal_date)) +
       geom_line(aes(y =   posSum), col = "blue") +
       geom_line(aes(y = - negSum), col = "red") +
+      theme_bw()
+    print(p)
+
+    p <- ggplot(pp, aes(x = Decimal_date)) +
+      geom_line(aes(y = -posSum/negSum), col = "cyan") +
       theme_bw()
     print(p)
 
@@ -160,7 +168,6 @@ for (DBn in dbs) {
       ylab("Year Sum") +
       theme_bw()
     print(p)
-
 
   }
 
