@@ -9,7 +9,6 @@ ERR_FILE="$ldir/$(basename "$0")_$(date +%F_%R).err"
 exec  > >(tee -i "${LOG_FILE}")
 exec 2> >(tee -i "${ERR_FILE}" >&2)
 
-
 ##  Run rsync if mounted  ------------------------------------------------------
 SOURCE="/media/sirena_lapdata_ro"
 if mountpoint -q "$SOURCE" ; then
@@ -60,50 +59,6 @@ for from in "${folders[@]}"; do
 done
 
 
-
-# echo "- - - - - - - - - - - - - - - - - - - -"
-# echo "Get signal files 'LAP' of CM-21 global"
-# rsync -arvth                                   \
-#     --include '*/'                             \
-#     --include '*.LAP'                          \
-#     --include '*.lap'                          \
-#     --include '*.ori'                          \
-#     --exclude '*'                              \
-#     "$SOURCE/archive/Bband/AC21_LAP.GLB/"      \
-#     "$HOME/DATA_RAW/Bband/AC21_LAP.GLB"
-# 
-# echo "- - - - - - - - - - - - - - - - - - - -"
-# echo "Get signal files 'LAP' of CM-21 inclined"
-# rsync -arvth                                   \
-#     --include '*/'                             \
-#     --include '*.LAP'                          \
-#     --include '*.lap'                          \
-#     --include '*.ori'                          \
-#     --exclude '*'                              \
-#     "$SOURCE/archive/Bband/CM21_LAP.INC/"      \
-#     "$HOME/DATA_RAW/Bband/CM21_LAP.INC"
-# 
-# echo "- - - - - - - - - - - - - - - - - - - -"
-# echo "Get signal files 'LAP' of ECO UVA? inclined"
-# rsync -arvth                                   \
-#     --include '*/'                             \
-#     --include '*.LAP'                          \
-#     --include '*.lap'                          \
-#     --include '*.ori'                          \
-#     --exclude '*'                              \
-#     "$SOURCE/archive/Bband/EKO_LAP.GLB/"       \
-#     "$HOME/DATA_RAW/Bband/EKO_LAP.GLB"
-# 
-# echo "- - - - - - - - - - - - - - - - - - - -"
-# echo "Get CHP1 signal files"
-# rsync -arvth                                   \
-#     "$SOURCE/archive/Bband/CHP1_lap.DIR/"      \
-#     "$HOME/DATA_RAW/Bband/CHP1_lap.DIR"
-
-
-
-
-
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "Get total radiation files 'TOT.DAT'"
 rsync -arvth                                 \
@@ -131,8 +86,8 @@ rsync -arvth                                 \
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "get Brewer files"
-rsync -arvth -u                                \
-  "$SOURCE/products/Dsc"                       \
+rsync -arvth -u                              \
+  "$SOURCE/products/Dsc"                     \
   "$HOME/DATA_RAW/Brewer_005"
 
 
@@ -152,25 +107,25 @@ rsync -arvth                                \
 
 ##  Commit data to github to preserve manual edits  ----------------------------
 folders=(
-    "$HOME/DATA_RAW/Bband"
-    "$HOME/DATA_RAW/tracker_chp1"
-    "$HOME/DATA_RAW/Raddata"
+  "$HOME/DATA_RAW/Bband"
+  "$HOME/DATA_RAW/tracker_chp1"
+  "$HOME/DATA_RAW/Raddata"
 )
 
 for i in "${folders[@]}"; do
-    echo
-    [ ! -d "$i" ] && echo "Not a folder: $i" && continue
-    ## get into the git folder
-    cd "$i" || return
-    pwd
-    ## add files we care about
-    find . -type f -not -path '*/\.git/*' -print0 |\
-           xargs -0 git add -f
-    ## commit and push
-    git commit -uno -a -m "Commit $(date +'%F %R')"
-    git push -f
-    git push --tag
-    git maintenance run --auto
+  echo
+  [ ! -d "$i" ] && echo "Not a folder: $i" && continue
+  ## get into the git folder
+  cd "$i" || return
+  pwd
+  ## add files we care about
+  find . -type f -not -path '*/\.git/*' -print0 |\
+         xargs -0 git add -f
+  ## commit and push
+  git commit -uno -a -m "Commit $(date +'%F %R')"
+  git push -f
+  git push --tag
+  git maintenance run --auto
 done
 
 ##  Incremental copy in case of deleted files from source location  ------------
