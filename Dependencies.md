@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-03-05 
+At: 2025-03-06 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -14,7 +14,7 @@ At: 2025-03-05
        lubridate:  1.9.4   
            tools:  4.2.3   
               fs:  1.6.5   
-          pander:  0.6.5   
+          pander:  0.6.6   
          stringr:  1.5.1   
              zoo:  1.8.13  
            arrow:  19.0.1  
