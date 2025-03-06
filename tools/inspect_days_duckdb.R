@@ -17,13 +17,11 @@ sink(file   = paste0("~/BBand_LAP/REPORTS/LOGs/", basename(sub("\\.R$", ".log", 
 ## plot async
 ## plot sun
 
-
 library(duckdb,     quietly = T, warn.conflicts = F)
 library(data.table, quietly = T, warn.conflicts = F)
 library(dplyr,      quietly = T, warn.conflicts = F)
 library(optparse,   quietly = T, warn.conflicts = F)
 library(plotly,     quietly = T, warn.conflicts = F)
-
 
 source("~/BBand_LAP/functions/Functions_CHP1.R")
 source("~/BBand_LAP/functions/Functions_CM21.R")
@@ -70,6 +68,7 @@ if (!all((ranges_CM21$Until - ranges_CM21$From) >= 1)) {
 ## use a user-data-dir to avoid load my custom colors
 BROWSER_CMD <- "brave-browser  --password-store=basic --window-size=1240,720 --user-data-dir=/tmp/bravetmp --incognito -app=file://"
 BROWSER_CMD <- "firefox  --password-store=basic --window-size=1240,720 --user-data-dir=/tmp/bravetmp --incognito -app=file://"
+# BROWSER_CMD <- "librewolf  --password-store=basic --window-size=1240,720 --user-data-dir=/tmp/bravetmp --incognito -app=file://"
 ## --
 
 
