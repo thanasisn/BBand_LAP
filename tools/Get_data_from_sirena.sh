@@ -58,14 +58,12 @@ for from in "${folders[@]}"; do
     "$target"
 done
 
-
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "Get total radiation files 'TOT.DAT'"
 rsync -arvth                                 \
   --delete                                   \
   "$SOURCE/products/Bband/AC21_lap.GLB/"     \
   "$HOME/DATA/cm21_data_validation/AC21_lap.GLB_TOT"
-
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "get other relative files"
@@ -89,7 +87,6 @@ echo "get Brewer files"
 rsync -arvth -u                              \
   "$SOURCE/products/Dsc"                     \
   "$HOME/DATA_RAW/Brewer_005"
-
 
 echo "- - - - - - - - - - - - - - - - - - - -"
 echo "get Sky camera files"
@@ -129,9 +126,9 @@ for i in "${folders[@]}"; do
 done
 
 ##  Incremental copy in case of deleted files from source location  ------------
-rsync -ar --exclude='.git/' "$HOME/DATA_RAW/Bband/"        "$HOME/DATA_RAW/.Bband_capture"
-rsync -ar --exclude='.git/' "$HOME/DATA_RAW/tracker_chp1/" "$HOME/DATA_RAW/.tracker_chp1_capture"
-rsync -ar --exclude='.git/' "$HOME/DATA_RAW/Raddata"       "$HOME/DATA_RAW/.Raddata"
+# rsync -ar --exclude='.git/' "$HOME/DATA_RAW/Bband/"        "$HOME/DATA_RAW/.Bband_capture"
+# rsync -ar --exclude='.git/' "$HOME/DATA_RAW/tracker_chp1/" "$HOME/DATA_RAW/.tracker_chp1_capture"
+# rsync -ar --exclude='.git/' "$HOME/DATA_RAW/Raddata"       "$HOME/DATA_RAW/.Raddata"
 
 echo
 echo "  ---------------------"
