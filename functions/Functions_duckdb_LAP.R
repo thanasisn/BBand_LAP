@@ -15,6 +15,7 @@ is_whole <- function(x) {
 }
 
 
+
 #' Give an appropriate duckdb data type, for this project
 #'
 #' @param column  An R column or vector or scalar
@@ -109,9 +110,6 @@ create_missing_columns <- function(con, new_data, table, quiet = TRUE) {
 
 
 
-
-
-
 #' Create a null column even if it already exists
 #'
 #' @param con      A connection to duckdb
@@ -141,7 +139,6 @@ make_null_column <- function(con, table, acolname, acoltype = "DECIMAL(18, 14)")
 
 
 
-#'
 #' Create a new column with a data type in a duckdb table
 #'
 #' @param con      Connection to the database
@@ -240,7 +237,6 @@ remove_column <- function(con, table, acolname) {
 
 
 
-#'
 #' Modifies existing rows. Key values in `new_data` must be unique, and,
 #' by default, key values in `new_data` must exist in `con`.
 #'
@@ -275,7 +271,6 @@ update_table <- function(con, new_data, table, matchvar, quiet = FALSE) {
 
 
 
-#'
 #' Adds new rows. By default, key values in `new_data` must not exist in `con`.
 #'
 #' @param con      A connection to a duckdb
@@ -309,7 +304,6 @@ insert_table <- function(con, new_data, table, matchvar, quiet = FALSE) {
 
 
 
-#'
 #' inserts or updates depending on whether or not the key value in `new_data`
 #' already exists in `con`. Key values in `new_data` must be unique.
 #'
@@ -403,6 +397,8 @@ status_msg <- function(
   )
 }
 
+
+
 ## test data types  ----------------------------------------------
 if (FALSE) {
 
@@ -419,7 +415,6 @@ if (FALSE) {
     cat(ac, duckdb_datatypes( test[[ac]] ),"\n")
   }
 
-
   helper <- function(c=1, ...) {
     if (!exists(quiet)) quiet = T
     cat("Q1", quiet,"\n")
@@ -431,7 +426,6 @@ if (FALSE) {
 
     # return(list(...))
   }
-
 
   important(1, quiet = F)
   helper()
