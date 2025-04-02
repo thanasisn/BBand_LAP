@@ -16,7 +16,7 @@ library(rmarkdown)
 run_days <- 10
 
 ## Get shell arguments
-args <- commandArgs( trailingOnly = TRUE )
+args <- commandArgs(trailingOnly = TRUE)
 ## Override run condition from shell
 FORCE <- FALSE
 if (length(args) > 0) {
