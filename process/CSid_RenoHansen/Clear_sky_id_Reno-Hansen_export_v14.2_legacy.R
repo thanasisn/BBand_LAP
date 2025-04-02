@@ -40,11 +40,9 @@
 #'
 #' ## DETECTION OF CLEAR PERIODS IN GHI AND DNI MEASUREMENTS
 #'
-#' Use the optimized alpha for the selected models and identify Clear-Sky
-#' minutes.
+#' Export flags
 #'
-#' This is just an application of the old implementation
-#'
+
 
 #+ include=F
 ## __ Document options  --------------------------------------------------------
@@ -97,52 +95,9 @@ library(yardstick,    warn.conflicts = FALSE, quietly = TRUE)
 library(rlang,        warn.conflicts = FALSE, quietly = TRUE)
 
 
-## some plot configs ####
-def.par <- par(no.readonly = TRUE) # save default, for resetting...
-kcols   <- brewer.pal(11, "Set3")
-
-##  Data walk function  --------------------------------------------------------
-walk <- function(i, nt_hw, tot_p) {
-  if (i <= nt_hw) {
-    w_sta <<- 1
-    w_end <<- i + nt_hw
-  } else if ( i >= tot_p - nt_hw ) {
-    w_sta <<- i - nt_hw
-    w_end <<- tot_p
-  } else {
-    w_sta <<- i - nt_hw
-    w_end <<- i + nt_hw
-  }
-}
-
-
-## Use monthly optimization of models
-# MONTHLY     <- T
-MONTHLY     <- FALSE
-TEST        <- FALSE
-# TEST        <- TRUE
-
-SAMPLE_DAYS <- 20  ## The total number of days to sample from data
-START_DAY   <- "1993-01-01"
-END_DAY     <- Sys.Date()
-
-if (TEST) {
-  warning("Test is active")
-  START_DAY <- "2020-01-01"
-  END_DAY   <- "2022-12-31"
-}
-
-## load previous state have to override it for alpha to be used
-if (MONTHLY) {
-  load("~/BBand_LAP/SIDE_DATA/CSid_RenoHansen/model_opt/Combinations_results_m_2019-12-12_082356.Rds")
-} else {
-  load("~/BBand_LAP/SIDE_DATA/CSid_RenoHansen/model_opt/Combinations_results_2022-06-14_153313.Rds")
-}
-
-
 
 ##  Load all data from duckdb  -------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_BROAD))
+con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 DATA <- tbl(con, "LAP")
 EXP  <- DATA |> select(Date, year, starts_with("CS") & contains("flag"), SKY)
@@ -155,9 +110,6 @@ for (ay in yearstoexp) {
   efile <- paste0("/home/athan/BBand_LAP/REPORTS/EXPORTS/", "CSRHv14_2_", ay)
   write_dat(tmp, efile)
 }
-
-
-stop()
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
