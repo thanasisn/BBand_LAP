@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-03-31 
+At: 2025-04-04 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -23,7 +23,7 @@ At: 2025-03-31
             doMC:  1.3.8   
          foreach:  1.5.2   
       reticulate:  1.42.0  
-            mgcv:  1.9.1   
+            mgcv:  1.9.3   
          RNetCDF:  2.9.2   
          formatR:  1.14    
          caTools:  1.18.3  
