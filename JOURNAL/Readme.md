@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Fri Mar 21 10:20:04 EET 2025 -->
+<!-- Added by: athan, at: Mon Apr  7 11:20:14 EEST 2025 -->
 
 <!--te-->
 
@@ -1517,6 +1517,17 @@ A lot of brown dust
 
 
 
+## 2025-04-07 11:13 EEST [ThanasisN]
+
+Broadband and spectral instruments windows cleaning at
+
+11:05  --  11:07  LT
+
+11:05  --  11:07  UTC
+
+
+
+
 :::
 
 
@@ -1608,7 +1619,7 @@ New List of tags
       5 broadband
       1 ccd
      30 chp1
-     20 cleaning
+     21 cleaning
       1 clear_sky
      10 cm21
       1 data_corruption_certain

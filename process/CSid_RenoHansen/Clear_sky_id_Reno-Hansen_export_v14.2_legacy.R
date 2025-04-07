@@ -93,7 +93,7 @@ library(pander,       warn.conflicts = FALSE, quietly = TRUE)
 library(scales,       warn.conflicts = FALSE, quietly = TRUE)
 library(yardstick,    warn.conflicts = FALSE, quietly = TRUE)
 library(rlang,        warn.conflicts = FALSE, quietly = TRUE)
-
+library(tidyr,        warn.conflicts = FALSE, quietly = TRUE)
 
 
 ##  Load all data from duckdb  -------------------------------------------------
@@ -106,9 +106,33 @@ yearstoexp <- EXP |> select(year) |> distinct() |> pull()
 
 
 for (ay in yearstoexp) {
+
+  ## export to csv
   tmp <- EXP |> filter(year == ay) |> select(-year) |> collect() |> data.table()
+  setorder(tmp, Date)
   efile <- paste0("/home/athan/BBand_LAP/REPORTS/EXPORTS/", "CSRHv14_2_", ay)
   write_dat(tmp, efile)
+
+  ## export to matrix
+  tmp[, DOY    := yday(Date)]
+  tmp[, minute := 60 * hour(Date) + minute(Date) + 1 ]
+  tmp <- tmp[, .(DOY, minute, SKY)]
+
+  exp   <- dcast(tmp, minute ~ DOY, value.var = "SKY")
+  efile <- paste0("/home/athan/BBand_LAP/REPORTS/EXPORTS/", "CSRHv14_2_", ay, ".mat")
+
+
+  # matrix(exp)
+  # exp <- data.table(exp)
+  # write_dat(exp, efile, clean = TRUE)
+  write.table(exp, efile, col.names = T, row.names = F, )
+  write.ftable(exp, efile)
+
+  ftable(exp)
+  # ftable(exp)
+
+    stop("SS")
+
 }
 
 #+ Clean_exit, echo=FALSE
