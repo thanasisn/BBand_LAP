@@ -113,26 +113,15 @@ for (ay in yearstoexp) {
   efile <- paste0("/home/athan/BBand_LAP/REPORTS/EXPORTS/", "CSRHv14_2_", ay)
   write_dat(tmp, efile)
 
+
   ## export to matrix
+  ## FOR RADMON
   tmp[, DOY    := yday(Date)]
   tmp[, minute := 60 * hour(Date) + minute(Date) + 1 ]
-  tmp <- tmp[, .(DOY, minute, SKY)]
-
+  tmp   <- tmp[, .(DOY, minute, SKY)]
   exp   <- dcast(tmp, minute ~ DOY, value.var = "SKY")
   efile <- paste0("/home/athan/BBand_LAP/REPORTS/EXPORTS/", "CSRHv14_2_", ay, ".mat")
-
-
-  # matrix(exp)
-  # exp <- data.table(exp)
-  # write_dat(exp, efile, clean = TRUE)
-  write.table(exp, efile, col.names = T, row.names = F, )
-  write.ftable(exp, efile)
-
-  ftable(exp)
-  # ftable(exp)
-
-    stop("SS")
-
+  write.table(format(exp), efile, col.names = T, row.names = F, sep = "; ", quote = F)
 }
 
 #+ Clean_exit, echo=FALSE
