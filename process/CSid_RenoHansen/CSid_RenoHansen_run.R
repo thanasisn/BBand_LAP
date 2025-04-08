@@ -56,14 +56,14 @@ if (FORCE || as.numeric(Sys.Date()) %% run_days == 0)
 
 
 
-## run on the first of each month to include all of the previous
-if (FORCE || as.numeric(strftime(Sys.Date(), "%d")) == 1) {
-
-  ##  Run training  ------------------------------------------------------------
-  source("~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_01_alldata_optim_v15.R")
-  try({
-    rmarkdown::render(input      = "~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_01_alldata_optim_v15.R",
-                      output_dir = output_dir)
-  })
-
-}
+# ## run on the first of each month to include all of the previous
+# if (FORCE || as.numeric(strftime(Sys.Date(), "%d")) == 1) {
+#
+#   ##  Run training  ------------------------------------------------------------
+#   source("~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_01_alldata_optim_v15.R")
+#   try({
+#     rmarkdown::render(input      = "~/BBand_LAP/process/CSid_RenoHansen/CSid_RenoHansen_01_alldata_optim_v15.R",
+#                       output_dir = output_dir)
+#   })
+#
+# }

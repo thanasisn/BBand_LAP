@@ -120,8 +120,9 @@ for (ay in yearstoexp) {
   tmp[, minute := 60 * hour(Date) + minute(Date) + 1 ]
   tmp   <- tmp[, .(DOY, minute, SKY)]
   exp   <- dcast(tmp, minute ~ DOY, value.var = "SKY")
-  efile <- paste0("/home/athan/BBand_LAP/REPORTS/EXPORTS/", "CSRHv14_2_", ay, ".mat")
+  efile <- paste0("/media/raddata_cloud_flags/", "CSRHv14_2_", ay, ".mat")
   write.table(format(exp), efile, col.names = T, row.names = F, sep = "; ", quote = F)
+
 }
 
 #+ Clean_exit, echo=FALSE
