@@ -100,10 +100,12 @@ library(tidyr,        warn.conflicts = FALSE, quietly = TRUE)
 con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 DATA <- tbl(con, "LAP")
-EXP  <- DATA |> select(Date, year, starts_with("CS") & contains("flag"), SKY)
+
+## Fix data version to use!!!
+EXP  <- DATA |> select(Date, year, starts_with("CSRHv14_2") & contains("flag"), SKY)
 
 yearstoexp <- EXP |> select(year) |> distinct() |> pull()
-
+yearstoexp <- sort(yearstoexp)
 
 for (ay in yearstoexp) {
 
@@ -119,10 +121,15 @@ for (ay in yearstoexp) {
   tmp[, DOY    := yday(Date)]
   tmp[, minute := 60 * hour(Date) + minute(Date) + 1 ]
   tmp   <- tmp[, .(DOY, minute, SKY)]
-  exp   <- dcast(tmp, minute ~ DOY, value.var = "SKY")
-  efile <- paste0("/media/raddata_cloud_flags/", "CSRHv14_2_", ay, ".mat")
-  write.table(format(exp), efile, col.names = T, row.names = F, sep = "; ", quote = F)
 
+  ##  Change flags to factors
+  tmp[SKY == "Clear", SKY := 0]
+  tmp[SKY == "Cloud", SKY := 1]
+  tmp[is.na(SKY),     SKY := 9]
+
+  exp   <- dcast(tmp, minute ~ DOY, value.var = "SKY")
+  efile <- paste0("/media/raddata_cloud_flags/", "CSRHv14_2_", ay, ".csv")
+  write.table(format(exp), efile, col.names = T, row.names = F, sep = ", ", quote = F)
 }
 
 #+ Clean_exit, echo=FALSE
