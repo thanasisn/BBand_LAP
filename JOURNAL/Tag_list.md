@@ -41,7 +41,7 @@ New List of tags
      12 data_loss
       2 down_time
       1 duckdb
-      4 error
+      5 error
       2 inclined
       4 leveling
      14 problem
@@ -51,5 +51,5 @@ New List of tags
       3 silica
       6 suspicious_data
       1 test
-      8 tracker
+      9 tracker
       1 works

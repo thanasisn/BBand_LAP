@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Thu Apr 24 11:40:04 EEST 2025 -->
+<!-- Added by: athan, at: Tue Apr 29 09:20:05 EEST 2025 -->
 
 <!--te-->
 
@@ -1540,6 +1540,19 @@ Broadband and spectral instruments windows cleaning at
 
 
 
+## 2025-04-29 08:58 EEST [ThanasisN]
+
+Tracker was not tracking at start of the day.
+
+Probably due to interference with the antivirus.
+
+Fixed after reboot.
+
+
+
+
+
+
 :::
 
 
@@ -1638,7 +1651,7 @@ New List of tags
      12 data_loss
       2 down_time
       1 duckdb
-      4 error
+      5 error
       2 inclined
       4 leveling
      14 problem
@@ -1648,5 +1661,5 @@ New List of tags
       3 silica
       6 suspicious_data
       1 test
-      8 tracker
+      9 tracker
       1 works
