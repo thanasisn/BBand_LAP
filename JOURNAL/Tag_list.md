@@ -35,6 +35,7 @@ New List of tags
       1 ccd
      30 chp1
      22 cleaning
+      1 cleanning
       1 clear_sky
      10 cm21
       1 data_corruption_certain

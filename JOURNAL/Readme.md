@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Tue Apr 29 09:20:05 EEST 2025 -->
+<!-- Added by: athan, at: Wed May  7 10:00:08 EEST 2025 -->
 
 <!--te-->
 
@@ -1553,6 +1553,17 @@ Fixed after reboot.
 
 
 
+## 2025-05-07 09:46 EEST [ThanasisN]
+
+Clean broadband and spectral instruments at 
+
+09:38  --  09:40  LT
+
+06:38  --  06:40  LT
+
+
+
+
 :::
 
 
@@ -1645,6 +1656,7 @@ New List of tags
       1 ccd
      30 chp1
      22 cleaning
+      1 cleanning
       1 clear_sky
      10 cm21
       1 data_corruption_certain
