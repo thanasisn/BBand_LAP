@@ -1,0 +1,2 @@
+~/LibRadTranG/Clear_sky_model_AERONET_monthly/LBT_PBS.sh NA atmosphere_file@@aattmmoo=NA.dat@source@@solar@@ssoollaa=NA.dat@@per_nm@albedo@@NA@pressure@@NA@sza@@NA@mol_modify@@O3@@NA@@DU@mol_modify@@H2O@@NA@@MM@aerosol_default@aerosol_angstrom@@NA@@NA@aerosol_modify@@ssa@@set@@NA@aerosol_modify@@gg@@set@@NA@mol_abs_param@@NA@rte_solver@@NA@NA@number_of_streams@@NA@wavelength@@NA@@NA@output_process@@integrate@quiet@
+~/LibRadTranG/Clear_sky_model_AERONET_monthly/LBT_PBS.sh aerosol_default@output_process@@integrate@quiet@

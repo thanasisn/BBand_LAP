@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-05-08 
+At: 2025-05-09 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -30,10 +30,11 @@ At: 2025-05-08
          janitor:  2.2.1   
          ggpmisc:  0.6.1   
             ggpp:  0.5.8.1 
-            base:  4.2.3   
+          pracma:  2.4.4   
     RColorBrewer:  1.1.3   
-           rlang:  1.1.6   
           scales:  1.4.0   
+            base:  4.2.3   
+           rlang:  1.1.6   
        yardstick:  1.3.2   
          metrica:  2.1.0   
            gdata:  3.0.1   
