@@ -102,7 +102,7 @@ META <- tbl(con, "META")
 #'
 #' - Only screened data
 #' - Sun above horizon
-#' - Sun above obsructions
+#' - Sun above obstructions
 #'
 #+ include=T, echo=T, results="asis"
 ##  Range of data ready to use  ------------------------------------------------
