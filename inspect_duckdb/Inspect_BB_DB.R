@@ -169,4 +169,4 @@ if (FORCE || as.numeric(Sys.Date()) %% run_days == 0)
 }
 
 cat("\n\nEND of inspecting the DB\n\n")
-i
+
