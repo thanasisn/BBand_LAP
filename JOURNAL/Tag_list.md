@@ -34,7 +34,7 @@ New List of tags
       5 broadband
       1 ccd
      30 chp1
-     22 cleaning
+     23 cleaning
       1 cleanning
       1 clear_sky
      10 cm21

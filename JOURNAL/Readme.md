@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Wed May  7 10:00:08 EEST 2025 -->
+<!-- Added by: athan, at: Wed May 28 11:20:04 EEST 2025 -->
 
 <!--te-->
 
@@ -1469,6 +1469,9 @@ Later in the noon we see through the camera people walking among the instruments
 
 ::: {.columns columngap=4em column-rule="1px solid black"}
 
+# 2025
+
+
 
 ## 2025-01-19 09:13 EET [ThanasisN]
 
@@ -1564,6 +1567,17 @@ Clean broadband and spectral instruments at
 
 
 
+## 2025-05-28 11:06 EEST [ThanasisN]
+
+Instruments windows cleaning at 
+
+10:45 -- 10:48 LT
+
+07:45 -- 07:48 UTC
+
+
+
+
 :::
 
 
@@ -1655,7 +1669,7 @@ New List of tags
       5 broadband
       1 ccd
      30 chp1
-     22 cleaning
+     23 cleaning
       1 cleanning
       1 clear_sky
      10 cm21
