@@ -15,7 +15,7 @@ under the [Data display](https://thanasisn.github.io/data_display.html) section.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Thu Jun 12 02:57:48 UTC 2025 -->
+<!-- Added by: athan, at: Fri Jun 13 02:58:03 UTC 2025 -->
 
 <!--te-->
 
@@ -31,7 +31,7 @@ under the [Data display](https://thanasisn.github.io/data_display.html) section.
 | Raw files hashes      |   927784 | 4.9 MiB |   3711136 |    4 |   100% |         1.4 |
 | **Total**             | 20073387 | 5.4 GiB | 1.158e+09 | 2049 |    NA% |        5.01 |
 
-Table: Datasets sizes on 2025-06-12
+Table: Datasets sizes on 2025-06-13
 
 
 
