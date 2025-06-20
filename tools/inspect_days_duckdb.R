@@ -81,7 +81,7 @@ INITDAY <- paste0(year(Sys.Date()), "-01-01")
 INISTEP <- 3
 
 ## TEST override start day
-INITDAY <- "2023-08-22"
+INITDAY <- "2025-01-11"
 INISTEP <- 1
 
 option_list <-  list(
@@ -197,14 +197,14 @@ for (ap in daystodo) {
   ## Direct with out dark on the fly
   fig <- add_trace(fig, x = gather$Date, y = gather$DIR_otf,
                    name = "Direct beam on-the-fly",
-                   line = list(color = "blue"),
+                   line = list(color = "cyan"),
                    text = paste(format(gather$Date, "%F %R"), "\n", "DBI F:", round(gather$DIR_otf, 1), " SZ:", round(gather$SZA, 1), "AZ:", round(gather$Azimuth, 1)),
                    hoverinfo = 'text',
                    mode = "lines", type = "scatter")
   ## Direct final product
   fig <- add_trace(fig, x = gather$Date, y = gather$DIR_wpsm,
                    name = "Direct beam Clean",
-                   line = list(color = "darkblue"),
+                   line = list(color = "lightblue"),
                    text = paste(format(gather$Date, "%F %R"),"\n","DBI C:", round(gather$DIR_wpsm, 1), " SZ:", round(gather$SZA, 1), "AZ:", round(gather$Azimuth, 1)),
                    hoverinfo = 'text',
                    mode = "lines", type = "scatter")
