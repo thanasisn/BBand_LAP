@@ -1,12 +1,12 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-06-20 
+At: 2025-06-21 
 
  R version 4.2.3 (2023-03-15) 
 
         bookdown:  0.43    
        rmarkdown:  2.29    
-      data.table:  1.17.4  
+      data.table:  1.17.6  
           dbplyr:  2.5.0   
            dplyr:  1.1.4   
           duckdb:  1.3.0   
@@ -51,4 +51,4 @@ At: 2025-06-20
             cloc:  0.3.5   
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
-          plotly:  4.10.4  
+          plotly:  4.11.0  
