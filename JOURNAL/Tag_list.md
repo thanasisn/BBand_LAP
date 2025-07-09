@@ -31,10 +31,10 @@ New List of tags
       1 CSid
       1 INCcm21
       1 brewers
-      5 broadband
+      6 broadband
       1 ccd
      30 chp1
-     23 cleaning
+     24 cleaning
       1 cleanning
       1 clear_sky
      10 cm21
