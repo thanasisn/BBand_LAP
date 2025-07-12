@@ -1,15 +1,15 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-07-06 
+At: 2025-07-12 
 
  R version 4.2.3 (2023-03-15) 
 
         bookdown:  0.43    
        rmarkdown:  2.29    
-      data.table:  1.17.6  
+      data.table:  1.17.8  
           dbplyr:  2.5.0   
            dplyr:  1.1.4   
-          duckdb:  1.3.0   
+          duckdb:  1.3.2   
            knitr:  1.50    
        lubridate:  1.9.4   
            tools:  4.2.3   
@@ -28,9 +28,9 @@ At: 2025-07-06
          formatR:  1.14    
          caTools:  1.18.3  
          janitor:  2.2.1   
-         ggpmisc:  0.6.1   
-            ggpp:  0.5.8.1 
-    directlabels:  2025.5.20
+         ggpmisc:  0.6.2   
+            ggpp:  0.5.9   
+    directlabels:  2025.6.24
          forcats:  1.0.0   
           pracma:  2.4.4   
     RColorBrewer:  1.1.3   
@@ -42,12 +42,12 @@ At: 2025-07-06
        yardstick:  1.3.2   
          metrica:  2.1.0   
            gdata:  3.0.1   
-          ggpubr:  0.6.0   
+          ggpubr:  0.6.1   
            Hmisc:  5.2.3   
           lmtest:  0.9.40  
        tidyquant:  1.0.11  
            akima:  0.6.3.6 
-           purrr:  1.0.4   
+           purrr:  1.1.0   
             cloc:  0.3.5   
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
