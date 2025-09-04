@@ -109,25 +109,33 @@ if (file.exists(parameter_fl)) {
 ncfiles <- list.files(CMIC_DIR, pattern = "_LAP.nc", full.names = TRUE)
 
 
+## create a flat description of data
+
 for (af in ncfiles) {
-
   nc <- nc_open(af)
-  print(nc)
 
-  ncatt_get(nc, "nominal_product_time")
-  ncvar_get(nc, "nominal_product_time")
+  # attributes(nc$dim)
+  # attributes(nc$var)
 
+  gatt <- ncatt_get(nc, 0)
 
-  attributes(nc$dim)
-  attributes(nc$var)
-  nc$fqgn2Rindex
+  cot <- ncvar_get(nc, "cmic_cot")
 
+  tmp <- data.table(
+    Date       = as.POSIXct(strptime(gatt$nominal_product_time, "%FT%R")),
+    Min_COT    = min(cot, na.rm = T),
+    Max_COT    = max(cot, na.rm = T),
+    Sum_COT    = sum(cot, na.rm = T),
+    Mean_COT   = mean(cot, na.rm = T),
+    Median_COT = median(cot, na.rm = T),
+    N          = length(cot),
+    N_valid    = sum(!is.na(cot))
+  )
+  DT <- rbind(DT, tmp)
 
-
-  stop("Dd")
 }
 
-
+saveRDS(DT, parameter_fl)
 
 
 
