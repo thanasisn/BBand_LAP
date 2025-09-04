@@ -120,3 +120,8 @@ DATA_TSIS <- "~/DATA/SUN/TSI_tsis_6hr.Rds"
 FROM_SORCE <- "https://lasp.colorado.edu/lisird/latis/dap/sorce_tsi_6hr_l3.csv?&format_time(yyyy-MM-dd'T'HH:mm:ss.SSSZ)"
 DEST_SORCE <- "~/DATA/SUN/TSI_sorce_6hr.csv"
 DATA_SORCE <- "~/DATA/SUN/TSI_sorce_6hr.Rds"
+
+
+## __ CMIC  --------------------------------------------------------------------
+CMIC_DIR <- "/home/folder/EUMETSAT/CMIC_output_LAP/"
+
