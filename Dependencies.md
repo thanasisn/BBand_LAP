@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-09-04 
+At: 2025-09-05 
 
  R version 4.2.3 (2023-03-15) 
 
@@ -30,6 +30,7 @@ At: 2025-09-04
          janitor:  2.2.1   
          ggpmisc:  0.6.2   
             ggpp:  0.5.9   
+           ncdf4:  1.24    
     directlabels:  2025.6.24
          forcats:  1.0.0   
           pracma:  2.4.4   
