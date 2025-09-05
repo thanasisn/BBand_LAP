@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Wed Jul  9 11:40:04 EEST 2025 -->
+<!-- Added by: athan, at: Fri Sep  5 10:20:09 EEST 2025 -->
 
 <!--te-->
 
@@ -1601,6 +1601,19 @@ Instruments windows cleaned at
 
 
 
+## 2025-09-05 10:01 EEST [ThanasisN]
+
+Instruments cleaning at
+
+09:53 -- 09:56 LT
+
+06:53 -- 06:56 UTC  
+
+Some instruments were very dirty
+
+
+
+
 :::
 
 
@@ -1689,10 +1702,10 @@ New List of tags
       1 CSid
       1 INCcm21
       1 brewers
-      6 broadband
+      7 broadband
       1 ccd
      30 chp1
-     24 cleaning
+     25 cleaning
       1 cleanning
       1 clear_sky
      10 cm21
