@@ -74,9 +74,10 @@ knitr::opts_chunk$set(tidy = TRUE,
 closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name  <- "~/BBand_LAP/process/Cloud_data/Read_CMIC.R"
-Script.ID    <- "C1"
-parameter_fl <- "~/BBand_LAP/SIDE_DATA/CMIC_data.Rds"
+Script.Name      <- "~/BBand_LAP/process/Cloud_data/Read_CMIC.R"
+Script.ID        <- "C1"
+parameter_fl_LAP <- "~/BBand_LAP/SIDE_DATA/CMIC_data_LAP.Rds"
+parameter_fl_glo <- "~/BBand_LAP/SIDE_DATA/CMIC_data_glo.Rds"
 
 if (!interactive()) {
     pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/",   basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -99,18 +100,23 @@ library(ncdf4,      warn.conflicts = FALSE, quietly = TRUE)
 
 
 ##  Variables  -----------------------------------------------------------------
-if (file.exists(parameter_fl)) {
-  DT <<- readRDS(parameter_fl)
+if (file.exists(parameter_fl_LAP)) {
+  DT_lap <<- readRDS(parameter_fl_LAP)
 } else {
-  DT <- data.table()
+  DT_lap <- data.table()
 }
 
+if (file.exists(parameter_fl_glo)) {
+  DT_glo <<- readRDS(parameter_fl_glo)
+} else {
+  DT_glo <- data.table()
+}
 
-ncfiles <- list.files(CMIC_DIR, pattern = "_LAP.nc", full.names = TRUE)
 
 
 ## create a flat description of data
 
+ncfiles <- list.files(CMIC_DIR, pattern = "_LAP.nc", full.names = TRUE)
 for (af in ncfiles) {
   nc <- nc_open(af)
 
@@ -131,13 +137,41 @@ for (af in ncfiles) {
     N          = length(cot),
     N_valid    = sum(!is.na(cot))
   )
-  DT <- rbind(DT, tmp)
+  DT_lap <- rbind(DT_lap, tmp)
 
 }
 
-saveRDS(DT, parameter_fl)
+saveRDS(DT_lap, parameter_fl_LAP)
 
 
+
+## create a flat description of data
+ncfiles <- list.files("/home/folder/EUMETSAT/CMIC_output/", pattern = ".nc", full.names = TRUE)
+for (af in ncfiles) {
+  nc <- nc_open(af)
+
+  # attributes(nc$dim)
+  # attributes(nc$var)
+
+  gatt <- ncatt_get(nc, 0)
+
+  cot <- ncvar_get(nc, "cmic_cot")
+
+  tmp <- data.table(
+    Date       = as.POSIXct(strptime(gatt$nominal_product_time, "%FT%R")),
+    Min_COT    = min(cot, na.rm = T),
+    Max_COT    = max(cot, na.rm = T),
+    Sum_COT    = sum(cot, na.rm = T),
+    Mean_COT   = mean(cot, na.rm = T),
+    Median_COT = median(cot, na.rm = T),
+    N          = length(cot),
+    N_valid    = sum(!is.na(cot))
+  )
+  DT_glo <- rbind(DT_glo, tmp)
+
+}
+
+saveRDS(DT_glo, parameter_fl_LAP)
 
 
 
