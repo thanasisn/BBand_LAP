@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-10-08 
+At: 2025-10-09 
 
  R version 4.5.0 (2025-04-11) 
 
@@ -44,7 +44,7 @@ At: 2025-10-08
          metrica:  2.1.0   
            gdata:  3.0.1   
           ggpubr:  0.6.1   
-           Hmisc:  5.2.3   
+           Hmisc:  5.2.4   
           lmtest:  0.9.40  
        tidyquant:  1.0.11  
            akima:  0.6.3.6 
