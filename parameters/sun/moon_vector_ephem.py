@@ -18,11 +18,11 @@ def moon_sky_parameters(date, lat, lon, height = 0):
     """
 
     # Create observer
-    observer = ephem.Observer()
-    observer.lat = str(lat)
-    observer.lon = str(lon)
+    observer           = ephem.Observer()
+    observer.lat       = str(lat)
+    observer.lon       = str(lon)
     observer.elevation = height
-    observer.date = date
+    observer.date      = date
 
     # Calculate Sun position
     sun = ephem.Sun()
