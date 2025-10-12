@@ -2,17 +2,16 @@
 import math
 from   datetime import datetime, timezone
 import ephem
-import pytz
 
-def moon_sky_parameters(date, latitude, longitude, altitude=0):
+def moon_sky_parameters(date, lat, lon, height = 0):
     """
     Calculate elevation, azimuth, and lunar phase for given date and location.
 
     Parameters:
-    - date: datetime object (UTC timezone)
-    - latitude: float, degrees North (+), South (-)
-    - longitude: float, degrees East (+), West (-)
-    - altitude: float, meters above sea level (default: 0)
+    - date:   datetime object (UTC timezone)
+    - lat:    float, degrees North (+), South (-)
+    - lon:    float, degrees East (+), West (-)
+    - height: float, meters above sea level (default: 0)
 
     Returns:
     - dict: Contains sun/moon elevation, azimuth, and lunar phase
@@ -20,9 +19,9 @@ def moon_sky_parameters(date, latitude, longitude, altitude=0):
 
     # Create observer
     observer = ephem.Observer()
-    observer.lat = str(latitude)
-    observer.lon = str(longitude)
-    observer.elevation = altitude
+    observer.lat = str(lat)
+    observer.lon = str(lon)
+    observer.elevation = height
     observer.date = date
 
     # Calculate Sun position
@@ -72,9 +71,9 @@ def moon_sky_parameters(date, latitude, longitude, altitude=0):
             'phase_name': phase_name
         },
         'observer': {
-            'latitude':  latitude,
-            'longitude': longitude,
-            'altitude':  altitude,
+            'latitude':  lat,
+            'longitude': lon,
+            'altitude':  height,
             'date_utc':  date.strftime('%Y-%m-%d %H:%M:%S UTC')
         }
     }
