@@ -78,25 +78,26 @@ def moon_sky_parameters(date, lat, lon, height = 0):
         }
     }
 
+
 # Example usage
-if __name__ == "__main__":
-    date_utc  = datetime.now(timezone.utc)
-    latitude  = 40.5954
-    longitude = 22.9863
-    altitude  = 10  # meters
-
-    result = moon_sky_parameters(date_utc, latitude, longitude, altitude)
-
-    print("")
-    print("Sky Parameters:")
-    print(f"Date:     {result['observer']['date_utc']}")
-    print(f"Location: {result['observer']['latitude']:.4f}°, {result['observer']['longitude']:.4f}°")
-    print(f"Altitude: {result['observer']['altitude']} m")
-    print("\nSun:")
-    print(f"  Elevation: {result['sun']['elevation']:.2f}°")
-    print(f"  Azimuth:   {result['sun']['azimuth']:.2f}°")
-    print("\nMoon:")
-    print(f"  Elevation: {result['moon']['elevation']:.2f}°")
-    print(f"  Azimuth:   {result['moon']['azimuth']:.2f}°")
-    print(f"  Phase:     {result['moon']['phase']:.3f} ({result['moon']['phase_name']})")
-    print("")
+# if __name__ == "__main__":
+#     date_utc  = datetime.now(timezone.utc)
+#     latitude  = 40.5954
+#     longitude = 22.9863
+#     altitude  = 10  # meters
+#
+#     result = moon_sky_parameters(date_utc, latitude, longitude, altitude)
+#
+#     print("")
+#     print("Sky Parameters:")
+#     print(f"Date:     {result['observer']['date_utc']}")
+#     print(f"Location: {result['observer']['latitude']:.4f}°, {result['observer']['longitude']:.4f}°")
+#     print(f"Altitude: {result['observer']['altitude']} m")
+#     print("\nSun:")
+#     print(f"  Elevation: {result['sun']['elevation']:.2f}°")
+#     print(f"  Azimuth:   {result['sun']['azimuth']:.2f}°")
+#     print("\nMoon:")
+#     print(f"  Elevation: {result['moon']['elevation']:.2f}°")
+#     print(f"  Azimuth:   {result['moon']['azimuth']:.2f}°")
+#     print(f"  Phase:     {result['moon']['phase']:.3f} ({result['moon']['phase_name']})")
+#     print("")
