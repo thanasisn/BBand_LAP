@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-10-22 
+At: 2025-10-24 
 
  R version 4.5.0 (2025-04-11) 
 
@@ -9,7 +9,7 @@ At: 2025-10-22
       data.table:  1.17.8  
           dbplyr:  2.5.1   
            dplyr:  1.1.4   
-          duckdb:  1.4.0   
+          duckdb:  1.4.1   
            knitr:  1.50    
        lubridate:  1.9.4   
            tools:  4.5.0   
@@ -33,7 +33,7 @@ At: 2025-10-22
            ncdf4:  1.24    
     directlabels:  2025.6.24
          forcats:  1.0.1   
-          pracma:  2.4.4   
+          pracma:  2.4.6   
     RColorBrewer:  1.1.3   
           digest:  0.6.37  
         filelock:  1.0.3   
@@ -43,7 +43,7 @@ At: 2025-10-22
        yardstick:  1.3.2   
          metrica:  2.1.0   
            gdata:  3.0.1   
-          ggpubr:  0.6.1   
+          ggpubr:  0.6.2   
            Hmisc:  5.2.4   
           lmtest:  0.9.40  
        tidyquant:  1.0.11  
