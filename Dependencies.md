@@ -22,7 +22,7 @@ At: 2025-10-26
          ggplot2:  4.0.0   
             doMC:  1.3.8   
          foreach:  1.5.2   
-      reticulate:  1.43.0  
+      reticulate:  1.44.0  
             mgcv:  1.9.3   
          RNetCDF:  2.11.1  
          formatR:  1.14    
