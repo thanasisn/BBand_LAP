@@ -120,7 +120,9 @@ walk <- function(i, nt_hw, tot_p) {
 # MONTHLY     <- T
 MONTHLY     <- FALSE
 TEST        <- FALSE
+
 # TEST        <- TRUE
+# Main.Host   <- "mumra"
 
 SAMPLE_DAYS <- 20  ## The total number of days to sample from data
 START_DAY   <- "1993-01-01"
