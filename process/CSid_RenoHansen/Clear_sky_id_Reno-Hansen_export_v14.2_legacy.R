@@ -101,6 +101,17 @@ con <- dbConnect(duckdb(dbdir = DB_BROAD, read_only = TRUE))
 
 DATA <- tbl(con, "LAP")
 
+##  Set flag for sky conditions  -----------------------------------------------
+##  This is also set in Trends_A_00_raw_data
+DATA <- DATA |>
+  mutate(
+    SKY := case_when(
+      CSRHv14_2_flag == 0 ~ "Clear",
+      CSRHv14_2_flag != 0 ~ "Cloud",
+      .default = as.character(NA)
+    ),
+  )
+
 ## Fix data version to use!!!
 EXP  <- DATA |> select(Date, year, starts_with("CSRHv14_2") & contains("flag"), SKY)
 
@@ -114,7 +125,6 @@ for (ay in yearstoexp) {
   setorder(tmp, Date)
   efile <- paste0("/home/athan/BBand_LAP/REPORTS/EXPORTS/", "CSRHv14_2_", ay)
   write_dat(tmp, efile)
-
 
   ## export to matrix
   ## FOR RADMON
