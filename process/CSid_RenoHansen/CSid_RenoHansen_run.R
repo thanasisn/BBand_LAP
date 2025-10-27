@@ -13,7 +13,7 @@ dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 library(rmarkdown)
 
 ## Run every nth day
-run_days <- 10
+run_days <- 5
 
 ## Get shell arguments
 args <- commandArgs(trailingOnly = TRUE)

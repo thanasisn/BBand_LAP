@@ -137,9 +137,15 @@ for (ay in yearstoexp) {
   tmp[SKY == "Cloud", SKY := 1]
   tmp[is.na(SKY),     SKY := 9]
 
-  exp   <- dcast(tmp, minute ~ DOY, value.var = "SKY")
-  efile <- paste0("/media/raddata_cloud_flags/", "CSRHv14_2_", ay, ".csv")
-  write.table(format(exp), efile, col.names = T, row.names = F, sep = ", ", quote = F)
+  if (dir.exists("/media/raddata_cloud_flags")) {
+    exp   <- dcast(tmp, minute ~ DOY, value.var = "SKY")
+    efile <- paste0("/media/raddata_cloud_flags/", "CSRHv14_2_", ay, ".csv")
+    write.table(format(exp), efile, col.names = T, row.names = F, sep = ", ", quote = F)
+  } else {
+    exp   <- dcast(tmp, minute ~ DOY, value.var = "SKY")
+    efile <- paste0("/home/athan/BBand_LAP/REPORTS/EXPORTS/", "CSRHv14_2_", ay, ".csv")
+    write.table(format(exp), efile, col.names = T, row.names = F, sep = ", ", quote = F)
+  }
 }
 
 #+ Clean_exit, echo=FALSE
