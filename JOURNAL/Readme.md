@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Fri Sep 19 12:17:09 PM EEST 2025 -->
+<!-- Added by: athan, at: Fri Oct 31 12:00:38 EET 2025 -->
 
 <!--te-->
 
@@ -1625,6 +1625,19 @@ Cleaning of instruments at
 
 
 
+## 2025-10-31 11:50 EET [ThanasisN]
+
+Instruments cleaned at 
+
+11:44 -- 11:46 LT
+
+09:44 -- 09:46 UTC
+
+
+
+
+
+
 :::
 
 
@@ -1710,21 +1723,21 @@ List of tags
 
 New List of tags
 ============
+      1 CSid
+      1 INCcm21
       1 brewers
-      7 broadband
+      8 broadband
       1 ccd
      30 chp1
-     26 cleaning
+     27 cleaning
       1 cleanning
       1 clear_sky
      10 cm21
-      1 CSid
       1 data_corruption_certain
      12 data_loss
       2 down_time
       1 duckdb
       5 error
-      1 INCcm21
       2 inclined
       4 leveling
      14 problem
