@@ -39,6 +39,14 @@ if (FORCE || as.numeric(Sys.Date()) %% run_days == 0)
            output_dir = output_dir)
   })
 
+  try({
+    source("~/BBand_LAP/process/CSid_RenoHansen/Clear_sky_id_Reno-Hansen_apply_v14.2_legacy.R")
+  })
+
+  try({
+    source("~/BBand_LAP/process/CSid_RenoHansen/Clear_sky_id_Reno-Hansen_export_v14.2_legacy.R")
+  })
+  
   ##  Run tests  -----------------------------------------------------------------
 
   # source("~/BBand_LAP/process/QCRad_LongShi/QCRad_LongShi_T02_v10.R")
