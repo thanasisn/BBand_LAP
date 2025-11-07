@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-11-06 
+At: 2025-11-07 
 
  R version 4.5.0 (2025-04-11) 
 
@@ -15,7 +15,7 @@ At: 2025-11-06
            tools:  4.5.0   
               fs:  1.6.6   
           pander:  0.6.6   
-         stringr:  1.5.2   
+         stringr:  1.6.0   
              zoo:  1.8.14  
            arrow:  22.0.0  
            tidyr:  1.3.1   
@@ -48,7 +48,7 @@ At: 2025-11-06
           lmtest:  0.9.40  
        tidyquant:  1.0.11  
            akima:  0.6.3.6 
-           purrr:  1.1.0   
+           purrr:  1.2.0   
             cloc:  0.3.5   
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
