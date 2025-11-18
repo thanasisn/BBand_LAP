@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-11-17 
+At: 2025-11-18 
 
  R version 4.5.0 (2025-04-11) 
 
@@ -19,10 +19,10 @@ At: 2025-11-17
              zoo:  1.8.14  
            arrow:  22.0.0  
            tidyr:  1.3.1   
-         ggplot2:  4.0.0   
+         ggplot2:  4.0.1   
             doMC:  1.3.8   
          foreach:  1.5.2   
-      reticulate:  1.44.0  
+      reticulate:  1.44.1  
             mgcv:  1.9.4   
          RNetCDF:  2.11.1  
          formatR:  1.14    
