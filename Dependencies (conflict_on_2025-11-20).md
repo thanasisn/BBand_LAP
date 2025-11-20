@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-11-20 
+At: 2025-11-19 
 
  R version 4.5.0 (2025-04-11) 
 
@@ -9,7 +9,7 @@ At: 2025-11-20
       data.table:  1.17.8  
           dbplyr:  2.5.1   
            dplyr:  1.1.4   
-          duckdb:  1.4.2   
+          duckdb:  1.4.1   
            knitr:  1.50    
        lubridate:  1.9.4   
            tools:  4.5.0   
