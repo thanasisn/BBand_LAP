@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-11-24 
+At: 2025-11-25 
 
  R version 4.5.0 (2025-04-11) 
 
@@ -35,7 +35,7 @@ At: 2025-11-24
          forcats:  1.0.1   
           pracma:  2.4.6   
     RColorBrewer:  1.1.3   
-          digest:  0.6.38  
+          digest:  0.6.39  
         filelock:  1.0.3   
           scales:  1.4.0   
             base:  4.5.0   
