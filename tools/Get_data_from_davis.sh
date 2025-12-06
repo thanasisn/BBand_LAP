@@ -18,24 +18,25 @@ TARGET_DB="$HOME/DATA_RAW/LAPWeath/LAP_roof/LAP_AUTH_davis.sdb"
 TARGET_FL="$HOME/DATA_RAW/LAPWeath/LAP_roof/LAP_AUTH_davis.csv"
 CONFIG_DR="$HOME/DATA_RAW/LAPWeath/LAP_roof/weewx_etc"
 
-##  Copy Davis data
+echo " -- Copy Davis data -- "
 cp -auv              "$SOURCE_DB"                            "$TARGET_DB"
 
-##  Dump DB to CSV
+echo " -- Dump weewx DB to CSV -- "
 sqlite3 -header -csv "$TARGET_DB" "select * from archive;" > "$TARGET_FL"
 
-##  Copy configurations
+echo " -- Copy weewx configurations -- "
 rsync -rah           "/etc/weewx/"                           "$CONFIG_DR"
 
-##  Upload
+echo " -- Upload weewx DB and CSV to google drive -- "
 bwlim=500  # if not set to 110
 rclone="$HOME/PROGRAMS/rclone"
 config="$HOME/Documents/rclone.conf"
-otheropt=" --checkers=20 --delete-before --stats=300s "
+otheropt=" --checkers=20 --delete-before --stats=30s "
 bwlimit=" --bwlimit=${bwlim}k "
 
 "${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$TARGET_DB"                                          "lapauththanasis:/Public/LAP_Davis"
 "${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$TARGET_FL"                                          "lapauththanasis:/Public/LAP_Davis"
 "${rclone}" ${otheropt} ${bwlimit} --config "$config" copy "$HOME/DATA_RAW/LAPWeath/LAP_roof/LAP_AUTH_davis.md"  "lapauththanasis:/Public/LAP_Davis"
 
+echo " ** DAVIS DATA PROCESS END ** "
 exit 0
