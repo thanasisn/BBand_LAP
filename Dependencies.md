@@ -1,10 +1,10 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2025-12-06 
+At: 2025-12-07 
 
  R version 4.5.0 (2025-04-11) 
 
-        bookdown:  0.45    
+        bookdown:  0.46    
        rmarkdown:  2.30    
       data.table:  1.17.8  
           dbplyr:  2.5.1   
