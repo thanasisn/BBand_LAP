@@ -93,7 +93,8 @@ DATOUT     <- "~/DATA/CHP1_LAP.DIR/"
 OTHEREXPOR <- "~/ZHOST/"
 
 MIN_YEAR  <- 2016
-MAX_YEAR  <- 2024
+MAX_YEAR  <- 2025
+## TODO !!!! 2025 has not been screened !!!!
 yearstodo <- MIN_YEAR:MAX_YEAR
 
 tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y"))
