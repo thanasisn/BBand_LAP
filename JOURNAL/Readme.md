@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Fri Oct 31 12:00:38 EET 2025 -->
+<!-- Added by: athan, at: Fri Dec 12 10:20:20 EET 2025 -->
 
 <!--te-->
 
@@ -1632,6 +1632,19 @@ Instruments cleaned at
 11:44 -- 11:46 LT
 
 09:44 -- 09:46 UTC
+
+
+
+
+
+
+## 2025-12-12 10:02 EET [ThanasisN]
+
+Broadband and spectral windows cleaned at
+
+09:48 -- 09:50 LT
+
+07:48 -- 07:50 UTC  
 
 
 
