@@ -26,25 +26,23 @@ $(TARGET): Makefile Readme.md
 	  --to              pdf           \
 	  --lua-filter      .columns.lua  \
 	  --pdf-engine      xelatex       \
-	  --pdf-engine-opt  -shell-escape \
+	  --pdf-engine-opt  "-shell-escape" \
 	  --out             '$@'          \
 	  Readme.md
 
-	  #--toc                           \
 
-## create doc file
-TARGET = Journal.odt
-odt: $(TARGET)
-$(TARGET): Makefile Readme.md
-	-pandoc                           \
-	  --standalone                    \
-	  --metadata-file   .index.yaml   \
-	  --from            markdown      \
-	  --to              odt           \
-	  --out             '$@'          \
-	  Readme.md
+# ## create doc file
+# TARGET = Journal.odt
+# odt: $(TARGET)
+# $(TARGET): Makefile Readme.md
+# 	-pandoc                           \
+# 	  --standalone                    \
+# 	  --metadata-file   .index.yaml   \
+# 	  --from            markdown      \
+# 	  --to              odt           \
+# 	  --out             '$@'          \
+# 	  Readme.md
 
-	  #--toc                           \
 
 ## create html file
 TARGET = Journal.html
@@ -60,6 +58,4 @@ $(TARGET): Makefile Readme.md
 	  --out             '$@'          \
 	  Readme.md
 
-	  # --template        .easy-pandoc-templates-master/html/uikit.html \
-	  # --toc                           \
 
