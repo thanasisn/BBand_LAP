@@ -283,7 +283,7 @@ for (ap in daystodo) {
                    name   = "Excluded CM21 in DB",
                    text   = paste(gather[!cm21_bad_data_flag %in% c("empty", "pass"), cm21_bad_data_flag]),
                    hoverinfo = 'text',
-                   marker = list(color = "red", symbol = "circle-x-opem", size = 10),
+                   marker = list(color = "red", symbol = "circle-x-open", size = 10),
                    mode   = 'markers', type = "scatter")
 
   fig <- add_trace(fig,
@@ -296,14 +296,29 @@ for (ap in daystodo) {
                    mode   = 'markers', type = "scatter")
 
 
-
   fig <- layout(fig, legend = list(x = 0.85, y = 0.95, bgcolor = 'rgba(75,75,75,0.3)'))
   # fig <- layout(fig, xaxis  = list(showcrossline = T))
   # fig <- layout(fig, hovermode = "x unified")
-  fig <- layout(fig, hovermode = "x")
+  fig <- layout(fig, hovermode = "x",
+                annotations = list(
+                  list(
+                    text =  paste(toplot),
+                    xref = "paper",
+                    yref = "paper",
+                    x =     0.01,
+                    y = 1 - 0.01,
+                    xanchor = "left",
+                    yanchor = "top",
+                    showarrow = FALSE,
+                    font = list(size = 14, color = "black")
+                  )
+                )
+  )
+
+
 
   # print(fig)
-  # show (fig)
+  # show(fig)
   # stop()
 
   # Generate random file name
