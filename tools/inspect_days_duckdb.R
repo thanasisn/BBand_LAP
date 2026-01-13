@@ -154,10 +154,8 @@ for (ap in daystodo) {
   # plot(gather$Date, gather$CM21_sig * cm21factor(gather$Date), type = "l", col = 2)
   # lines(gather$Date, gather$CM21_sig_wo_dark * cm21factor(gather$Date), type = "l", col = 3)
 
-
-
   ## keep signal for debugging
-  gather$GLBraw <- gather$CM21_sig_wo_dark
+  gather$GLBraw     <- gather$CM21_sig_wo_dark
 
   ## convert to radiation
   gather$GLB_otf    <- gather$CM21_sig    * cm21factor(gather$Date)
@@ -197,7 +195,7 @@ for (ap in daystodo) {
   ## Direct with out dark on the fly
   fig <- add_trace(fig, x = gather$Date, y = gather$DIR_otf,
                    name = "Direct beam on-the-fly",
-                   line = list(color = "cyan"),
+                   line = list(color = "blue"),
                    text = paste(format(gather$Date, "%F %R"), "\n", "DBI F:", round(gather$DIR_otf, 1), " SZ:", round(gather$SZA, 1), "AZ:", round(gather$Azimuth, 1)),
                    hoverinfo = 'text',
                    mode = "lines", type = "scatter")
@@ -304,8 +302,6 @@ for (ap in daystodo) {
   # fig <- layout(fig, hovermode = "x unified")
   fig <- layout(fig, hovermode = "x")
 
-
-  # fig
   # print(fig)
   # show (fig)
   # stop()

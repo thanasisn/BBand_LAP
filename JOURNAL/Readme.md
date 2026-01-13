@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Mon Jan 12 16:08:54 EET 2026 -->
+<!-- Added by: athan, at: Tue Jan 13 11:08:20 EET 2026 -->
 
 <!--te-->
 
@@ -1526,7 +1526,7 @@ Broadband and spectral instruments windows cleaning at
 
 11:05  --  11:07  LT
 
-11:05  --  11:07  UTC
+08:05  --  08:07  UTC
 
 
 
@@ -1562,7 +1562,7 @@ Clean broadband and spectral instruments at
 
 09:38  --  09:40  LT
 
-06:38  --  06:40  LT
+06:38  --  06:40  UTC
 
 
 
