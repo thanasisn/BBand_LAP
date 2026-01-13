@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2026-01-11 
+At: 2026-01-13 
 
  R version 4.5.0 (2025-04-11) 
 
@@ -39,16 +39,16 @@ At: 2026-01-11
         filelock:  1.0.3   
           scales:  1.4.0   
             base:  4.5.0   
-           rlang:  1.1.6   
+           rlang:  1.1.7   
        yardstick:  1.3.2   
          metrica:  2.1.0   
            gdata:  3.0.1   
           ggpubr:  0.6.2   
-           Hmisc:  5.2.4   
+           Hmisc:  5.2.5   
           lmtest:  0.9.40  
        tidyquant:  1.0.11  
            akima:  0.6.3.6 
-           purrr:  1.2.0   
+           purrr:  1.2.1   
             cloc:  0.3.5   
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
