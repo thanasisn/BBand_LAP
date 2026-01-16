@@ -68,7 +68,7 @@ TSI <- tbl(tsi, "LAP_TSI") |>
 ## TODO check TSI accuracy digits!!
 cat(Script.ID, ": ", "TODO Check TSI accuracy digits!\n")
 
-## Remove all TSI data from database in order to update all
+##  Remove all TSI data from database in order to update all  ------------------
 remove_column(con, "LAP", "TSI_TOA")
 remove_column(con, "LAP", "TSI_LAP")
 remove_column(con, "LAP", "TSI_source")
@@ -106,7 +106,6 @@ if (TSI |> tally() |> pull() > 0) {
 }
 
 pander::pander(tbl(con, "LAP") |> group_by(TSI_source) |> tally() |> collect())
-
 
 
 #+ Clean_exit, echo=FALSE

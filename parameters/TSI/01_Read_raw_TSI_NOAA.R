@@ -28,6 +28,7 @@ closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/01_Read_raw_TSI_NOAA.R"
+Script.ID   <- "T1"
 
 if (!interactive()) {
   pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))

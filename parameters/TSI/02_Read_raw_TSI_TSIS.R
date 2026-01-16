@@ -1,9 +1,11 @@
 #!/usr/bin/env Rscript
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Download and import TSI from TSIS
+#' # Download and import TSI from TSIS
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
+#'
+#'  Use this data to extend to current date
 #'
 #+ include=F
 
@@ -27,6 +29,7 @@ closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/02_Read_raw_TSI_TSIS.R"
+Script.ID   <- "T2"
 
 if (!interactive()) {
   pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))

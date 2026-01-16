@@ -61,8 +61,8 @@ basedir   <- "/media/sirena_lapdata_ro/archive/Bband"
 logdir    <- "~/BBand_LAP/REPORTS/LOGs/Broadbandsingal/"
 outputdir <- "~/BBand_LAP/REPORTS/DAILY/BroadBandSignal/"
 
-## use local copoy
-if (Sys.info()["nodename"] == "tyler") {
+## use local copy
+if (Sys.info()["nodename"] %in% c("tyler", "mumra")) {
   basedir   <- "~/DATA_RAW/Bband/"
 }
 
@@ -73,13 +73,12 @@ if (!file.exists(basedir)) {
   stop("Input folder missing!!!\n")
 }
 
-COLS <- c("#f27979", "#ffa640", "#4c4700", "#30bf30", "#3de6f2", "#5c33cc", "#bbace6", "#e60099")
+COLS <- c("#f27979",  "#ffa640",   "#4c4700",  "#30bf30", "#3de6f2", "#5c33cc",  "#bbace6", "#e60099")
 
 ## do this channels
-CHA <- c(    0,          1,         2,          3,         4,       5,         6,        7    )
+CHA <- c(         0,          1,           2,          3,         4,         5,          6,         7)
 ## Channels names
-##           0           1          2           3          4        5          6         7
-ORG <- c("UVA-TUVR","CM21-INC","EPPLEY-IR","CHP1-DIR","ERY-GLB","UVA-EKO","CM21-HOR","ERY-DIF")
+ORG <- c("UVA-TUVR", "CM21-INC", "EPPLEY-IR", "CHP1-DIR", "ERY-GLB", "UVA-EKO", "CM21-HOR", "ERY-DIF")
 
 ## start with all files
 allfiles <- list.files(path        = basedir,

@@ -3,8 +3,7 @@
 #'
 #' Reads Global radiation from Sirena TOT files into the database
 #'
-#'  - Reads raw resistance data
-#'  - Converts resistance to temperature
+#'  - Reads independent calculation of total irradiance
 #'
 #' **Details and source code: [`github.com/thanasisn/BBand_LAP`](https://github.com/thanasisn/BBand_LAP)**
 #'

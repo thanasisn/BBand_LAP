@@ -30,6 +30,7 @@ closeAllConnections()
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/00_download_TSI.R"
+Script.ID   <- "T0"
 
 if (!interactive()) {
   pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))

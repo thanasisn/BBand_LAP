@@ -19,7 +19,7 @@ knitr::opts_chunk$set(fig.pos   = "!ht"   )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/parameters/TSI/30_Export_LAP_TSI_legacy.R"
-Script.ID   <- "0B"
+Script.ID   <- "T12"
 
 if (!interactive()) {
   pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
