@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2026-01-16 
+At: 2026-01-17 
 
  R version 4.5.0 (2025-04-11) 
 
