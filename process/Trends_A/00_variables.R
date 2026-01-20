@@ -1,6 +1,5 @@
 
-#### Paths ####
-tag                      <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
+tag                       <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %Y" ))
 
 ## https://www.rapidtables.com/calc/time/days-in-year.html
 # Days_of_year             <- 365.25   ## Mean Julian year

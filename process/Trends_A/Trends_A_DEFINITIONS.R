@@ -6,7 +6,7 @@
 DB_BROAD  <- "~/DATA/Broad_Band/Broad_Band_LAP.duckdb"
 Main.Host <- "sagan"        ## This is the main host used to build the DB
 
-LAST_DAY  <- as.POSIXct("2025-01-01 00:00:00")  ## Move this after data QCrad procedure
+LAST_DAY  <- as.POSIXct("2026-01-01 00:00:00")  ## Move this after data QCrad procedure and data cleaning
 FIRST_DAY <- as.POSIXct("1900-01-01 00:00:00")
 
 FIBais_Az_1                   <-  58  ##  Azimuth exclusion start
