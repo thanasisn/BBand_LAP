@@ -29,7 +29,7 @@ At: 2026-01-20
          caTools:  1.18.3  
          janitor:  2.2.1   
          ggpmisc:  0.6.3   
-            ggpp:  0.5.9   
+            ggpp:  0.6.0   
            ncdf4:  1.24    
     directlabels:  2025.6.24
          forcats:  1.0.1   
