@@ -50,6 +50,7 @@ At: 2026-01-23
            akima:  0.6.3.6 
            purrr:  1.2.1   
             cloc:  0.3.5   
+             DBI:  1.2.3   
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
           plotly:  4.11.0  
