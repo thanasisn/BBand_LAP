@@ -49,7 +49,9 @@ library(reticulate, warn.conflicts = FALSE, quietly = TRUE)
 require(duckdb,     warn.conflicts = FALSE, quietly = TRUE)
 library(foreach,    warn.conflicts = FALSE, quietly = TRUE)
 library(doMC,       warn.conflicts = FALSE, quietly = TRUE)
+# use_python("/home/athan/.pyenv/shims/python")
 use_python("/usr/bin/python3")
+
 
 cat("\n Initialize params DB and/or import Sun data\n\n")
 

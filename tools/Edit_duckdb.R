@@ -95,10 +95,12 @@ tag <- paste0("Natsis Athanasios LAP AUTH ", strftime(Sys.time(), format = "%b %
 
 #+ include=TRUE, echo=T, results="asis", messages=F
 ##  Open dataset  --------------------------------------------------------------
-con <- dbConnect(duckdb(dbdir = DB_BROAD))
+con   <- dbConnect(duckdb(dbdir = DB_BROAD))
+LAP   <- tbl(con, "LAP")
+META  <- tbl(con, "META")
 
-LAP <- tbl(con, "LAP")
-
+tbl(con, "LAP")
+dbListTables(con)
 
 ## remove all data after a date
 if (FALSE) {
@@ -108,25 +110,39 @@ if (FALSE) {
 
   LAP_filtered |> summarise(max(Date, na.rm = TRUE)) |> pull()
 
+
+
   # Correct SQL query to select rows
   query <- paste0(
     "SELECT * FROM LAP WHERE Date >= '", DATELIM, "'"
   )
-
   # Execute query and get results
-  to_remove <- dbGetQuery(con, query)
+  data_remove <- dbGetQuery(con, query)
+
+
+
+  # Correct SQL query to select rows
+  query <- paste0(
+    "SELECT * FROM META WHERE Day >= '", DATELIM, "'"
+  )
+  # Execute query and get results
+  meta_remove <- dbGetQuery(con, query)
+
+
+
+
 
   # Delete all rows after DATELIM
   dbExecute(con, paste0(
     "DELETE FROM LAP WHERE Date >= '", DATELIM, "'"
   ))
 
+  dbExecute(con, paste0(
+    "DELETE FROM META WHERE Day >= '", DATELIM, "'"
+  ))
+
 }
 
-
-
-
-stop()
 
 #+ Clean_exit, echo=FALSE
 dbDisconnect(con, shutdown = TRUE); rm(con)
