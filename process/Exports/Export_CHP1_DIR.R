@@ -209,7 +209,7 @@ for (YYYY in yearstodo) {
     doy      <- yday(dateD)
 
     output <- data.frame(TIME_UT = round(TIME_UT,            digits = 4),
-                         SZA     = round(oneday$lap_sza,      digits = 2),
+                         SZA     = round(oneday$lap_sza,     digits = 2),
                          Wm2     = round(oneday$DIR_wpsm,    digits = 3),
                          st.dev  = round(oneday$DIR_SD_wpsm, digits = 3))
 
