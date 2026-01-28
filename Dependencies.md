@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2026-01-27 
+At: 2026-01-28 
 
  R version 4.5.0 (2025-04-11) 
 
@@ -53,4 +53,4 @@ At: 2026-01-27
              DBI:  1.2.3   
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
-          plotly:  4.11.0  
+          plotly:  4.12.0  
