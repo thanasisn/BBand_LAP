@@ -1,13 +1,13 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2026-02-14 
+At: 2026-02-15 
 
  R version 4.5.0 (2025-04-11) 
 
         bookdown:  0.46    
        rmarkdown:  2.30    
       data.table:  1.18.2.1
-          dbplyr:  2.5.1   
+          dbplyr:  2.5.2   
            dplyr:  1.2.0   
           duckdb:  1.4.4   
            knitr:  1.51    
@@ -22,7 +22,7 @@ At: 2026-02-14
          ggplot2:  4.0.2   
             doMC:  1.3.8   
          foreach:  1.5.2   
-      reticulate:  1.44.1  
+      reticulate:  1.45.0  
             mgcv:  1.9.4   
          RNetCDF:  2.11.1  
          formatR:  1.14    
