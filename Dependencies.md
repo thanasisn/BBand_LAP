@@ -1,6 +1,6 @@
 
 Dependencies for: ~/BBand_LAP/ 
-At: 2026-02-25 
+At: 2026-02-26 
 
  R version 4.5.0 (2025-04-11) 
 
@@ -17,7 +17,7 @@ At: 2026-02-25
           pander:  0.6.6   
          stringr:  1.6.0   
              zoo:  1.8.15  
-           arrow:  23.0.1  
+           arrow:  23.0.1.1
            tidyr:  1.3.2   
          ggplot2:  4.0.2   
             doMC:  1.3.8   
@@ -43,14 +43,14 @@ At: 2026-02-25
        yardstick:  1.3.2   
          metrica:  2.1.0   
            gdata:  3.0.1   
-          ggpubr:  0.6.2   
+          ggpubr:  0.6.3   
            Hmisc:  5.2.5   
           lmtest:  0.9.40  
        tidyquant:  1.0.11  
            akima:  0.6.3.6 
            purrr:  1.2.1   
             cloc:  0.3.5   
-             DBI:  1.2.3   
+             DBI:  1.3.0   
      htmlwidgets:  1.6.4   
         optparse:  1.7.5   
           plotly:  4.12.0  
