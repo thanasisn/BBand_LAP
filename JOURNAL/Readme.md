@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Tue Jan 13 11:08:20 EET 2026 -->
+<!-- Added by: athan, at: Thu Mar  5 07:21:42 PM EET 2026 -->
 
 <!--te-->
 
@@ -1654,6 +1654,35 @@ Broadband and spectral windows cleaned at
 :::
 
 
+\newpage
+
+# 2026
+
+::: {.columns columngap=4em column-rule="1px solid black"}
+
+# 2026
+
+
+
+## 2026-03-05 09:59 EET [ThanasisN]
+
+Instruments windows cleaned at 
+
+09:49 -- 09:51 LT
+
+07:49 -- 07:51 UTC
+
+CHP-1 was very dirty
+
+Davis rain collector cleaned. Was filled with derbies.
+
+
+
+
+
+:::
+
+
 -------
 
 
@@ -1736,21 +1765,22 @@ List of tags
 
 New List of tags
 ============
-      1 CSid
-      1 INCcm21
       1 brewers
-      8 broadband
+      9 broadband
       1 ccd
      30 chp1
-     27 cleaning
+     28 cleaning
       1 cleanning
       1 clear_sky
      10 cm21
+      1 CSid
       1 data_corruption_certain
      12 data_loss
+      1 davis
       2 down_time
       1 duckdb
       5 error
+      1 INCcm21
       2 inclined
       4 leveling
      14 problem

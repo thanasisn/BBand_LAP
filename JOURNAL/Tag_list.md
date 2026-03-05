@@ -28,21 +28,22 @@ List of tags
 
 New List of tags
 ============
-      1 CSid
-      1 INCcm21
       1 brewers
-      8 broadband
+      9 broadband
       1 ccd
      30 chp1
-     27 cleaning
+     28 cleaning
       1 cleanning
       1 clear_sky
      10 cm21
+      1 CSid
       1 data_corruption_certain
      12 data_loss
+      1 davis
       2 down_time
       1 duckdb
       5 error
+      1 INCcm21
       2 inclined
       4 leveling
      14 problem
