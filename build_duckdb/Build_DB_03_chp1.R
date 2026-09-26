@@ -37,7 +37,7 @@ Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_03_chp1.R"
 Script.ID   <- "03"
 
 ## ONLY FOR MANUAL USE
-REINPORT_RAW <- TRUE
+REINPORT_RAW <- FALSE
 
 if (!interactive()) {
   pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
