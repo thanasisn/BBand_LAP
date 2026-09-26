@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## created on 2025-01-17
 
-#### Run only the parts updating Broadbanad data, use for development
+#### Run only the parts updating Broadband data, use for development
 
 exec 9>"/dev/shm/$(basename $0).lock"
 if ! flock -n 9  ; then

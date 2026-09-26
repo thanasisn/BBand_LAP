@@ -19,7 +19,7 @@ Other journals and log exist, but are not included here.
 
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
-<!-- Added by: athan, at: Thu Mar  5 07:21:42 PM EET 2026 -->
+<!-- Added by: athan, at: Wed Jul  1 10:15:42 PM EEST 2026 -->
 
 <!--te-->
 
@@ -1680,6 +1680,62 @@ Davis rain collector cleaned. Was filled with derbies.
 
 
 
+## 2026-04-21 09:31 EEST
+
+Cleaning broadbands at 
+
+09:07 -- 09:11 LT
+
+06:07 -- 06:11 UTC
+
+All instruments in general had brown dust.
+
+The rain cover of CHP-1 was occupied by spider webs. The rain cover was cleaned with
+penetrating oil to discourage further bugs.
+
+The rain collector of Davis was removed and cleaned from debris at ~ 
+
+09:01 LT
+
+06:01 UTC
+
+
+
+
+
+## 2026-05-18 10:09 EEST [ThanasisN]
+
+CHP-1 leveled and sighting corrected ~ 10:07 LT
+
+On Saturday some paining work occurred near the instrument.
+
+
+
+
+## 2026-06-08 10:51 EEST [ThanasinN]
+
+Cleaning of broadband, Brewers and DOAS windows at 
+
+10:46 -- 10:48 LT
+
+07:46 -- 07:48 UTC
+
+
+
+
+
+## 2026-07-01 11:36 EEST [ThanasisN]
+
+Instruments windows cleaned at ~ 
+
+11:32 -- 11:34 LT
+
+08:32 -- 08:34 UTC
+
+
+
+
+
 :::
 
 
@@ -1766,27 +1822,29 @@ List of tags
 New List of tags
 ============
       1 brewers
-      9 broadband
+     11 broadband
+      1 broadbands
       1 ccd
      30 chp1
-     28 cleaning
+      1 CHP-1
+     31 cleaning
       1 cleanning
       1 clear_sky
      10 cm21
       1 CSid
       1 data_corruption_certain
      12 data_loss
-      1 davis
+      2 davis
       2 down_time
       1 duckdb
       5 error
       1 INCcm21
       2 inclined
-      4 leveling
+      5 leveling
      14 problem
       6 radmon
       1 roof
-      3 sighting
+      4 sighting
       3 silica
       6 suspicious_data
       1 test

@@ -93,7 +93,7 @@ DATOUT     <- "~/DATA/CHP1_LAP.DIR/"
 OTHEREXPOR <- "~/ZHOST/"
 
 MIN_YEAR  <- 2016
-MAX_YEAR  <- 2025
+MAX_YEAR  <- 2026
 ## TODO 2025 have not been screened
 yearstodo <- MIN_YEAR:MAX_YEAR
 
@@ -106,6 +106,9 @@ sun <- dbConnect(duckdb(dbdir = DB_LAP, read_only = TRUE))
 
 LAP <- tbl(con, "LAP")
 SUN <- tbl(sun, "params")
+
+## TEST
+yearstodo <- 2026
 
 
 for (YYYY in yearstodo) {
@@ -190,8 +193,10 @@ for (YYYY in yearstodo) {
   yearfolder <- paste0(DATOUT, "/", YYYY)
   dir.create(yearfolder, showWarnings = F)
 
-  ## Export each day ---------------------------------------------------------
+  ## Export each day -----------------------------------------------------------
   alldays <- sort(unique(year_data$Day))
+
+  stop()
 
   for (dd in alldays) {
     dateD <- as.Date(dd, origin = "1970-01-01")
@@ -278,9 +283,9 @@ for (YYYY in yearstodo) {
              col = c("green", "blue"),  cex = 0.8)
       legend("topleft", tag, bty = "n", cex = 0.8)
 
-    }## if data
+    } ## if data
     rm(output)
-  }## alldays
+  } ## all days
   dev.off()
 }
 

@@ -1,7 +1,7 @@
 # /* !/usr/bin/env Rscript */
 # /* Copyright (C) 2024 Athanasios Natsis <natsisphysicist@gmail.com> */
 #'
-#' Read CHP-1 signal from `[0-9]*03.LAP$`
+#' Reads CHP-1 signal from `[0-9]*03.LAP$`
 #'
 #' Populates:
 #'  - CHP1_sig
@@ -35,6 +35,9 @@ Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/build_duckdb/Build_DB_03_chp1.R"
 Script.ID   <- "03"
+
+## ONLY FOR MANUAL USE
+REINPORT_RAW <- TRUE
 
 if (!interactive()) {
   pdf(file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
@@ -89,18 +92,28 @@ inp_filelist <- right_join(inp_filelist,
                            by = "Day") |>
   filter(!is.na(chp1_basename))
 
-## add only files not in the metadata
-if (dbExistsTable(con, "META") &
-    any(dbListFields(con, "META") %in% "chp1_basename")) {
-  inp_filelist <- anti_join(inp_filelist,
-                            tbl(con, "META") |>
-                              filter(!is.na(chp1_basename)) |>
-                              select(Day) |>
-                              collect(),
-                            by = "Day") |>
-    filter(!is.na(chp1_basename))
+
+if (REINPORT_RAW) {
+
+  cat("\n**RE-IMPORT ALL RAW FILES**\n")
+
+} else {
+
+  cat("\n**Select files to import**\n")
+  ## add only files not in the metadata
+  if (dbExistsTable(con, "META") &
+      any(dbListFields(con, "META") %in% "chp1_basename")) {
+    inp_filelist <- anti_join(inp_filelist,
+                              tbl(con, "META") |>
+                                filter(!is.na(chp1_basename)) |>
+                                select(Day) |>
+                                collect(),
+                              by = "Day") |>
+      filter(!is.na(chp1_basename))
+  }
+  setorder(inp_filelist, Day)
+
 }
-setorder(inp_filelist, Day)
 
 cat("\n**Parse:",paste(nrow(inp_filelist), "CHP-1 files**\n\n"))
 

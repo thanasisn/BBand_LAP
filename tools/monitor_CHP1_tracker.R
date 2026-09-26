@@ -26,6 +26,8 @@ Sys.setenv(RETICULATE_PYTHON = "/usr/bin/python3")
 use_python("/usr/bin/python3")
 source_python("~/CODE/conky/scripts/broadband_data_sub.py")
 
+cat("\n--------------------------------------------------\n")
+
 ## Override notification function
 options(error = function() {
         system(paste("notify-send -u critical -t 30000 'BROAD BAND NOTIFICATION FAILED'", Script.Name))
@@ -88,5 +90,7 @@ if (NOTIFY) {
 } else {
     cat("\nOPERATION IS NORMAL\n\n")
 }
+
+cat("--------------------------------------------------\n")
 
 #' **END**

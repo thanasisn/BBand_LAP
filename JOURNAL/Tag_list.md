@@ -29,27 +29,29 @@ List of tags
 New List of tags
 ============
       1 brewers
-      9 broadband
+     11 broadband
+      1 broadbands
       1 ccd
      30 chp1
-     28 cleaning
+      1 CHP-1
+     31 cleaning
       1 cleanning
       1 clear_sky
      10 cm21
       1 CSid
       1 data_corruption_certain
      12 data_loss
-      1 davis
+      2 davis
       2 down_time
       1 duckdb
       5 error
       1 INCcm21
       2 inclined
-      4 leveling
+      5 leveling
      14 problem
       6 radmon
       1 roof
-      3 sighting
+      4 sighting
       3 silica
       6 suspicious_data
       1 test
