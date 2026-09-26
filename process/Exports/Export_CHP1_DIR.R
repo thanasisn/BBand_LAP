@@ -110,7 +110,6 @@ SUN <- tbl(sun, "params")
 ## TEST
 yearstodo <- 2026
 
-
 for (YYYY in yearstodo) {
 
   pdf(file = paste0(DATOUT, "/", "CurrentDataPlots_", YYYY, ".pdf"))
@@ -196,7 +195,6 @@ for (YYYY in yearstodo) {
   ## Export each day -----------------------------------------------------------
   alldays <- sort(unique(year_data$Day))
 
-  stop()
 
   for (dd in alldays) {
     dateD <- as.Date(dd, origin = "1970-01-01")
@@ -235,7 +233,7 @@ for (YYYY in yearstodo) {
                 row.names = FALSE,
                 eol = "\r\n")
 
-    ## make sure has consistent line endings
+    ## if needed make sure has consistent line endings
     # system(paste("unix2dos ", filename),
     #        ignore.stdout = TRUE)
 

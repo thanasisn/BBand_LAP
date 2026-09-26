@@ -45,7 +45,6 @@ tic <- Sys.time()
 Script.Name <- "~/BBand_LAP/tools/Plot_broad_band.R"
 
 if (!interactive()) {
-  pdf( file = paste0("~/BBand_LAP/REPORTS/RUNTIME/", basename(sub("\\.R$", ".pdf", Script.Name))))
   sink(file = paste0("~/BBand_LAP/REPORTS/LOGs/", basename(sub("\\.R$", ".out", Script.Name))), split = TRUE)
 }
 
@@ -118,6 +117,7 @@ Date <- seq(as.POSIXct("2000-01-01 00:00:30"),
 
 ## override for this years
 all_years <- all_years[all_years >= START_YEAR]
+
 
 for (ay in all_years) {
   year_dates <- all_dates[year(all_dates) == ay]
